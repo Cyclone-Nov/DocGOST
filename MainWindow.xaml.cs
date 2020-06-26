@@ -335,34 +335,50 @@ namespace DocGOST
                             {
                                 string[] schStrArray = schStr.Split(new Char[] { '|' });
                                 for (int i = 0; i < schStrArray.Length - 1; i++)
-                                {                                    
+                                {
                                     if (isComponent == true)
                                     {
                                         if (schStrArray[i].Length >= 23)
-                                            if (schStrArray[i].Substring(0, 23) == "COMPONENTKINDVERSION2=5") isNoBom = true;
+                                        {
+                                            string ver = schStrArray[i].Substring(0, 23).ToUpper();
+                                            if (ver == "COMPONENTKINDVERSION2=5") isNoBom = true;
+                                        }
 
-                                        if (schStrArray[i].Length >= 15) 
-                                            if (schStrArray[i].Substring(0, 14) == "CURRENTPARTID=")
-                                                if ((schStrArray[i].Substring(0, 15) != "CURRENTPARTID=1") | (schStrArray[i].Length > 15)) isFirstPartOfComponent = false;
+                                        if (schStrArray[i].Length >= 15)
+                                        {
+                                            string partid = schStrArray[i].Substring(0, 14).ToUpper();
+                                            if (partid == "CURRENTPARTID=")
+                                            {
+                                                string partid1 = schStrArray[i].Substring(0, 15).ToUpper();
+                                                if ((partid1 != "CURRENTPARTID=1") | (schStrArray[i].Length > 15)) isFirstPartOfComponent = false;
+                                            }
+                                        }
 
-                                        if ((schStrArray[i].Length > 5) & (schStrArray[i + 1].Length > 5))
-                                            if ((schStrArray[i].Substring(0, 5) == "TEXT=") & (schStrArray[i + 1].Substring(0, 5) == "NAME="))
+                                        if ((schStrArray[i].Length > 5) && (schStrArray[i + 1].Length > 5))
+                                        {
+                                            string text = schStrArray[i].Substring(0, 5).ToUpper();
+                                            string name = schStrArray[i + 1].Substring(0, 5).ToUpper();
+                                            if ((text == "TEXT=") && (name == "NAME="))
                                             {
                                                 ComponentProperties prop = new ComponentProperties();
                                                 prop.Name = schStrArray[i + 1].Substring(5);
                                                 prop.Text = schStrArray[i].Substring(5);
                                                 if (isNoBom == false)
-                                                //if ((prop.Name == "Designator") | (prop.Name == "SType") | (prop.Name == "Docum") | (prop.Name == "Note"))
-                                                componentPropList.Add(prop);
+                                                    //if ((prop.Name == "Designator") | (prop.Name == "SType") | (prop.Name == "Docum") | (prop.Name == "Note"))
+                                                    componentPropList.Add(prop);
                                             }
+                                        }
 
                                         if (schStrArray[i].Length >= 8)
-                                            if ((schStrArray[i].Substring(0, 7) == "HEADER=") |((schStrArray[i].Substring(0, 8) == "RECORD=1")&(schStrArray[i].Length==8))) //Считаем, что описание каждого компонента заканчивается этой фразой
+                                        {
+                                            string header = schStrArray[i].Substring(0, 7).ToUpper();
+                                            string record = schStrArray[i].Substring(0, 8).ToUpper();
+                                            if ((header == "HEADER=") || ((record == "RECORD=1") && (schStrArray[i].Length == 8))) //Считаем, что описание каждого компонента заканчивается этой фразой
                                             {
-                                                if ((isNoBom == false) & (componentPropList.Count > 0) & (isFirstPartOfComponent==true))
+                                                if ((isNoBom == false) && (componentPropList.Count > 0) && (isFirstPartOfComponent == true))
                                                 {
                                                     componentsList.Add(componentPropList);
-                                                    
+
                                                     numberOfStrings++;
                                                 }
 
@@ -372,12 +388,17 @@ namespace DocGOST
 
                                                 componentPropList = new List<ComponentProperties>();
                                             }
+
+                                        }
                                     }
                                     else if (isComponent == false)
                                     {
                                         //Запись полей основной надписи в базу данных проекта, если они встречаются в файле Sch:
-                                        if ((schStrArray[i].Length > 5) & (schStrArray[i + 1].Length > 5))
-                                            if ((schStrArray[i].Substring(0, 5) == "TEXT=") & (schStrArray[i + 1].Substring(0, 5) == "NAME="))
+                                        if ((schStrArray[i].Length > 5) && (schStrArray[i + 1].Length > 5))
+                                        {
+                                            string txt = schStrArray[i].Substring(0, 5).ToUpper();
+                                            string name = schStrArray[i + 1].Substring(0, 5).ToUpper();
+                                            if ((txt == "TEXT=") && (name == "NAME="))
                                             {
                                                 ComponentProperties prop = new ComponentProperties();
                                                 prop.Name = schStrArray[i + 1].Substring(5);
@@ -385,11 +406,15 @@ namespace DocGOST
 
                                                 otherPropList.Add(prop);
                                             }
+                                        }
                                     }
                                     //Теперь ищем все записи компонента и сохраняем их
                                     if (schStrArray[i].Length == 8)
-                                        if (schStrArray[i].Substring(0, 8) == "RECORD=1") //Считаем, что описание каждого компонента начинается этой фразой
+                                    {
+                                        string record = schStrArray[i].Substring(0, 8).ToUpper();
+                                        if (record == "RECORD=1") //Считаем, что описание каждого компонента начинается этой фразой
                                             isComponent = true;
+                                    }
                                 }
                             }
 
@@ -577,18 +602,18 @@ namespace DocGOST
                         {
                             DesignatorDescriptionItem desDescr = designDB.GetItem(j + 1);
 
-                            if (tempPerechen.designator.Length>=2)
-                            if ((desDescr.Designator == tempPerechen.designator.Substring(0, 1)) | (desDescr.Designator == tempPerechen.designator.Substring(0, 2)))
-                            {
-                                tempPerechen.group = desDescr.Group.Substring(0, 1).ToUpper() + desDescr.Group.Substring(1, desDescr.Group.Length - 1).ToLower();
-                                tempPerechen.groupPlural = desDescr.GroupPlural.Substring(0, 1).ToUpper() + desDescr.GroupPlural.Substring(1, desDescr.GroupPlural.Length - 1).ToLower();
+                            if (tempPerechen.designator.Length >= 2)
+                                if ((desDescr.Designator == tempPerechen.designator.Substring(0, 1)) | (desDescr.Designator == tempPerechen.designator.Substring(0, 2)))
+                                {
+                                    tempPerechen.group = desDescr.Group.Substring(0, 1).ToUpper() + desDescr.Group.Substring(1, desDescr.Group.Length - 1).ToLower();
+                                    tempPerechen.groupPlural = desDescr.GroupPlural.Substring(0, 1).ToUpper() + desDescr.GroupPlural.Substring(1, desDescr.GroupPlural.Length - 1).ToLower();
 
-                                group = tempPerechen.group;
+                                    group = tempPerechen.group;
 
-                                tempSpecification.group = group;
-                                tempVedomost.group = group;
-                                tempVedomost.groupPlural = tempPerechen.groupPlural;
-                            }
+                                    tempSpecification.group = group;
+                                    tempVedomost.group = group;
+                                    tempVedomost.groupPlural = tempPerechen.groupPlural;
+                                }
                         }
 
 
