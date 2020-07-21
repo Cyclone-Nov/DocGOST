@@ -110,6 +110,9 @@
     <Compile Include="Common\Commands.cs" />
     <Compile Include="Common\DispatcherHelper.cs" />
     <Compile Include="Common\ObservableProperty.cs" />
+    <Compile Include="ViewModels\ElementsList\ElementsListTableVM.cs" />
+    <Compile Include="ViewModels\Specification\SpecTableVM.cs" />
+    <Compile Include="ViewModels\Vedomost\VedomostTableVM.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
