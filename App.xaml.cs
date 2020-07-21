@@ -13,5 +13,18 @@ namespace GostDOC
     /// </summary>
     public partial class App : Application
     {
+        static App()
+        {
+            DispatcherHelper.Initialize();
+        }
+        private void ApplicationStart(object sender, StartupEventArgs e)
+        {
+
+        }
+
+        private void ApplicationExit(object sender, ExitEventArgs e)
+        {
+            DispatcherHelper.Reset();
+        }
     }
 }
