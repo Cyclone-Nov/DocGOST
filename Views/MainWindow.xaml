@@ -3,9 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:GostDOC"
+        xmlns:local="clr-namespace:GostDOC.ViewModels"
         mc:Ignorable="d"
+        DataContext="{StaticResource MainViewModel}"
         Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -86,20 +89,20 @@
             </TreeViewItem>
         </TreeView>
 
-        <DockPanel Grid.Row="2" LastChildFill="False">
+        <DockPanel Grid.Row="2" Grid.Column="0" LastChildFill="False">
             <Button DockPanel.Dock="Left" Width="100" Margin="5">Удалить группу</Button>
         </DockPanel>
 
         <DataGrid Grid.Row="1" Grid.Column="1" SelectionMode="Extended" SelectionUnit="FullRow" SelectedItem="{Binding SelectedItem.Value}" 
-                          AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*">
+                          AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*" ItemsSource="{Binding SpecificationTable}">
             <DataGrid.Columns>
-                <DataGridComboBoxColumn Header="Формат" />
-                <DataGridComboBoxColumn Header="Зона"/>
-                <DataGridComboBoxColumn Header="Позиция"/>
-                <DataGridComboBoxColumn Header="Обозначение"/>
-                <DataGridComboBoxColumn Header="Наименование"/>
-                <DataGridComboBoxColumn Header="Количество"/>
-                <DataGridComboBoxColumn Header="Примечание"/>
+                <DataGridTextColumn Header="Формат" Binding="{Binding Path=Format.Value}"/>
+                <DataGridTextColumn Header="Зона" Binding="{Binding Path=Zone.Value}"/>
+                <DataGridTextColumn Header="Позиция" Binding="{Binding Path=Position.Value}"/>
+                <DataGridTextColumn Header="Обозначение" Binding="{Binding Path=Designation.Value}"/>
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Path=Name.Value}"/>
+                <DataGridTextColumn Header="Количество" Binding="{Binding Path=Quantity.Value}"/>
+                <DataGridTextColumn Header="Примечание" Binding="{Binding Path=Note.Value}" />
             </DataGrid.Columns>
         </DataGrid>
 
