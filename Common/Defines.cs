@@ -4,9 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GostDOC.ViewModels
+namespace GostDOC.Common
 {
-    class MainWindowViewModel
+    enum DocumentType
     {
+        Elements,
+        Specification,
+        Bill,
+        Bill_D27,
+        None
     }
 }

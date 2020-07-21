@@ -4,29 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GostDOC.ViewModels.ElementsList
+namespace GostDOC.ViewModels
 {
-    class ElementsListTableVM
+    class ElementsEntryVM
     {
         /// <summary>
         /// Позиционное обозначение
         /// </summary>
-        private ObservableProperty<string> PositionDesignation = new ObservableProperty<string>();
+        public ObservableProperty<string> PositionDesignation = new ObservableProperty<string>();
 
         /// <summary>
         /// Наименование
         /// </summary>
-        private ObservableProperty<string> Name = new ObservableProperty<string>();
-        
+        public ObservableProperty<string> Name = new ObservableProperty<string>();
+
         /// <summary>
         /// Количество
         /// </summary>
-        private ObservableProperty<uint> Quantity = new ObservableProperty<uint>();
-        
+        public ObservableProperty<uint> Quantity = new ObservableProperty<uint>();
+
         /// <summary>
         /// Примечание
         /// </summary>
-        private ObservableProperty<string> Note = new ObservableProperty<string>();
+        public ObservableProperty<string> Note = new ObservableProperty<string>();
 
     }
 }

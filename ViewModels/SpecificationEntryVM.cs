@@ -1,6 +1,6 @@
 using System.Security.Policy;
 
-namespace GostDOC.ViewModels.Specification
+namespace GostDOC.ViewModels
 {
     class SpecificationEntryVM
     {
@@ -15,18 +15,9 @@ namespace GostDOC.ViewModels.Specification
         public ObservableProperty<string> Zone { get; } = new ObservableProperty<string>();
 
         /// <summary>
-        /// Не знаю что именно должно быть в позиции...
-        /// </summary>
-        public enum PositionEnum
-        {
-            Auto,
-            NonAuto
-        }
-
-        /// <summary>
         /// Количество
         /// </summary>
-        public ObservableProperty<PositionEnum> Position { get; } = new ObservableProperty<PositionEnum>();
+        public ObservableProperty<string> Position { get; } = new ObservableProperty<string>();
 
         /// <summary>
         /// Обозначение
