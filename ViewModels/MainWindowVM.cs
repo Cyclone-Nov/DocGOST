@@ -26,6 +26,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<BillEntryVM> BillSelectedItem { get; } = new ObservableProperty<BillEntryVM>();
         public ObservableCollection<BillEntryVM> BillTable { get; } = new ObservableCollection<BillEntryVM>();
+        public ObservableProperty<string> CurrentPdfPath { get; } = new ObservableProperty<string>();
 
         #region Commands
         public ICommand OpenFilesCmd => new Command(OpenFiles);

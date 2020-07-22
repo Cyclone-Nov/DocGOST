@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:common="clr-namespace:GostDOC.Common"
         xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
         xmlns:uc="clr-namespace:GostDOC.UserControls"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
@@ -117,8 +118,8 @@
 
         <GridSplitter Grid.Column="3" Grid.RowSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ResizeDirection="Columns" Margin="0,7,0,7" />
 
-        <Canvas Grid.Column="4" Grid.Row="1" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock>PDF</TextBlock>
-        </Canvas>
+        <Grid Grid.Column="4" Grid.Row="1" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <WebBrowser common:WebBrowserUtility.BindableSource="{Binding CurrentPdfPath.Value}"></WebBrowser>
+        </Grid>
     </Grid>
 </Window>
