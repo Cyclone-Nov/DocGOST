@@ -110,7 +110,7 @@
 
         <GridSplitter Grid.Column="1" Grid.RowSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ResizeDirection="Columns" Margin="0,7,0,7" />
 
-        <Grid Grid.Row="1" Grid.Column="2" Margin="5">
+        <Grid Grid.Row="1" Grid.Column="2">
             <uc:Specification Visibility="{Binding IsSpecificationTableVisible.Value, Converter={StaticResource b2v}}" />
             <uc:Bill Visibility="{Binding IsBillTableVisible.Value, Converter={StaticResource b2v}}" />
         </Grid>

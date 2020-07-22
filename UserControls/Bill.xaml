@@ -13,8 +13,8 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
-        
-        <DataGrid x:Name="billDataGrid" SelectionMode="Extended" SelectionUnit="FullRow" 
+
+        <DataGrid x:Name="billDataGrid" Margin="5" SelectionMode="Extended" SelectionUnit="FullRow" 
                   AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*"
                   SelectedItem="{Binding BillSelectedItem.Value}"
                   ItemsSource="{Binding BillTable}">

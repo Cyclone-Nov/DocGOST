@@ -20,12 +20,12 @@ namespace GostDOC.ViewModels
         private DocumentType _selectedDoc = DocumentType.None;
         private DocManager _docManager = DocManager.Instance;
 
-        public ObservableProperty<bool> IsSpecificationTableVisible { get; set; } = new ObservableProperty<bool>(false);
-        public ObservableProperty<SpecificationEntryVM> SpecificationSelectedItem { get; set; } = new ObservableProperty<SpecificationEntryVM>();
-        public ObservableCollection<SpecificationEntryVM> SpecificationTable { get; set; } = new ObservableCollection<SpecificationEntryVM>();
-        public ObservableProperty<bool> IsBillTableVisible { get; set; } = new ObservableProperty<bool>(false);
-        public ObservableProperty<BillEntryVM> BillSelectedItem { get; set; } = new ObservableProperty<BillEntryVM>();
-        public ObservableCollection<BillEntryVM> BillTable { get; set; } = new ObservableCollection<BillEntryVM>();
+        public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<SpecificationEntryVM> SpecificationSelectedItem { get; } = new ObservableProperty<SpecificationEntryVM>();
+        public ObservableCollection<SpecificationEntryVM> SpecificationTable { get; } = new ObservableCollection<SpecificationEntryVM>();
+        public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<BillEntryVM> BillSelectedItem { get; } = new ObservableProperty<BillEntryVM>();
+        public ObservableCollection<BillEntryVM> BillTable { get; } = new ObservableCollection<BillEntryVM>();
 
         #region Commands
         public ICommand OpenFilesCmd => new Command(OpenFiles);

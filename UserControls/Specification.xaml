@@ -13,7 +13,7 @@
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
 
-        <DataGrid x:Name="specificationDataGrid" SelectionMode="Extended" SelectionUnit="FullRow" 
+        <DataGrid x:Name="specificationDataGrid" Margin="5" SelectionMode="Extended" SelectionUnit="FullRow" 
                   AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*"
                   SelectedItem="{Binding SpecificationSelectedItem.Value}"
                   ItemsSource="{Binding SpecificationTable}">

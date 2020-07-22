@@ -11,22 +11,22 @@ namespace GostDOC.ViewModels
         /// <summary>
         /// Позиционное обозначение
         /// </summary>
-        public ObservableProperty<string> PositionDesignation = new ObservableProperty<string>();
+        public ObservableProperty<string> PositionDesignation { get; } = new ObservableProperty<string>();
 
         /// <summary>
         /// Наименование
         /// </summary>
-        public ObservableProperty<string> Name = new ObservableProperty<string>();
+        public ObservableProperty<string> Name { get; } = new ObservableProperty<string>();
 
         /// <summary>
         /// Количество
         /// </summary>
-        public ObservableProperty<uint> Quantity = new ObservableProperty<uint>();
+        public ObservableProperty<uint> Quantity { get; } = new ObservableProperty<uint>();
 
         /// <summary>
         /// Примечание
         /// </summary>
-        public ObservableProperty<string> Note = new ObservableProperty<string>();
+        public ObservableProperty<string> Note { get; } = new ObservableProperty<string>();
 
     }
 }
