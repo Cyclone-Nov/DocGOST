@@ -30,16 +30,16 @@
                 </Style>
             </DataGrid.ColumnHeaderStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Name.Value}"/>
-                <DataGridTextColumn Header="Код продукции" Binding="{Binding Code.Value}"/>
-                <DataGridTextColumn Header="Обозначение документа на поставки" Binding="{Binding Document.Value}"/>
-                <DataGridTextColumn Header="Поставщик" Binding="{Binding Supplier.Value}"/>
-                <DataGridTextColumn Header="Куда входит (обозначение)" Binding="{Binding WhereIncluded.Value}"/>
-                <DataGridTextColumn Header="Количество (на изделие)" Binding="{Binding QuantityOnProduct.Value}"/>
-                <DataGridTextColumn Header="Количество (в комплекты)" Binding="{Binding QuantityOnSets.Value}" />
-                <DataGridTextColumn Header="Количество (на регулир.)" Binding="{Binding QuantityOnReg.Value}" />
-                <DataGridTextColumn Header="Количество (всего)" Binding="{Binding Sum.Value}" />
-                <DataGridTextColumn Header="Примечание" Binding="{Binding Note.Value}" />
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Код продукции" Binding="{Binding Code}"/>
+                <DataGridTextColumn Header="Обозначение документа на поставки" Binding="{Binding Document}"/>
+                <DataGridTextColumn Header="Поставщик" Binding="{Binding Supplier}"/>
+                <DataGridTextColumn Header="Куда входит (обозначение)" Binding="{Binding WhereIncluded}"/>
+                <DataGridTextColumn Header="Количество (на изделие)" Binding="{Binding QuantityOnProduct}"/>
+                <DataGridTextColumn Header="Количество (в комплекты)" Binding="{Binding QuantityOnSets}" />
+                <DataGridTextColumn Header="Количество (на регулир.)" Binding="{Binding QuantityOnReg}" />
+                <DataGridTextColumn Header="Количество (всего)" Binding="{Binding Sum}" />
+                <DataGridTextColumn Header="Примечание" Binding="{Binding Note}" />
             </DataGrid.Columns>
         </DataGrid>
 

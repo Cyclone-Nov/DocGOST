@@ -112,10 +112,17 @@
     <Compile Include="UserControls\Bill.xaml.cs">
       <DependentUpon>Bill.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\GraphValues.xaml.cs">
+      <DependentUpon>GraphValues.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\Specification.xaml.cs">
       <DependentUpon>Specification.xaml</DependentUpon>
     </Compile>
     <Page Include="UserControls\Bill.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\GraphValues.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -133,10 +140,11 @@
     <Compile Include="Common\ObservableProperty.cs" />
     <Compile Include="Common\Utils.cs" />
     <Compile Include="Models\DocManager.cs" />
-    <Compile Include="ViewModels\ElementsEntryVM.cs" />
+    <Compile Include="Models\ElementsEntry.cs" />
+    <Compile Include="Models\GraphValues.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />
-    <Compile Include="ViewModels\SpecificationEntryVM.cs" />
-    <Compile Include="ViewModels\BillEntryVM.cs" />
+    <Compile Include="Models\SpecificationEntry.cs" />
+    <Compile Include="Models\BillEntry.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

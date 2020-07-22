@@ -39,7 +39,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Menu Height="20" VerticalAlignment="Top" Grid.ColumnSpan="4">
+        <Menu Height="20" VerticalAlignment="Top" Grid.ColumnSpan="10">
             <MenuItem Header="Файл">
                 <MenuItem Header="Открыть" InputGestureText="Ctrl+O" Command="{Binding OpenFilesCmd}"/>
                 <MenuItem Header="Сохранить" InputGestureText="Ctrl+S" Command="{Binding SaveFileCmd}"/>
@@ -68,7 +68,7 @@
                         <i:InvokeCommandAction Command="{Binding TreeViewSelectionChangedCmd}" CommandParameter="{Binding ElementName=myTreeView, Path=SelectedItem}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-                <TreeViewItem Header="Документ" IsExpanded="True">
+                <TreeViewItem Header="Документы" IsExpanded="True">
                     <TreeViewItem Header="Перечень элементов"/>
                     <TreeViewItem Header="Спецификация" IsExpanded="True">
                         <TreeViewItem Header="Основная надпись"/>
@@ -114,11 +114,12 @@
         <Grid Grid.Row="1" Grid.Column="2">
             <uc:Specification Visibility="{Binding IsSpecificationTableVisible.Value, Converter={StaticResource b2v}}" />
             <uc:Bill Visibility="{Binding IsBillTableVisible.Value, Converter={StaticResource b2v}}" />
+            <uc:GraphValues GraphType="General" ItemsSource="{Binding GeneralGraphValues}" Visibility="{Binding IsGeneralGraphValuesVisible.Value, Converter={StaticResource b2v}}"/>
         </Grid>
 
         <GridSplitter Grid.Column="3" Grid.RowSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ResizeDirection="Columns" Margin="0,7,0,7" />
 
-        <Grid Grid.Column="4" Grid.Row="1" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid Grid.Column="4" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
             <WebBrowser common:WebBrowserUtility.BindableSource="{Binding CurrentPdfPath.Value}"></WebBrowser>
         </Grid>
     </Grid>

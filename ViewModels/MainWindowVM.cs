@@ -21,12 +21,14 @@ namespace GostDOC.ViewModels
         private DocManager _docManager = DocManager.Instance;
 
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
-        public ObservableProperty<SpecificationEntryVM> SpecificationSelectedItem { get; } = new ObservableProperty<SpecificationEntryVM>();
-        public ObservableCollection<SpecificationEntryVM> SpecificationTable { get; } = new ObservableCollection<SpecificationEntryVM>();
+        public ObservableProperty<SpecificationEntry> SpecificationSelectedItem { get; } = new ObservableProperty<SpecificationEntry>();
+        public ObservableCollection<SpecificationEntry> SpecificationTable { get; } = new ObservableCollection<SpecificationEntry>();
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
-        public ObservableProperty<BillEntryVM> BillSelectedItem { get; } = new ObservableProperty<BillEntryVM>();
-        public ObservableCollection<BillEntryVM> BillTable { get; } = new ObservableCollection<BillEntryVM>();
+        public ObservableProperty<BillEntry> BillSelectedItem { get; } = new ObservableProperty<BillEntry>();
+        public ObservableCollection<BillEntry> BillTable { get; } = new ObservableCollection<BillEntry>();
         public ObservableProperty<string> CurrentPdfPath { get; } = new ObservableProperty<string>();
+        public ObservableProperty<bool> IsGeneralGraphValuesVisible { get; } = new ObservableProperty<bool>(false);
+        public ObservableCollection<GraphValues> GeneralGraphValues { get; } = new ObservableCollection<GraphValues>();
 
         #region Commands
         public ICommand OpenFilesCmd => new Command(OpenFiles);
@@ -39,8 +41,9 @@ namespace GostDOC.ViewModels
         public ICommand AddSpecificationItemCmd => new Command(AddSpecificationItem);
         public ICommand RemoveSpecificationItemsCmd => new Command<IList<object>>(RemoveSpecificationItems);
         public ICommand MergeSpecificationItemsCmd => new Command<IList<object>>(MergeSpecificationItems);
-
         public ICommand TreeViewSelectionChangedCmd => new Command<TreeViewItem>(TreeViewSelectionChanged);
+        public ICommand SaveGraphValuesCmd => new Command<GraphType>(SaveGraphValues);
+
         #endregion Commands
 
         public MainWindowVM()
@@ -91,18 +94,18 @@ namespace GostDOC.ViewModels
         
         private void AddBillItem(object obj)
         {
-            BillTable.Add(new BillEntryVM());
+            BillTable.Add(new BillEntry());
         }
         private void RemoveBillItems(IList<object> lst)
         {
-            foreach (var item in lst.Cast<BillEntryVM>().ToList())
+            foreach (var item in lst.Cast<BillEntry>().ToList())
             {
                 BillTable.Remove(item);
             }
         }
         private void MergeBillItems(IList<object> lst)
         {
-            foreach (var item in lst.Cast<BillEntryVM>().ToList())
+            foreach (var item in lst.Cast<BillEntry>().ToList())
             {
                 // TODO: merge items
                 BillTable.Remove(item);                
@@ -110,22 +113,25 @@ namespace GostDOC.ViewModels
         }
         private void AddSpecificationItem(object obj)
         {
-            SpecificationTable.Add(new SpecificationEntryVM());
+            SpecificationTable.Add(new SpecificationEntry());
         }
         private void RemoveSpecificationItems(IList<object> lst)
         {
-            foreach (var item in lst.Cast<SpecificationEntryVM>().ToList())
+            foreach (var item in lst.Cast<SpecificationEntry>().ToList())
             {
                 SpecificationTable.Remove(item);
             }
         }
         private void MergeSpecificationItems(IList<object> lst)
         {
-            foreach (var item in lst.Cast<SpecificationEntryVM>().ToList())
+            foreach (var item in lst.Cast<SpecificationEntry>().ToList())
             {
                 // TODO: merge items
                 SpecificationTable.Remove(item);
             }
+        }
+        private void SaveGraphValues(GraphType tp)
+        {
         }
 
         #endregion Commands impl
@@ -174,6 +180,8 @@ namespace GostDOC.ViewModels
                     IsBillTableVisible.Value = false;
                     break;
             }
+
+            IsGeneralGraphValuesVisible.Value = (_selectedTreeItem != null && _selectedTreeItem.Header.Equals("Документы"));           
         }           
     }
 }

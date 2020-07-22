@@ -6,27 +6,27 @@ using System.Threading.Tasks;
 
 namespace GostDOC.ViewModels
 {
-    class ElementsEntryVM
+    class ElementsEntry
     {
         /// <summary>
         /// Позиционное обозначение
         /// </summary>
-        public ObservableProperty<string> PositionDesignation { get; } = new ObservableProperty<string>();
+        public string PositionDesignation { get; set; }
 
         /// <summary>
         /// Наименование
         /// </summary>
-        public ObservableProperty<string> Name { get; } = new ObservableProperty<string>();
+        public string Name { get; set; }
 
         /// <summary>
         /// Количество
         /// </summary>
-        public ObservableProperty<uint> Quantity { get; } = new ObservableProperty<uint>();
+        public uint Quantity { get; set; }
 
         /// <summary>
         /// Примечание
         /// </summary>
-        public ObservableProperty<string> Note { get; } = new ObservableProperty<string>();
+        public string Note { get; set; }
 
     }
 }
