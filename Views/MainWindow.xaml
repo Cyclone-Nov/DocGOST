@@ -4,149 +4,120 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
+        xmlns:uc="clr-namespace:GostDOC.UserControls"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
-        Title="ПО формирования документов на основе перечня элементов изделия" Height="450" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+        Title="ПО формирования документов на основе перечня элементов изделия" Height="800" Width="1280" WindowStartupLocation="CenterScreen" WindowState="Maximized">
 
     <Window.DataContext>
         <viewModels:MainWindowVM x:Name="ViewModel" />
     </Window.DataContext>
-    
+
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="b2v" />
     </Window.Resources>
-    
+
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenFilesCmd}"/>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveFileCmd}"/>
+        <KeyBinding Key="A" Modifiers="Control" Command="{Binding SaveFileAsCmd}"/>
+        <KeyBinding Key="F4" Modifiers="Alt" Command="{Binding ExitCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+    </Window.InputBindings>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="2" />
             <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2" />
             <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="30" />
+            <RowDefinition Height="20" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="30" />
         </Grid.RowDefinitions>
 
         <Menu Height="20" VerticalAlignment="Top" Grid.ColumnSpan="4">
             <MenuItem Header="Файл">
-                <MenuItem x:Name="createProjectMenuItem" Header="Создать проект" InputGestureText="Ctrl+N"></MenuItem>
-                <MenuItem x:Name="openProjectMenuItem" Header="Открыть проект" InputGestureText="Ctrl+O"></MenuItem>
+                <MenuItem Header="Открыть" InputGestureText="Ctrl+O" Command="{Binding OpenFilesCmd}"/>
+                <MenuItem Header="Сохранить" InputGestureText="Ctrl+S" Command="{Binding SaveFileCmd}"/>
+                <MenuItem Header="Сохранить как..." InputGestureText="Ctrl+A" Command="{Binding SaveFileAsCmd}"/>
                 <Separator />
-                <MenuItem x:Name="saveProjectMenuItem" Header="Сохранить проект" IsEnabled="False" InputGestureText="Ctrl+S">
-                </MenuItem>
-                <Separator />
-                <MenuItem x:Name="importMenuItem" Header="Импорт данных" IsEnabled="False">
-                    <MenuItem x:Name="importPrjPcbMfromADMenuItem" Header="Altium Designer PrjPcb"></MenuItem>
-                </MenuItem>
-                <Separator />
-                <MenuItem x:Name="createPdfMenuItem" Header="Экспорт в pdf" IsEnabled="False" />
+                <MenuItem Header="Экспорт в PDF" />
+                <MenuItem Header="Экспорт в XLSX" />
                 <Separator/>
-                <MenuItem x:Name="exitMenuItem" Header="Выход" InputGestureText="Alt+F4" ></MenuItem>
+                <MenuItem Header="Выход" InputGestureText="Alt+F4" Command="{Binding ExitCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"></MenuItem>
             </MenuItem>
             <MenuItem Header="Правка">
-                <MenuItem x:Name="undoMenuItem" Header="Отменить" IsEnabled="False" InputGestureText="Ctrl+Z"/>
-                <MenuItem x:Name="redoMenuItem" Header="Вернуть" IsEnabled="False" InputGestureText="Ctrl+Y"/>
-            </MenuItem>
-
-            <MenuItem Header="Редактирование">
-                <MenuItem x:Name="osnNadpisMenuItem" Header="Основная надпись" IsEnabled="False" />
-            </MenuItem>
-
-            <MenuItem Header="Справка">
-                <MenuItem x:Name="helpMenuItem" Header="Справка" />
+                <MenuItem Header="Отменить" InputGestureText="Ctrl+Z" Command="ApplicationCommands.Undo"/>
+                <MenuItem Header="Вернуть" InputGestureText="Ctrl+Y" Command="ApplicationCommands.Redo"/>
             </MenuItem>
         </Menu>
 
-        <TreeView x:Name="myTreeView" Grid.Row="1">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectedItemChanged">
-                    <i:InvokeCommandAction Command="{Binding TreeViewSelectionChangedCmd}" CommandParameter="{Binding ElementName=myTreeView, Path=SelectedItem}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-            <TreeViewItem Header="Документ" IsExpanded="True">
-                <TreeViewItem Header="Перечень элементов"/>
-                <TreeViewItem Header="Спецификация" IsExpanded="True">
-                    <TreeViewItem Header="Основная надпись"/>
-                    <TreeViewItem Header="Верхняя дополнительная графа"/>
-                    <TreeViewItem Header="Нижняя дополнительная графа"/>
-                    <TreeViewItem Header="Группы" IsExpanded="True">
-                        <TreeViewItem Header="Документация" />
-                        <TreeViewItem Header="Комплексы" />
-                        <TreeViewItem Header="Сборочные единицы" />
-                        <TreeViewItem Header="Детали" />
-                        <TreeViewItem Header="Стандартные изделия" />
-                        <TreeViewItem Header="Прочие изделия" />
-                        <TreeViewItem Header="Материалы" />
-                        <TreeViewItem Header="Комплекты" />
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+
+            <TreeView x:Name="myTreeView" Margin="5">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectedItemChanged">
+                        <i:InvokeCommandAction Command="{Binding TreeViewSelectionChangedCmd}" CommandParameter="{Binding ElementName=myTreeView, Path=SelectedItem}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <TreeViewItem Header="Документ" IsExpanded="True">
+                    <TreeViewItem Header="Перечень элементов"/>
+                    <TreeViewItem Header="Спецификация" IsExpanded="True">
+                        <TreeViewItem Header="Основная надпись"/>
+                        <TreeViewItem Header="Верхняя дополнительная графа"/>
+                        <TreeViewItem Header="Нижняя дополнительная графа"/>
+                        <TreeViewItem Header="Группы" IsExpanded="True">
+                            <TreeViewItem Header="Документация" />
+                            <TreeViewItem Header="Комплексы" />
+                            <TreeViewItem Header="Сборочные единицы" />
+                            <TreeViewItem Header="Детали" />
+                            <TreeViewItem Header="Стандартные изделия" />
+                            <TreeViewItem Header="Прочие изделия" />
+                            <TreeViewItem Header="Материалы" />
+                            <TreeViewItem Header="Комплекты" />
+                        </TreeViewItem>
                     </TreeViewItem>
-                </TreeViewItem>
-                <TreeViewItem Header="Ведомость покупных изделий" IsExpanded="True">
-                    <TreeViewItem Header="Основная надпись"/>
-                    <TreeViewItem Header="Верхняя дополнительная графа"/>
-                    <TreeViewItem Header="Нижняя дополнительная графа"/>
-                    <TreeViewItem Header="Группы" IsExpanded="True">
-                        <TreeViewItem Header="Документация" />
-                        <TreeViewItem Header="Комплексы" />
-                        <TreeViewItem Header="Сборочные единицы" />
-                        <TreeViewItem Header="Детали" />
-                        <TreeViewItem Header="Стандартные изделия" />
-                        <TreeViewItem Header="Прочие изделия" />
-                        <TreeViewItem Header="Материалы" />
-                        <TreeViewItem Header="Комплекты" />
+                    <TreeViewItem Header="Ведомость покупных изделий" IsExpanded="True">
+                        <TreeViewItem Header="Основная надпись"/>
+                        <TreeViewItem Header="Верхняя дополнительная графа"/>
+                        <TreeViewItem Header="Нижняя дополнительная графа"/>
+                        <TreeViewItem Header="Группы" IsExpanded="True">
+                            <TreeViewItem Header="Документация" />
+                            <TreeViewItem Header="Комплексы" />
+                            <TreeViewItem Header="Сборочные единицы" />
+                            <TreeViewItem Header="Детали" />
+                            <TreeViewItem Header="Стандартные изделия" />
+                            <TreeViewItem Header="Прочие изделия" />
+                            <TreeViewItem Header="Материалы" />
+                            <TreeViewItem Header="Комплекты" />
+                        </TreeViewItem>
                     </TreeViewItem>
+                    <TreeViewItem Header="Ведомость Д27"/>
                 </TreeViewItem>
-                <TreeViewItem Header="Ведомость Д27"/>
-            </TreeViewItem>
-        </TreeView>
+            </TreeView>
 
-        <DockPanel Grid.Row="2" Grid.Column="0" LastChildFill="False">
-            <Button DockPanel.Dock="Left" Width="100" Margin="5">Удалить группу</Button>
-        </DockPanel>
+            <DockPanel Grid.Row="1" LastChildFill="False">
+                <Button DockPanel.Dock="Left" Width="100" Margin="5">Удалить группу</Button>
+            </DockPanel>
+        </Grid>
 
-        <DataGrid Grid.Row="1" Grid.Column="1" SelectionMode="Extended" SelectionUnit="FullRow" 
-                  AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*"
-                  SelectedItem="{Binding SpecificationSelectedItem.Value}"
-                  ItemsSource="{Binding SpecificationTable}"
-                  Visibility="{Binding IsSpecificationTableVisible.Value, Converter={StaticResource b2v}}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Формат" Binding="{Binding Format.Value}"/>
-                <DataGridTextColumn Header="Зона" Binding="{Binding Zone.Value}"/>
-                <DataGridTextColumn Header="Позиция" Binding="{Binding Position.Value}"/>
-                <DataGridTextColumn Header="Обозначение" Binding="{Binding Designation.Value}"/>
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Name.Value}"/>
-                <DataGridTextColumn Header="Количество" Binding="{Binding Quantity.Value}"/>
-                <DataGridTextColumn Header="Примечание" Binding="{Binding Note.Value}" />
-            </DataGrid.Columns>
-        </DataGrid>
+        <GridSplitter Grid.Column="1" Grid.RowSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ResizeDirection="Columns" Margin="0,7,0,7" />
 
-        <DataGrid Grid.Row="1" Grid.Column="1" SelectionMode="Extended" SelectionUnit="FullRow" 
-                  AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*"
-                  SelectedItem="{Binding BillSelectedItem.Value}"
-                  ItemsSource="{Binding BillTable}"
-                  Visibility="{Binding IsBillTableVisible.Value, Converter={StaticResource b2v}}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Name.Value}"/>
-                <DataGridTextColumn Header="Код продукции" Binding="{Binding Code.Value}"/>
-                <DataGridTextColumn Header="Обозначение документа на поставки" Binding="{Binding Document.Value}"/>
-                <DataGridTextColumn Header="Поставщик" Binding="{Binding Supplier.Value}"/>
-                <DataGridTextColumn Header="Куда входит (обозначение)" Binding="{Binding WhereIncluded.Value}"/>
-                <DataGridTextColumn Header="Количество (на изделие)" Binding="{Binding QuantityOnProduct.Value}"/>
-                <DataGridTextColumn Header="Количество (в комплекты)" Binding="{Binding QuantityOnSets.Value}" />
-                <DataGridTextColumn Header="Количество (на регулир.)" Binding="{Binding QuantityOnReg.Value}" />
-                <DataGridTextColumn Header="Количество (всего)" Binding="{Binding Sum.Value}" />
-                <DataGridTextColumn Header="Примечание" Binding="{Binding Note.Value}" />
-            </DataGrid.Columns>
-        </DataGrid>
+        <Grid Grid.Row="1" Grid.Column="2" Margin="5">
+            <uc:Specification Visibility="{Binding IsSpecificationTableVisible.Value, Converter={StaticResource b2v}}" />
+            <uc:Bill Visibility="{Binding IsBillTableVisible.Value, Converter={StaticResource b2v}}" />
+        </Grid>
 
-        <DockPanel Grid.Column="1" Grid.Row="2" LastChildFill="False">
-            <Button DockPanel.Dock="Left" Width="100" Margin="5">Добавить</Button>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5">Удалить</Button>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5">Объединить</Button>
-        </DockPanel>
+        <GridSplitter Grid.Column="3" Grid.RowSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ResizeDirection="Columns" Margin="0,7,0,7" />
 
-        <Canvas Grid.Column="2" Grid.Row="1" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Canvas Grid.Column="4" Grid.Row="1" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock>PDF</TextBlock>
         </Canvas>
     </Grid>
