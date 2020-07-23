@@ -25,6 +25,13 @@ namespace GostDOC
                 col.Add(val);
             }
         }
+        public static void AddRange<T>(this HashSet<T> col, IEnumerable<T> data)
+        {
+            foreach (T val in data)
+            {
+                col.Add(val);
+            }
+        }
 
         public static void AddRange(this ObservableCollection<TreeViewItem> col, IEnumerable<string> data)
         {

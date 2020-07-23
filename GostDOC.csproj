@@ -109,6 +109,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Common\WebBrowserUtility.cs" />
+    <Compile Include="Common\XUtils.cs" />
+    <Compile Include="Models\XmlManager.cs" />
     <Compile Include="UserControls\BillControl.xaml.cs">
       <DependentUpon>BillControl.xaml</DependentUpon>
     </Compile>
@@ -120,6 +122,9 @@
     </Compile>
     <Compile Include="Views\NewGroup.xaml.cs">
       <DependentUpon>NewGroup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SelectMainFile.xaml.cs">
+      <DependentUpon>SelectMainFile.xaml</DependentUpon>
     </Compile>
     <Page Include="UserControls\BillControl.xaml">
       <SubType>Designer</SubType>
@@ -157,6 +162,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\NewGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SelectMainFile.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

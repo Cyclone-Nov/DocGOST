@@ -50,9 +50,6 @@ namespace GostDOC.ViewModels
 
         public MainWindowVM()
         {
-            BillGroups.AddRange(_docManager.BillGroups);
-            SpecificationGroups.AddRange(_docManager.SpecificationGroups);
-            GeneralGraphValues.AddRange(_docManager.GeneralGraphValues);
         }
 
         #region Commands impl
@@ -65,7 +62,17 @@ namespace GostDOC.ViewModels
 
             if (open.ShowDialog() == DialogResult.OK)
             {
-                _docManager.LoadData(open.FileNames);
+                string mainFileName = null;
+                if (open.FileNames.Length > 1)
+                {
+                    mainFileName = GetMainFileName(open.SafeFileNames);
+                    if (string.IsNullOrEmpty(mainFileName))
+                        return;
+                }
+                // Parse xml files
+                _docManager.XmlManager.LoadData(open.FileNames, mainFileName);
+                // Update visual data
+                UpdateData();
             }
         }
 
@@ -101,6 +108,7 @@ namespace GostDOC.ViewModels
         {
             BillTable.Add(new BillEntry());
         }
+
         private void RemoveBillItems(IList<object> lst)
         {
             foreach (var item in lst.Cast<BillEntry>().ToList())
@@ -108,6 +116,7 @@ namespace GostDOC.ViewModels
                 BillTable.Remove(item);
             }
         }
+
         private void MergeBillItems(IList<object> lst)
         {
             string groupName = GetGroupName();
@@ -120,10 +129,12 @@ namespace GostDOC.ViewModels
                 }
             }
         }
+
         private void AddSpecificationItem(object obj)
         {
             SpecificationTable.Add(new SpecificationEntry());
         }
+
         private void RemoveSpecificationItems(IList<object> lst)
         {
             foreach (var item in lst.Cast<SpecificationEntry>().ToList())
@@ -131,6 +142,7 @@ namespace GostDOC.ViewModels
                 SpecificationTable.Remove(item);
             }
         }
+
         private void MergeSpecificationItems(IList<object> lst)
         {
             string groupName = GetGroupName();
@@ -143,6 +155,7 @@ namespace GostDOC.ViewModels
                 }
             }
         }
+
         private void SaveGraphValues(GraphType tp)
         {
             // TODO: Save updated graph values
@@ -164,13 +177,32 @@ namespace GostDOC.ViewModels
 
         private string GetGroupName()
         {
-            NewGroup newGroup = new NewGroup();
-            var result = newGroup.ShowDialog();
+            NewGroup newGroupDlg = new NewGroup();
+            var result = newGroupDlg.ShowDialog();
             if (result.HasValue && result.Value)
             {
-                return newGroup.GroupName.Text;
+                return newGroupDlg.GroupName.Text;
             }
             return null;
+        }
+
+        private string GetMainFileName(string[] aFileNames)
+        {
+            SelectMainFile mainFileDlg = new SelectMainFile();
+            mainFileDlg.ItemsSource = aFileNames;
+            var result = mainFileDlg.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                return mainFileDlg.FileName.Text;
+            }
+            return null;
+        }
+
+        private void UpdateData()
+        {
+            BillGroups.AddRange(_docManager.XmlManager.BillGroups);
+            SpecificationGroups.AddRange(_docManager.XmlManager.SpecificationGroups);
+            GeneralGraphValues.AddRange(_docManager.XmlManager.GeneralGraphValues);
         }
     }
 }
