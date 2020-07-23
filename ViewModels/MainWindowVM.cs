@@ -200,8 +200,13 @@ namespace GostDOC.ViewModels
 
         private void UpdateData()
         {
+            BillGroups.Clear();
             BillGroups.AddRange(_docManager.XmlManager.BillGroups);
+
+            SpecificationGroups.Clear();
             SpecificationGroups.AddRange(_docManager.XmlManager.SpecificationGroups);
+
+            GeneralGraphValues.Clear();
             GeneralGraphValues.AddRange(_docManager.XmlManager.GeneralGraphValues);
         }
     }

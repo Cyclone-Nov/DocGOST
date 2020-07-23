@@ -44,6 +44,7 @@ namespace GostDOC.Models
 
         private void UpdateGraphValues()
         {
+            GeneralGraphValues.Clear();
             GeneralGraphValues.Add(new GraphValues() { Num = "1а", Name = "Наименование изделия", Text = _document.ReadElementValue("Наименование")});
             GeneralGraphValues.Add(new GraphValues() { Num = "1б", Name = "Наименование документа", Text = _document.ReadElementValue("Наименование_PCB") });
             GeneralGraphValues.Add(new GraphValues() { Num = "2", Name = "Обозначение документа", Text = _document.ReadElementValue("Обозначение") });

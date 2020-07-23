@@ -37,6 +37,7 @@ namespace GostDOC.Common
             }
             return elements;
         }
+
         public static string ReadElementValue(this XDocument doc, string elementName)
         {
             foreach (XNode node in doc.DescendantNodes())
@@ -50,7 +51,8 @@ namespace GostDOC.Common
             }
             return null;
         }
-        public static IList<string> ReadElementValues(this XDocument doc, string elementName)
+
+        public static IList<string> ReadElementValues(this XDocument doc, string elementName, bool skipEmpty = true)
         {
             List<string> elements = new List<string>();
             foreach (XNode node in doc.DescendantNodes())
@@ -59,7 +61,11 @@ namespace GostDOC.Common
                 {
                     XElement element = (XElement)node;
                     if (element.Attribute("name")?.Value == elementName)
-                        elements.Add(element.Attribute("value")?.Value);
+                    {
+                        var val = element.Attribute("value")?.Value;                                                
+                        if (!skipEmpty || (skipEmpty && !string.IsNullOrEmpty(val))) 
+                            elements.Add(val);                        
+                    }
                 }
             }
             return elements;
