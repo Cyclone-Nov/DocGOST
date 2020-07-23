@@ -18,11 +18,11 @@ using System.Windows.Shapes;
 namespace GostDOC.UserControls
 {
     /// <summary>
-    /// Interaction logic for General.xaml
+    /// Interaction logic for GraphValuesControl.xaml
     /// </summary>
-    public partial class GraphValues : UserControl
+    public partial class GraphValuesControl : UserControl
     {
-        public GraphValues()
+        public GraphValuesControl()
         {
             InitializeComponent();
         }
@@ -38,9 +38,11 @@ namespace GostDOC.UserControls
         }
 
         public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(object), typeof(GraphValues), new PropertyMetadata(null));
+            DependencyProperty.Register("ItemsSource", typeof(object), typeof(GraphValuesControl), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
         public static readonly DependencyProperty GraphTypeProperty =
-             DependencyProperty.Register("GraphType", typeof(GraphType), typeof(GraphValues), new PropertyMetadata(null));
+             DependencyProperty.Register("GraphType", typeof(GraphType), typeof(GraphValuesControl),
+                 new FrameworkPropertyMetadata(GraphType.General, FrameworkPropertyMetadataOptions.AffectsRender));
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace GostDOC
 {
@@ -14,6 +16,22 @@ namespace GostDOC
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public static void AddRange<T>(this ObservableCollection<T> col, IEnumerable<T> data) 
+        {
+            foreach (T val in data)
+            {
+                col.Add(val);
+            }
+        }
+
+        public static void AddRange(this ObservableCollection<TreeViewItem> col, IEnumerable<string> data)
+        {
+            foreach (string val in data)
+            {
+                col.Add(new TreeViewItem() { Header = val });
+            }
         }
     }
 }

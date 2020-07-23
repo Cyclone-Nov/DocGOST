@@ -29,7 +29,14 @@ namespace GostDOC.Common
             if (browser != null)
             {
                 string uri = e.NewValue as string;
-                browser.Source = !String.IsNullOrEmpty(uri) ? new Uri(uri) : null;
+                if (!string.IsNullOrEmpty(uri))
+                {
+                    browser.Navigate(new Uri(uri), string.Empty, null, null);
+                }
+                else
+                {
+                    browser.Source = null;
+                }
             }
         }
     }

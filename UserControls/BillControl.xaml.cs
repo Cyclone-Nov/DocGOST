@@ -1,5 +1,4 @@
-﻿using GostDOC.ViewModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,11 +16,11 @@ using System.Windows.Shapes;
 namespace GostDOC.UserControls
 {
     /// <summary>
-    /// Interaction logic for Specification.xaml
+    /// Interaction logic for BillControl.xaml
     /// </summary>
-    public partial class Specification : UserControl
+    public partial class BillControl : UserControl
     {
-        public Specification()
+        public BillControl()
         {
             InitializeComponent();
         }

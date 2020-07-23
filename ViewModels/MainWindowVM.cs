@@ -1,5 +1,6 @@
 ﻿using GostDOC.Common;
 using GostDOC.Models;
+using GostDOC.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +18,6 @@ namespace GostDOC.ViewModels
     {
         private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
         private TreeViewItem _selectedTreeItem = null;
-        private DocumentType _selectedDoc = DocumentType.None;
         private DocManager _docManager = DocManager.Instance;
 
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
@@ -29,6 +29,8 @@ namespace GostDOC.ViewModels
         public ObservableProperty<string> CurrentPdfPath { get; } = new ObservableProperty<string>();
         public ObservableProperty<bool> IsGeneralGraphValuesVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableCollection<GraphValues> GeneralGraphValues { get; } = new ObservableCollection<GraphValues>();
+        public ObservableCollection<TreeViewItem> SpecificationGroups { get; } = new ObservableCollection<TreeViewItem>();
+        public ObservableCollection<TreeViewItem> BillGroups { get; } = new ObservableCollection<TreeViewItem>();
 
         #region Commands
         public ICommand OpenFilesCmd => new Command(OpenFiles);
@@ -48,6 +50,9 @@ namespace GostDOC.ViewModels
 
         public MainWindowVM()
         {
+            BillGroups.AddRange(_docManager.BillGroups);
+            SpecificationGroups.AddRange(_docManager.SpecificationGroups);
+            GeneralGraphValues.AddRange(_docManager.GeneralGraphValues);
         }
 
         #region Commands impl
@@ -105,10 +110,14 @@ namespace GostDOC.ViewModels
         }
         private void MergeBillItems(IList<object> lst)
         {
-            foreach (var item in lst.Cast<BillEntry>().ToList())
+            string groupName = GetGroupName();
+            if (string.IsNullOrEmpty(groupName))
             {
-                // TODO: merge items
-                BillTable.Remove(item);                
+                foreach (var item in lst.Cast<BillEntry>().ToList())
+                {
+                    // TODO: merge items
+                    BillTable.Remove(item);
+                }
             }
         }
         private void AddSpecificationItem(object obj)
@@ -124,64 +133,44 @@ namespace GostDOC.ViewModels
         }
         private void MergeSpecificationItems(IList<object> lst)
         {
-            foreach (var item in lst.Cast<SpecificationEntry>().ToList())
+            string groupName = GetGroupName();
+            if (string.IsNullOrEmpty(groupName))
             {
-                // TODO: merge items
-                SpecificationTable.Remove(item);
+                foreach (var item in lst.Cast<SpecificationEntry>().ToList())
+                {
+                    // TODO: merge items
+                    SpecificationTable.Remove(item);
+                }
             }
         }
         private void SaveGraphValues(GraphType tp)
         {
+            // TODO: Save updated graph values
         }
 
         #endregion Commands impl
 
         private void UpdateSelectedDocument()
         {
-            _selectedDoc = DocumentType.None;
-            TreeViewItem item = _selectedTreeItem;
-            while (item != null)
+            if (_selectedTreeItem == null)
             {
-                if (item.Header.Equals("Перечень элементов"))
-                {
-                    _selectedDoc = DocumentType.Elements;
-                    break;
-                }
-                else if (item.Header.Equals("Спецификация"))
-                {
-                    _selectedDoc = DocumentType.Specification;
-                    break;
-                }
-                else if (item.Header.Equals("Ведомость покупных изделий"))
-                {
-                    _selectedDoc = DocumentType.Bill;
-                    break;
-                }
-                else if (item.Header.Equals("Ведомость Д27"))
-                {
-                    _selectedDoc = DocumentType.Bill_D27;
-                    break;
-                }
-                item = item.Parent as TreeViewItem;
+                return;
             }
 
-            switch (_selectedDoc)
-            {
-                case DocumentType.Specification:
-                    IsSpecificationTableVisible.Value = true;
-                    IsBillTableVisible.Value = false;
-                    break;
-                case DocumentType.Bill:
-                    IsSpecificationTableVisible.Value = false;
-                    IsBillTableVisible.Value = true;
-                    break;
-                default:
-                    IsSpecificationTableVisible.Value = false;
-                    IsBillTableVisible.Value = false;
-                    break;
-            }
+            IsGeneralGraphValuesVisible.Value = _selectedTreeItem.Header.Equals("Документы"); 
+            IsSpecificationTableVisible.Value = SpecificationGroups.Contains(_selectedTreeItem);
+            IsBillTableVisible.Value = BillGroups.Contains(_selectedTreeItem);
+        }
 
-            IsGeneralGraphValuesVisible.Value = (_selectedTreeItem != null && _selectedTreeItem.Header.Equals("Документы"));           
-        }           
+        private string GetGroupName()
+        {
+            NewGroup newGroup = new NewGroup();
+            var result = newGroup.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                return newGroup.GroupName.Text;
+            }
+            return null;
+        }
     }
 }

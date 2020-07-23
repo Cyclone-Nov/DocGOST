@@ -1,6 +1,5 @@
-using System.Security.Policy;
 
-namespace GostDOC.ViewModels
+namespace GostDOC.Models
 {
     class SpecificationEntry
     {
