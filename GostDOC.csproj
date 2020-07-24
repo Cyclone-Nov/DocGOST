@@ -109,13 +109,28 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Common\WebBrowserUtility.cs" />
-    <Compile Include="UserControls\Bill.xaml.cs">
-      <DependentUpon>Bill.xaml</DependentUpon>
+    <Compile Include="Common\XUtils.cs" />
+    <Compile Include="Models\XmlManager.cs" />
+    <Compile Include="UserControls\BillControl.xaml.cs">
+      <DependentUpon>BillControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\Specification.xaml.cs">
-      <DependentUpon>Specification.xaml</DependentUpon>
+    <Compile Include="UserControls\GraphValuesControl.xaml.cs">
+      <DependentUpon>GraphValuesControl.xaml</DependentUpon>
     </Compile>
-    <Page Include="UserControls\Bill.xaml">
+    <Compile Include="UserControls\SpecificationControl.xaml.cs">
+      <DependentUpon>SpecificationControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NewGroup.xaml.cs">
+      <DependentUpon>NewGroup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SelectMainFile.xaml.cs">
+      <DependentUpon>SelectMainFile.xaml</DependentUpon>
+    </Compile>
+    <Page Include="UserControls\BillControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\GraphValuesControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -133,15 +148,24 @@
     <Compile Include="Common\ObservableProperty.cs" />
     <Compile Include="Common\Utils.cs" />
     <Compile Include="Models\DocManager.cs" />
-    <Compile Include="ViewModels\ElementsEntryVM.cs" />
+    <Compile Include="Models\ElementsEntry.cs" />
+    <Compile Include="Models\GraphValues.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />
-    <Compile Include="ViewModels\SpecificationEntryVM.cs" />
-    <Compile Include="ViewModels\BillEntryVM.cs" />
+    <Compile Include="Models\SpecificationEntry.cs" />
+    <Compile Include="Models\BillEntry.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UserControls\Specification.xaml">
+    <Page Include="UserControls\SpecificationControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\NewGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SelectMainFile.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

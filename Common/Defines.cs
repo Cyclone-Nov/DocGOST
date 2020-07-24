@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace GostDOC.Common
 {
-    enum DocumentType
+    public enum GraphType
     {
-        Elements,
-        Specification,
-        Bill,
-        Bill_D27,
-        None
+        General
     }
 }

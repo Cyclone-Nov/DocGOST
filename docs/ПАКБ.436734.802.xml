@@ -1,0 +1,618 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Версия XML 1.0-->
+<!--Раздел документации // Вид документа#Код документа#Обозначение#Формат#Примечание-->
+<!--BOARD_OUTLINE       // SEGMENT;X;Y#-->
+<!--BOARD_CUTOUT        // SEGMENT;X;Y#-->
+<!--DRILLED_HOLES       // HOLE_NUMBER;HOLE_D;HOLE_X;HOLE_Y;HOLE_STYLE#-->
+<!--STYLE_HOLE          // PTH=1, NPTH=0-->
+<!--LAYER_COMPONENT     // TOP=1, BOTTOM=0-->
+<xml>
+<transaction	Type="AltiumDesigner"	Date="23.07.2020"	Time="14:15:46">
+<project	Project_Path="G:\ПАКБ.687281.800 Плата объединительная (ПО)\SAVIP_Cross_Board.PrjPcb"	Project_Name="SAVIP_Cross_Board.PrjPcb">
+<!-- -00 из 1 -->
+	<configuration	name="-00">
+		<attribute name="Раздел_Сп"	value="Сборочные единицы"/>
+		<attribute name="Вид_документа"	value="Файл проекта печатной платы"/>
+		<attribute name="Дата_изменения"	value=""/>
+		<attribute name="Дата_изменения_ПЭ3"	value=""/>
+		<attribute name="Дата_изменения_СП"	value=""/>
+		<attribute name="Код_документа"	value="Т6М"/>
+		<attribute name="Литера"	value=""/>
+		<attribute name="Литера2"	value=""/>
+		<attribute name="Литера3"	value=""/>
+		<attribute name="Наименование"	value="Модуль питания (МП)"/>
+		<attribute name="Наименование_PCB"	value="Плата печатная"/>
+		<attribute name="Номер_документа_изменение"	value=""/>
+		<attribute name="Номер_документа_изменение_ПЭ3"	value=""/>
+		<attribute name="Номер_документа_изменение_СП"	value=""/>
+		<attribute name="Обозначение"	value="ПАКБ.436734.802"/>
+		<attribute name="Обозначение_PCB"	value=""/>
+		<attribute name="Перв.Примен."	value="ПАКБ.436734.802"/>
+		<attribute name="Порядковый_номер_изменения"	value=""/>
+		<attribute name="Порядковый_номер_изменения_ПЭ3"	value=""/>
+		<attribute name="Порядковый_номер_изменения_СП"	value=""/>
+		<attribute name="Примечание"	value=""/>
+		<attribute name="Проект"	value="САВиП"/>
+		<attribute name="Раздел"	value="Документация"/>
+		<attribute name="Указания_изменение"	value=""/>
+		<attribute name="Указания_изменение_ПЭ3"	value=""/>
+		<attribute name="Указания_изменение_СП"	value=""/>
+		<attribute name="Формат_PCB"	value="А4"/>
+		<attribute name="Характер_работы"	value=""/>
+		<attribute name="Шифр_PCB"	value=""/>
+		<attribute name="п_Доп_графа"	value=""/>
+		<attribute name="п_Н_контр"	value="Корнева"/>
+		<attribute name="п_Пров"	value="Десинов"/>
+		<attribute name="п_Пров_P"	value="Васильев"/>
+		<attribute name="п_Разраб"	value="Ражева"/>
+		<attribute name="п_Разраб_P"	value="Струнков"/>
+		<attribute name="п_Утв"	value="Гульцов"/>
+	<references>
+		<document	ID="Документация">
+			<property>
+				<attribute name="Раздел_Сп"	value="Документация"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="Наименование"	value="Сборочный чертеж"/>
+				<attribute name="Обозначение"	value="ПАКБ.436734.802СБ"/>
+				<attribute name="Код_документа"	value="СБ"/>
+				<attribute name="Формат"	value="А3"/>
+				<attribute name="Примечание"	value=""/>
+			</property>
+		</document>
+		<document	ID="Документация">
+			<property>
+				<attribute name="Раздел_Сп"	value="Документация"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="Наименование"	value="Схема электрическая принципиальная"/>
+				<attribute name="Обозначение"	value="ПАКБ.436734.802Э3"/>
+				<attribute name="Код_документа"	value="Э3"/>
+				<attribute name="Формат"	value="А3"/>
+				<attribute name="Примечание"	value=""/>
+			</property>
+		</document>
+		<document	ID="Документация">
+			<property>
+				<attribute name="Раздел_Сп"	value="Документация"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="Наименование"	value="Перечень элементов"/>
+				<attribute name="Обозначение"	value="ПАКБ.436734.802ПЭ3"/>
+				<attribute name="Код_документа"	value="ПЭ3"/>
+				<attribute name="Формат"	value="А4"/>
+				<attribute name="Примечание"	value=""/>
+			</property>
+		</document>
+		<component_pcb	PCBID="">
+			<property>
+				<attribute name="Раздел_Сп"	value="Сборочные единицы"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="Group"	value=""/>
+				<attribute name="Entry"	value=""/>
+				<attribute name="Наименование"	value="Плата печатная"/>
+				<attribute name="Обозначение"	value=""/>
+				<attribute name="Перв.Примен."	value="ПАКБ.687281.800"/>
+				<attribute name="Формат"	value="А4"/>
+				<attribute name="Board_filename"	value="SAVIP_Cross_Board.PcbDoc"/>
+				<attribute name="Board_Code"	value=""/>
+				<attribute name="Кол-во слоев"	value="8"/>
+				<attribute name="Толщина, мм"	value="2,01"/>
+				<attribute name="BOARD_OUTLINE"	value="
+50;50;240;50#
+240;50;240;123#
+240;123;50;123#
+50;123;50;50#
+				"/>
+				<attribute name="BOARD_CUTOUT"	value="
+				"/>
+				<attribute name="DRILLED_HOLES"	value="
+2,2;215;82,5;1#
+0,7;216;79;1#
+0,7;214;79;1#
+0,7;216;75;1#
+0,7;216;77;1#
+2,2;215;71,5;1#
+0,7;214;77;1#
+0,7;214;75;1#
+2,2;207;62,5;1#
+0,7;206;66;1#
+0,7;208;66;1#
+0,7;206;68;1#
+2,2;207;71,5;1#
+0,7;208;68;1#
+3,4;91;81;1#
+1,2;195,93;88,66;1#
+1,2;198,47;88,66;1#
+1,2;193,39;88,66;1#
+1,2;198,47;86,12;1#
+1,2;195,93;86,12;1#
+1,2;193,39;86,12;1#
+1,2;190,85;88,66;1#
+1,2;188,31;88,66;1#
+1,2;190,85;86,12;1#
+1,2;185,77;86,12;1#
+1,2;188,31;86,12;1#
+1,2;180,69;88,66;1#
+1,2;183,23;88,66;1#
+1,2;185,77;88,66;1#
+1,2;180,69;86,12;1#
+1,2;183,23;86,12;1#
+1,2;175,61;88,66;1#
+1,2;178,15;88,66;1#
+1,2;178,15;86,12;1#
+1,2;175,61;86,12;1#
+1,2;173,07;86,12;1#
+1,2;173,07;88,66;1#
+1,2;170,53;88,66;1#
+1,2;165,45;88,66;1#
+1,2;160,37;88,66;1#
+1,2;167,99;88,66;1#
+1,2;170,53;86,12;1#
+1,2;165,45;86,12;1#
+1,2;167,99;86,12;1#
+1,2;162,91;88,66;1#
+1,2;162,91;86,12;1#
+1,2;160,37;86,12;1#
+1,2;198,47;83,58;1#
+1,2;193,39;83,58;1#
+1,2;195,93;83,58;1#
+1,2;190,85;83,58;1#
+2,7;204,1;83,28;0#
+1,2;198,47;81,04;1#
+1,2;193,39;81,04;1#
+1,2;195,93;81,04;1#
+1,2;190,85;81,04;1#
+1,2;188,31;83,58;1#
+1,2;183,23;83,58;1#
+1,2;185,77;83,58;1#
+1,2;180,69;83,58;1#
+1,2;185,77;81,04;1#
+1,2;188,31;81,04;1#
+1,2;183,23;81,04;1#
+1,2;180,69;81,04;1#
+1,2;195,93;78,5;1#
+1,2;198,47;78,5;1#
+1,2;193,39;78,5;1#
+1,2;190,85;78,5;1#
+1,2;188,31;78,5;1#
+1,2;185,77;78,5;1#
+1,2;180,69;78,5;1#
+1,2;183,23;78,5;1#
+1,2;178,15;83,58;1#
+1,2;175,61;83,58;1#
+1,2;173,07;83,58;1#
+1,2;170,53;83,58;1#
+1,2;178,15;81,04;1#
+1,2;175,61;81,04;1#
+1,2;173,07;81,04;1#
+1,2;170,53;81,04;1#
+1,2;167,99;83,58;1#
+1,2;165,45;83,58;1#
+1,2;162,91;83,58;1#
+1,2;160,37;83,58;1#
+1,2;165,45;81,04;1#
+1,2;167,99;81,04;1#
+1,2;162,91;81,04;1#
+1,2;160,37;81,04;1#
+1,2;178,15;78,5;1#
+1,2;175,61;78,5;1#
+1,2;170,53;78,5;1#
+1,2;173,07;78,5;1#
+1,2;167,99;78,5;1#
+1,2;162,91;78,5;1#
+1,2;165,45;78,5;1#
+1,2;160,37;78,5;1#
+1,2;155,29;88,66;1#
+1,2;157,83;88,66;1#
+1,2;150,21;88,66;1#
+1,2;157,83;86,12;1#
+1,2;152,75;86,12;1#
+1,2;155,29;86,12;1#
+1,2;152,75;88,66;1#
+1,2;150,21;86,12;1#
+1,2;147,67;88,66;1#
+1,2;145,13;88,66;1#
+1,2;147,67;86,12;1#
+1,2;142,59;88,66;1#
+1,2;145,13;86,12;1#
+1,2;140,05;88,66;1#
+1,2;140,05;86,12;1#
+1,2;142,59;86,12;1#
+1,2;134,97;88,66;1#
+1,2;137,51;88,66;1#
+1,2;137,51;86,12;1#
+1,2;134,97;86,12;1#
+1,2;132,43;88,66;1#
+1,2;132,43;86,12;1#
+1,2;129,89;88,66;1#
+1,2;129,89;86,12;1#
+1,2;127,35;88,66;1#
+1,2;124,81;88,66;1#
+1,2;127,35;86,12;1#
+1,2;122,27;88,66;1#
+1,2;124,81;86,12;1#
+1,2;119,73;88,66;1#
+1,2;119,73;86,12;1#
+1,2;122,27;86,12;1#
+1,2;157,83;83,58;1#
+1,2;155,29;83,58;1#
+1,2;152,75;83,58;1#
+1,2;150,21;83,58;1#
+1,2;155,29;81,04;1#
+1,2;157,83;81,04;1#
+1,2;152,75;81,04;1#
+1,2;150,21;81,04;1#
+1,2;147,67;83,58;1#
+1,2;145,13;83,58;1#
+1,2;142,59;83,58;1#
+1,2;140,05;83,58;1#
+1,2;147,67;81,04;1#
+1,2;145,13;81,04;1#
+1,2;140,05;81,04;1#
+1,2;142,59;81,04;1#
+1,2;157,83;78,5;1#
+1,2;152,75;78,5;1#
+1,2;155,29;78,5;1#
+1,2;150,21;78,5;1#
+1,2;147,67;78,5;1#
+1,2;145,13;78,5;1#
+1,2;142,59;78,5;1#
+1,2;140,05;78,5;1#
+1,2;134,97;83,58;1#
+1,2;137,51;83,58;1#
+1,2;132,43;83,58;1#
+1,2;129,89;83,58;1#
+1,2;134,97;81,04;1#
+1,2;137,51;81,04;1#
+1,2;132,43;81,04;1#
+1,2;127,35;81,04;1#
+1,2;129,89;81,04;1#
+1,2;127,35;83,58;1#
+1,2;124,81;83,58;1#
+1,2;122,27;83,58;1#
+1,2;119,73;83,58;1#
+1,2;124,81;81,04;1#
+1,2;122,27;81,04;1#
+2,7;114,1;83,28;0#
+1,2;119,73;81,04;1#
+1,2;137,51;78,5;1#
+1,2;132,43;78,5;1#
+1,2;134,97;78,5;1#
+1,2;129,89;78,5;1#
+1,2;127,35;78,5;1#
+1,2;122,27;78,5;1#
+1,2;124,81;78,5;1#
+1,2;119,73;78,5;1#
+1,1;147,62;104,24;1#
+1,1;146,2;106,01;1#
+1,1;145,97;102,66;1#
+1,1;144,14;107;1#
+1,1;144,14;104,72;1#
+1,1;148,16;102;1#
+1,1;147,62;99,76;1#
+1,1;145,36;100,09;1#
+1,1;146,2;97,99;1#
+1,1;143;101,24;1#
+1,1;143;98,95;1#
+1,1;144,14;97;1#
+1,1;141,86;107;1#
+1,1;141,86;104,72;1#
+1,1;140,64;100,09;1#
+1,1;139,8;106,01;1#
+1,1;140,03;102,66;1#
+1,1;138,38;104,24;1#
+1,1;137,84;102;1#
+1,1;141,86;97;1#
+1,1;139,8;97,99;1#
+1,1;138,38;99,76;1#
+1,1;97,62;104,24;1#
+1,1;96,2;106,01;1#
+1,1;95,97;102,66;1#
+1,1;94,14;107;1#
+1,1;94,14;104,72;1#
+1,1;98,16;102;1#
+1,1;97,62;99,76;1#
+1,1;95,36;100,09;1#
+1,1;96,2;97,99;1#
+1,1;93;101,24;1#
+1,1;93;98,95;1#
+1,1;94,14;97;1#
+1,1;91,86;107;1#
+1,1;91,86;104,72;1#
+1,1;90,64;100,09;1#
+1,1;89,8;106,01;1#
+1,1;90,03;102,66;1#
+1,1;88,38;104,24;1#
+1,1;87,84;102;1#
+1,1;91,86;97;1#
+1,1;89,8;97,99;1#
+1,1;88,38;99,76;1#
+1,1;166,86;70,72;1#
+1,1;165,03;68,66;1#
+1,1;165,64;66,09;1#
+1,1;168;64,95;1#
+1,1;170,36;66,09;1#
+1,1;170,97;68,66;1#
+1,1;169,14;70,72;1#
+1,1;166,86;73;1#
+1,1;164,8;72,01;1#
+1,1;163,38;70,24;1#
+1,1;162,84;68;1#
+1,1;173,16;68;1#
+1,1;171,2;63,99;1#
+1,1;163,38;65,76;1#
+1,1;166,86;63;1#
+1,1;164,8;63,99;1#
+1,1;172,62;70,24;1#
+1,1;172,62;65,76;1#
+1,1;171,2;72,01;1#
+1,1;169,14;73;1#
+1,1;169,14;63;1#
+1,1;168;67,24;1#
+1,1;116,86;70,72;1#
+1,1;115,03;68,66;1#
+1,1;115,64;66,09;1#
+1,1;118;64,95;1#
+1,1;120,36;66,09;1#
+1,1;120,97;68,66;1#
+1,1;119,14;70,72;1#
+1,1;116,86;73;1#
+1,1;114,8;72,01;1#
+1,1;113,38;70,24;1#
+1,1;112,84;68;1#
+1,1;123,16;68;1#
+1,1;121,2;63,99;1#
+1,1;113,38;65,76;1#
+1,1;116,86;63;1#
+1,1;114,8;63,99;1#
+1,1;122,62;70,24;1#
+1,1;122,62;65,76;1#
+1,1;121,2;72,01;1#
+1,1;119,14;73;1#
+1,1;119,14;63;1#
+1,1;118;67,24;1#
+1,1;71,51;69,14;1#
+1,1;70,16;71;1#
+1,1;68;71,71;1#
+1,1;68;69,42;1#
+1,1;71,51;66,86;1#
+1,1;70,16;65;1#
+1,1;69,24;67,11;1#
+1,1;68;64,29;1#
+1,1;65,84;71;1#
+1,1;66,76;67,11;1#
+1,1;64,49;69,14;1#
+1,1;64,49;66,86;1#
+1,1;65,84;65;1#
+1,1;196,51;103,14;1#
+1,1;195,16;105;1#
+1,1;193;105,71;1#
+1,1;193;103,42;1#
+1,1;196,51;100,86;1#
+1,1;195,16;99;1#
+1,1;194,24;101,11;1#
+1,1;193;98,29;1#
+1,1;190,84;105;1#
+1,1;191,76;101,11;1#
+1,1;189,49;103,14;1#
+1,1;189,49;100,86;1#
+1,1;190,84;99;1#
+3,4;236;119;1#
+3,4;236;54;1#
+3,4;54;119;1#
+				"/>
+			</property>
+		</component_pcb>
+		<component	ID="Прочие изделия">
+			<property>
+				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="DM_PhysicalDesignator"	value="A1"/>
+				<attribute name="Наименование"	value="МДМ160-1В12МУВ"/>
+				<attribute name="Part Number"	value="БКЯЮ.436630.004ТУ"/>
+				<attribute name="Product code"	value=""/>
+				<attribute name="Manufacturer"	value=""/>
+				<attribute name="Type"	value=""/>
+				<attribute name="Group"	value=""/>
+				<attribute name="Entry"	value=""/>
+				<attribute name="Footprint"	value="CAPC2012X125N"/>
+				<attribute name="X"	value="0"/>
+				<attribute name="Y"	value="0"/>
+				<attribute name="Z"	value="2,01"/>
+				<attribute name="Layer"	value="1"/>
+				<attribute name="Rotation"	value="0"/>
+				<attribute name="StandOff"	value="0"/>
+			</property>
+		</component>
+		<component	ID="Прочие изделия">
+			<property>
+				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="DM_PhysicalDesignator"	value="A2"/>
+				<attribute name="Наименование"	value="МДМ50-1В05МУВ"/>
+				<attribute name="Part Number"	value="БКЯЮ.436630.004ТУ"/>
+				<attribute name="Product code"	value=""/>
+				<attribute name="Manufacturer"	value=""/>
+				<attribute name="Type"	value=""/>
+				<attribute name="Group"	value=""/>
+				<attribute name="Entry"	value=""/>
+				<attribute name="Footprint"	value="CAPC2012X125N"/>
+				<attribute name="X"	value="0"/>
+				<attribute name="Y"	value="0"/>
+				<attribute name="Z"	value="2,01"/>
+				<attribute name="Layer"	value="1"/>
+				<attribute name="Rotation"	value="0"/>
+				<attribute name="StandOff"	value="0"/>
+			</property>
+		</component>
+		<component	ID="Прочие изделия">
+			<property>
+				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="DM_PhysicalDesignator"	value="A3"/>
+				<attribute name="Наименование"	value="МДМ3-1А05МУП"/>
+				<attribute name="Part Number"	value="БКЯЮ.436630.001ТУ"/>
+				<attribute name="Product code"	value=""/>
+				<attribute name="Manufacturer"	value=""/>
+				<attribute name="Type"	value=""/>
+				<attribute name="Group"	value=""/>
+				<attribute name="Entry"	value=""/>
+				<attribute name="Footprint"	value="CAPC2012X125N"/>
+				<attribute name="X"	value="0"/>
+				<attribute name="Y"	value="0"/>
+				<attribute name="Z"	value="2,01"/>
+				<attribute name="Layer"	value="1"/>
+				<attribute name="Rotation"	value="0"/>
+				<attribute name="StandOff"	value="0"/>
+			</property>
+		</component>		
+		<component	ID="Прочие изделия">
+			<property>
+				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="DM_PhysicalDesignator"	value="C1"/>
+				<attribute name="Наименование"	value="К10-79-50 В-0.15 мкФ ±20 % Н30"/>
+				<attribute name="Part Number"	value="АЖЯР.673511.004ТУ"/>
+				<attribute name="Product code"	value=""/>
+				<attribute name="Manufacturer"	value=""/>
+				<attribute name="Type"	value="К10-79"/>
+				<attribute name="Group"	value=""/>
+				<attribute name="Entry"	value=""/>
+				<attribute name="Footprint"	value="CAPC1005X55N"/>
+				<attribute name="X"	value="147,9"/>
+				<attribute name="Y"	value="58,78"/>
+				<attribute name="Z"	value="0"/>
+				<attribute name="Layer"	value="0"/>
+				<attribute name="Rotation"	value="180"/>
+				<attribute name="StandOff"	value="0"/>
+			</property>
+		</component>
+		<component	ID="Прочие изделия">
+			<property>
+				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="DM_PhysicalDesignator"	value="C2"/>
+				<attribute name="Наименование"	value="К10-79-50 В-0.15 мкФ ±20 % Н30"/>
+				<attribute name="Part Number"	value="АЖЯР.673511.004ТУ"/>
+				<attribute name="Product code"	value=""/>
+				<attribute name="Manufacturer"	value=""/>
+				<attribute name="Type"	value="К10-79"/>
+				<attribute name="Group"	value=""/>
+				<attribute name="Entry"	value=""/>
+				<attribute name="Footprint"	value="CAPC1005X55N"/>
+				<attribute name="X"	value="147,9"/>
+				<attribute name="Y"	value="58,78"/>
+				<attribute name="Z"	value="0"/>
+				<attribute name="Layer"	value="0"/>
+				<attribute name="Rotation"	value="180"/>
+				<attribute name="StandOff"	value="0"/>
+			</property>
+		</component>
+		<component	ID="Прочие изделия">
+			<property>
+				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="DM_PhysicalDesignator"	value="C3"/>
+				<attribute name="Наименование"	value="К10-79-50 В-0.15 мкФ ±20 % Н30"/>
+				<attribute name="Part Number"	value="АЖЯР.673511.004ТУ"/>
+				<attribute name="Product code"	value=""/>
+				<attribute name="Manufacturer"	value=""/>
+				<attribute name="Type"	value="К10-79"/>
+				<attribute name="Group"	value=""/>
+				<attribute name="Entry"	value=""/>
+				<attribute name="Footprint"	value="CAPC1005X55N"/>
+				<attribute name="X"	value="147,9"/>
+				<attribute name="Y"	value="58,78"/>
+				<attribute name="Z"	value="0"/>
+				<attribute name="Layer"	value="0"/>
+				<attribute name="Rotation"	value="180"/>
+				<attribute name="StandOff"	value="0"/>
+			</property>
+		</component>
+		<component	ID="Прочие изделия">
+			<property>
+				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="DM_PhysicalDesignator"	value="C4"/>
+				<attribute name="Наименование"	value="К10-79-50 В-0.22 мкФ ±20 % Н30"/>
+				<attribute name="Part Number"	value="АЖЯР.673511.004ТУ"/>
+				<attribute name="Product code"	value=""/>
+				<attribute name="Manufacturer"	value=""/>
+				<attribute name="Type"	value="К10-79"/>
+				<attribute name="Group"	value=""/>
+				<attribute name="Entry"	value=""/>
+				<attribute name="Footprint"	value="CAPC1005X55N"/>
+				<attribute name="X"	value="147,9"/>
+				<attribute name="Y"	value="58,78"/>
+				<attribute name="Z"	value="0"/>
+				<attribute name="Layer"	value="0"/>
+				<attribute name="Rotation"	value="180"/>
+				<attribute name="StandOff"	value="0"/>
+			</property>
+		</component>
+		<component	ID="Прочие изделия">
+			<property>
+				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="DM_PhysicalDesignator"	value="C5"/>
+				<attribute name="Наименование"	value="К10-82-250 В-0.022 мкФ ±20 % Н20"/>
+				<attribute name="Part Number"	value="АЖЯР.673511.007ТУ"/>
+				<attribute name="Product code"	value=""/>
+				<attribute name="Manufacturer"	value=""/>
+				<attribute name="Type"	value="К10-82"/>
+				<attribute name="Group"	value=""/>
+				<attribute name="Entry"	value=""/>
+				<attribute name="Footprint"	value="CAPC1005X55N"/>
+				<attribute name="X"	value="147,9"/>
+				<attribute name="Y"	value="58,78"/>
+				<attribute name="Z"	value="0"/>
+				<attribute name="Layer"	value="0"/>
+				<attribute name="Rotation"	value="180"/>
+				<attribute name="StandOff"	value="0"/>
+			</property>
+		</component>
+		<component	ID="Прочие изделия">
+			<property>
+				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="DM_PhysicalDesignator"	value="C6"/>
+				<attribute name="Наименование"	value="К10-82-250 В-0.022 мкФ ±20 % Н20"/>
+				<attribute name="Part Number"	value="АЖЯР.673511.007ТУ"/>
+				<attribute name="Product code"	value=""/>
+				<attribute name="Manufacturer"	value=""/>
+				<attribute name="Type"	value="К10-82"/>
+				<attribute name="Group"	value=""/>
+				<attribute name="Entry"	value=""/>
+				<attribute name="Footprint"	value="CAPC1005X55N"/>
+				<attribute name="X"	value="147,9"/>
+				<attribute name="Y"	value="58,78"/>
+				<attribute name="Z"	value="0"/>
+				<attribute name="Layer"	value="0"/>
+				<attribute name="Rotation"	value="180"/>
+				<attribute name="StandOff"	value="0"/>
+			</property>
+		</component>
+		<component	ID="Прочие изделия">
+			<property>
+				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Fitted"	value="1"/>
+				<attribute name="DM_PhysicalDesignator"	value="C7"/>
+				<attribute name="Наименование"	value="К10-82-250 В-0.033 мкФ ±20 % Н20"/>
+				<attribute name="Part Number"	value="АЖЯР.673511.007ТУ"/>
+				<attribute name="Product code"	value=""/>
+				<attribute name="Manufacturer"	value=""/>
+				<attribute name="Type"	value="К10-82"/>
+				<attribute name="Group"	value=""/>
+				<attribute name="Entry"	value=""/>
+				<attribute name="Footprint"	value="CAPC1005X55N"/>
+				<attribute name="X"	value="147,9"/>
+				<attribute name="Y"	value="58,78"/>
+				<attribute name="Z"	value="0"/>
+				<attribute name="Layer"	value="0"/>
+				<attribute name="Rotation"	value="180"/>
+				<attribute name="StandOff"	value="0"/>
+			</property>
+		</component>		
+	</references>
+	</configuration>
+</project>
+</transaction>
+</xml>

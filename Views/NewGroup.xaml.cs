@@ -10,19 +10,24 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace GostDOC.UserControls
+namespace GostDOC.Views
 {
     /// <summary>
-    /// Interaction logic for Bill.xaml
+    /// Interaction logic for NewGroup.xaml
     /// </summary>
-    public partial class Bill : UserControl
+    public partial class NewGroup : Window
     {
-        public Bill()
+        public NewGroup()
         {
             InitializeComponent();
+        }
+
+        private void OkButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+            this.Close();
         }
     }
 }
