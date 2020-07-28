@@ -52,17 +52,5 @@ namespace GostDOC.Models
             }
             return null;
         }
-
-        public static T ConvertTo<T>(this object value)
-        {
-            try
-            {
-                return (T)Convert.ChangeType(value, typeof(T));
-            }
-            catch (Exception)
-            {
-                return default(T);
-            }
-        }
     }
 }

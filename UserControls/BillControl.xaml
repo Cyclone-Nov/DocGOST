@@ -32,13 +32,12 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name.Value}"/>
                 <DataGridTextColumn Header="Код продукции" Binding="{Binding Code.Value}"/>
-                <DataGridTextColumn Header="Обозначение документа на поставки" Binding="{Binding Entry.Value}"/>
+                <DataGridTextColumn Header="Документ на поставку" Binding="{Binding Entry.Value}"/>
                 <DataGridTextColumn Header="Поставщик" Binding="{Binding Manufacturer.Value}"/>
-                <DataGridTextColumn Header="Куда входит (обозначение)" Binding="{Binding WhereIncluded.Value}"/>
-                <DataGridTextColumn Header="Количество (на изделие)" Binding="{Binding CountProduct.Value}"/>
-                <DataGridTextColumn Header="Количество (в комплекты)" Binding="{Binding CountKits.Value}" />
-                <DataGridTextColumn Header="Количество (на регулир.)" Binding="{Binding CountReg.Value}" />
-                <DataGridTextColumn Header="Количество (всего)" Binding="{Binding Count.Value}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Кол-во (на изд.)" Width="50" Binding="{Binding CountProduct.Value}"/>
+                <DataGridTextColumn Header="Кол-во (в комп.)" Width="50" Binding="{Binding CountKits.Value}" />
+                <DataGridTextColumn Header="Кол-во (на рег.)" Width="50" Binding="{Binding CountReg.Value}" />
+                <DataGridTextColumn Header="Кол-во (всего)" Width="50" Binding="{Binding Count.Value}" IsReadOnly="True" />
                 <DataGridTextColumn Header="Примечание" Binding="{Binding Note.Value}" />
             </DataGrid.Columns>
         </DataGrid>

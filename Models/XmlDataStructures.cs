@@ -49,7 +49,7 @@ namespace GostDOC.Models
         [XmlArrayItem(typeof(ComponentXml), ElementName = "component")]
         public List<ComponentXml> Components { get; set; } = new List<ComponentXml>();
 
-        [XmlArray("components_pcb")]
+        [XmlArray("componentsPcb")]
         [XmlArrayItem(typeof(ComponentXml), ElementName = "component_pcb")]
         public List<ComponentXml> ComponentsPCB { get; set; } = new List<ComponentXml>();
     }

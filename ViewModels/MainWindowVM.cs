@@ -154,6 +154,11 @@ namespace GostDOC.ViewModels
             IsGeneralGraphValuesVisible.Value = _selectedItem.NodeType == NodeType.Root;
             IsSpecificationTableVisible.Value = _selectedItem.ParentType == NodeType.Specification && isGroup;
             IsBillTableVisible.Value = _selectedItem.ParentType == NodeType.Bill && isGroup;
+
+            if (isGroup)
+            {
+                UpdateComponents();
+            }
         }
 
         private string GetGroupName()
@@ -177,6 +182,44 @@ namespace GostDOC.ViewModels
                 return mainFileDlg.FileName.Text;
             }
             return null;
+        }
+
+        private void UpdateComponents()
+        {
+            Components.Clear();
+
+            string cfgName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Parent.Name : _selectedItem.Parent.Parent.Name;
+            string groupName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Name : _selectedItem.Parent.Name;
+            if (groupName == "Без имени")
+                groupName = "";
+
+            Configuration cfg;
+            if (_docManager.Project.Configurations.TryGetValue(cfgName, out cfg))
+            {
+                Group grp = null;
+                // Find group
+                if (_selectedItem.ParentType == NodeType.Specification)
+                {
+                    cfg.Specification.TryGetValue(groupName, out grp);
+                }
+                else if (_selectedItem.ParentType == NodeType.Bill)
+                {
+                    cfg.Bill.TryGetValue(groupName, out grp);
+                }
+                // Find subgroup
+                if (_selectedItem.NodeType == NodeType.SubGroup && grp != null)
+                {
+                    grp.SubGroups.TryGetValue(_selectedItem.Name, out grp);
+                }
+                // Fill components
+                if (grp != null)
+                {
+                    foreach (var component in grp.Components.Values)
+                    {
+                        Components.Add(new ComponentVM(component));
+                    }
+                }
+            }
         }
 
         private void UpdateConfiguration(Node aCollection, string aCfgName, IDictionary<string, Group> aGroups)

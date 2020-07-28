@@ -32,17 +32,5 @@ namespace GostDOC.Models
                 dic.Add(val.Name, val.Text);
             }
         }
-
-        public static T ConvertTo<T>(this object value)
-        {
-            try
-            {
-                return (T)Convert.ChangeType(value, typeof(T));
-            }
-            catch (Exception)
-            {
-                return default(T);
-            }
-        }
     }
 }
