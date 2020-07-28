@@ -11,7 +11,7 @@
 <project	Project_Path="G:\ПАКБ.687281.800 Плата объединительная (ПО)\SAVIP_Cross_Board.PrjPcb"	Project_Name="SAVIP_Cross_Board.PrjPcb">
 <!-- -00 из 1 -->
 	<configuration	name="-00">
-		<attribute name="Раздел_Сп"	value="Сборочные единицы"/>
+		<attribute name="Раздел_СП"	value="Сборочные единицы"/>
 		<attribute name="Вид_документа"	value="Файл проекта печатной платы"/>
 		<attribute name="Дата_изменения"	value=""/>
 		<attribute name="Дата_изменения_ПЭ3"	value=""/>
@@ -50,7 +50,7 @@
 	<references>
 		<document	ID="Документация">
 			<property>
-				<attribute name="Раздел_Сп"	value="Документация"/>
+				<attribute name="Раздел_СП"	value="Документация"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="Наименование"	value="Сборочный чертеж"/>
 				<attribute name="Обозначение"	value="ПАКБ.436734.802СБ"/>
@@ -61,7 +61,7 @@
 		</document>
 		<document	ID="Документация">
 			<property>
-				<attribute name="Раздел_Сп"	value="Документация"/>
+				<attribute name="Раздел_СП"	value="Документация"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="Наименование"	value="Схема электрическая принципиальная"/>
 				<attribute name="Обозначение"	value="ПАКБ.436734.802Э3"/>
@@ -72,7 +72,7 @@
 		</document>
 		<document	ID="Документация">
 			<property>
-				<attribute name="Раздел_Сп"	value="Документация"/>
+				<attribute name="Раздел_СП"	value="Документация"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="Наименование"	value="Перечень элементов"/>
 				<attribute name="Обозначение"	value="ПАКБ.436734.802ПЭ3"/>
@@ -83,7 +83,7 @@
 		</document>
 		<component_pcb	PCBID="">
 			<property>
-				<attribute name="Раздел_Сп"	value="Сборочные единицы"/>
+				<attribute name="Раздел_СП"	value="Сборочные единицы"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="Group"	value=""/>
 				<attribute name="Entry"	value=""/>
@@ -403,7 +403,7 @@
 		</component_pcb>
 		<component	ID="Прочие изделия">
 			<property>
-				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Раздел_СП"	value="Прочие изделия"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="DM_PhysicalDesignator"	value="A1"/>
 				<attribute name="Наименование"	value="МДМ160-1В12МУВ"/>
@@ -424,7 +424,7 @@
 		</component>
 		<component	ID="Прочие изделия">
 			<property>
-				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Раздел_СП"	value="Прочие изделия"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="DM_PhysicalDesignator"	value="A2"/>
 				<attribute name="Наименование"	value="МДМ50-1В05МУВ"/>
@@ -445,7 +445,7 @@
 		</component>
 		<component	ID="Прочие изделия">
 			<property>
-				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Раздел_СП"	value="Прочие изделия"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="DM_PhysicalDesignator"	value="A3"/>
 				<attribute name="Наименование"	value="МДМ3-1А05МУП"/>
@@ -466,7 +466,7 @@
 		</component>		
 		<component	ID="Прочие изделия">
 			<property>
-				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Раздел_СП"	value="Прочие изделия"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="DM_PhysicalDesignator"	value="C1"/>
 				<attribute name="Наименование"	value="К10-79-50 В-0.15 мкФ ±20 % Н30"/>
@@ -487,7 +487,7 @@
 		</component>
 		<component	ID="Прочие изделия">
 			<property>
-				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Раздел_СП"	value="Прочие изделия"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="DM_PhysicalDesignator"	value="C2"/>
 				<attribute name="Наименование"	value="К10-79-50 В-0.15 мкФ ±20 % Н30"/>
@@ -508,7 +508,7 @@
 		</component>
 		<component	ID="Прочие изделия">
 			<property>
-				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Раздел_СП"	value="Прочие изделия"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="DM_PhysicalDesignator"	value="C3"/>
 				<attribute name="Наименование"	value="К10-79-50 В-0.15 мкФ ±20 % Н30"/>
@@ -529,7 +529,7 @@
 		</component>
 		<component	ID="Прочие изделия">
 			<property>
-				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Раздел_СП"	value="Прочие изделия"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="DM_PhysicalDesignator"	value="C4"/>
 				<attribute name="Наименование"	value="К10-79-50 В-0.22 мкФ ±20 % Н30"/>
@@ -550,7 +550,7 @@
 		</component>
 		<component	ID="Прочие изделия">
 			<property>
-				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Раздел_СП"	value="Прочие изделия"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="DM_PhysicalDesignator"	value="C5"/>
 				<attribute name="Наименование"	value="К10-82-250 В-0.022 мкФ ±20 % Н20"/>
@@ -571,7 +571,7 @@
 		</component>
 		<component	ID="Прочие изделия">
 			<property>
-				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Раздел_СП"	value="Прочие изделия"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="DM_PhysicalDesignator"	value="C6"/>
 				<attribute name="Наименование"	value="К10-82-250 В-0.022 мкФ ±20 % Н20"/>
@@ -592,7 +592,7 @@
 		</component>
 		<component	ID="Прочие изделия">
 			<property>
-				<attribute name="Раздел_Сп"	value="Прочие изделия"/>
+				<attribute name="Раздел_СП"	value="Прочие изделия"/>
 				<attribute name="Fitted"	value="1"/>
 				<attribute name="DM_PhysicalDesignator"	value="C7"/>
 				<attribute name="Наименование"	value="К10-82-250 В-0.033 мкФ ±20 % Н20"/>

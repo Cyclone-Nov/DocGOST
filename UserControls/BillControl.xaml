@@ -16,8 +16,8 @@
 
         <DataGrid x:Name="billDataGrid" Margin="5" SelectionMode="Extended" SelectionUnit="FullRow" 
                   AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*"
-                  SelectedItem="{Binding BillSelectedItem.Value}"
-                  ItemsSource="{Binding BillTable}">
+                  SelectedItem="{Binding ComponentsSelectedItem.Value}"
+                  ItemsSource="{Binding Components}">
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="ContentTemplate">
@@ -30,23 +30,23 @@
                 </Style>
             </DataGrid.ColumnHeaderStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"/>
-                <DataGridTextColumn Header="Код продукции" Binding="{Binding Code}"/>
-                <DataGridTextColumn Header="Обозначение документа на поставки" Binding="{Binding Document}"/>
-                <DataGridTextColumn Header="Поставщик" Binding="{Binding Supplier}"/>
-                <DataGridTextColumn Header="Куда входит (обозначение)" Binding="{Binding WhereIncluded}"/>
-                <DataGridTextColumn Header="Количество (на изделие)" Binding="{Binding QuantityOnProduct}"/>
-                <DataGridTextColumn Header="Количество (в комплекты)" Binding="{Binding QuantityOnSets}" />
-                <DataGridTextColumn Header="Количество (на регулир.)" Binding="{Binding QuantityOnReg}" />
-                <DataGridTextColumn Header="Количество (всего)" Binding="{Binding Sum}" />
-                <DataGridTextColumn Header="Примечание" Binding="{Binding Note}" />
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Name.Value}"/>
+                <DataGridTextColumn Header="Код продукции" Binding="{Binding Code.Value}"/>
+                <DataGridTextColumn Header="Обозначение документа на поставки" Binding="{Binding Entry.Value}"/>
+                <DataGridTextColumn Header="Поставщик" Binding="{Binding Manufacturer.Value}"/>
+                <DataGridTextColumn Header="Куда входит (обозначение)" Binding="{Binding WhereIncluded.Value}"/>
+                <DataGridTextColumn Header="Количество (на изделие)" Binding="{Binding CountProduct.Value}"/>
+                <DataGridTextColumn Header="Количество (в комплекты)" Binding="{Binding CountKits.Value}" />
+                <DataGridTextColumn Header="Количество (на регулир.)" Binding="{Binding CountReg.Value}" />
+                <DataGridTextColumn Header="Количество (всего)" Binding="{Binding Count.Value}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Примечание" Binding="{Binding Note.Value}" />
             </DataGrid.Columns>
         </DataGrid>
 
         <DockPanel Grid.Row="1" LastChildFill="False">
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Command="{Binding AddBillItemCmd}">Добавить</Button>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding RemoveBillItemsCmd}">Удалить</Button>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding MergeBillItemsCmd}">Объединить</Button>
+            <Button DockPanel.Dock="Left" Width="100" Margin="5" Command="{Binding AddComponentCmd}">Добавить</Button>
+            <Button DockPanel.Dock="Left" Width="100" Margin="5" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding RemoveComponentsCmd}">Удалить</Button>
+            <Button DockPanel.Dock="Left" Width="100" Margin="5" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding MoveComponentsCmd}">Перенести</Button>
         </DockPanel>
     </Grid>
 </UserControl>

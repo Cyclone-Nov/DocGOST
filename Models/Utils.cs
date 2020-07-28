@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace GostDOC
+namespace GostDOC.Models
 {
     static class Utils
     {
@@ -25,19 +25,23 @@ namespace GostDOC
                 col.Add(val);
             }
         }
-        public static void AddRange<T>(this HashSet<T> col, IEnumerable<T> data)
+        public static void AddRange(this Dictionary<string, string> dic, IList<PropertyXml> data)
         {
-            foreach (T val in data)
+            foreach (var val in data)
             {
-                col.Add(val);
+                dic.Add(val.Name, val.Text);
             }
         }
 
-        public static void AddRange(this ObservableCollection<TreeViewItem> col, IEnumerable<string> data)
+        public static T ConvertTo<T>(this object value)
         {
-            foreach (string val in data)
+            try
             {
-                col.Add(new TreeViewItem() { Header = val });
+                return (T)Convert.ChangeType(value, typeof(T));
+            }
+            catch (Exception)
+            {
+                return default(T);
             }
         }
     }

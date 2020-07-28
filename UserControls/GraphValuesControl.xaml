@@ -27,9 +27,8 @@
                 </Style>
             </DataGrid.ColumnHeaderStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="№ графы" IsReadOnly="True" Binding="{Binding Num}"/>
-                <DataGridTextColumn Header="Наименование графы" IsReadOnly="True" Binding="{Binding Name}"/>
-                <DataGridTextColumn Header="Значение" Binding="{Binding Text}"/>
+                <DataGridTextColumn Header="Наименование графы" IsReadOnly="True" Binding="{Binding Name.Value}"/>
+                <DataGridTextColumn Header="Значение" Binding="{Binding Text.Value}"/>
             </DataGrid.Columns>
         </DataGrid>
 

@@ -62,22 +62,27 @@
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>
 
-            <TreeView x:Name="myTreeView" Margin="5">
+            <TreeView x:Name="myTreeView" Margin="5" ItemsSource="{Binding DocNodes}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedItemChanged">
                         <i:InvokeCommandAction Command="{Binding TreeViewSelectionChangedCmd}" CommandParameter="{Binding ElementName=myTreeView, Path=SelectedItem}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-                <TreeViewItem Header="Документы" IsExpanded="True">
-                    <TreeViewItem Header="Перечень элементов"/>
-                    <TreeViewItem Header="Спецификация" IsExpanded="True" ItemsSource="{Binding SpecificationGroups}"/>
-                    <TreeViewItem Header="Ведомость покупных изделий" IsExpanded="True" ItemsSource="{Binding BillGroups}"/>
-                    <TreeViewItem Header="Ведомость Д27"/>
-                </TreeViewItem>
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes}">
+                        <TextBlock Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="True" />
+                    </Style>
+                </TreeView.ItemContainerStyle>
             </TreeView>
 
             <DockPanel Grid.Row="1" LastChildFill="False">
-                <Button DockPanel.Dock="Left" Width="100" Margin="5">Удалить группу</Button>
+                <Button DockPanel.Dock="Left" Width="100" Margin="5">Добавить</Button>
+                <Button DockPanel.Dock="Right" Width="100" Margin="5">Удалить</Button>
             </DockPanel>
         </Grid>
 
