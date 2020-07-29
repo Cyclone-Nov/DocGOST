@@ -25,12 +25,30 @@ namespace GostDOC.Models
                 col.Add(val);
             }
         }
+        public static void AddRange<T, V>(this IDictionary<T, V> dst, IDictionary<T, V> src)
+        {
+            foreach (var val in src)
+            {
+                dst.Add(val);
+            }
+        }
+
         public static void AddRange(this Dictionary<string, string> dic, IList<PropertyXml> data)
         {
             foreach (var val in data)
             {
                 dic.Add(val.Name, val.Text);
             }
+        }
+
+        public static IEnumerable<T> AsNotNull<T>(this IEnumerable<T> original)
+        {
+            return original ?? Enumerable.Empty<T>();
+        }
+
+        public static IEnumerable<KeyValuePair<T, V>> AsNotNull<T, V>(this IDictionary<T, V> original)
+        {
+            return original ?? Enumerable.Empty<KeyValuePair<T, V>>();
         }
     }
 }

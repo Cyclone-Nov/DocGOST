@@ -33,9 +33,9 @@
         </DataGrid>
 
         <DockPanel Grid.Row="1" LastChildFill="False">
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" 
+            <Button DockPanel.Dock="Right" Width="100" Margin="5" Content="Сохранить" 
                     CommandParameter="{Binding Path=GraphType, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:GraphValuesControl}}}" 
-                    Command="{Binding SaveGraphValuesCmd}">Сохранить</Button>
+                    Command="{Binding SaveGraphValuesCmd}"/>
         </DockPanel>
     </Grid>
 </UserControl>

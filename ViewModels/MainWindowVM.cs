@@ -49,6 +49,7 @@ namespace GostDOC.ViewModels
         public ICommand SaveGraphValuesCmd => new Command<GraphPageType>(SaveGraphValues);
         public ICommand AddGroupCmd => new Command(AddGroup);
         public ICommand RemoveGroupCmd => new Command(RemoveGroup);
+        public ICommand SaveComponentsCmd => new Command(SaveComponents);
 
         #endregion Commands
 
@@ -141,6 +142,40 @@ namespace GostDOC.ViewModels
             }
         }
 
+        private void SaveComponents(object obj)
+        {
+            string cfgName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Parent.Name : _selectedItem.Parent.Parent.Name;
+            string groupName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Name : _selectedItem.Parent.Name;
+            string subGroupName = _selectedItem.NodeType == NodeType.SubGroup ? _selectedItem.Name : string.Empty;
+
+            bool isDocument = groupName == Constants.GroupNameDoc || subGroupName == Constants.GroupNameDoc;
+
+            Dictionary<Guid, Component> components = new Dictionary<Guid, Component>();
+            foreach (var cmp in Components)
+            {
+                Component component = new Component(cmp.Guid)
+                {                    
+                    Type = isDocument ? ComponentType.Document : ComponentType.Component
+                };                
+
+                component.Properties.Add(Constants.GroupNameSp, groupName);
+                component.Properties.Add(Constants.ComponentName, cmp.Name.Value);
+                component.Properties.Add(Constants.ComponentSign, cmp.Sign.Value);
+                component.Properties.Add(Constants.ComponentProductCode, cmp.Code.Value);
+                component.Properties.Add(Constants.ComponentFormat, cmp.Format.Value);
+                component.Properties.Add(Constants.ComponentDoc, cmp.Entry.Value);
+                component.Properties.Add(Constants.ComponentSupplier, cmp.Manufacturer.Value);
+                component.Properties.Add(Constants.ComponentCountDev, cmp.CountDev.Value.ToString());
+                component.Properties.Add(Constants.ComponentCountSet, cmp.CountSet.Value.ToString());
+                component.Properties.Add(Constants.ComponentCountReg, cmp.CountReg.Value.ToString());
+                component.Properties.Add(Constants.ComponentNote, cmp.Note.Value);
+
+                components.Add(component.Guid, component);
+            }
+
+            _docManager.UpdateComponents(cfgName, groupName, subGroupName, _selectedItem.ParentType, components);
+        }
+
         private void SaveGraphValues(GraphPageType tp)
         {
             // TODO: Save updated graph values
@@ -148,12 +183,48 @@ namespace GostDOC.ViewModels
 
         private void AddGroup(object obj)
         {
-            // TODO: Add group
+            string name = GetGroupName();
+            if (string.IsNullOrEmpty(name))
+            {
+                return;
+            }
+
+            if (_selectedItem.NodeType == NodeType.Configuration)
+            {
+                _docManager.AddGroup(_selectedItem.Name, name, null, _selectedItem.ParentType);
+            }
+            else if (_selectedItem.NodeType == NodeType.Group)
+            {
+                _docManager.AddGroup(_selectedItem.Parent.Name, _selectedItem.Name, name, _selectedItem.ParentType);
+            }
+
+            UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
         }
 
         private void RemoveGroup(object obj)
         {
-            // TODO: Remove group
+            bool removeComponents = false;
+            var components = GetComponents();
+            if (components.Count > 0)
+            {
+                var result = System.Windows.MessageBox.Show("Удалить компоненты?", "Удаление группы", MessageBoxButton.YesNoCancel);
+                if (result == MessageBoxResult.Cancel)
+                {
+                    return;
+                }
+                removeComponents = (result == MessageBoxResult.Yes);
+            }
+
+            if (_selectedItem.NodeType == NodeType.Group)
+            {
+                _docManager.RemoveGroup(_selectedItem.Parent.Name, _selectedItem.Name, null, _selectedItem.ParentType, removeComponents);
+            }
+            else if (_selectedItem.NodeType == NodeType.SubGroup)
+            {
+                _docManager.RemoveGroup(_selectedItem.Parent.Parent.Name, _selectedItem.Parent.Name, _selectedItem.Name, _selectedItem.ParentType, removeComponents);
+            }
+
+            UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
         }
 
         #endregion Commands impl
@@ -167,8 +238,9 @@ namespace GostDOC.ViewModels
             bool isGroup = _selectedItem.NodeType == NodeType.Group || _selectedItem.NodeType == NodeType.SubGroup;
 
             IsGeneralGraphValuesVisible.Value = _selectedItem.NodeType == NodeType.Root;
-            IsAddEnabled.Value = _selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group;
-            IsRemoveEnabled.Value = isGroup;
+            IsAddEnabled.Value = (_selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group) && 
+                _selectedItem.Name != Constants.DefaultGroupName && _selectedItem.Name != Constants.GroupNameDoc;
+            IsRemoveEnabled.Value = isGroup && _selectedItem.Name != Constants.DefaultGroupName;
 
             IsSpecificationTableVisible.Value = _selectedItem.ParentType == NodeType.Specification && isGroup;
             IsBillTableVisible.Value = _selectedItem.ParentType == NodeType.Bill && isGroup;
@@ -202,42 +274,25 @@ namespace GostDOC.ViewModels
             return null;
         }
 
+        private IList<Component> GetComponents()
+        {
+            string cfgName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Parent.Name : _selectedItem.Parent.Parent.Name;
+            string groupName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Name : _selectedItem.Parent.Name;
+            string subGroupName = _selectedItem.NodeType == NodeType.SubGroup ? _selectedItem.Name : string.Empty;
+
+            if (groupName == Constants.DefaultGroupName)
+                groupName = "";
+
+            return _docManager.GetComponents(cfgName, _selectedItem.ParentType, groupName, subGroupName);
+        }
+
         private void UpdateComponents()
         {
             Components.Clear();
-
-            string cfgName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Parent.Name : _selectedItem.Parent.Parent.Name;
-            string groupName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Name : _selectedItem.Parent.Name;
-            if (groupName == "Без имени")
-                groupName = "";
-
-            Configuration cfg;
-            if (_docManager.Project.Configurations.TryGetValue(cfgName, out cfg))
+            foreach (var component in GetComponents())
             {
-                Group grp = null;
-                // Find group
-                if (_selectedItem.ParentType == NodeType.Specification)
-                {
-                    cfg.Specification.TryGetValue(groupName, out grp);
-                }
-                else if (_selectedItem.ParentType == NodeType.Bill)
-                {
-                    cfg.Bill.TryGetValue(groupName, out grp);
-                }
-                // Find subgroup
-                if (_selectedItem.NodeType == NodeType.SubGroup && grp != null)
-                {
-                    grp.SubGroups.TryGetValue(_selectedItem.Name, out grp);
-                }
-                // Fill components
-                if (grp != null)
-                {
-                    foreach (var component in grp.Components.Values)
-                    {
-                        Components.Add(new ComponentVM(component));
-                    }
-                }
-            }
+                Components.Add(new ComponentVM(component));
+            }            
         }
 
         private void UpdateConfiguration(Node aCollection, string aCfgName, IDictionary<string, Group> aGroups)
@@ -248,20 +303,18 @@ namespace GostDOC.ViewModels
                 string groupName = grp.Key;
                 if (string.IsNullOrEmpty(groupName))
                 {
-                    groupName = "Без имени";
+                    groupName = Constants.DefaultGroupName;
                 }
 
-                Node treeItemGroup = new Node() { Name = groupName, NodeType = NodeType.Group, ParentType = aCollection.NodeType, Parent = treeItemCfg, Nodes = new ObservableCollection<Node>() };
-                foreach (var sub in grp.Value.SubGroups)
+                Node treeItemGroup = new Node() { Name = groupName, NodeType = NodeType.Group, ParentType = aCollection.NodeType, Parent = treeItemCfg, Nodes = new ObservableCollection<Node>() };              
+                foreach (var sub in grp.Value.SubGroups.AsNotNull())
                 {
                     Node treeItemSubGroup = new Node() { Name = sub.Key, NodeType = NodeType.SubGroup, ParentType = aCollection.NodeType, Parent = treeItemGroup };
                     treeItemGroup.Nodes.Add(treeItemSubGroup);
                 }
                 treeItemCfg.Nodes.Add(treeItemGroup);
-
             }
             aCollection.Nodes.Add(treeItemCfg);
-
         }
 
         private void UpdateGraphValues()
@@ -280,15 +333,21 @@ namespace GostDOC.ViewModels
             }
         }
 
-        private void UpdateGroups()
+        private void UpdateGroups(bool aUpdateSp = true, bool aUpdateB = true)
         {
-            _specification.Nodes.Clear();
-            _bill.Nodes.Clear();
+            if (aUpdateSp) 
+                _specification.Nodes.Clear();
+
+            if (aUpdateB)
+                _bill.Nodes.Clear();
 
             foreach (var cfg in _docManager.Project.Configurations)
             {
-                UpdateConfiguration(_specification, cfg.Key, cfg.Value.Specification);
-                UpdateConfiguration(_bill, cfg.Key, cfg.Value.Bill);
+                if (aUpdateSp)
+                    UpdateConfiguration(_specification, cfg.Key, cfg.Value.Specification);
+
+                if (aUpdateB)
+                    UpdateConfiguration(_bill, cfg.Key, cfg.Value.Bill);
             }
         }
 

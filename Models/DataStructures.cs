@@ -12,6 +12,10 @@ namespace GostDOC.Models
         public Guid Guid { get; } = Guid.NewGuid();
         public ComponentType Type { get; set; }
         public Dictionary<string, string> Properties { get; } = new Dictionary<string, string>();
+        public Component(Guid aGuid)
+        {
+            Guid = aGuid;
+        }
         public Component(ComponentXml aComponent)
         {
             Properties.AddRange(aComponent.Properties);

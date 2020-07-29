@@ -32,15 +32,17 @@
                 <DataGridTextColumn Header="Формат" Binding="{Binding Format.Value}"/>
                 <DataGridTextColumn Header="Позиция" Binding="{Binding Position.Value}"/>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name.Value}"/>
+                <DataGridTextColumn Header="Обозначение" Binding="{Binding Sign.Value}"/>
                 <DataGridTextColumn Header="Количество" Binding="{Binding Count.Value}"/>
                 <DataGridTextColumn Header="Примечание" Width="*" Binding="{Binding Note.Value}" />
             </DataGrid.Columns>
         </DataGrid>
 
         <DockPanel Grid.Row="1" LastChildFill="False">
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Command="{Binding AddComponentCmd}">Добавить</Button>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding RemoveComponentsCmd}">Удалить</Button>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding MoveComponentsCmd}">Перенести</Button>
+            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Добавить" Command="{Binding AddComponentCmd}"/>
+            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Удалить" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding RemoveComponentsCmd}"/>
+            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Перенести" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding MoveComponentsCmd}"/>
+            <Button DockPanel.Dock="Right" Width="100" Margin="5" Content="Сохранить" Command="{Binding SaveComponentsCmd}"/>
         </DockPanel>
         
     </Grid>
