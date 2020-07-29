@@ -34,6 +34,8 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsGeneralGraphValuesVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableCollection<GraphValueVM> GeneralGraphValues { get; } = new ObservableCollection<GraphValueVM>();
         public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
+        public ObservableProperty<bool> IsAddEnabled { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
 
         #region Commands
         public ICommand OpenFilesCmd => new Command(OpenFiles);
@@ -45,6 +47,8 @@ namespace GostDOC.ViewModels
         public ICommand MoveComponentsCmd => new Command<IList<object>>(MoveComponents);
         public ICommand TreeViewSelectionChangedCmd => new Command<Node>(TreeViewSelectionChanged);
         public ICommand SaveGraphValuesCmd => new Command<GraphPageType>(SaveGraphValues);
+        public ICommand AddGroupCmd => new Command(AddGroup);
+        public ICommand RemoveGroupCmd => new Command(RemoveGroup);
 
         #endregion Commands
 
@@ -142,6 +146,16 @@ namespace GostDOC.ViewModels
             // TODO: Save updated graph values
         }
 
+        private void AddGroup(object obj)
+        {
+            // TODO: Add group
+        }
+
+        private void RemoveGroup(object obj)
+        {
+            // TODO: Remove group
+        }
+
         #endregion Commands impl
         private void UpdateSelectedDocument()
         {
@@ -151,7 +165,11 @@ namespace GostDOC.ViewModels
             }
 
             bool isGroup = _selectedItem.NodeType == NodeType.Group || _selectedItem.NodeType == NodeType.SubGroup;
+
             IsGeneralGraphValuesVisible.Value = _selectedItem.NodeType == NodeType.Root;
+            IsAddEnabled.Value = _selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group;
+            IsRemoveEnabled.Value = isGroup;
+
             IsSpecificationTableVisible.Value = _selectedItem.ParentType == NodeType.Specification && isGroup;
             IsBillTableVisible.Value = _selectedItem.ParentType == NodeType.Bill && isGroup;
 

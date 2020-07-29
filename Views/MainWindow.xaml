@@ -81,8 +81,12 @@
             </TreeView>
 
             <DockPanel Grid.Row="1" LastChildFill="False">
-                <Button DockPanel.Dock="Left" Width="100" Margin="5">Добавить</Button>
-                <Button DockPanel.Dock="Right" Width="100" Margin="5">Удалить</Button>
+                <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Добавить" 
+                        IsEnabled="{Binding IsAddEnabled.Value}"
+                        Command="{Binding AddGroupCmd}"/>
+                <Button DockPanel.Dock="Right" Width="100" Margin="5" Content="Удалить" 
+                        IsEnabled="{Binding IsRemoveEnabled.Value}"
+                        Command="{Binding RemoveGroupCmd}"/>
             </DockPanel>
         </Grid>
 

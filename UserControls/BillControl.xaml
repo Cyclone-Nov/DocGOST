@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
 
         <DataGrid x:Name="billDataGrid" Margin="5" SelectionMode="Extended" SelectionUnit="FullRow" 
-                  AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*"
+                  AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="Auto"
                   SelectedItem="{Binding ComponentsSelectedItem.Value}"
                   ItemsSource="{Binding Components}">
             <DataGrid.ColumnHeaderStyle>
@@ -38,7 +38,7 @@
                 <DataGridTextColumn Header="Кол-во (в комп.)" Width="50" Binding="{Binding CountKits.Value}" />
                 <DataGridTextColumn Header="Кол-во (на рег.)" Width="50" Binding="{Binding CountReg.Value}" />
                 <DataGridTextColumn Header="Кол-во (всего)" Width="50" Binding="{Binding Count.Value}" IsReadOnly="True" />
-                <DataGridTextColumn Header="Примечание" Binding="{Binding Note.Value}" />
+                <DataGridTextColumn Header="Примечание" Width="*" Binding="{Binding Note.Value}" />
             </DataGrid.Columns>
         </DataGrid>
 
