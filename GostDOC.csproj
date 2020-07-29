@@ -110,6 +110,7 @@
     </ApplicationDefinition>
     <Compile Include="Common\WebBrowserUtility.cs" />
     <Compile Include="Common\XmlSerializerHelper.cs" />
+    <Compile Include="Models\ProjectWrapper.cs" />
     <Compile Include="Models\XUtils.cs" />
     <Compile Include="Models\Converter.cs" />
     <Compile Include="Models\DataStructures.cs" />

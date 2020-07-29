@@ -25,6 +25,7 @@ namespace GostDOC.ViewModels
         private Node _selectedItem = null;
 
         private DocManager _docManager = DocManager.Instance;
+        private ProjectWrapper _project = new ProjectWrapper();
 
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
@@ -173,7 +174,7 @@ namespace GostDOC.ViewModels
                 components.Add(component.Guid, component);
             }
 
-            _docManager.UpdateComponents(cfgName, groupName, subGroupName, _selectedItem.ParentType, components);
+            _project.UpdateComponents(cfgName, groupName, subGroupName, _selectedItem.ParentType, components);
         }
 
         private void SaveGraphValues(GraphPageType tp)
@@ -191,11 +192,11 @@ namespace GostDOC.ViewModels
 
             if (_selectedItem.NodeType == NodeType.Configuration)
             {
-                _docManager.AddGroup(_selectedItem.Name, name, null, _selectedItem.ParentType);
+                _project.AddGroup(_selectedItem.Name, name, null, _selectedItem.ParentType);
             }
             else if (_selectedItem.NodeType == NodeType.Group)
             {
-                _docManager.AddGroup(_selectedItem.Parent.Name, _selectedItem.Name, name, _selectedItem.ParentType);
+                _project.AddGroup(_selectedItem.Parent.Name, _selectedItem.Name, name, _selectedItem.ParentType);
             }
 
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
@@ -217,11 +218,11 @@ namespace GostDOC.ViewModels
 
             if (_selectedItem.NodeType == NodeType.Group)
             {
-                _docManager.RemoveGroup(_selectedItem.Parent.Name, _selectedItem.Name, null, _selectedItem.ParentType, removeComponents);
+                _project.RemoveGroup(_selectedItem.Parent.Name, _selectedItem.Name, null, _selectedItem.ParentType, removeComponents);
             }
             else if (_selectedItem.NodeType == NodeType.SubGroup)
             {
-                _docManager.RemoveGroup(_selectedItem.Parent.Parent.Name, _selectedItem.Parent.Name, _selectedItem.Name, _selectedItem.ParentType, removeComponents);
+                _project.RemoveGroup(_selectedItem.Parent.Parent.Name, _selectedItem.Parent.Name, _selectedItem.Name, _selectedItem.ParentType, removeComponents);
             }
 
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
@@ -283,7 +284,7 @@ namespace GostDOC.ViewModels
             if (groupName == Constants.DefaultGroupName)
                 groupName = "";
 
-            return _docManager.GetComponents(cfgName, _selectedItem.ParentType, groupName, subGroupName);
+            return _project.GetComponents(cfgName, _selectedItem.ParentType, groupName, subGroupName);
         }
 
         private void UpdateComponents()
