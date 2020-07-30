@@ -95,29 +95,6 @@ namespace GostDOC.Models
         #endregion Public
 
         #region Private
-        private void AddComponent(Group aGroup, Component aComponent)
-        {
-            bool exists = false;
-            foreach (var component in aGroup.Components)
-            {
-                if (component.Guid == aComponent.Guid)
-                {                    
-                    // Update existing
-                    foreach (var prop in aComponent.Properties)
-                    {
-                        component.Properties[prop.Key] = prop.Value;
-                    }
-                    exists = true;
-                }
-            }
-
-            if (!exists)
-            {
-                // Add new component to group
-                aGroup.Components.Add(aComponent);
-            }
-        }
-
         private void UpdateComponents(Group aGroup, IList<Component> aComponents)
         {
             var copy = aGroup.Components.ToList();
@@ -233,7 +210,7 @@ namespace GostDOC.Models
             else
             {
                 Group subGroup = null;
-                if (!group.SubGroups.TryGetValue(aSubGroupName, out subGroup))
+                if (group.SubGroups.TryGetValue(aSubGroupName, out subGroup))
                 {
                     if (!aRemoveComponents)
                     {

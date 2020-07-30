@@ -206,7 +206,7 @@ namespace GostDOC.ViewModels
 
         private void RemoveGroup(object obj)
         {
-            bool removeComponents = false;
+            bool removeComponents = true;
             var components = GetComponents();
             if (components.Count > 0)
             {
