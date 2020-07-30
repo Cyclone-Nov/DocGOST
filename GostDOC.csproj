@@ -109,8 +109,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Common\WebBrowserUtility.cs" />
-    <Compile Include="Common\XUtils.cs" />
+    <Compile Include="Common\XmlSerializerHelper.cs" />
+    <Compile Include="Models\ProjectWrapper.cs" />
+    <Compile Include="Models\XUtils.cs" />
+    <Compile Include="Models\Converter.cs" />
+    <Compile Include="Models\DataStructures.cs" />
+    <Compile Include="Models\Node.cs" />
     <Compile Include="Models\XmlManager.cs" />
+    <Compile Include="Models\XmlDataStructures.cs" />
     <Compile Include="UserControls\BillControl.xaml.cs">
       <DependentUpon>BillControl.xaml</DependentUpon>
     </Compile>
@@ -120,6 +126,8 @@
     <Compile Include="UserControls\SpecificationControl.xaml.cs">
       <DependentUpon>SpecificationControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\ComponentVM.cs" />
+    <Compile Include="ViewModels\GraphValueVM.cs" />
     <Compile Include="Views\NewGroup.xaml.cs">
       <DependentUpon>NewGroup.xaml</DependentUpon>
     </Compile>
@@ -146,13 +154,9 @@
     <Compile Include="Common\Defines.cs" />
     <Compile Include="Common\DispatcherHelper.cs" />
     <Compile Include="Common\ObservableProperty.cs" />
-    <Compile Include="Common\Utils.cs" />
+    <Compile Include="Models\Utils.cs" />
     <Compile Include="Models\DocManager.cs" />
-    <Compile Include="Models\ElementsEntry.cs" />
-    <Compile Include="Models\GraphValues.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />
-    <Compile Include="Models\SpecificationEntry.cs" />
-    <Compile Include="Models\BillEntry.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

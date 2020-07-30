@@ -11,89 +11,144 @@ namespace GostDOC.Models
 {
     class XmlManager
     {
-        private XDocument _document;
-        private HashSet<string> _billGroups = new HashSet<string>();
-        private HashSet<string> _specificationGroups = new HashSet<string>();
-
-        public IList<GraphValues> GeneralGraphValues { get; } = new List<GraphValues>();
-        public IEnumerable<string> BillGroups => _billGroups;
-        public IEnumerable<string> SpecificationGroups => _specificationGroups;
+        private Converter _defaults = new Converter();
 
         public XmlManager()
         {
         }
 
-        public bool LoadData(string[] aFiles, string aMainFile)
-        {            
+        public bool LoadData(Project aResult, string[] aFiles, string aMainFile)
+        {
+            RootXml rootXml = null;
             if (aFiles.Length > 1)
             {
                 // Merge files to one
-                return MergeFiles(aFiles, aMainFile);
+                rootXml = MergeFiles(aFiles, aMainFile);
+            }
+            else if (aFiles.Length == 1)
+            {
+                XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref rootXml, aFiles[0]);
+            }       
+            
+            if (rootXml == null)
+            {
+                return false;
+            }
+
+            // Set project name
+            aResult.Name = rootXml.Transaction.Project.Name;
+            // Clear configurations
+            aResult.Configurations.Clear();
+            // Fill configurations
+            foreach (var cfg in rootXml.Transaction.Project.Configurations)
+            {
+                // Set cfg name
+                Configuration newCfg = new Configuration() { Name = cfg.Name };
+
+                // Fill graphs
+                foreach (var graph in cfg.Graphs)
+                {
+                    newCfg.Graphs.Add(graph.Name, graph.Text);
+                }
+
+                // Fill groups
+                foreach (var component in cfg.Components)
+                {
+                    AddComponent(newCfg, component, ComponentType.Component);
+                }
+                foreach (var doc in cfg.Documents)
+                {
+                    AddComponent(newCfg, doc, ComponentType.Document);
+                }
+                foreach (var doc in cfg.ComponentsPCB)
+                {
+                    AddComponent(newCfg, doc, ComponentType.ComponentPCB);
+                }
+
+                aResult.Configurations.Add(newCfg.Name, newCfg);
+            }
+
+            return true;
+        }
+
+        private void AddComponent(Configuration aNewCfg, ComponentXml aComponent, ComponentType aType)
+        {
+            string[] groups = GetGroups(aComponent);
+
+            var component = new Component(aComponent) { Type = aType };
+            AddComponent(aNewCfg.Specification, component, groups[0], groups[1]);
+            AddComponent(aNewCfg.Bill, component, groups[2], groups[3]);
+        }
+
+        private void AddComponent(Dictionary<string, Group> aGroups, Component aComponent, string aGroup, string aSubGroup)
+        {
+            Group spGroup = null;
+            if (!aGroups.TryGetValue(aGroup, out spGroup))
+            {
+                // Add group
+                spGroup = new Group() { Name = aGroup, SubGroups = new Dictionary<string, Group>() };
+                aGroups.Add(spGroup.Name, spGroup);
+            }
+
+            if (string.IsNullOrEmpty(aSubGroup))
+            {
+                // Add component, no subgroup
+                spGroup.Components.Add(aComponent.Guid, aComponent);
             }
             else
             {
-                // Load file
-                _document = XDocument.Load(aFiles[0]);
+                Group subGroup = null;
+                if (!spGroup.SubGroups.TryGetValue(aSubGroup, out subGroup))
+                {
+                    // Add subgroup
+                    subGroup = new Group() { Name = aSubGroup };
+                    spGroup.SubGroups.Add(subGroup.Name, subGroup);
+                }
+                // Add component to subgroup
+                subGroup.Components.Add(aComponent.Guid, aComponent);
             }
-
-            UpdateGroups();
-            UpdateGraphValues();
-
-            return _document != null;
         }
 
-        private void UpdateGraphValues()
+        private string[] GetGroups(ComponentXml aComponent)
         {
-            GeneralGraphValues.Clear();
-            GeneralGraphValues.Add(new GraphValues() { Num = "1а", Name = "Наименование изделия", Text = _document.ReadElementValue("Наименование")});
-            GeneralGraphValues.Add(new GraphValues() { Num = "1б", Name = "Наименование документа", Text = _document.ReadElementValue("Наименование_PCB") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "2", Name = "Обозначение документа", Text = _document.ReadElementValue("Обозначение") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "4а", Name = "Литера", Text = _document.ReadElementValue("Литера") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "4б", Name = "Литера2", Text = _document.ReadElementValue("Литера2") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "4в", Name = "Литера3", Text = _document.ReadElementValue("Литера3") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "9", Name = "Наименование организации", Text = _document.ReadElementValue("?") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "10", Name = "Разраб., Пров., Н. контр., Утв.)", Text = _document.ReadElementValue("п_Доп_графа") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "11а", Name = "Фамилия разраб.", Text = _document.ReadElementValue("п_Разраб") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "11б", Name = "Фамилия разраб.Р.", Text = _document.ReadElementValue("п_Разраб_P") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "11в", Name = "Фамилия пров.", Text = _document.ReadElementValue("п_Пров") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "11г", Name = "Фамилия пров.Р.", Text = _document.ReadElementValue("п_Пров_P") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "11д", Name = "Фамилия н.контр.", Text = _document.ReadElementValue("п_Н_контр") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "11е", Name = "Фамилия утв.", Text = _document.ReadElementValue("п_Утв") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "14", Name = "Порядковый номер изм.", Text = _document.ReadElementValue("Порядковый_номер_изменения") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "15", Name = "Лист (нов.зам.)", Text = _document.ReadElementValue("?") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "16", Name = "Номер документа изм.", Text = _document.ReadElementValue("Номер_документа_изменение") });
-            GeneralGraphValues.Add(new GraphValues() { Num = "18", Name = "Дата изменения", Text = _document.ReadElementValue("Дата_изменения") });
+            string[] result = Enumerable.Repeat(string.Empty, 4).ToArray();
+
+            foreach (var property in aComponent.Properties)
+            {
+                if (property.Name == "Раздел СП")
+                {
+                    result[0] = property.Text;
+                }
+                else if (property.Name == "Подраздел СП")
+                {
+                    result[1] = property.Text;
+                }
+                else if (property.Name == "Раздел ВП")
+                {
+                    result[2] = property.Text;
+                }
+                else if (property.Name == "Подраздел ВП")
+                {
+                    result[3] = property.Text;
+                }
+            }
+            return result;
         }
 
-        private void UpdateGroups()
+        private RootXml MergeFiles(string[] aFiles, string aMainFile)
         {
-            _billGroups.Clear();
-            _billGroups.Add("Стандартные изделия");
-            _billGroups.Add("Прочие изделия");
-            _billGroups.Add("Материалы");
-            _billGroups.AddRange(_document.ReadElementValues("Group"));
+            RootXml rootXml = null;
 
-            _specificationGroups.Clear();
-            _specificationGroups.Add("Документация");
-            _specificationGroups.Add("Комплексы");
-            _specificationGroups.Add("Сборочные единицы");
-            _specificationGroups.Add("Детали");
-            _specificationGroups.Add("Стандартные изделия");
-            _specificationGroups.Add("Прочие изделия");
-            _specificationGroups.Add("Материалы");
-            _specificationGroups.Add("Комплекты");
-            _specificationGroups.AddRange(_document.ReadElementValues("Group"));
-        }
-
-        private bool MergeFiles(string[] aFiles, string aMainFile)
-        {
             // Find main file
             List<string> otherFiles = new List<string>();
             foreach (var file in aFiles)
             {
                 if (file.EndsWith(aMainFile))
                 {
-                    _document = XDocument.Load(file);
+                    if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref rootXml, file))
+                    {
+                        return null;
+                    }
                 }
                 else
                 {
@@ -101,24 +156,30 @@ namespace GostDOC.Models
                 }
             }
 
-            // Find components tag
-            var references = _document.FindElement("references");
-            if (references == null)
-            {
-                return false;
-            }
-
             // Read all components and write them to main file
             foreach (var file in otherFiles)
             {
-                var doc = XDocument.Load(file);
-                foreach (var component in doc.FindElements("component"))
+                RootXml otherRootXml = null;
+                if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref otherRootXml, file))
                 {
-                    references.Add(component);
+                    continue;
                 }
+                
+                foreach (var cfg in otherRootXml.Transaction.Project.Configurations)
+                {
+                    foreach (var mainCfg in rootXml.Transaction.Project.Configurations)
+                    {
+                        if (mainCfg.Name == cfg.Name)
+                        {
+                            mainCfg.Components.AddRange(cfg.Components);
+                            break;
+                        }
+                    }
+                }
+
             }
 
-            return true;
+            return rootXml;
         }
     }
 }

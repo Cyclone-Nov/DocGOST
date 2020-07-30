@@ -22,8 +22,7 @@
                   ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType={x:Type local:SelectMainFile}}}"/>
 
         <DockPanel Grid.Row="1" Grid.Column="1" LastChildFill="False">
-            <Button Margin="5" DockPanel.Dock="Right" Content="Отмена" Width="100" Height="25" IsCancel="True" />
-            <Button Margin="5" DockPanel.Dock="Left" Content="Применить" Width="100" Height="25" IsDefault="True" Click="OkButton_Click" />
+            <Button Margin="5" DockPanel.Dock="Right" Content="Применить" Width="100" Height="25" IsDefault="True" Click="OkButton_Click" />
         </DockPanel>
     </Grid>
 </Window>

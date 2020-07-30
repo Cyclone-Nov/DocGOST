@@ -17,39 +17,52 @@ namespace GostDOC.ViewModels
     class MainWindowVM
     {
         private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
-        private TreeViewItem _selectedTreeItem = null;
+
+        private Node _elements = new Node() { Name = "Перечень элементов", NodeType = NodeType.Elements, Nodes = new ObservableCollection<Node>() };
+        private Node _specification = new Node() { Name = "Спецификация", NodeType = NodeType.Specification, Nodes = new ObservableCollection<Node>() };
+        private Node _bill = new Node() { Name = "Ведомость покупных изделий", NodeType = NodeType.Bill, Nodes = new ObservableCollection<Node>() };
+        private Node _bill_D27 = new Node() { Name = "Ведомость Д27", NodeType = NodeType.Bill_D27, Nodes = new ObservableCollection<Node>() };
+        private Node _selectedItem = null;
+
         private DocManager _docManager = DocManager.Instance;
+        private ProjectWrapper _project = new ProjectWrapper();
 
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
-        public ObservableProperty<SpecificationEntry> SpecificationSelectedItem { get; } = new ObservableProperty<SpecificationEntry>();
-        public ObservableCollection<SpecificationEntry> SpecificationTable { get; } = new ObservableCollection<SpecificationEntry>();
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
-        public ObservableProperty<BillEntry> BillSelectedItem { get; } = new ObservableProperty<BillEntry>();
-        public ObservableCollection<BillEntry> BillTable { get; } = new ObservableCollection<BillEntry>();
+        public ObservableProperty<ComponentVM> ComponentsSelectedItem { get; } = new ObservableProperty<ComponentVM>();
+        public ObservableCollection<ComponentVM> Components { get; } = new ObservableCollection<ComponentVM>();
         public ObservableProperty<string> CurrentPdfPath { get; } = new ObservableProperty<string>();
         public ObservableProperty<bool> IsGeneralGraphValuesVisible { get; } = new ObservableProperty<bool>(false);
-        public ObservableCollection<GraphValues> GeneralGraphValues { get; } = new ObservableCollection<GraphValues>();
-        public ObservableCollection<TreeViewItem> SpecificationGroups { get; } = new ObservableCollection<TreeViewItem>();
-        public ObservableCollection<TreeViewItem> BillGroups { get; } = new ObservableCollection<TreeViewItem>();
+        public ObservableCollection<GraphValueVM> GeneralGraphValues { get; } = new ObservableCollection<GraphValueVM>();
+        public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
+        public ObservableProperty<bool> IsAddEnabled { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
 
         #region Commands
         public ICommand OpenFilesCmd => new Command(OpenFiles);
         public ICommand SaveFileCmd => new Command(SaveFile);
         public ICommand SaveFileAsCmd => new Command(SaveFileAs);
         public ICommand ExitCmd => new Command<Window>(Exit);
-        public ICommand AddBillItemCmd => new Command(AddBillItem);
-        public ICommand RemoveBillItemsCmd => new Command<IList<object>>(RemoveBillItems);
-        public ICommand MergeBillItemsCmd => new Command<IList<object>>(MergeBillItems);
-        public ICommand AddSpecificationItemCmd => new Command(AddSpecificationItem);
-        public ICommand RemoveSpecificationItemsCmd => new Command<IList<object>>(RemoveSpecificationItems);
-        public ICommand MergeSpecificationItemsCmd => new Command<IList<object>>(MergeSpecificationItems);
-        public ICommand TreeViewSelectionChangedCmd => new Command<TreeViewItem>(TreeViewSelectionChanged);
-        public ICommand SaveGraphValuesCmd => new Command<GraphType>(SaveGraphValues);
+        public ICommand AddComponentCmd => new Command(AddComponent);
+        public ICommand RemoveComponentsCmd => new Command<IList<object>>(RemoveComponents);
+        public ICommand MoveComponentsCmd => new Command<IList<object>>(MoveComponents);
+        public ICommand TreeViewSelectionChangedCmd => new Command<Node>(TreeViewSelectionChanged);
+        public ICommand SaveGraphValuesCmd => new Command<GraphPageType>(SaveGraphValues);
+        public ICommand AddGroupCmd => new Command(AddGroup);
+        public ICommand RemoveGroupCmd => new Command(RemoveGroup);
+        public ICommand SaveComponentsCmd => new Command(SaveComponents);
 
         #endregion Commands
 
         public MainWindowVM()
         {
+            var root = new Node() { Name = "Документы", Nodes = new ObservableCollection<Node>() };
+            root.Nodes.Add(_elements);
+            root.Nodes.Add(_specification);
+            root.Nodes.Add(_bill);
+            root.Nodes.Add(_bill_D27);
+
+            DocNodes.Add(root);
         }
 
         #region Commands impl
@@ -70,7 +83,7 @@ namespace GostDOC.ViewModels
                         return;
                 }
                 // Parse xml files
-                _docManager.XmlManager.LoadData(open.FileNames, mainFileName);
+                _docManager.LoadData(open.FileNames, mainFileName);
                 // Update visual data
                 UpdateData();
             }
@@ -93,9 +106,9 @@ namespace GostDOC.ViewModels
             }
         }
 
-        private void TreeViewSelectionChanged(TreeViewItem obj)
+        private void TreeViewSelectionChanged(Node obj)
         {
-            _selectedTreeItem = obj;
+            _selectedItem = obj;
             UpdateSelectedDocument();
         }
 
@@ -104,75 +117,139 @@ namespace GostDOC.ViewModels
             wnd.Close();
         }
         
-        private void AddBillItem(object obj)
+        private void AddComponent(object obj)
         {
-            BillTable.Add(new BillEntry());
+            Components.Add(new ComponentVM());
         }
 
-        private void RemoveBillItems(IList<object> lst)
+        private void RemoveComponents(IList<object> lst)
         {
-            foreach (var item in lst.Cast<BillEntry>().ToList())
+            foreach (var item in lst.Cast<ComponentVM>().ToList())
             {
-                BillTable.Remove(item);
+                Components.Remove(item);
             }
         }
 
-        private void MergeBillItems(IList<object> lst)
+        private void MoveComponents(IList<object> lst)
         {
             string groupName = GetGroupName();
             if (string.IsNullOrEmpty(groupName))
             {
-                foreach (var item in lst.Cast<BillEntry>().ToList())
+                foreach (var item in lst.Cast<ComponentVM>().ToList())
                 {
-                    // TODO: merge items
-                    BillTable.Remove(item);
+                    // TODO: move items
+                    Components.Remove(item);
                 }
             }
         }
 
-        private void AddSpecificationItem(object obj)
+        private void SaveComponents(object obj)
         {
-            SpecificationTable.Add(new SpecificationEntry());
-        }
+            string cfgName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Parent.Name : _selectedItem.Parent.Parent.Name;
+            string groupName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Name : _selectedItem.Parent.Name;
+            string subGroupName = _selectedItem.NodeType == NodeType.SubGroup ? _selectedItem.Name : string.Empty;
 
-        private void RemoveSpecificationItems(IList<object> lst)
-        {
-            foreach (var item in lst.Cast<SpecificationEntry>().ToList())
+            bool isDocument = groupName == Constants.GroupNameDoc || subGroupName == Constants.GroupNameDoc;
+
+            Dictionary<Guid, Component> components = new Dictionary<Guid, Component>();
+            foreach (var cmp in Components)
             {
-                SpecificationTable.Remove(item);
+                Component component = new Component(cmp.Guid)
+                {                    
+                    Type = isDocument ? ComponentType.Document : ComponentType.Component
+                };                
+
+                component.Properties.Add(Constants.GroupNameSp, groupName);
+                component.Properties.Add(Constants.ComponentName, cmp.Name.Value);
+                component.Properties.Add(Constants.ComponentSign, cmp.Sign.Value);
+                component.Properties.Add(Constants.ComponentProductCode, cmp.Code.Value);
+                component.Properties.Add(Constants.ComponentFormat, cmp.Format.Value);
+                component.Properties.Add(Constants.ComponentDoc, cmp.Entry.Value);
+                component.Properties.Add(Constants.ComponentSupplier, cmp.Manufacturer.Value);
+                component.Properties.Add(Constants.ComponentCountDev, cmp.CountDev.Value.ToString());
+                component.Properties.Add(Constants.ComponentCountSet, cmp.CountSet.Value.ToString());
+                component.Properties.Add(Constants.ComponentCountReg, cmp.CountReg.Value.ToString());
+                component.Properties.Add(Constants.ComponentNote, cmp.Note.Value);
+
+                components.Add(component.Guid, component);
             }
+
+            _project.UpdateComponents(cfgName, groupName, subGroupName, _selectedItem.ParentType, components);
         }
 
-        private void MergeSpecificationItems(IList<object> lst)
-        {
-            string groupName = GetGroupName();
-            if (string.IsNullOrEmpty(groupName))
-            {
-                foreach (var item in lst.Cast<SpecificationEntry>().ToList())
-                {
-                    // TODO: merge items
-                    SpecificationTable.Remove(item);
-                }
-            }
-        }
-
-        private void SaveGraphValues(GraphType tp)
+        private void SaveGraphValues(GraphPageType tp)
         {
             // TODO: Save updated graph values
         }
 
-        #endregion Commands impl
-
-        private void UpdateSelectedDocument()
+        private void AddGroup(object obj)
         {
-            if (_selectedTreeItem == null)
+            string name = GetGroupName();
+            if (string.IsNullOrEmpty(name))
             {
                 return;
             }
 
-            IsGeneralGraphValuesVisible.Value = _selectedTreeItem.Header.Equals("Документы"); 
-            IsSpecificationTableVisible.Value = SpecificationGroups.Contains(_selectedTreeItem);
-            IsBillTableVisible.Value = BillGroups.Contains(_selectedTreeItem);
+            if (_selectedItem.NodeType == NodeType.Configuration)
+            {
+                _project.AddGroup(_selectedItem.Name, name, null, _selectedItem.ParentType);
+            }
+            else if (_selectedItem.NodeType == NodeType.Group)
+            {
+                _project.AddGroup(_selectedItem.Parent.Name, _selectedItem.Name, name, _selectedItem.ParentType);
+            }
+
+            UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
+        }
+
+        private void RemoveGroup(object obj)
+        {
+            bool removeComponents = false;
+            var components = GetComponents();
+            if (components.Count > 0)
+            {
+                var result = System.Windows.MessageBox.Show("Удалить компоненты?", "Удаление группы", MessageBoxButton.YesNoCancel);
+                if (result == MessageBoxResult.Cancel)
+                {
+                    return;
+                }
+                removeComponents = (result == MessageBoxResult.Yes);
+            }
+
+            if (_selectedItem.NodeType == NodeType.Group)
+            {
+                _project.RemoveGroup(_selectedItem.Parent.Name, _selectedItem.Name, null, _selectedItem.ParentType, removeComponents);
+            }
+            else if (_selectedItem.NodeType == NodeType.SubGroup)
+            {
+                _project.RemoveGroup(_selectedItem.Parent.Parent.Name, _selectedItem.Parent.Name, _selectedItem.Name, _selectedItem.ParentType, removeComponents);
+            }
+
+            UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
+        }
+
+        #endregion Commands impl
+        private void UpdateSelectedDocument()
+        {
+            if (_selectedItem == null)
+            {
+                return;
+            }
+
+            bool isGroup = _selectedItem.NodeType == NodeType.Group || _selectedItem.NodeType == NodeType.SubGroup;
+
+            IsGeneralGraphValuesVisible.Value = _selectedItem.NodeType == NodeType.Root;
+            IsAddEnabled.Value = (_selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group) && 
+                _selectedItem.Name != Constants.DefaultGroupName && _selectedItem.Name != Constants.GroupNameDoc;
+            IsRemoveEnabled.Value = isGroup && _selectedItem.Name != Constants.DefaultGroupName;
+
+            IsSpecificationTableVisible.Value = _selectedItem.ParentType == NodeType.Specification && isGroup;
+            IsBillTableVisible.Value = _selectedItem.ParentType == NodeType.Bill && isGroup;
+
+            if (isGroup)
+            {
+                UpdateComponents();
+            }
         }
 
         private string GetGroupName()
@@ -198,16 +275,87 @@ namespace GostDOC.ViewModels
             return null;
         }
 
+        private IList<Component> GetComponents()
+        {
+            string cfgName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Parent.Name : _selectedItem.Parent.Parent.Name;
+            string groupName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Name : _selectedItem.Parent.Name;
+            string subGroupName = _selectedItem.NodeType == NodeType.SubGroup ? _selectedItem.Name : string.Empty;
+
+            if (groupName == Constants.DefaultGroupName)
+                groupName = "";
+
+            return _project.GetComponents(cfgName, _selectedItem.ParentType, groupName, subGroupName);
+        }
+
+        private void UpdateComponents()
+        {
+            Components.Clear();
+            foreach (var component in GetComponents())
+            {
+                Components.Add(new ComponentVM(component));
+            }            
+        }
+
+        private void UpdateConfiguration(Node aCollection, string aCfgName, IDictionary<string, Group> aGroups)
+        {
+            Node treeItemCfg = new Node() { Name = aCfgName, NodeType = NodeType.Configuration, ParentType = aCollection.NodeType, Parent = aCollection, Nodes = new ObservableCollection<Node>() };
+            foreach (var grp in aGroups)
+            {
+                string groupName = grp.Key;
+                if (string.IsNullOrEmpty(groupName))
+                {
+                    groupName = Constants.DefaultGroupName;
+                }
+
+                Node treeItemGroup = new Node() { Name = groupName, NodeType = NodeType.Group, ParentType = aCollection.NodeType, Parent = treeItemCfg, Nodes = new ObservableCollection<Node>() };              
+                foreach (var sub in grp.Value.SubGroups.AsNotNull())
+                {
+                    Node treeItemSubGroup = new Node() { Name = sub.Key, NodeType = NodeType.SubGroup, ParentType = aCollection.NodeType, Parent = treeItemGroup };
+                    treeItemGroup.Nodes.Add(treeItemSubGroup);
+                }
+                treeItemCfg.Nodes.Add(treeItemGroup);
+            }
+            aCollection.Nodes.Add(treeItemCfg);
+        }
+
+        private void UpdateGraphValues()
+        {
+            GeneralGraphValues.Clear();
+            foreach (var cfg in _docManager.Project.Configurations)
+            {
+                if (cfg.Value.Graphs.Count > 0)
+                {
+                    foreach (var graph in cfg.Value.Graphs)
+                    {
+                        GeneralGraphValues.Add(new GraphValueVM(graph.Key, graph.Value));
+                    }
+                    break;
+                }
+            }
+        }
+
+        private void UpdateGroups(bool aUpdateSp = true, bool aUpdateB = true)
+        {
+            if (aUpdateSp) 
+                _specification.Nodes.Clear();
+
+            if (aUpdateB)
+                _bill.Nodes.Clear();
+
+            foreach (var cfg in _docManager.Project.Configurations)
+            {
+                if (aUpdateSp)
+                    UpdateConfiguration(_specification, cfg.Key, cfg.Value.Specification);
+
+                if (aUpdateB)
+                    UpdateConfiguration(_bill, cfg.Key, cfg.Value.Bill);
+            }
+        }
+
         private void UpdateData()
         {
-            BillGroups.Clear();
-            BillGroups.AddRange(_docManager.XmlManager.BillGroups);
-
-            SpecificationGroups.Clear();
-            SpecificationGroups.AddRange(_docManager.XmlManager.SpecificationGroups);
-
-            GeneralGraphValues.Clear();
-            GeneralGraphValues.AddRange(_docManager.XmlManager.GeneralGraphValues);
+            UpdateGraphValues();
+            UpdateGroups();
         }
     }
 }

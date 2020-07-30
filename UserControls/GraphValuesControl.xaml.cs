@@ -31,9 +31,9 @@ namespace GostDOC.UserControls
             get { return (object)GetValue(ItemsSourceProperty); }
             set { SetValue(ItemsSourceProperty, value); }
         }
-        public GraphType GraphType
+        public GraphPageType GraphType
         {
-            get { return (GraphType)GetValue(GraphTypeProperty); }
+            get { return (GraphPageType)GetValue(GraphTypeProperty); }
             set { SetValue(GraphTypeProperty, value); }
         }
 
@@ -42,7 +42,7 @@ namespace GostDOC.UserControls
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
         public static readonly DependencyProperty GraphTypeProperty =
-             DependencyProperty.Register("GraphType", typeof(GraphType), typeof(GraphValuesControl),
-                 new FrameworkPropertyMetadata(GraphType.General, FrameworkPropertyMetadataOptions.AffectsRender));
+             DependencyProperty.Register("GraphType", typeof(GraphPageType), typeof(GraphValuesControl),
+                 new FrameworkPropertyMetadata(GraphPageType.General, FrameworkPropertyMetadataOptions.AffectsRender));
     }
 }

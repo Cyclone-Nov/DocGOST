@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using GostDOC.Common;
 
 namespace GostDOC.Models
 {
@@ -8,10 +10,19 @@ namespace GostDOC.Models
         #region Singleton
         private static readonly Lazy<DocManager> _instance = new Lazy<DocManager>(() => new DocManager(), true);
         public static DocManager Instance => _instance.Value;
-        DocManager() 
+        DocManager()
         {
         }
         #endregion
-        public XmlManager XmlManager { get; } = new XmlManager();
+        private XmlManager _xmlManager { get; } = new XmlManager();
+
+        public Project Project { get; private set; } = new Project();
+
+        #region Public
+        public bool LoadData(string[] aFiles, string aMainFile)
+        {
+            return _xmlManager.LoadData(Project, aFiles, aMainFile);
+        }
+        #endregion Public
     }
 }
