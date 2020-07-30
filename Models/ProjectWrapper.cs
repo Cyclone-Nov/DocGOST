@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,24 +13,7 @@ namespace GostDOC.Models
         private DocManager _docManager = DocManager.Instance;
 
         #region Public
-        public bool AddComponent(string aCfgName, string aGroupName, string aSubGroupName, NodeType aParentType, Component aComponent)
-        {
-            Configuration cfg;
-            if (_docManager.Project.Configurations.TryGetValue(aCfgName, out cfg))
-            {
-                if (aParentType == NodeType.Specification)
-                {
-                    return AddComponent(cfg.Specification, aGroupName, aSubGroupName, aComponent);
-                }
-                else if (aParentType == NodeType.Bill)
-                {
-                    return AddComponent(cfg.Bill, aGroupName, aSubGroupName, aComponent);
-                }
-            }
-            return false;
-        }
-
-        public bool UpdateComponents(string aCfgName, string aGroupName, string aSubGroupName, NodeType aParentType, IDictionary<Guid, Component> aComponents)
+        public bool UpdateComponents(string aCfgName, string aGroupName, string aSubGroupName, NodeType aParentType, IList<Component> aComponents)
         {
             Configuration cfg;
             if (_docManager.Project.Configurations.TryGetValue(aCfgName, out cfg))
@@ -41,23 +25,6 @@ namespace GostDOC.Models
                 else if (aParentType == NodeType.Bill)
                 {
                     return UpdateComponents(cfg.Bill, aGroupName, aSubGroupName, aComponents);
-                }
-            }
-            return false;
-        }
-
-        public bool Component(string aCfgName, string aGroupName, string aSubGroupName, NodeType aParentType, Component aComponent)
-        {
-            Configuration cfg;
-            if (_docManager.Project.Configurations.TryGetValue(aCfgName, out cfg))
-            {
-                if (aParentType == NodeType.Specification)
-                {
-                    return AddComponent(cfg.Specification, aGroupName, aSubGroupName, aComponent);
-                }
-                else if (aParentType == NodeType.Bill)
-                {
-                    return AddComponent(cfg.Bill, aGroupName, aSubGroupName, aComponent);
                 }
             }
             return false;
@@ -99,8 +66,6 @@ namespace GostDOC.Models
 
         public IList<Component> GetComponents(string aCfgName, NodeType aParentType, string aGroupName, string aSubGroupName)
         {
-            List<Component> components = new List<Component>();
-
             Configuration cfg;
             if (_docManager.Project.Configurations.TryGetValue(aCfgName, out cfg))
             {
@@ -122,80 +87,62 @@ namespace GostDOC.Models
                     grp.SubGroups.TryGetValue(aSubGroupName, out grp);
                 }
 
-                // Fill components
-                if (grp != null)
-                {
-                    foreach (var component in grp.Components.Values)
-                    {
-                        components.Add(component);
-                    }
-                }
+                return grp?.Components;
             }
-            return components;
+            return null;
         }
+
         #endregion Public
 
         #region Private
         private void AddComponent(Group aGroup, Component aComponent)
         {
-            Component existing = null;
-            if (aGroup.Components.TryGetValue(aComponent.Guid, out existing))
+            bool exists = false;
+            foreach (var component in aGroup.Components)
             {
-                // Update existing
-                foreach (var prop in aComponent.Properties)
-                {
-                    existing.Properties[prop.Key] = prop.Value;
+                if (component.Guid == aComponent.Guid)
+                {                    
+                    // Update existing
+                    foreach (var prop in aComponent.Properties)
+                    {
+                        component.Properties[prop.Key] = prop.Value;
+                    }
+                    exists = true;
                 }
             }
-            else
+
+            if (!exists)
             {
-                // Add new component
-                aGroup.Components.Add(aComponent.Guid, aComponent);
+                // Add new component to group
+                aGroup.Components.Add(aComponent);
             }
         }
 
-        private bool AddComponent(IDictionary<string, Group> aGroups, string aGroupName, string aSubGroupName, Component aComponent)
+        private void UpdateComponents(Group aGroup, IList<Component> aComponents)
         {
-            Group group = null;
-            if (!aGroups.TryGetValue(aGroupName, out group))
-            {
-                return false;
-            }
+            var copy = aGroup.Components.ToList();
+            aGroup.Components.Clear();
 
-            if (string.IsNullOrEmpty(aSubGroupName))
-            {
-                AddComponent(group, aComponent);
-                return true;
-            }
-            else
-            {
-                Group subGroup = null;
-                if (!group.SubGroups.TryGetValue(aSubGroupName, out subGroup))
-                {
-                    AddComponent(subGroup, aComponent);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void UpdateComponents(Group aGroup, IDictionary<Guid, Component> aComponents)
-        {
             foreach (var component in aComponents)
             {
-                AddComponent(aGroup, component.Value);
-            }
-
-            foreach (var component in aGroup.Components.ToList())
-            {
-                if (!aComponents.ContainsKey(component.Key))
+                Component existing = copy.Find(x => x.Guid == component.Guid);
+                if (existing != null)
                 {
-                    aGroup.Components.Remove(component.Key);
+                    // Update existing
+                    foreach (var prop in component.Properties)
+                    {
+                        existing.Properties[prop.Key] = prop.Value;
+                    }
+                    aGroup.Components.Add(existing);
+                }
+                else
+                {
+                    aGroup.Components.Add(component);
                 }
             }
         }
 
-        private bool UpdateComponents(IDictionary<string, Group> aGroups, string aGroupName, string aSubGroupName, IDictionary<Guid, Component> aComponents)
+        private bool UpdateComponents(IDictionary<string, Group> aGroups, string aGroupName, string aSubGroupName, IList<Component> aComponents)
         {
             Group group = null;
             if (!aGroups.TryGetValue(aGroupName, out group))
@@ -259,14 +206,16 @@ namespace GostDOC.Models
 
         private bool RemoveGroup(IDictionary<string, Group> aGroups, string aGroupName, string aSubGroupName, bool aRemoveComponents)
         {
-            // Get default groups to copy components to
+            // Get default group
             Group defaultGroup = aRemoveComponents ? null : GetDefaultGroup(aGroups);
+
             // Get group
             Group group = null;
             if (!aGroups.TryGetValue(aGroupName, out group))
             {
                 return false;
             }
+
             // Remove group or subgroup
             if (string.IsNullOrEmpty(aSubGroupName))
             {

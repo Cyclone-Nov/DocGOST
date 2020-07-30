@@ -23,7 +23,7 @@ namespace GostDOC.ViewModels
         private Node _bill = new Node() { Name = "Ведомость покупных изделий", NodeType = NodeType.Bill, Nodes = new ObservableCollection<Node>() };
         private Node _bill_D27 = new Node() { Name = "Ведомость Д27", NodeType = NodeType.Bill_D27, Nodes = new ObservableCollection<Node>() };
         private Node _selectedItem = null;
-
+        
         private DocManager _docManager = DocManager.Instance;
         private ProjectWrapper _project = new ProjectWrapper();
 
@@ -51,6 +51,8 @@ namespace GostDOC.ViewModels
         public ICommand AddGroupCmd => new Command(AddGroup);
         public ICommand RemoveGroupCmd => new Command(RemoveGroup);
         public ICommand SaveComponentsCmd => new Command(SaveComponents);
+        public ICommand UpComponentCmd => new Command<ComponentVM>(UpComponent);
+        public ICommand DownComponentCmd => new Command<ComponentVM>(DownComponent);
 
         #endregion Commands
 
@@ -151,7 +153,7 @@ namespace GostDOC.ViewModels
 
             bool isDocument = groupName == Constants.GroupNameDoc || subGroupName == Constants.GroupNameDoc;
 
-            Dictionary<Guid, Component> components = new Dictionary<Guid, Component>();
+            List<Component> components = new List<Component>();
             foreach (var cmp in Components)
             {
                 Component component = new Component(cmp.Guid)
@@ -171,7 +173,7 @@ namespace GostDOC.ViewModels
                 component.Properties.Add(Constants.ComponentCountReg, cmp.CountReg.Value.ToString());
                 component.Properties.Add(Constants.ComponentNote, cmp.Note.Value);
 
-                components.Add(component.Guid, component);
+                components.Add(component);
             }
 
             _project.UpdateComponents(cfgName, groupName, subGroupName, _selectedItem.ParentType, components);
@@ -228,7 +230,32 @@ namespace GostDOC.ViewModels
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
         }
 
+        private void UpComponent(ComponentVM obj)
+        {
+            if (obj != null)
+            {
+                int pos = Components.IndexOf(obj);
+                if (pos > 0)
+                {
+                    Components.Move(pos, pos - 1);
+                }
+            }
+        }
+
+        private void DownComponent(ComponentVM obj)
+        {
+            if (obj != null)
+            {
+                int pos = Components.IndexOf(obj);
+                if (pos < Components.Count - 1)
+                {
+                    Components.Move(pos, pos + 1);
+                }
+            }
+        }
+
         #endregion Commands impl
+
         private void UpdateSelectedDocument()
         {
             if (_selectedItem == null)

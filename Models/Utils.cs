@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,11 +35,18 @@ namespace GostDOC.Models
             }
         }
 
-        public static void AddRange(this Dictionary<string, string> dic, IList<PropertyXml> data)
+        public static void AddRange(this IDictionary<string, string> dic, IList<PropertyXml> data)
         {
             foreach (var val in data)
             {
                 dic.Add(val.Name, val.Text);
+            }
+        }
+        public static void AddRange<T, V>(this IDictionary<T, V> dic, OrderedDictionary data)
+        {
+            foreach (DictionaryEntry val in data)
+            {
+                dic.Add((T)val.Key, (V)val.Value);
             }
         }
 
@@ -49,6 +58,20 @@ namespace GostDOC.Models
         public static IEnumerable<KeyValuePair<T, V>> AsNotNull<T, V>(this IDictionary<T, V> original)
         {
             return original ?? Enumerable.Empty<KeyValuePair<T, V>>();
+        }
+
+        public static int IndexOf<T>(this OrderedDictionary dictionary, T key)
+        {
+            int i = 0;
+            foreach (var k in dictionary.Keys)
+            {
+                if (k.Equals(key))
+                {
+                    return i;
+                }
+                i++;
+            }
+            return -1;
         }
     }
 }

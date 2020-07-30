@@ -16,7 +16,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<string> Format { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> Entry { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> Manufacturer { get; } = new ObservableProperty<string>();
-        public ObservableProperty<uint> Position { get; } = new ObservableProperty<uint>();
+        public ObservableProperty<int> Position { get; } = new ObservableProperty<int>();
         public ObservableProperty<uint> CountDev { get; } = new ObservableProperty<uint>();
         public ObservableProperty<uint> CountSet { get; } = new ObservableProperty<uint>();
         public ObservableProperty<uint> CountReg { get; } = new ObservableProperty<uint>();

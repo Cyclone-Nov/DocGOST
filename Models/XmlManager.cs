@@ -39,6 +39,7 @@ namespace GostDOC.Models
             aResult.Name = rootXml.Transaction.Project.Name;
             // Clear configurations
             aResult.Configurations.Clear();
+
             // Fill configurations
             foreach (var cfg in rootXml.Transaction.Project.Configurations)
             {
@@ -52,10 +53,6 @@ namespace GostDOC.Models
                 }
 
                 // Fill groups
-                foreach (var component in cfg.Components)
-                {
-                    AddComponent(newCfg, component, ComponentType.Component);
-                }
                 foreach (var doc in cfg.Documents)
                 {
                     AddComponent(newCfg, doc, ComponentType.Document);
@@ -64,10 +61,13 @@ namespace GostDOC.Models
                 {
                     AddComponent(newCfg, doc, ComponentType.ComponentPCB);
                 }
+                foreach (var component in cfg.Components)
+                {
+                    AddComponent(newCfg, component, ComponentType.Component);
+                }
 
                 aResult.Configurations.Add(newCfg.Name, newCfg);
             }
-
             return true;
         }
 
@@ -80,7 +80,7 @@ namespace GostDOC.Models
             AddComponent(aNewCfg.Bill, component, groups[2], groups[3]);
         }
 
-        private void AddComponent(Dictionary<string, Group> aGroups, Component aComponent, string aGroup, string aSubGroup)
+        private void AddComponent(IDictionary<string, Group> aGroups, Component aComponent, string aGroup, string aSubGroup)
         {
             Group spGroup = null;
             if (!aGroups.TryGetValue(aGroup, out spGroup))
@@ -93,7 +93,7 @@ namespace GostDOC.Models
             if (string.IsNullOrEmpty(aSubGroup))
             {
                 // Add component, no subgroup
-                spGroup.Components.Add(aComponent.Guid, aComponent);
+                spGroup.Components.Add(aComponent);
             }
             else
             {
@@ -105,7 +105,7 @@ namespace GostDOC.Models
                     spGroup.SubGroups.Add(subGroup.Name, subGroup);
                 }
                 // Add component to subgroup
-                subGroup.Components.Add(aComponent.Guid, aComponent);
+                subGroup.Components.Add(aComponent);
             }
         }
 
@@ -176,9 +176,7 @@ namespace GostDOC.Models
                         }
                     }
                 }
-
             }
-
             return rootXml;
         }
     }
