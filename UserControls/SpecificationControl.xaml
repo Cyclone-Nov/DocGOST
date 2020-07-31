@@ -43,8 +43,8 @@
             <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Добавить" Command="{Binding AddComponentCmd}"/>
             <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Удалить" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding RemoveComponentsCmd}"/>
             <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Перенести" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding MoveComponentsCmd}"/>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Вверх" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItem}" Command="{Binding UpComponentCmd}"/>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Вниз" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItem}" Command="{Binding DownComponentCmd}"/>
+            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Вверх" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding UpComponentsCmd}"/>
+            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Вниз" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding DownComponentsCmd}"/>
             <Button DockPanel.Dock="Right" Width="100" Margin="5" Content="Сохранить" Command="{Binding SaveComponentsCmd}"/>
         </DockPanel>
         

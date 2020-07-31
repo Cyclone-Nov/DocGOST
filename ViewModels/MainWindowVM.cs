@@ -53,8 +53,8 @@ namespace GostDOC.ViewModels
         public ICommand AddGroupCmd => new Command(AddGroup);
         public ICommand RemoveGroupCmd => new Command(RemoveGroup);
         public ICommand SaveComponentsCmd => new Command(SaveComponents);
-        public ICommand UpComponentCmd => new Command<ComponentVM>(UpComponent);
-        public ICommand DownComponentCmd => new Command<ComponentVM>(DownComponent);
+        public ICommand UpComponentsCmd => new Command<IList<object>>(UpComponents);
+        public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
 
         public string ConfigurationName
         {
@@ -282,11 +282,12 @@ namespace GostDOC.ViewModels
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
         }
 
-        private void UpComponent(ComponentVM obj)
+        private void UpComponents(IList<object> lst)
         {
-            if (obj != null)
+            var items = lst.Cast<ComponentVM>();
+            foreach (var item in items)
             {
-                int pos = Components.IndexOf(obj);
+                int pos = Components.IndexOf(item);
                 if (pos > 0)
                 {
                     Components.Move(pos, pos - 1);
@@ -294,11 +295,12 @@ namespace GostDOC.ViewModels
             }
         }
 
-        private void DownComponent(ComponentVM obj)
+        private void DownComponents(IList<object> lst)
         {
-            if (obj != null)
+            var items = lst.Cast<ComponentVM>().Reverse();
+            foreach (var item in items)
             {
-                int pos = Components.IndexOf(obj);
+                int pos = Components.IndexOf(item);
                 if (pos < Components.Count - 1)
                 {
                     Components.Move(pos, pos + 1);
