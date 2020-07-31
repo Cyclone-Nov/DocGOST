@@ -94,6 +94,21 @@ namespace GostDOC.Models
             return result;
         }
 
+        public void SaveGraphValues(IDictionary<string, string> aGraphValues)
+        {
+            foreach (var cfg in _docManager.Project.Configurations)
+            {
+                if (cfg.Value.Graphs.Count > 0)
+                {
+                    foreach (var kvp in aGraphValues)
+                    {
+                        cfg.Value.Graphs[kvp.Key] = kvp.Value; 
+                    }
+                    break;
+                }
+            }
+        }
+
         #endregion Public
 
         #region Private

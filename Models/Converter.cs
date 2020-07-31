@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,17 +29,22 @@ namespace GostDOC.Models
                     return isOneElement ? names.Item1 : names.Item2;
                 }
             }
-            return null;
+            return string.Empty;
         }
 
         private void FillGroupNames()
         {
-            _groupNames.Add("A", new Tuple<string, string>("Устройство", "Устройства"));
-            _groupNames.Add("BA", new Tuple<string, string>("Громкоговоритель", "Громкоговорители"));
-            _groupNames.Add("BB", new Tuple<string, string>("Магнитострикционный элемент", "Магнитострикционные элементы"));
-            _groupNames.Add("BD", new Tuple<string, string>("Детектор ионизирующих излучений", "Детекторы ионизирующих излучений"));
-
-            // TODO: Fill values
+            using (var reader = new StreamReader(Path.Combine(Environment.CurrentDirectory, "PhysicalDesignators.txt")))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] split = line.Split(new char[] { '\t' });
+                    if (split.Length == 3) {
+                        _groupNames.Add(split[0], new Tuple<string, string>(split[1], split[2]));
+                    }
+                }
+            }
         }
     }
 }

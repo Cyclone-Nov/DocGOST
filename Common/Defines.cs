@@ -39,6 +39,7 @@ namespace GostDOC.Common
         public static readonly string SubGroupNameSp = "Подраздел СП";
         public static readonly string GroupNameB = "Раздел ВП";
         public static readonly string SubGroupNameB = "Подраздел ВП";
+        public static readonly string GroupOthers = "Прочие изделия";
 
 
         public static readonly string ComponentName = "Наименование";
@@ -51,5 +52,6 @@ namespace GostDOC.Common
         public static readonly string ComponentCountReg = "Количество на рег.";
         public static readonly string ComponentNote = "Примечание";
         public static readonly string ComponentSign = "Обозначение";
+        public static readonly string ComponentDesignatiorID = "Позиционное обозначение";
     }
 }

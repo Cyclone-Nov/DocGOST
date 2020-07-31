@@ -113,25 +113,44 @@ namespace GostDOC.Models
         {
             string[] result = Enumerable.Repeat(string.Empty, 4).ToArray();
 
+            string designatorID = string.Empty;
             foreach (var property in aComponent.Properties)
             {
-                if (property.Name == "Раздел СП")
+                if (property.Name == Constants.GroupNameSp)
                 {
                     result[0] = property.Text;
                 }
-                else if (property.Name == "Подраздел СП")
+                else if (property.Name == Constants.SubGroupNameSp)
                 {
                     result[1] = property.Text;
                 }
-                else if (property.Name == "Раздел ВП")
+                else if (property.Name == Constants.GroupNameB)
                 {
                     result[2] = property.Text;
                 }
-                else if (property.Name == "Подраздел ВП")
+                else if (property.Name == Constants.SubGroupNameB)
                 {
                     result[3] = property.Text;
                 }
+                else if (property.Name == Constants.ComponentDesignatiorID)
+                {
+                    designatorID = property.Text;
+                }
             }
+
+            if (!string.IsNullOrEmpty(designatorID))
+            {
+                string subGroupName = _defaults.GetGroupName(designatorID);                
+                if (result[0] == Constants.GroupOthers && string.IsNullOrEmpty(result[1]))
+                {
+                    result[1] = subGroupName;
+                }
+                if (result[2] == Constants.GroupOthers && string.IsNullOrEmpty(result[3]))
+                {
+                    result[3] = subGroupName;
+                }
+            }
+
             return result;
         }
 

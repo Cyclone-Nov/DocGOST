@@ -56,6 +56,9 @@ namespace GostDOC.ViewModels
         public ICommand UpComponentsCmd => new Command<IList<object>>(UpComponents);
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
 
+        /// <summary>
+        /// Current selected configuration
+        /// </summary>
         public string ConfigurationName
         {
             get
@@ -75,7 +78,9 @@ namespace GostDOC.ViewModels
                 return string.Empty;
             }
         }
-
+        /// <summary>
+        /// Current selected group
+        /// </summary>
         public string GroupName
         {
             get
@@ -96,7 +101,9 @@ namespace GostDOC.ViewModels
                 return name;
             }
         }
-
+        /// <summary>
+        /// Current selected subgroup
+        /// </summary>
         public string SubGroupName => _selectedItem?.NodeType == NodeType.SubGroup ? _selectedItem.Name : string.Empty;
 
         #endregion Commands
@@ -138,7 +145,7 @@ namespace GostDOC.ViewModels
 
         private void SaveFile(object obj)
         {
-            // TODO: save file / files
+            // TODO: save file
         }
 
         private void SaveFileAs(object obj)
@@ -224,6 +231,7 @@ namespace GostDOC.ViewModels
             {
                 _project.MoveComponents(cfgName, _selectedItem.ParentType, move);
             }
+            _moveInfo.Clear();
 
             // Update components
             _project.UpdateComponents(cfgName, new SubGroupInfo(GroupName, SubGroupName), _selectedItem.ParentType, components);
@@ -231,7 +239,12 @@ namespace GostDOC.ViewModels
 
         private void SaveGraphValues(GraphPageType tp)
         {
-            // TODO: Save updated graph values
+            Dictionary<string, string> values = new Dictionary<string, string>();
+            foreach (var value in GeneralGraphValues)
+            {
+                values.Add(value.Name.Value, value.Text.Value);
+            }
+            _project.SaveGraphValues(values);
         }
 
         private void AddGroup(object obj)
@@ -241,7 +254,7 @@ namespace GostDOC.ViewModels
             {
                 return;
             }
-
+            // Add group or subgroup
             if (_selectedItem.NodeType == NodeType.Configuration)
             {
                 _project.AddGroup(_selectedItem.Name, new SubGroupInfo(name, null), _selectedItem.ParentType);
@@ -250,13 +263,14 @@ namespace GostDOC.ViewModels
             {
                 _project.AddGroup(_selectedItem.Parent.Name, new SubGroupInfo(_selectedItem.Name, name), _selectedItem.ParentType);
             }
-
+            // Update view
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
         }
 
         private void RemoveGroup(object obj)
         {
             bool removeComponents = true;
+            // Ask user to remove components in group
             var components = GetComponents();
             if (components.Count > 0)
             {
@@ -267,7 +281,7 @@ namespace GostDOC.ViewModels
                 }
                 removeComponents = (result == MessageBoxResult.Yes);
             }
-
+            // Remove group or subgroup
             if (_selectedItem.NodeType == NodeType.Group)
             {
                 var groupInfo = new SubGroupInfo(_selectedItem.Name, null);
@@ -278,12 +292,13 @@ namespace GostDOC.ViewModels
                 var groupInfo = new SubGroupInfo(_selectedItem.Parent.Name, _selectedItem.Name);
                 _project.RemoveGroup(_selectedItem.Parent.Parent.Name, groupInfo, _selectedItem.ParentType, removeComponents);
             }
-
+            // Update view
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
         }
 
         private void UpComponents(IList<object> lst)
         {
+            // Move selected components up
             var items = lst.Cast<ComponentVM>();
             foreach (var item in items)
             {
@@ -297,6 +312,7 @@ namespace GostDOC.ViewModels
 
         private void DownComponents(IList<object> lst)
         {
+            // Move selected components down
             var items = lst.Cast<ComponentVM>().Reverse();
             foreach (var item in items)
             {
@@ -316,22 +332,26 @@ namespace GostDOC.ViewModels
             {
                 return;
             }
-
+            // Is group or subgroup selected
             bool isGroup = _selectedItem.NodeType == NodeType.Group || _selectedItem.NodeType == NodeType.SubGroup;
-
+            // Is graph table visible
             IsGeneralGraphValuesVisible.Value = _selectedItem.NodeType == NodeType.Root;
+            // Is add group button enabled
             IsAddEnabled.Value = (_selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group) && 
                 _selectedItem.Name != Constants.DefaultGroupName && _selectedItem.Name != Constants.GroupNameDoc;
+            // Is remove group button enabled
             IsRemoveEnabled.Value = isGroup && _selectedItem.Name != Constants.DefaultGroupName;
-
+            // Is scecification table visible
             IsSpecificationTableVisible.Value = _selectedItem.ParentType == NodeType.Specification && isGroup;
+            // Is bill table visible
             IsBillTableVisible.Value = _selectedItem.ParentType == NodeType.Bill && isGroup;
 
             if (isGroup)
             {
+                // Update selected group / subgroup components
                 UpdateComponents();
             }
-
+            // Clear move components info
             _moveInfo.Clear();
         }
 
@@ -352,6 +372,7 @@ namespace GostDOC.ViewModels
 
         private void UpdateConfiguration(Node aCollection, string aCfgName, IDictionary<string, Group> aGroups)
         {
+            // Populate configuration tree
             Node treeItemCfg = new Node() { Name = aCfgName, NodeType = NodeType.Configuration, ParentType = aCollection.NodeType, Parent = aCollection, Nodes = new ObservableCollection<Node>() };
             foreach (var grp in aGroups)
             {
@@ -374,6 +395,7 @@ namespace GostDOC.ViewModels
 
         private void UpdateGraphValues()
         {
+            // Add graph values to view
             GeneralGraphValues.Clear();
             foreach (var cfg in _docManager.Project.Configurations)
             {
