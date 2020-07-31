@@ -115,13 +115,16 @@
     </ApplicationDefinition>
     <Compile Include="Common\WebBrowserUtility.cs" />
     <Compile Include="Common\XmlSerializerHelper.cs" />
+    <Compile Include="Models\MoveInfo.cs" />
     <Compile Include="Models\ProjectWrapper.cs" />
+    <Compile Include="Models\SubGroupInfo.cs" />
     <Compile Include="Models\XUtils.cs" />
     <Compile Include="Models\Converter.cs" />
     <Compile Include="Models\DataStructures.cs" />
     <Compile Include="Models\Node.cs" />
     <Compile Include="Models\XmlManager.cs" />
     <Compile Include="Models\XmlDataStructures.cs" />
+    <Compile Include="UI\CommonDialogs.cs" />
     <Compile Include="UserControls\BillControl.xaml.cs">
       <DependentUpon>BillControl.xaml</DependentUpon>
     </Compile>
@@ -133,8 +136,12 @@
     </Compile>
     <Compile Include="ViewModels\ComponentVM.cs" />
     <Compile Include="ViewModels\GraphValueVM.cs" />
+    <Compile Include="ViewModels\SelectGroupVM.cs" />
     <Compile Include="Views\NewGroup.xaml.cs">
       <DependentUpon>NewGroup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SelectGroup.xaml.cs">
+      <DependentUpon>SelectGroup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SelectMainFile.xaml.cs">
       <DependentUpon>SelectMainFile.xaml</DependentUpon>
@@ -171,6 +178,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\NewGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SelectGroup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,5 +1,6 @@
 ﻿using GostDOC.Common;
 using GostDOC.Models;
+using GostDOC.UI;
 using GostDOC.Views;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace GostDOC.ViewModels
         
         private DocManager _docManager = DocManager.Instance;
         private ProjectWrapper _project = new ProjectWrapper();
+        private List<MoveInfo> _moveInfo = new List<MoveInfo>();
 
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
@@ -54,6 +56,49 @@ namespace GostDOC.ViewModels
         public ICommand UpComponentCmd => new Command<ComponentVM>(UpComponent);
         public ICommand DownComponentCmd => new Command<ComponentVM>(DownComponent);
 
+        public string ConfigurationName
+        {
+            get
+            {
+                if (_selectedItem?.NodeType == NodeType.Configuration)
+                {
+                    return _selectedItem.Name;
+                }
+                if (_selectedItem?.NodeType == NodeType.Group)
+                {
+                    return _selectedItem.Parent.Name;
+                }
+                if (_selectedItem?.NodeType == NodeType.SubGroup)
+                {
+                    return _selectedItem.Parent.Parent.Name;
+                }
+                return string.Empty;
+            }
+        }
+
+        public string GroupName
+        {
+            get
+            {
+                string name = string.Empty;
+                if (_selectedItem?.NodeType == NodeType.Group)
+                {
+                    name = _selectedItem.Name;
+                }
+                else if (_selectedItem?.NodeType == NodeType.SubGroup)
+                {
+                    name = _selectedItem.Parent.Name;
+                }
+                if (name.Equals(Constants.DefaultGroupName))
+                {
+                    name = string.Empty;
+                } 
+                return name;
+            }
+        }
+
+        public string SubGroupName => _selectedItem?.NodeType == NodeType.SubGroup ? _selectedItem.Name : string.Empty;
+
         #endregion Commands
 
         public MainWindowVM()
@@ -80,7 +125,7 @@ namespace GostDOC.ViewModels
                 string mainFileName = null;
                 if (open.FileNames.Length > 1)
                 {
-                    mainFileName = GetMainFileName(open.SafeFileNames);
+                    mainFileName = CommonDialogs.GetMainFileName(open.SafeFileNames);
                     if (string.IsNullOrEmpty(mainFileName))
                         return;
                 }
@@ -134,49 +179,54 @@ namespace GostDOC.ViewModels
 
         private void MoveComponents(IList<object> lst)
         {
-            string groupName = GetGroupName();
-            if (string.IsNullOrEmpty(groupName))
+            var groups = _project.GetGroupNames(ConfigurationName, _selectedItem.ParentType);
+            var subGroupInfo = CommonDialogs.SelectGroup(groups);
+            if (subGroupInfo != null)
             {
-                foreach (var item in lst.Cast<ComponentVM>().ToList())
+                MoveInfo moveInfo = new MoveInfo()
                 {
-                    // TODO: move items
-                    Components.Remove(item);
+                    Source = new SubGroupInfo() { GroupName = GroupName, SubGroupName = SubGroupName },
+                    Destination = subGroupInfo
+                };
+
+                if (!moveInfo.Source.Equals(moveInfo.Destination))
+                {
+                    foreach (var cmp in lst.Cast<ComponentVM>().ToList())
+                    {
+                        // Add component to move list
+                        Component component = new Component(cmp.Guid);
+                        UpdateComponent(cmp, component);
+                        moveInfo.Components.Add(component);
+                        // Remove component from view
+                        Components.Remove(cmp);
+                    }
+                    // Add move info
+                    _moveInfo.Add(moveInfo);
                 }
             }
         }
 
         private void SaveComponents(object obj)
         {
-            string cfgName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Parent.Name : _selectedItem.Parent.Parent.Name;
-            string groupName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Name : _selectedItem.Parent.Name;
-            string subGroupName = _selectedItem.NodeType == NodeType.SubGroup ? _selectedItem.Name : string.Empty;
+            string cfgName = ConfigurationName;
 
-            bool isDocument = groupName == Constants.GroupNameDoc || subGroupName == Constants.GroupNameDoc;
-
+            // Update components properties
             List<Component> components = new List<Component>();
             foreach (var cmp in Components)
             {
-                Component component = new Component(cmp.Guid)
-                {                    
-                    Type = isDocument ? ComponentType.Document : ComponentType.Component
-                };                
-
-                component.Properties.Add(Constants.GroupNameSp, groupName);
-                component.Properties.Add(Constants.ComponentName, cmp.Name.Value);
-                component.Properties.Add(Constants.ComponentSign, cmp.Sign.Value);
-                component.Properties.Add(Constants.ComponentProductCode, cmp.Code.Value);
-                component.Properties.Add(Constants.ComponentFormat, cmp.Format.Value);
-                component.Properties.Add(Constants.ComponentDoc, cmp.Entry.Value);
-                component.Properties.Add(Constants.ComponentSupplier, cmp.Manufacturer.Value);
-                component.Properties.Add(Constants.ComponentCountDev, cmp.CountDev.Value.ToString());
-                component.Properties.Add(Constants.ComponentCountSet, cmp.CountSet.Value.ToString());
-                component.Properties.Add(Constants.ComponentCountReg, cmp.CountReg.Value.ToString());
-                component.Properties.Add(Constants.ComponentNote, cmp.Note.Value);
-
+                Component component = new Component(cmp.Guid);
+                UpdateComponent(cmp, component);
                 components.Add(component);
             }
 
-            _project.UpdateComponents(cfgName, groupName, subGroupName, _selectedItem.ParentType, components);
+            // Move components
+            foreach (var move in _moveInfo)
+            {
+                _project.MoveComponents(cfgName, _selectedItem.ParentType, move);
+            }
+
+            // Update components
+            _project.UpdateComponents(cfgName, new SubGroupInfo(GroupName, SubGroupName), _selectedItem.ParentType, components);
         }
 
         private void SaveGraphValues(GraphPageType tp)
@@ -186,7 +236,7 @@ namespace GostDOC.ViewModels
 
         private void AddGroup(object obj)
         {
-            string name = GetGroupName();
+            string name = CommonDialogs.GetGroupName();
             if (string.IsNullOrEmpty(name))
             {
                 return;
@@ -194,11 +244,11 @@ namespace GostDOC.ViewModels
 
             if (_selectedItem.NodeType == NodeType.Configuration)
             {
-                _project.AddGroup(_selectedItem.Name, name, null, _selectedItem.ParentType);
+                _project.AddGroup(_selectedItem.Name, new SubGroupInfo(name, null), _selectedItem.ParentType);
             }
             else if (_selectedItem.NodeType == NodeType.Group)
             {
-                _project.AddGroup(_selectedItem.Parent.Name, _selectedItem.Name, name, _selectedItem.ParentType);
+                _project.AddGroup(_selectedItem.Parent.Name, new SubGroupInfo(_selectedItem.Name, name), _selectedItem.ParentType);
             }
 
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
@@ -220,11 +270,13 @@ namespace GostDOC.ViewModels
 
             if (_selectedItem.NodeType == NodeType.Group)
             {
-                _project.RemoveGroup(_selectedItem.Parent.Name, _selectedItem.Name, null, _selectedItem.ParentType, removeComponents);
+                var groupInfo = new SubGroupInfo(_selectedItem.Name, null);
+                _project.RemoveGroup(_selectedItem.Parent.Name, groupInfo, _selectedItem.ParentType, removeComponents);
             }
             else if (_selectedItem.NodeType == NodeType.SubGroup)
             {
-                _project.RemoveGroup(_selectedItem.Parent.Parent.Name, _selectedItem.Parent.Name, _selectedItem.Name, _selectedItem.ParentType, removeComponents);
+                var groupInfo = new SubGroupInfo(_selectedItem.Parent.Name, _selectedItem.Name);
+                _project.RemoveGroup(_selectedItem.Parent.Parent.Name, groupInfo, _selectedItem.ParentType, removeComponents);
             }
 
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
@@ -277,41 +329,14 @@ namespace GostDOC.ViewModels
             {
                 UpdateComponents();
             }
-        }
 
-        private string GetGroupName()
-        {
-            NewGroup newGroupDlg = new NewGroup();
-            var result = newGroupDlg.ShowDialog();
-            if (result.HasValue && result.Value)
-            {
-                return newGroupDlg.GroupName.Text;
-            }
-            return null;
-        }
-
-        private string GetMainFileName(string[] aFileNames)
-        {
-            SelectMainFile mainFileDlg = new SelectMainFile();
-            mainFileDlg.ItemsSource = aFileNames;
-            var result = mainFileDlg.ShowDialog();
-            if (result.HasValue && result.Value)
-            {
-                return mainFileDlg.FileName.Text;
-            }
-            return null;
+            _moveInfo.Clear();
         }
 
         private IList<Component> GetComponents()
         {
-            string cfgName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Parent.Name : _selectedItem.Parent.Parent.Name;
-            string groupName = _selectedItem.NodeType == NodeType.Group ? _selectedItem.Name : _selectedItem.Parent.Name;
-            string subGroupName = _selectedItem.NodeType == NodeType.SubGroup ? _selectedItem.Name : string.Empty;
-
-            if (groupName == Constants.DefaultGroupName)
-                groupName = "";
-
-            return _project.GetComponents(cfgName, _selectedItem.ParentType, groupName, subGroupName);
+            var groupInfo = new SubGroupInfo(GroupName, SubGroupName);
+            return _project.GetComponents(ConfigurationName, _selectedItem.ParentType, groupInfo);
         }
 
         private void UpdateComponents()
@@ -383,6 +408,25 @@ namespace GostDOC.ViewModels
         {
             UpdateGraphValues();
             UpdateGroups();
+        }
+
+        private void UpdateComponent(ComponentVM aSrc, Component aDst)
+        {
+            string groupName = GroupName;
+            bool isDocument = groupName == Constants.GroupNameDoc;
+
+            aDst.Type = isDocument ? ComponentType.Document : ComponentType.Component;
+            aDst.Properties.Add(Constants.GroupNameSp, groupName);
+            aDst.Properties.Add(Constants.ComponentName, aSrc.Name.Value);
+            aDst.Properties.Add(Constants.ComponentSign, aSrc.Sign.Value);
+            aDst.Properties.Add(Constants.ComponentProductCode, aSrc.Code.Value);
+            aDst.Properties.Add(Constants.ComponentFormat, aSrc.Format.Value);
+            aDst.Properties.Add(Constants.ComponentDoc, aSrc.Entry.Value);
+            aDst.Properties.Add(Constants.ComponentSupplier, aSrc.Manufacturer.Value);
+            aDst.Properties.Add(Constants.ComponentCountDev, aSrc.CountDev.Value.ToString());
+            aDst.Properties.Add(Constants.ComponentCountSet, aSrc.CountSet.Value.ToString());
+            aDst.Properties.Add(Constants.ComponentCountReg, aSrc.CountReg.Value.ToString());
+            aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
         }
     }
 }
