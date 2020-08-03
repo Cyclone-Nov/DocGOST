@@ -24,6 +24,7 @@ namespace GostDOC.ViewModels
         private Node _bill = new Node() { Name = "Ведомость покупных изделий", NodeType = NodeType.Bill, Nodes = new ObservableCollection<Node>() };
         private Node _bill_D27 = new Node() { Name = "Ведомость Д27", NodeType = NodeType.Bill_D27, Nodes = new ObservableCollection<Node>() };
         private Node _selectedItem = null;
+        private string _filePath = null;
         
         private DocManager _docManager = DocManager.Instance;
         private ProjectWrapper _project = new ProjectWrapper();
@@ -129,6 +130,9 @@ namespace GostDOC.ViewModels
 
             if (open.ShowDialog() == DialogResult.OK)
             {
+                // Reset file path
+                _filePath = null;
+
                 string mainFileName = null;
                 if (open.FileNames.Length > 1)
                 {
@@ -136,19 +140,34 @@ namespace GostDOC.ViewModels
                     if (string.IsNullOrEmpty(mainFileName))
                         return;
                 }
+                else
+                {
+                    // Save current file name only if one file was selected
+                    _filePath = open.FileName;
+                }
+
                 // Parse xml files
-                _docManager.LoadData(open.FileNames, mainFileName);
-                // Update visual data
-                UpdateData();
+                if (_docManager.LoadData(open.FileNames, mainFileName))
+                {
+                    // Update visual data
+                    UpdateData();                    
+                }
             }
         }
 
-        private void SaveFile(object obj)
+        private void SaveFile(object obj = null)
         {
-            // TODO: save file
+            if (string.IsNullOrEmpty(_filePath))
+            {
+                SaveFileAs();
+            }
+            else
+            {
+                SaveFile();
+            }
         }
 
-        private void SaveFileAs(object obj)
+        private void SaveFileAs(object obj = null)
         {
             SaveFileDialog save = new SaveFileDialog();
             save.Filter = "All Files *.xml | *.xml";
@@ -156,7 +175,8 @@ namespace GostDOC.ViewModels
 
             if (save.ShowDialog() == DialogResult.OK)
             {
-                // TODO: save file / files
+                _filePath = save.FileName;
+                SaveFile();
             }
         }
 
@@ -326,6 +346,11 @@ namespace GostDOC.ViewModels
 
         #endregion Commands impl
 
+        private bool SaveFile()
+        {
+            return string.IsNullOrEmpty(_filePath) ? false : _docManager.SaveData(_filePath);
+        }
+
         private void UpdateSelectedDocument()
         {
             if (_selectedItem == null)
@@ -412,19 +437,26 @@ namespace GostDOC.ViewModels
 
         private void UpdateGroups(bool aUpdateSp = true, bool aUpdateB = true)
         {
-            if (aUpdateSp) 
+            // Clear group nodes
+            if (aUpdateSp)
+            {
                 _specification.Nodes.Clear();
-
+            }
             if (aUpdateB)
+            {
                 _bill.Nodes.Clear();
-
+            }
+            // Update visual view
             foreach (var cfg in _docManager.Project.Configurations)
             {
                 if (aUpdateSp)
+                {
                     UpdateConfiguration(_specification, cfg.Key, cfg.Value.Specification);
-
+                }
                 if (aUpdateB)
+                {
                     UpdateConfiguration(_bill, cfg.Key, cfg.Value.Bill);
+                }
             }
         }
 

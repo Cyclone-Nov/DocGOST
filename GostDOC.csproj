@@ -115,15 +115,16 @@
     </ApplicationDefinition>
     <Compile Include="Common\WebBrowserUtility.cs" />
     <Compile Include="Common\XmlSerializerHelper.cs" />
+    <Compile Include="Converters\TreeViewSortConverter.cs" />
     <Compile Include="Models\MoveInfo.cs" />
     <Compile Include="Models\ProjectWrapper.cs" />
     <Compile Include="Models\SubGroupInfo.cs" />
-    <Compile Include="Models\XUtils.cs" />
+    <Compile Include="XML\XUtils.cs" />
     <Compile Include="Models\Converter.cs" />
     <Compile Include="Models\DataStructures.cs" />
     <Compile Include="Models\Node.cs" />
-    <Compile Include="Models\XmlManager.cs" />
-    <Compile Include="Models\XmlDataStructures.cs" />
+    <Compile Include="XML\XmlManager.cs" />
+    <Compile Include="XML\XmlDataStructures.cs" />
     <Compile Include="UI\CommonDialogs.cs" />
     <Compile Include="UserControls\BillControl.xaml.cs">
       <DependentUpon>BillControl.xaml</DependentUpon>

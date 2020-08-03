@@ -8,19 +8,9 @@ using GostDOC.Common;
 
 namespace GostDOC.Models
 {
-    static class Extensions
-    {
-        public static void UpdateComponentProperties(this Component current, Component update)
-        {
-            foreach (var prop in update.Properties)
-            {
-                current.Properties[prop.Key] = prop.Value;
-            }
-        }
-    }
-
     class ProjectWrapper
     {
+        private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
         private DocManager _docManager = DocManager.Instance;
 
         #region Public
@@ -49,7 +39,18 @@ namespace GostDOC.Models
             var groups = GetConfigGroups(aCfgName, aParentType);
             if (groups != null)
             {
-                return RemoveGroup(groups, aGroupInfo, aRemoveComponents);
+                // Remove components 
+                var removed = RemoveGroup(groups, aGroupInfo, aRemoveComponents);
+
+                // Update components group
+                if (!aRemoveComponents)
+                {
+                    foreach (var component in removed)
+                    {
+                        component.UpdateComponentGroupInfo(aParentType, new SubGroupInfo());
+                    }
+                }
+                return removed.Count > 0;
             }
             return false;
         }
@@ -59,7 +60,7 @@ namespace GostDOC.Models
             var groups = GetConfigGroups(aCfgName, aParentType);
             if (groups != null)
             {
-                MoveComponents(groups, aMoveInfo);
+                MoveComponents(groups, aParentType, aMoveInfo);
             }
         }
 
@@ -108,7 +109,6 @@ namespace GostDOC.Models
                 }
             }
         }
-
         #endregion Public
 
         #region Private
@@ -156,7 +156,7 @@ namespace GostDOC.Models
 
         private bool UpdateComponents(IDictionary<string, Group> aGroups, SubGroupInfo aGroupInfo, IList<Component> aComponents)
         {
-            Group group = null;
+            Group group;
             if (!aGroups.TryGetValue(aGroupInfo.GroupName, out group))
             {
                 return false;
@@ -169,7 +169,7 @@ namespace GostDOC.Models
             }
             else
             {
-                Group subGroup = null;
+                Group subGroup;
                 if (!group.SubGroups.TryGetValue(aGroupInfo.SubGroupName, out subGroup))
                 {
                     UpdateComponents(subGroup, aComponents);
@@ -192,7 +192,7 @@ namespace GostDOC.Models
             }
             else
             {
-                Group grp = null;
+                Group grp;
                 if (aGroups.TryGetValue(aGroupInfo.GroupName, out grp))
                 {
                     if (!grp.SubGroups.ContainsKey(aGroupInfo.SubGroupName))
@@ -207,7 +207,7 @@ namespace GostDOC.Models
 
         private Group GetDefaultGroup(IDictionary<string, Group> aGroups)
         {
-            Group defaultGroup = null;
+            Group defaultGroup;
             if (!aGroups.TryGetValue("", out defaultGroup))
             {
                 defaultGroup = new Group() { Name = "" };
@@ -216,16 +216,15 @@ namespace GostDOC.Models
             return defaultGroup;
         }
 
-        private bool RemoveGroup(IDictionary<string, Group> aGroups, SubGroupInfo aGroupInfo, bool aRemoveComponents)
+        private IList<Component> RemoveGroup(IDictionary<string, Group> aGroups, SubGroupInfo aGroupInfo, bool aRemoveComponents)
         {
-            // Get default group
-            Group defaultGroup = aRemoveComponents ? null : GetDefaultGroup(aGroups);
+            List<Component> removed = new List<Component>();
 
             // Get group
-            Group group = null;
+            Group group;
             if (!aGroups.TryGetValue(aGroupInfo.GroupName, out group))
             {
-                return false;
+                return removed;
             }
 
             // Remove group or subgroup
@@ -235,27 +234,32 @@ namespace GostDOC.Models
                 {
                     foreach (var subGroup in group.SubGroups)
                     {
-                        defaultGroup.Components.AddRange(subGroup.Value.Components);
+                        removed.AddRange(subGroup.Value.Components);
                     }
-                    defaultGroup.Components.AddRange(group.Components);
+                    removed.AddRange(group.Components);
                 }
                 aGroups.Remove(aGroupInfo.GroupName);
-                return true;
             }
             else
             {
-                Group subGroup = null;
+                Group subGroup;
                 if (group.SubGroups.TryGetValue(aGroupInfo.SubGroupName, out subGroup))
                 {
                     if (!aRemoveComponents)
                     {
-                        defaultGroup.Components.AddRange(subGroup.Components);
+                        removed.AddRange(subGroup.Components);
                     }
                     group.SubGroups.Remove(aGroupInfo.SubGroupName);
-                    return true;
                 }
             }
-            return false;
+
+            if (!aRemoveComponents)
+            {
+                Group defaultGroup = GetDefaultGroup(aGroups);
+                defaultGroup.Components.AddRange(removed);
+            }
+
+            return removed;
         }
 
         private void GetGroupInfo(IDictionary<string, Group> aGroups, IDictionary<string, IEnumerable<string>> aResult)
@@ -273,7 +277,7 @@ namespace GostDOC.Models
 
         private Group GetGroup(IDictionary<string, Group> aGroups, SubGroupInfo aSubGroupInfo)
         {
-            Group group = null;
+            Group group;
             if (aGroups.TryGetValue(aSubGroupInfo.GroupName, out group))
             {
                 if (!string.IsNullOrEmpty(aSubGroupInfo.SubGroupName))
@@ -284,7 +288,7 @@ namespace GostDOC.Models
             return group;
         }
 
-        private void MoveComponents(IDictionary<string, Group> aGroups, MoveInfo aMoveInfo)
+        private void MoveComponents(IDictionary<string, Group> aGroups, NodeType aParentType, MoveInfo aMoveInfo)
         {
             var src = GetGroup(aGroups, aMoveInfo.Source);
             var dst = GetGroup(aGroups, aMoveInfo.Destination);
@@ -295,6 +299,8 @@ namespace GostDOC.Models
                 var component = src.Components.Find(x => x.Guid == cmp.Guid);
                 // Save changes in properties
                 component.UpdateComponentProperties(cmp);
+                // Update group info
+                component.UpdateComponentGroupInfo(aParentType, aMoveInfo.Destination);
                 // Add component to destination group
                 dst.Components.Add(component);
                 // Remove component from source group

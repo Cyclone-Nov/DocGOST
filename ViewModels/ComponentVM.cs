@@ -30,6 +30,8 @@ namespace GostDOC.ViewModels
 
         public ComponentVM(Component aComponent)
         {
+            Init(); 
+
             Guid = aComponent.Guid;
 
             Name.Value = GetValue(Constants.ComponentName, aComponent);
@@ -45,7 +47,7 @@ namespace GostDOC.ViewModels
             Note.Value = GetValue(Constants.ComponentNote, aComponent);
             Sign.Value = GetValue(Constants.ComponentSign, aComponent);
 
-            Init();
+            CountDev.Value = aComponent.Count;
         }
 
         private uint Convert(string aValue)

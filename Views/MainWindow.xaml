@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:common="clr-namespace:GostDOC.Common"
         xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
+        xmlns:converters="clr-namespace:GostDOC.Converters"
         xmlns:uc="clr-namespace:GostDOC.UserControls"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
@@ -16,6 +17,7 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="b2v" />
+        <converters:TreeViewSortConverter x:Key="sortConverter" />
     </Window.Resources>
 
     <Window.InputBindings>
@@ -69,7 +71,7 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes}">
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes, Converter={StaticResource sortConverter}, ConverterParameter=Name}">
                         <TextBlock Text="{Binding Name}" />
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>

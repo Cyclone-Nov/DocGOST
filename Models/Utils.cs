@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using GostDOC.Common;
 
 namespace GostDOC.Models
 {
@@ -72,6 +73,31 @@ namespace GostDOC.Models
                 i++;
             }
             return -1;
+        }
+    }
+
+    static class Extensions
+    {
+        public static void UpdateComponentProperties(this Component current, Component update)
+        {
+            foreach (var prop in update.Properties)
+            {
+                current.Properties[prop.Key] = prop.Value;
+            }
+        }
+        public static void UpdateComponentGroupInfo(this Component current, NodeType aParentType, SubGroupInfo info)
+        {
+            if (aParentType == NodeType.Specification)
+            {
+                current.Properties[Constants.GroupNameSp] = info.GroupName;
+                current.Properties[Constants.SubGroupNameSp] = info.SubGroupName;
+            }
+
+            if (aParentType == NodeType.Bill)
+            {
+                current.Properties[Constants.GroupNameB] = info.GroupName;
+                current.Properties[Constants.SubGroupNameB] = info.SubGroupName;
+            }
         }
     }
 }

@@ -23,6 +23,12 @@ namespace GostDOC.Models
         {
             return _xmlManager.LoadData(Project, aFiles, aMainFile);
         }
+
+        public bool SaveData(string aFilePath)
+        {
+            return _xmlManager.SaveData(Project, aFilePath);
+        }
+        
         #endregion Public
     }
 }

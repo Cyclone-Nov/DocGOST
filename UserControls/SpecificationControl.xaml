@@ -34,7 +34,7 @@
                 <DataGridTextColumn Header="Позиция" Binding="{Binding Position.Value}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name.Value}"/>
                 <DataGridTextColumn Header="Обозначение" Binding="{Binding Sign.Value}"/>
-                <DataGridTextColumn Header="Количество" Binding="{Binding Count.Value}"/>
+                <DataGridTextColumn Header="Количество" Binding="{Binding CountDev.Value}"/>
                 <DataGridTextColumn Header="Примечание" Width="*" Binding="{Binding Note.Value}" />
             </DataGrid.Columns>
         </DataGrid>

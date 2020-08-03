@@ -28,7 +28,13 @@ namespace GostDOC.ViewModels
         {
             foreach (var group in aGroups)
             {
-                Node groupNode = new Node() { Name = group.Key, Nodes = new ObservableCollection<Node>(), NodeType = NodeType.Group };
+                string groupName = group.Key;
+                if (string.IsNullOrEmpty(group.Key))
+                {
+                    groupName = Constants.DefaultGroupName;
+                }
+
+                Node groupNode = new Node() { Name = groupName, Nodes = new ObservableCollection<Node>(), NodeType = NodeType.Group };
                 foreach (var subGroup in group.Value)
                 {
                     Node subGroupNode = new Node() { Name = subGroup, NodeType = NodeType.SubGroup };
