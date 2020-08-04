@@ -215,7 +215,7 @@ class Program {
         // canvas.Add(table);
         // PdfFont f1 = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.TIMES_ROMAN, true);
 
-        PdfFont times = PdfFontFactory.CreateFont("times.ttf", "cp1251", true);
+        PdfFont times = PdfFontFactory.CreateFont("GOST_TYPE_A.ttf", "cp1251", true);
         PdfFont gostBu = PdfFontFactory.CreateFont("GOST_BU.ttf", "cp1251", true);
 
        // float[] columnWidths = {.2f, .4f, 1, 6, .2f, 2};

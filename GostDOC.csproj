@@ -115,6 +115,7 @@
     </ApplicationDefinition>
     <Compile Include="Common\WebBrowserUtility.cs" />
     <Compile Include="Common\XmlSerializerHelper.cs" />
+    <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\TreeViewSortConverter.cs" />
     <Compile Include="Models\MoveInfo.cs" />
     <Compile Include="Models\ProjectWrapper.cs" />

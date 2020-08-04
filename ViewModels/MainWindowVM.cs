@@ -40,6 +40,7 @@ namespace GostDOC.ViewModels
         public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
         public ObservableProperty<bool> IsAddEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<bool> IsAutoSortEnabled { get; } = new ObservableProperty<bool>(true);
 
         #region Commands
         public ICommand OpenFilesCmd => new Command(OpenFiles);
@@ -254,7 +255,7 @@ namespace GostDOC.ViewModels
             _moveInfo.Clear();
 
             // Update components
-            _project.UpdateComponents(cfgName, new SubGroupInfo(GroupName, SubGroupName), _selectedItem.ParentType, components);
+            _project.UpdateComponents(cfgName, new SubGroupInfo(GroupName, SubGroupName), _selectedItem.ParentType, components, IsAutoSortEnabled.Value);
         }
 
         private void SaveGraphValues(GraphPageType tp)
@@ -375,6 +376,10 @@ namespace GostDOC.ViewModels
             {
                 // Update selected group / subgroup components
                 UpdateComponents();
+
+                // Update auto sort enabled / disabled
+                var groupInfo = new SubGroupInfo(GroupName, SubGroupName);
+                IsAutoSortEnabled.Value = _project.IsAutoSortEnabled(ConfigurationName, _selectedItem.ParentType, groupInfo);
             }
             // Clear move components info
             _moveInfo.Clear();
@@ -482,7 +487,15 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentCountDev, aSrc.CountDev.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCountSet, aSrc.CountSet.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCountReg, aSrc.CountReg.Value.ToString());
-            aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
+
+            if (aSrc.NoteSP.Value != aSrc.DesignatorID.Value)
+            {
+                aDst.Properties.Add(Constants.ComponentNote, aSrc.NoteSP.Value);
+            }
+            else
+            {
+                aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
+            }
         }
     }
 }

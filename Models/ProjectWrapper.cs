@@ -14,12 +14,12 @@ namespace GostDOC.Models
         private DocManager _docManager = DocManager.Instance;
 
         #region Public
-        public bool UpdateComponents(string aCfgName, SubGroupInfo aGroupInfo, NodeType aParentType, IList<Component> aComponents)
+        public bool UpdateComponents(string aCfgName, SubGroupInfo aGroupInfo, NodeType aParentType, IList<Component> aComponents, bool aAutoSort)
         {
             var groups = GetConfigGroups(aCfgName, aParentType);
             if (groups != null)
             {
-                return UpdateComponents(groups, aGroupInfo, aComponents);
+                return UpdateComponents(groups, aGroupInfo, aComponents, aAutoSort);
             }            
             return false;
         }
@@ -109,6 +109,21 @@ namespace GostDOC.Models
                 }
             }
         }
+
+        public bool IsAutoSortEnabled(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo)
+        {
+            var groups = GetConfigGroups(aCfgName, aParentType);
+            if (groups != null)
+            {
+                var group = GetGroup(groups, aGroupInfo);
+                if (group != null)
+                {
+                    return group.AutoSort;
+                }
+            }
+            return false;
+        }
+
         #endregion Public
 
         #region Private
@@ -130,7 +145,7 @@ namespace GostDOC.Models
             return null;
         }
 
-        private void UpdateComponents(Group aGroup, IList<Component> aComponents)
+        private void UpdateComponents(Group aGroup, IList<Component> aComponents, bool aAutoSort)
         {
             // Copy all components from group and clear them
             var copy = aGroup.Components.ToList();
@@ -152,31 +167,25 @@ namespace GostDOC.Models
                     aGroup.Components.Add(component);
                 }
             }
-        }
 
-        private bool UpdateComponents(IDictionary<string, Group> aGroups, SubGroupInfo aGroupInfo, IList<Component> aComponents)
-        {
-            Group group;
-            if (!aGroups.TryGetValue(aGroupInfo.GroupName, out group))
+            if (aGroup.AutoSort != aAutoSort)
             {
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(aGroupInfo.SubGroupName))
-            {
-                UpdateComponents(group, aComponents);
-                return true;
-            }
-            else
-            {
-                Group subGroup;
-                if (!group.SubGroups.TryGetValue(aGroupInfo.SubGroupName, out subGroup))
+                aGroup.AutoSort = aAutoSort;
+                if (aAutoSort)
                 {
-                    UpdateComponents(subGroup, aComponents);
-                    return true;
+                    // TODO: Sort components
                 }
             }
+        }
 
+        private bool UpdateComponents(IDictionary<string, Group> aGroups, SubGroupInfo aGroupInfo, IList<Component> aComponents, bool aAutoSort)
+        {
+            Group group = GetGroup(aGroups, aGroupInfo);
+            if (group != null)
+            {
+                UpdateComponents(group, aComponents, aAutoSort);
+                return true;
+            }
             return false;
         }
 
