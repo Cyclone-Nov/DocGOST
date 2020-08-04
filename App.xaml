@@ -5,6 +5,5 @@
              xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
              StartupUri="Views\MainWindow.xaml">
     <Application.Resources>
-        <viewModels:MainWindowVM x:Key="MainViewModel"/>
     </Application.Resources>
 </Application>
