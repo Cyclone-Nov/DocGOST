@@ -19,6 +19,14 @@ namespace GostDOC.Common
         SubGroup
     }
 
+    public enum SortType
+    {
+        Specification,
+        SpecificationOthers,
+        Bill,
+        None
+    }
+
     public enum GraphPageType 
     {
         General

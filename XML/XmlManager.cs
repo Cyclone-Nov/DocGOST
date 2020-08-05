@@ -61,6 +61,9 @@ namespace GostDOC.Models
                 AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB);
                 AddComponents(newCfg, cfg.Components, ComponentType.Component);
 
+                // Sort components
+                SortComponents(newCfg);
+
                 aResult.Configurations.Add(newCfg.Name, newCfg);
             }
             return true;
@@ -304,6 +307,35 @@ namespace GostDOC.Models
                     }
                 }
                 FillComponents(group.Value.SubGroups, aDst);
+            }
+        }
+
+        private void SortComponents(Group aGroup, string aGroupName, NodeType aNodeType)
+        {
+            foreach (var subGroup in aGroup.SubGroups.AsNotNull())
+            {
+                // Recursive call for subgroups
+                SortComponents(subGroup.Value, aGroupName, aNodeType);
+            }
+
+            // Sort components
+            SortType sortType = Utils.GetSortType(aNodeType, aGroupName);
+            ISort<Component> sorter = SortFactory.GetSort(sortType);
+            if (sorter != null) {
+                aGroup.Components = sorter.Sort(aGroup.Components);
+            }
+        }
+
+        private void SortComponents(Configuration aCfg)
+        {
+            foreach (var group in aCfg.Specification.Values)
+            {
+                SortComponents(group, group.Name, NodeType.Specification);
+            }
+
+            foreach (var group in aCfg.Bill.Values)
+            {
+                SortComponents(group, group.Name, NodeType.Bill);
             }
         }
     }

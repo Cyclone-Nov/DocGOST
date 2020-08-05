@@ -117,8 +117,10 @@
     <Compile Include="Common\XmlSerializerHelper.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\TreeViewSortConverter.cs" />
+    <Compile Include="Models\GroupData.cs" />
     <Compile Include="Models\MoveInfo.cs" />
     <Compile Include="Models\ProjectWrapper.cs" />
+    <Compile Include="Models\SortFactory.cs" />
     <Compile Include="Models\SubGroupInfo.cs" />
     <Compile Include="XML\XUtils.cs" />
     <Compile Include="Models\Converter.cs" />
@@ -207,6 +209,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Content Include="PhysicalDesignators.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Units.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Properties\Resources.resx">

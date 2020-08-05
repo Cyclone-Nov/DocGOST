@@ -14,17 +14,17 @@ namespace GostDOC.Models
         private DocManager _docManager = DocManager.Instance;
 
         #region Public
-        public bool UpdateComponents(string aCfgName, SubGroupInfo aGroupInfo, NodeType aParentType, IList<Component> aComponents, bool aAutoSort)
+        public bool UpdateGroup(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo, GroupData aGroupData)
         {
             var groups = GetConfigGroups(aCfgName, aParentType);
             if (groups != null)
             {
-                return UpdateComponents(groups, aGroupInfo, aComponents, aAutoSort);
+                return UpdateComponents(groups, aGroupInfo, aGroupData);
             }            
             return false;
         }
 
-        public bool AddGroup(string aCfgName, SubGroupInfo aGroupInfo, NodeType aParentType)
+        public bool AddGroup(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo)
         {
             var groups = GetConfigGroups(aCfgName, aParentType);
             if (groups != null)
@@ -34,7 +34,7 @@ namespace GostDOC.Models
             return false;
         }
 
-        public bool RemoveGroup(string aCfgName, SubGroupInfo aGroupInfo, NodeType aParentType, bool aRemoveComponents)
+        public bool RemoveGroup(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo, bool aRemoveComponents)
         {
             var groups = GetConfigGroups(aCfgName, aParentType);
             if (groups != null)
@@ -64,22 +64,12 @@ namespace GostDOC.Models
             }
         }
 
-        public IList<Component> GetComponents(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo)
+        public GroupData GetGroupData(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo)
         {
-            var groups = GetConfigGroups(aCfgName, aParentType);
-            if (groups != null)
+            Group group = GetGroup(aCfgName, aParentType, aGroupInfo);
+            if (group != null)
             {
-                Group grp = null;
-                if (groups.TryGetValue(aGroupInfo.GroupName, out grp))
-                {
-                    // Find subgroup
-                    if (!string.IsNullOrEmpty(aGroupInfo.SubGroupName))
-                    {
-                        grp.SubGroups.TryGetValue(aGroupInfo.SubGroupName, out grp);
-                    }
-
-                    return grp?.Components;
-                }
+                return new GroupData() { AutoSort = group.AutoSort, Components = group.Components };
             }
             return null;
         }
@@ -108,21 +98,7 @@ namespace GostDOC.Models
                     break;
                 }
             }
-        }
-
-        public bool IsAutoSortEnabled(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo)
-        {
-            var groups = GetConfigGroups(aCfgName, aParentType);
-            if (groups != null)
-            {
-                var group = GetGroup(groups, aGroupInfo);
-                if (group != null)
-                {
-                    return group.AutoSort;
-                }
-            }
-            return false;
-        }
+        }       
 
         #endregion Public
 
@@ -145,7 +121,19 @@ namespace GostDOC.Models
             return null;
         }
 
-        private void UpdateComponents(Group aGroup, IList<Component> aComponents, bool aAutoSort)
+        private bool UpdateComponents(IDictionary<string, Group> aGroups, SubGroupInfo aGroupInfo, GroupData aGroupData)
+        {
+            Group group = GetGroup(aGroups, aGroupInfo);
+            if (group != null)
+            {
+                group.AutoSort = aGroupData.AutoSort;
+                UpdateComponents(group, aGroupData.Components);
+                return true;
+            }
+            return false;
+        }
+
+        private void UpdateComponents(Group aGroup, IList<Component> aComponents)
         {
             // Copy all components from group and clear them
             var copy = aGroup.Components.ToList();
@@ -167,26 +155,6 @@ namespace GostDOC.Models
                     aGroup.Components.Add(component);
                 }
             }
-
-            if (aGroup.AutoSort != aAutoSort)
-            {
-                aGroup.AutoSort = aAutoSort;
-                if (aAutoSort)
-                {
-                    // TODO: Sort components
-                }
-            }
-        }
-
-        private bool UpdateComponents(IDictionary<string, Group> aGroups, SubGroupInfo aGroupInfo, IList<Component> aComponents, bool aAutoSort)
-        {
-            Group group = GetGroup(aGroups, aGroupInfo);
-            if (group != null)
-            {
-                UpdateComponents(group, aComponents, aAutoSort);
-                return true;
-            }
-            return false;
         }
 
         private bool AddGroup(IDictionary<string, Group> aGroups, SubGroupInfo aGroupInfo)
@@ -282,6 +250,16 @@ namespace GostDOC.Models
                 }
                 aResult.Add(group.Name, subGroups);
             }
+        }
+
+        private Group GetGroup(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo)
+        {
+            var groups = GetConfigGroups(aCfgName, aParentType);
+            if (groups != null)
+            {
+                return GetGroup(groups, aGroupInfo);
+            }
+            return null;
         }
 
         private Group GetGroup(IDictionary<string, Group> aGroups, SubGroupInfo aSubGroupInfo)

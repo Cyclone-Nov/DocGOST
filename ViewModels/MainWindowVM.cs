@@ -247,6 +247,16 @@ namespace GostDOC.ViewModels
                 components.Add(component);
             }
 
+            if (IsAutoSortEnabled.Value)
+            {
+                SortType sortType = Utils.GetSortType(_selectedItem.ParentType, GroupName);
+                ISort<Component> sorter = SortFactory.GetSort(sortType);
+                if (sorter != null)
+                {
+                    components = sorter.Sort(components);
+                }
+            }
+
             // Move components
             foreach (var move in _moveInfo)
             {
@@ -255,7 +265,12 @@ namespace GostDOC.ViewModels
             _moveInfo.Clear();
 
             // Update components
-            _project.UpdateComponents(cfgName, new SubGroupInfo(GroupName, SubGroupName), _selectedItem.ParentType, components, IsAutoSortEnabled.Value);
+            var groupInfo = new SubGroupInfo(GroupName, SubGroupName);
+            var groupData = new GroupData(IsAutoSortEnabled.Value, components);
+
+            _project.UpdateGroup(cfgName, _selectedItem.ParentType, groupInfo, groupData);
+
+            UpdateGroupData();
         }
 
         private void SaveGraphValues(GraphPageType tp)
@@ -278,11 +293,11 @@ namespace GostDOC.ViewModels
             // Add group or subgroup
             if (_selectedItem.NodeType == NodeType.Configuration)
             {
-                _project.AddGroup(_selectedItem.Name, new SubGroupInfo(name, null), _selectedItem.ParentType);
+                _project.AddGroup(_selectedItem.Name, _selectedItem.ParentType, new SubGroupInfo(name, null));
             }
             else if (_selectedItem.NodeType == NodeType.Group)
             {
-                _project.AddGroup(_selectedItem.Parent.Name, new SubGroupInfo(_selectedItem.Name, name), _selectedItem.ParentType);
+                _project.AddGroup(_selectedItem.Parent.Name, _selectedItem.ParentType, new SubGroupInfo(_selectedItem.Name, name));
             }
             // Update view
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
@@ -292,8 +307,8 @@ namespace GostDOC.ViewModels
         {
             bool removeComponents = true;
             // Ask user to remove components in group
-            var components = GetComponents();
-            if (components.Count > 0)
+            var groupData = GetGroupData();
+            if (groupData?.Components.Count > 0)
             {
                 var result = System.Windows.MessageBox.Show("Удалить компоненты?", "Удаление группы", MessageBoxButton.YesNoCancel);
                 if (result == MessageBoxResult.Cancel)
@@ -306,12 +321,12 @@ namespace GostDOC.ViewModels
             if (_selectedItem.NodeType == NodeType.Group)
             {
                 var groupInfo = new SubGroupInfo(_selectedItem.Name, null);
-                _project.RemoveGroup(_selectedItem.Parent.Name, groupInfo, _selectedItem.ParentType, removeComponents);
+                _project.RemoveGroup(_selectedItem.Parent.Name, _selectedItem.ParentType, groupInfo, removeComponents);
             }
             else if (_selectedItem.NodeType == NodeType.SubGroup)
             {
                 var groupInfo = new SubGroupInfo(_selectedItem.Parent.Name, _selectedItem.Name);
-                _project.RemoveGroup(_selectedItem.Parent.Parent.Name, groupInfo, _selectedItem.ParentType, removeComponents);
+                _project.RemoveGroup(_selectedItem.Parent.Parent.Name, _selectedItem.ParentType, groupInfo, removeComponents);
             }
             // Update view
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
@@ -375,26 +390,26 @@ namespace GostDOC.ViewModels
             if (isGroup)
             {
                 // Update selected group / subgroup components
-                UpdateComponents();
-
-                // Update auto sort enabled / disabled
-                var groupInfo = new SubGroupInfo(GroupName, SubGroupName);
-                IsAutoSortEnabled.Value = _project.IsAutoSortEnabled(ConfigurationName, _selectedItem.ParentType, groupInfo);
+                UpdateGroupData();
             }
             // Clear move components info
             _moveInfo.Clear();
         }
 
-        private IList<Component> GetComponents()
+        private GroupData GetGroupData()
         {
             var groupInfo = new SubGroupInfo(GroupName, SubGroupName);
-            return _project.GetComponents(ConfigurationName, _selectedItem.ParentType, groupInfo);
+            return _project.GetGroupData(ConfigurationName, _selectedItem.ParentType, groupInfo);
         }
 
-        private void UpdateComponents()
+        private void UpdateGroupData()
         {
+            var groupData = GetGroupData();
+
+            IsAutoSortEnabled.Value = groupData.AutoSort;
+
             Components.Clear();
-            foreach (var component in GetComponents())
+            foreach (var component in groupData.Components)
             {
                 Components.Add(new ComponentVM(component));
             }            
