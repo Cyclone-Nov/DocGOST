@@ -154,7 +154,11 @@ namespace GostDOC.ViewModels
                 if (_docManager.LoadData(open.FileNames, mainFileName))
                 {
                     // Update visual data
-                    UpdateData();                    
+                    UpdateData();
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("Формат файла не поддерживается!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

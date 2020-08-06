@@ -25,6 +25,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<string> Note { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> NoteSP { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> Sign { get; } = new ObservableProperty<string>();
+        public ObservableProperty<string> WhereIncluded { get; } = new ObservableProperty<string>();
 
         public ComponentVM()
         {
@@ -52,6 +53,7 @@ namespace GostDOC.ViewModels
 
             DesignatorID.Value = GetValue(Constants.ComponentDesignatiorID, aComponent);
             NoteSP.Value = string.IsNullOrEmpty(DesignatorID.Value) ? Note.Value : DesignatorID.Value;
+            WhereIncluded.Value = GetValue(Constants.ComponentWhereIncluded, aComponent);
 
             CountDev.Value = aComponent.Count;
         }

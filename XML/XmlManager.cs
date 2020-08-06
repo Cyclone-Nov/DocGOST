@@ -143,9 +143,14 @@ namespace GostDOC.Models
                 Component component = new Component(cmp) { Type = aType };
                 // Fill group info
                 SubGroupInfo[] groups = UpdateGroups(cmp, component);
-                // Add component to specification and bill
+                // Add component to specification
                 AddComponent(aNewCfg.Specification, component, groups[0]);
-                AddComponent(aNewCfg.Bill, component, groups[1]);
+                // Add component to bill
+                string groupName = groups[1].GroupName;
+                if (groupName == Constants.GroupOthers || groupName == Constants.GroupStandard || groupName == Constants.GroupMaterials)
+                {
+                    AddComponent(aNewCfg.Bill, component, groups[1]);
+                }
                 // Save added component for counting
                 components.Add(name.Text, component);
             }
