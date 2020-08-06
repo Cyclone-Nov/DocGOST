@@ -10,7 +10,7 @@ namespace GostDOC.Common
 {
     class HttpDataToBrowser
     {
-        public const string HostUri = "http://localhost:8088/PsuedoWebHost/";
+        public const string HostUri = "http://localhost:40000/pdf/";
 
         private HttpListener _httpListener = new HttpListener();
 
