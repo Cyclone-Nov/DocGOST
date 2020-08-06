@@ -5,6 +5,7 @@ using GostDOC.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<ComponentVM> ComponentsSelectedItem { get; } = new ObservableProperty<ComponentVM>();
         public ObservableCollection<ComponentVM> Components { get; } = new ObservableCollection<ComponentVM>();
         public ObservableProperty<string> CurrentPdfPath { get; } = new ObservableProperty<string>();
+        public ObservableProperty<byte[]> CurrentPdfData { get; } = new ObservableProperty<byte[]>();
         public ObservableProperty<bool> IsGeneralGraphValuesVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableCollection<GraphValueVM> GeneralGraphValues { get; } = new ObservableCollection<GraphValueVM>();
         public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
@@ -57,6 +59,7 @@ namespace GostDOC.ViewModels
         public ICommand SaveComponentsCmd => new Command(SaveComponents);
         public ICommand UpComponentsCmd => new Command<IList<object>>(UpComponents);
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
+        public ICommand UpdatePdfCmd => new Command(UpdatePdf);
 
         /// <summary>
         /// Current selected configuration
@@ -358,6 +361,13 @@ namespace GostDOC.ViewModels
                     Components.Move(pos, pos + 1);
                 }
             }
+        }
+
+        private void UpdatePdf(object obj)
+        {
+            byte[] data = File.ReadAllBytes(Path.Combine(Environment.CurrentDirectory, "example.pdf"));
+            CurrentPdfData.Value = data;
+            //CurrentPdfPath.Value = Path.Combine(Environment.CurrentDirectory, "example.pdf");
         }
 
         #endregion Commands impl
