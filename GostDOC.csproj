@@ -119,6 +119,12 @@
     <Compile Include="Models\MoveInfo.cs" />
     <Compile Include="Models\ProjectWrapper.cs" />
     <Compile Include="Models\SubGroupInfo.cs" />
+    <Compile Include="PDF\PdfBillCreator.cs" />
+    <Compile Include="PDF\PdfCreator.cs" />
+    <Compile Include="PDF\PdfElementListCreator.cs" />
+    <Compile Include="PDF\PdfDefines.cs" />
+    <Compile Include="PDF\PdfManager.cs" />
+    <Compile Include="PDF\PdfSpecificationCreator.cs" />
     <Compile Include="XML\XUtils.cs" />
     <Compile Include="Models\Converter.cs" />
     <Compile Include="Models\DataStructures.cs" />

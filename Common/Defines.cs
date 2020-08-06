@@ -19,6 +19,33 @@ namespace GostDOC.Common
         SubGroup
     }
 
+    /// <summary>
+    /// тип документа
+    /// </summary>
+    public enum DocType
+    {
+        /// <summary>
+        /// Спецификация
+        /// </summary>
+        Specification = NodeType.Specification,
+        /// <summary>
+        /// Ведомость покупных изделий
+        /// </summary>
+        Bill = NodeType.Bill,
+        /// <summary>
+        /// Ведомость Д27
+        /// </summary>
+        D27 = NodeType.Bill_D27,
+        /// <summary>
+        /// Перечень элементов
+        /// </summary>
+        ItemsList = NodeType.Elements,
+        /// <summary>
+        /// Тип не определен
+        /// </summary>
+        None = 100
+    }
+
     public enum GraphPageType 
     {
         General
@@ -29,6 +56,21 @@ namespace GostDOC.Common
         Component,
         Document,
         ComponentPCB
+    }
+
+    public static class Converters
+    {
+        /// <summary>
+        /// Gets the type of the PDF.
+        /// </summary>
+        /// <param name="aNodeType">Type of a node.</param>
+        /// <returns></returns>
+        public static DocType GetPdfType(NodeType aNodeType)
+        {
+            DocType res = (DocType)aNodeType;
+            return res;
+        }
+
     }
 
     public static class Constants

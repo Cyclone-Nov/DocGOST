@@ -224,8 +224,8 @@ class Program {
         // canvas.Add(table);
         // PdfFont f1 = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.TIMES_ROMAN, true);
 
-        PdfFont times = PdfFontFactory.CreateFont("GOST_TYPE_A.ttf", "cp1251", true);
-        PdfFont gostBu = PdfFontFactory.CreateFont("GOST_BU.ttf", "cp1251", true);
+        //PdfFont times = PdfFontFactory.CreateFont("GOST_TYPE_A.ttf", "cp1251", true);
+        //PdfFont gostBu = PdfFontFactory.CreateFont("GOST_BU.ttf", "cp1251", true);
 
        // float[] columnWidths = {.2f, .4f, 1, 6, .2f, 2};
         float[] columnWidths = {0.6f, 1.1f, 1, 13, 0.1f, 5};
@@ -252,12 +252,11 @@ class Program {
                     SetItalic().
                     SetTextAlignment(TextAlignment.CENTER));
 
-            c
-                .SetHorizontalAlignment(HorizontalAlignment.CENTER)
-                .SetVerticalAlignment(VerticalAlignment.MIDDLE)
-                .SetMargin(0)
-                .SetPadding(0)
-                .SetBorder(new SolidBorder(2));
+            c.SetHorizontalAlignment(HorizontalAlignment.CENTER)
+             .SetVerticalAlignment(VerticalAlignment.MIDDLE)
+             .SetMargin(0)
+             .SetPadding(0)
+             .SetBorder(new SolidBorder(2));
         }
 
         void AddEmptyCells(int numberOfCells, float height) {

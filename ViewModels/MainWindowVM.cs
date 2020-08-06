@@ -25,7 +25,7 @@ namespace GostDOC.ViewModels
         private Node _bill_D27 = new Node() { Name = "Ведомость Д27", NodeType = NodeType.Bill_D27, Nodes = new ObservableCollection<Node>() };
         private Node _selectedItem = null;
         private string _filePath = null;
-        
+                
         private DocManager _docManager = DocManager.Instance;
         private ProjectWrapper _project = new ProjectWrapper();
         private List<MoveInfo> _moveInfo = new List<MoveInfo>();
@@ -40,6 +40,8 @@ namespace GostDOC.ViewModels
         public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
         public ObservableProperty<bool> IsAddEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
+
+        public DocType CurrentDocType = DocType.Specification;
 
         #region Commands
         public ICommand OpenFilesCmd => new Command(OpenFiles);
@@ -56,6 +58,8 @@ namespace GostDOC.ViewModels
         public ICommand SaveComponentsCmd => new Command(SaveComponents);
         public ICommand UpComponentsCmd => new Command<IList<object>>(UpComponents);
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
+        public ICommand UpdatePdfCmd => new Command(UpdatePdf);
+        
 
         /// <summary>
         /// Current selected configuration
@@ -342,6 +346,17 @@ namespace GostDOC.ViewModels
                     Components.Move(pos, pos + 1);
                 }
             }
+        }
+
+
+        private void UpdatePdf(object obj)
+        {
+            var type = Common.Converters.GetPdfType(_selectedItem.ParentType);
+
+            // TODO: async
+            /*res = await*/ _docManager.SaveChangesInPdf(type);
+
+            //  = _docManager.GetPdfStream(type);
         }
 
         #endregion Commands impl
