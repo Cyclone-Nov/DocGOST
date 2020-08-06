@@ -21,8 +21,11 @@ namespace GostDOC.ViewModels
         public ObservableProperty<uint> CountSet { get; } = new ObservableProperty<uint>();
         public ObservableProperty<uint> CountReg { get; } = new ObservableProperty<uint>();
         public ObservableProperty<uint> Count { get; } = new ObservableProperty<uint>();
+        public ObservableProperty<string> DesignatorID { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> Note { get; } = new ObservableProperty<string>();
+        public ObservableProperty<string> NoteSP { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> Sign { get; } = new ObservableProperty<string>();
+
         public ComponentVM()
         {
             Init();
@@ -46,6 +49,9 @@ namespace GostDOC.ViewModels
 
             Note.Value = GetValue(Constants.ComponentNote, aComponent);
             Sign.Value = GetValue(Constants.ComponentSign, aComponent);
+
+            DesignatorID.Value = GetValue(Constants.ComponentDesignatiorID, aComponent);
+            NoteSP.Value = string.IsNullOrEmpty(DesignatorID.Value) ? Note.Value : DesignatorID.Value;
 
             CountDev.Value = aComponent.Count;
         }

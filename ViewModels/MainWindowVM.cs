@@ -5,6 +5,7 @@ using GostDOC.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,11 +36,13 @@ namespace GostDOC.ViewModels
         public ObservableProperty<ComponentVM> ComponentsSelectedItem { get; } = new ObservableProperty<ComponentVM>();
         public ObservableCollection<ComponentVM> Components { get; } = new ObservableCollection<ComponentVM>();
         public ObservableProperty<string> CurrentPdfPath { get; } = new ObservableProperty<string>();
+        public ObservableProperty<byte[]> CurrentPdfData { get; } = new ObservableProperty<byte[]>();
         public ObservableProperty<bool> IsGeneralGraphValuesVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableCollection<GraphValueVM> GeneralGraphValues { get; } = new ObservableCollection<GraphValueVM>();
         public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
         public ObservableProperty<bool> IsAddEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<bool> IsAutoSortEnabled { get; } = new ObservableProperty<bool>(true);
 
         public DocType CurrentDocType = DocType.Specification;
 
@@ -250,6 +253,16 @@ namespace GostDOC.ViewModels
                 components.Add(component);
             }
 
+            if (IsAutoSortEnabled.Value)
+            {
+                SortType sortType = Utils.GetSortType(_selectedItem.ParentType, GroupName);
+                ISort<Component> sorter = SortFactory.GetSort(sortType);
+                if (sorter != null)
+                {
+                    components = sorter.Sort(components);
+                }
+            }
+
             // Move components
             foreach (var move in _moveInfo)
             {
@@ -258,7 +271,12 @@ namespace GostDOC.ViewModels
             _moveInfo.Clear();
 
             // Update components
-            _project.UpdateComponents(cfgName, new SubGroupInfo(GroupName, SubGroupName), _selectedItem.ParentType, components);
+            var groupInfo = new SubGroupInfo(GroupName, SubGroupName);
+            var groupData = new GroupData(IsAutoSortEnabled.Value, components);
+
+            _project.UpdateGroup(cfgName, _selectedItem.ParentType, groupInfo, groupData);
+
+            UpdateGroupData();
         }
 
         private void SaveGraphValues(GraphPageType tp)
@@ -281,11 +299,11 @@ namespace GostDOC.ViewModels
             // Add group or subgroup
             if (_selectedItem.NodeType == NodeType.Configuration)
             {
-                _project.AddGroup(_selectedItem.Name, new SubGroupInfo(name, null), _selectedItem.ParentType);
+                _project.AddGroup(_selectedItem.Name, _selectedItem.ParentType, new SubGroupInfo(name, null));
             }
             else if (_selectedItem.NodeType == NodeType.Group)
             {
-                _project.AddGroup(_selectedItem.Parent.Name, new SubGroupInfo(_selectedItem.Name, name), _selectedItem.ParentType);
+                _project.AddGroup(_selectedItem.Parent.Name, _selectedItem.ParentType, new SubGroupInfo(_selectedItem.Name, name));
             }
             // Update view
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
@@ -295,8 +313,8 @@ namespace GostDOC.ViewModels
         {
             bool removeComponents = true;
             // Ask user to remove components in group
-            var components = GetComponents();
-            if (components.Count > 0)
+            var groupData = GetGroupData();
+            if (groupData?.Components.Count > 0)
             {
                 var result = System.Windows.MessageBox.Show("Удалить компоненты?", "Удаление группы", MessageBoxButton.YesNoCancel);
                 if (result == MessageBoxResult.Cancel)
@@ -309,12 +327,12 @@ namespace GostDOC.ViewModels
             if (_selectedItem.NodeType == NodeType.Group)
             {
                 var groupInfo = new SubGroupInfo(_selectedItem.Name, null);
-                _project.RemoveGroup(_selectedItem.Parent.Name, groupInfo, _selectedItem.ParentType, removeComponents);
+                _project.RemoveGroup(_selectedItem.Parent.Name, _selectedItem.ParentType, groupInfo, removeComponents);
             }
             else if (_selectedItem.NodeType == NodeType.SubGroup)
             {
                 var groupInfo = new SubGroupInfo(_selectedItem.Parent.Name, _selectedItem.Name);
-                _project.RemoveGroup(_selectedItem.Parent.Parent.Name, groupInfo, _selectedItem.ParentType, removeComponents);
+                _project.RemoveGroup(_selectedItem.Parent.Parent.Name, _selectedItem.ParentType, groupInfo, removeComponents);
             }
             // Update view
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
@@ -359,6 +377,13 @@ namespace GostDOC.ViewModels
             //  = _docManager.GetPdfStream(type);
         }
 
+        private void UpdatePdf(object obj)
+        {
+            byte[] data = File.ReadAllBytes(Path.Combine(Environment.CurrentDirectory, "example.pdf"));
+            CurrentPdfData.Value = data;
+            //CurrentPdfPath.Value = Path.Combine(Environment.CurrentDirectory, "example.pdf");
+        }
+
         #endregion Commands impl
 
         private bool SaveFile()
@@ -389,22 +414,26 @@ namespace GostDOC.ViewModels
             if (isGroup)
             {
                 // Update selected group / subgroup components
-                UpdateComponents();
+                UpdateGroupData();
             }
             // Clear move components info
             _moveInfo.Clear();
         }
 
-        private IList<Component> GetComponents()
+        private GroupData GetGroupData()
         {
             var groupInfo = new SubGroupInfo(GroupName, SubGroupName);
-            return _project.GetComponents(ConfigurationName, _selectedItem.ParentType, groupInfo);
+            return _project.GetGroupData(ConfigurationName, _selectedItem.ParentType, groupInfo);
         }
 
-        private void UpdateComponents()
+        private void UpdateGroupData()
         {
+            var groupData = GetGroupData();
+
+            IsAutoSortEnabled.Value = groupData.AutoSort;
+
             Components.Clear();
-            foreach (var component in GetComponents())
+            foreach (var component in groupData.Components)
             {
                 Components.Add(new ComponentVM(component));
             }            
@@ -497,7 +526,15 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentCountDev, aSrc.CountDev.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCountSet, aSrc.CountSet.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCountReg, aSrc.CountReg.Value.ToString());
-            aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
+
+            if (aSrc.NoteSP.Value != aSrc.DesignatorID.Value)
+            {
+                aDst.Properties.Add(Constants.ComponentNote, aSrc.NoteSP.Value);
+            }
+            else
+            {
+                aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
+            }
         }
     }
 }

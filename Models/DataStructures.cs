@@ -28,7 +28,8 @@ namespace GostDOC.Models
     public class Group
     {
         public string Name { get; set; }
-        public List<Component> Components { get; } = new List<Component>();
+        public bool AutoSort { get; set; } = true;
+        public List<Component> Components { get; set; } = new List<Component>();
         public IDictionary<string, Group> SubGroups { get; set; } 
     }
 

@@ -5,8 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
              xmlns:local="clr-namespace:GostDOC.UserControls"
+             xmlns:converters="clr-namespace:GostDOC.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <converters:InverseBooleanConverter x:Key="inverseConverter" />
+    </UserControl.Resources>
     
     <Grid>
         <Grid.RowDefinitions>
@@ -41,14 +46,23 @@
                 <DataGridTextColumn Header="Примечание" Width="*" Binding="{Binding Note.Value}" />
             </DataGrid.Columns>
         </DataGrid>
-
+        
         <DockPanel Grid.Row="1" LastChildFill="False">
             <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Добавить" Command="{Binding AddComponentCmd}"/>
             <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Удалить" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding RemoveComponentsCmd}"/>
             <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Перенести" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding MoveComponentsCmd}"/>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Вверх" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding UpComponentsCmd}"/>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Вниз" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding DownComponentsCmd}"/>
+
+            <CheckBox x:Name="autoSortEnabled" DockPanel.Dock="Left" Margin="5,7,5,3" Content="Авто сортировка"
+                      IsChecked="{Binding IsAutoSortEnabled.Value}"/>            
+            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Вверх" 
+                    IsEnabled="{Binding ElementName=autoSortEnabled, Path=IsChecked, Converter={StaticResource inverseConverter}}"
+                    CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding UpComponentsCmd}"/>
+            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Вниз"
+                    IsEnabled="{Binding ElementName=autoSortEnabled, Path=IsChecked, Converter={StaticResource inverseConverter}}"
+                    CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding DownComponentsCmd}"/>
+            
             <Button DockPanel.Dock="Right" Width="100" Margin="5" Content="Сохранить" Command="{Binding SaveComponentsCmd}"/>
+
         </DockPanel>
     </Grid>
 </UserControl>

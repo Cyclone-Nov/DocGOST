@@ -74,6 +74,21 @@ namespace GostDOC.Models
             }
             return -1;
         }
+
+        public static SortType GetSortType(NodeType aNodeType, string aGroupName)
+        {
+            SortType sortType = SortType.None;
+            switch (aNodeType)
+            {
+                case NodeType.Bill:
+                    sortType = SortType.Bill;
+                    break;
+                case NodeType.Specification:
+                    sortType = aGroupName.Equals(Constants.GroupOthers) ? SortType.SpecificationOthers : SortType.Specification;
+                    break;
+            }
+            return sortType;
+        }
     }
 
     static class Extensions
