@@ -49,8 +49,6 @@
         </DataGrid>
         
         <DockPanel Grid.Row="1" LastChildFill="False">
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Добавить" Command="{Binding AddComponentCmd}"/>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Удалить" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding RemoveComponentsCmd}"/>
             <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Перенести" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding MoveComponentsCmd}"/>
 
             <CheckBox x:Name="autoSortEnabled" DockPanel.Dock="Left" Margin="5,7,5,3" Content="Авто сортировка"

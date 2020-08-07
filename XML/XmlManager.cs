@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -12,33 +14,22 @@ namespace GostDOC.Models
     class XmlManager
     {
         private Converter _defaults = new Converter();
-        private RootXml _xml = null;
+        private RootXml _xml = null; 
 
         public XmlManager()
         {
         }
 
-        public bool LoadData(Project aResult, string[] aFiles, string aMainFile)
+        public bool LoadData(Project aResult, string aFilePath)
         {
             _xml = new RootXml();
 
-            if (aFiles.Length > 1)
-            {
-                // Merge files to one
-                _xml = MergeFiles(aFiles, aMainFile);
-            }
-            else if (aFiles.Length == 1)
-            {
-                if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref _xml, aFiles[0]))
-                {
-                    return false;
-                }
-            }       
-            
-            if (_xml == null)
+            if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref _xml, aFilePath))
             {
                 return false;
             }
+
+            string dir = Path.GetDirectoryName(aFilePath);
 
             // Set project name
             aResult.Name = _xml.Transaction.Project.Name;
@@ -57,12 +48,16 @@ namespace GostDOC.Models
                     newCfg.Graphs.Add(graph.Name, graph.Text);
                 }
 
-                AddComponents(newCfg, cfg.Documents, ComponentType.Document);
-                AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB);
-                AddComponents(newCfg, cfg.Components, ComponentType.Component);
+                AddComponents(newCfg, cfg.Documents, ComponentType.Document, dir);
+                AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, dir);
+                AddComponents(newCfg, cfg.Components, ComponentType.Component, dir);
 
                 // Sort components
                 SortComponents(newCfg);
+                // Fill default graphs
+                FillDefaultGraphs(newCfg);
+                // Fill default groups
+                FillDefaultGroups(newCfg);
 
                 aResult.Configurations.Add(newCfg.Name, newCfg);
             }
@@ -122,7 +117,78 @@ namespace GostDOC.Models
             return XmlSerializeHelper.SaveXmlStructFile<RootXml>(_xml, aFilePath);
         }
 
-        private void AddComponents(Configuration aNewCfg, List<ComponentXml> aComponents, ComponentType aType)
+        private void AddGroup(IDictionary<string, Group> aGroups, string aGroupName)
+        {
+            if (!aGroups.ContainsKey(aGroupName))
+            {
+                aGroups.Add(aGroupName, new Group() { Name = aGroupName, SubGroups = new Dictionary<string, Group>() });
+            }
+        }
+
+        private void FillDefaultGroups(Configuration aCfg)
+        {
+            AddGroup(aCfg.Specification, Constants.GroupDoc);
+            AddGroup(aCfg.Specification, Constants.GroupComplex);
+            AddGroup(aCfg.Specification, Constants.GroupAssemblyUnits);
+            AddGroup(aCfg.Specification, Constants.GroupDetails);
+            AddGroup(aCfg.Specification, Constants.GroupStandard);
+            AddGroup(aCfg.Specification, Constants.GroupOthers);
+            AddGroup(aCfg.Specification, Constants.GroupMaterials);
+            AddGroup(aCfg.Specification, Constants.GroupKits);
+        }
+
+        private void AddGraph(IDictionary<string, string> aGraphs, string aName)
+        {
+            if (!aGraphs.ContainsKey(aName))
+            {
+                aGraphs.Add(aName, string.Empty);
+            }
+        }
+
+        private void FillDefaultGraphs(Configuration aCfg)
+        {
+            AddGraph(aCfg.Graphs, Constants.GraphCommentsSp);
+            AddGraph(aCfg.Graphs, Constants.GraphCommentsB);
+        }
+
+        private bool IsBillComponent(SubGroupInfo aGroupInfo)
+        {
+            return aGroupInfo.GroupName == Constants.GroupOthers 
+                || aGroupInfo.GroupName == Constants.GroupStandard 
+                || aGroupInfo.GroupName == Constants.GroupMaterials;
+        }
+
+        private bool ParseAssemblyUnit(string aUnitName, string aDir, Configuration aNewCfg)
+        {
+            string searchCfg = "-00";
+
+            Regex regex = new Regex(@"\w*(-\d{2})");
+            Match match = regex.Match(aUnitName);
+            if (match.Success && match.Groups.Count > 0)
+            {
+                searchCfg = match.Groups[0].Value;
+            }
+
+            RootXml xml = new RootXml();
+            string filePath = Path.Combine(aDir, aUnitName + ".xml");            
+            if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref xml, filePath))
+            {
+                return false;
+            }
+
+            foreach (var cfg in xml.Transaction.Project.Configurations)
+            {
+                if (cfg.Name == searchCfg)
+                {
+                    AddComponents(aNewCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, aDir, false);
+                    AddComponents(aNewCfg, cfg.Components, ComponentType.Component, aDir, false);
+                    break;
+                }
+            }
+            return true;
+        }
+
+        private void AddComponents(Configuration aNewCfg, List<ComponentXml> aComponents, ComponentType aType, string aDir, bool aAddToSp = true)
         {
             Dictionary<string, Component> components = new Dictionary<string, Component>();
             foreach (var cmp in aComponents)
@@ -143,11 +209,25 @@ namespace GostDOC.Models
                 Component component = new Component(cmp) { Type = aType };
                 // Fill group info
                 SubGroupInfo[] groups = UpdateGroups(cmp, component);
-                // Add component to specification
-                AddComponent(aNewCfg.Specification, component, groups[0]);
+
+                if (aAddToSp)
+                {
+                    // Add component to specification
+                    AddComponent(aNewCfg.Specification, component, groups[0]);
+                }
+
+                // Parse assembly units
+                if (groups[0].GroupName == Constants.GroupAssemblyUnits)
+                {
+                    string val;
+                    if (component.Properties.TryGetValue(Constants.ComponentSign, out val))
+                    {                        
+                        ParseAssemblyUnit(val, aDir, aNewCfg);
+                    }
+                }
+
                 // Add component to bill
-                string groupName = groups[1].GroupName;
-                if (groupName == Constants.GroupOthers || groupName == Constants.GroupStandard || groupName == Constants.GroupMaterials)
+                if (IsBillComponent(groups[0]))
                 {
                     AddComponent(aNewCfg.Bill, component, groups[1]);
                 }
@@ -222,74 +302,28 @@ namespace GostDOC.Models
             string groupName = _defaults.GetGroupName(designatorID);
             if (!string.IsNullOrEmpty(groupName))
             {
-                if (string.IsNullOrEmpty(result[0].GroupName))
-                {
-                    result[0].GroupName = groupName;
-                    aDst.Properties[Constants.GroupNameSp] = groupName;
-                }
                 if (string.IsNullOrEmpty(result[1].GroupName))
                 {
                     result[1].GroupName = groupName;
                     aDst.Properties[Constants.GroupNameB] = groupName;
                 }
-                if (result[0].GroupName == Constants.GroupOthers && string.IsNullOrEmpty(result[0].SubGroupName))
+
+                if (result[0].GroupName == Constants.GroupOthers)
                 {
-                    result[0].SubGroupName = groupName;
-                    aDst.Properties[Constants.SubGroupNameSp] = groupName;
-                }
-                if (result[1].GroupName == Constants.GroupOthers && string.IsNullOrEmpty(result[1].SubGroupName))
-                {
-                    result[1].SubGroupName = groupName;
-                    aDst.Properties[Constants.SubGroupNameB] = groupName;
+                    if (string.IsNullOrEmpty(result[0].SubGroupName))
+                    {
+                        result[0].SubGroupName = groupName;
+                        aDst.Properties[Constants.SubGroupNameSp] = groupName;
+                    }
+                    if (string.IsNullOrEmpty(result[1].SubGroupName))
+                    {
+                        result[1].SubGroupName = groupName;
+                        aDst.Properties[Constants.SubGroupNameB] = groupName;
+                    }
                 }
             }
 
             return result;
-        }
-
-        private RootXml MergeFiles(string[] aFiles, string aMainFile)
-        {
-            RootXml rootXml = null;
-
-            // Find main file
-            List<string> otherFiles = new List<string>();
-            foreach (var file in aFiles)
-            {
-                if (file.EndsWith(aMainFile))
-                {
-                    if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref rootXml, file))
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    otherFiles.Add(file);
-                }
-            }
-
-            // Read all components and write them to main file
-            foreach (var file in otherFiles)
-            {
-                RootXml otherRootXml = null;
-                if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref otherRootXml, file))
-                {
-                    continue;
-                }
-                
-                foreach (var cfg in otherRootXml.Transaction.Project.Configurations)
-                {
-                    foreach (var mainCfg in rootXml.Transaction.Project.Configurations)
-                    {
-                        if (mainCfg.Name == cfg.Name)
-                        {
-                            mainCfg.Components.AddRange(cfg.Components);
-                            break;
-                        }
-                    }
-                }
-            }
-            return rootXml;
         }
 
         private void PropertiesToXml(IDictionary<string, string> aSrc, List<PropertyXml> aDst)

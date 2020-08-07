@@ -26,9 +26,17 @@
                     </Setter>
                 </Style>
             </DataGrid.ColumnHeaderStyle>
+        
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Наименование графы" IsReadOnly="True" Binding="{Binding Name.Value}"/>
-                <DataGridTextColumn Header="Значение" Binding="{Binding Text.Value}"/>
+                <DataGridTextColumn Header="Значение" Binding="{Binding Text.Value}">
+                    <DataGridTextColumn.EditingElementStyle>
+                        <Style TargetType="TextBox">
+                            <Setter Property="TextWrapping" Value="Wrap" />
+                            <Setter Property="AcceptsReturn" Value="true" />
+                        </Style>
+                    </DataGridTextColumn.EditingElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
 

@@ -29,7 +29,9 @@ namespace GostDOC.Common
 
     public enum GraphPageType 
     {
-        General
+        General,
+        Specification,
+        Bill
     }
 
     public enum ComponentType
@@ -42,10 +44,14 @@ namespace GostDOC.Common
     public static class Constants
     {
         public static readonly string DefaultGroupName = "Без группы";
-        public static readonly string GroupNameDoc = "Документация";
-        public static readonly string GroupOthers = "Прочие изделия";
+        public static readonly string GroupDoc = "Документация";
+        public static readonly string GroupComplex = "Комплексы";
+        public static readonly string GroupAssemblyUnits = "Сборочные единицы";
+        public static readonly string GroupDetails = "Детали";
         public static readonly string GroupStandard = "Стандартные изделия";
+        public static readonly string GroupOthers = "Прочие изделия";
         public static readonly string GroupMaterials = "Материалы";
+        public static readonly string GroupKits = "Комплекты";
 
         public static readonly string GroupNameSp = "Раздел СП";
         public static readonly string SubGroupNameSp = "Подраздел СП";
@@ -64,5 +70,8 @@ namespace GostDOC.Common
         public static readonly string ComponentSign = "Обозначение";
         public static readonly string ComponentWhereIncluded = "Куда входит";
         public static readonly string ComponentDesignatiorID = "Позиционное обозначение";
+
+        public static readonly string GraphCommentsSp = "Комментарии СП";
+        public static readonly string GraphCommentsB = "Комментарии ВП";
     }
 }

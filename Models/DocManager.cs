@@ -19,9 +19,9 @@ namespace GostDOC.Models
         public Project Project { get; private set; } = new Project();
 
         #region Public
-        public bool LoadData(string[] aFiles, string aMainFile)
+        public bool LoadData(string aFilePath)
         {
-            return _xmlManager.LoadData(Project, aFiles, aMainFile);
+            return _xmlManager.LoadData(Project, aFilePath);
         }
 
         public bool SaveData(string aFilePath)

@@ -129,29 +129,15 @@ namespace GostDOC.ViewModels
         {
             OpenFileDialog open = new OpenFileDialog();
             open.Filter = "All Files *.xml | *.xml";
-            open.Multiselect = true;
-            open.Title = "Выбрать файлы...";
+            open.Title = "Выбрать файл...";
 
             if (open.ShowDialog() == DialogResult.OK)
             {
-                // Reset file path
-                _filePath = null;
-
-                string mainFileName = null;
-                if (open.FileNames.Length > 1)
-                {
-                    mainFileName = CommonDialogs.GetMainFileName(open.SafeFileNames);
-                    if (string.IsNullOrEmpty(mainFileName))
-                        return;
-                }
-                else
-                {
-                    // Save current file name only if one file was selected
-                    _filePath = open.FileName;
-                }
+                // Save current file name only if one file was selected
+                _filePath = open.FileName;
 
                 // Parse xml files
-                if (_docManager.LoadData(open.FileNames, mainFileName))
+                if (_docManager.LoadData(_filePath))
                 {
                     // Update visual data
                     UpdateData();
@@ -391,11 +377,25 @@ namespace GostDOC.ViewModels
             bool isGroup = _selectedItem.NodeType == NodeType.Group || _selectedItem.NodeType == NodeType.SubGroup;
             // Is graph table visible
             IsGeneralGraphValuesVisible.Value = _selectedItem.NodeType == NodeType.Root;
-            // Is add group button enabled
-            IsAddEnabled.Value = (_selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group) && 
-                _selectedItem.Name != Constants.DefaultGroupName && _selectedItem.Name != Constants.GroupNameDoc;
-            // Is remove group button enabled
-            IsRemoveEnabled.Value = isGroup && _selectedItem.Name != Constants.DefaultGroupName;
+
+            if (_selectedItem.ParentType == NodeType.Specification)
+            {
+                // Is add group button enabled
+                IsAddEnabled.Value = _selectedItem.NodeType == NodeType.Group &&
+                                     _selectedItem.Name != Constants.DefaultGroupName &&
+                                     _selectedItem.Name != Constants.GroupDoc;
+                // Is remove group button enabled
+                IsRemoveEnabled.Value = _selectedItem.NodeType == NodeType.SubGroup && _selectedItem.Name != Constants.DefaultGroupName;
+            }
+            else if (_selectedItem.ParentType == NodeType.Bill)
+            {
+                // Is add group button enabled
+                IsAddEnabled.Value = (_selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group) &&
+                                      _selectedItem.Name != Constants.DefaultGroupName && 
+                                      _selectedItem.Name != Constants.GroupDoc;
+                // Is remove group button enabled
+                IsRemoveEnabled.Value = isGroup && _selectedItem.Name != Constants.DefaultGroupName;
+            }
             // Is scecification table visible
             IsSpecificationTableVisible.Value = _selectedItem.ParentType == NodeType.Specification && isGroup;
             // Is bill table visible
@@ -503,7 +503,7 @@ namespace GostDOC.ViewModels
         private void UpdateComponent(ComponentVM aSrc, Component aDst)
         {
             string groupName = GroupName;
-            bool isDocument = groupName == Constants.GroupNameDoc;
+            bool isDocument = groupName == Constants.GroupDoc;
 
             aDst.Type = isDocument ? ComponentType.Document : ComponentType.Component;
             aDst.Properties.Add(Constants.GroupNameSp, groupName);
