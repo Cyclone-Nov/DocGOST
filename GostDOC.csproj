@@ -46,6 +46,9 @@
     <Reference Include="Common.Logging.Core, Version=3.4.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <HintPath>packages\Common.Logging.Core.3.4.1\lib\net40\Common.Logging.Core.dll</HintPath>
     </Reference>
+    <Reference Include="GongSolutions.WPF.DragDrop, Version=2.0.0.0, Culture=neutral, PublicKeyToken=91f1945125b7a587, processorArchitecture=MSIL">
+      <HintPath>packages\gong-wpf-dragdrop.2.2.0\lib\net47\GongSolutions.WPF.DragDrop.dll</HintPath>
+    </Reference>
     <Reference Include="itext.barcodes, Version=7.1.11.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
       <HintPath>packages\itext7.7.1.11\lib\net40\itext.barcodes.dll</HintPath>
     </Reference>
@@ -107,6 +110,21 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Extended.Wpf.Toolkit.4.0.1\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Extended.Wpf.Toolkit.4.0.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Extended.Wpf.Toolkit.4.0.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Extended.Wpf.Toolkit.4.0.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Extended.Wpf.Toolkit.4.0.1\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -118,11 +136,20 @@
     <Compile Include="Common\XmlSerializerHelper.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\TreeViewSortConverter.cs" />
+    <Compile Include="Events\TEventArgs.cs" />
     <Compile Include="Models\GroupData.cs" />
     <Compile Include="Models\MoveInfo.cs" />
     <Compile Include="Models\ProjectWrapper.cs" />
     <Compile Include="Models\SortFactory.cs" />
     <Compile Include="Models\SubGroupInfo.cs" />
+    <Compile Include="UI\DragDropFile.cs" />
+    <Compile Include="UserControls\NameValueControl.xaml.cs">
+      <DependentUpon>NameValueControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\NewFileVM.cs" />
+    <Compile Include="Views\NewFile.xaml.cs">
+      <DependentUpon>NewFile.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XML\XUtils.cs" />
     <Compile Include="Models\Converter.cs" />
     <Compile Include="Models\DataStructures.cs" />
@@ -159,6 +186,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControls\NameValueControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -179,6 +210,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UserControls\SpecificationControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\NewFile.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -210,6 +245,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Content Include="PhysicalDesignators.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DefaultGraphNames.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Units.txt">

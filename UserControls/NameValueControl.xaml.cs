@@ -1,6 +1,4 @@
-﻿using GostDOC.Common;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,18 +16,13 @@ using System.Windows.Shapes;
 namespace GostDOC.UserControls
 {
     /// <summary>
-    /// Interaction logic for GraphValuesControl.xaml
+    /// Interaction logic for NameValueControl.xaml
     /// </summary>
-    public partial class GraphValuesControl : UserControl
+    public partial class NameValueControl : UserControl
     {
-        public GraphValuesControl()
+        public NameValueControl()
         {
             InitializeComponent();
-        }
-        public GraphPageType GraphType
-        {
-            get { return (GraphPageType)GetValue(GraphTypeProperty); }
-            set { SetValue(GraphTypeProperty, value); }
         }
 
         public object ItemsSource
@@ -39,11 +32,7 @@ namespace GostDOC.UserControls
         }
 
         public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(object), typeof(GraphValuesControl),
+            DependencyProperty.Register("ItemsSource", typeof(object), typeof(NameValueControl),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
-
-        public static readonly DependencyProperty GraphTypeProperty =
-             DependencyProperty.Register("GraphType", typeof(GraphPageType), typeof(GraphValuesControl),
-                 new FrameworkPropertyMetadata(GraphPageType.General, FrameworkPropertyMetadataOptions.AffectsRender));
     }
 }

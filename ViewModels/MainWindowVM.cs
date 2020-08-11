@@ -1,4 +1,6 @@
-﻿using GostDOC.Common;
+﻿using GongSolutions.Wpf.DragDrop;
+using GostDOC.Common;
+using GostDOC.Events;
 using GostDOC.Models;
 using GostDOC.UI;
 using GostDOC.Views;
@@ -43,9 +45,11 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsAddEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsAutoSortEnabled { get; } = new ObservableProperty<bool>(true);
+        public DragDropFile DragDropFile { get; } = new DragDropFile();
 
         #region Commands
-        public ICommand OpenFilesCmd => new Command(OpenFiles);
+        public ICommand NewFileCmd => new Command(NewFile);
+        public ICommand OpenFileCmd => new Command(OpenFile);
         public ICommand SaveFileCmd => new Command(SaveFile);
         public ICommand SaveFileAsCmd => new Command(SaveFileAs);
         public ICommand ExitCmd => new Command<Window>(Exit);
@@ -122,10 +126,12 @@ namespace GostDOC.ViewModels
             root.Nodes.Add(_bill_D27);
 
             DocNodes.Add(root);
+
+            DragDropFile.FileDropped += OnDragDropFile_FileDropped;
         }
 
         #region Commands impl
-        private void OpenFiles(object obj)
+        private void OpenFile(object obj)
         {
             OpenFileDialog open = new OpenFileDialog();
             open.Filter = "All Files *.xml | *.xml";
@@ -133,19 +139,7 @@ namespace GostDOC.ViewModels
 
             if (open.ShowDialog() == DialogResult.OK)
             {
-                // Save current file name only if one file was selected
-                _filePath = open.FileName;
-
-                // Parse xml files
-                if (_docManager.LoadData(_filePath))
-                {
-                    // Update visual data
-                    UpdateData();
-                }
-                else
-                {
-                    System.Windows.MessageBox.Show("Формат файла не поддерживается!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                OpenFile(open.FileName);
             }
         }
 
@@ -261,7 +255,7 @@ namespace GostDOC.ViewModels
             var groupInfo = new SubGroupInfo(GroupName, SubGroupName);
             var groupData = new GroupData(IsAutoSortEnabled.Value, components);
 
-            _project.UpdateGroup(cfgName, _selectedItem.ParentType, groupInfo, groupData);
+            _project.UpdateGroup(cfgName, _selectedItem.ParentType, groupInfo, groupData);            
 
             UpdateGroupData();
         }
@@ -362,6 +356,34 @@ namespace GostDOC.ViewModels
 
         #endregion Commands impl
 
+        private void OnDragDropFile_FileDropped(object sender, TEventArgs<string> e)
+        {
+            OpenFile(e.Arg);
+        }
+
+        private void NewFile(object obj)
+        {
+            CommonDialogs.CreateConfiguration();
+            UpdateData();
+        }
+
+        private void OpenFile(string aFilePath)
+        {
+            // Save current file name only if one file was selected
+            _filePath = aFilePath;
+
+            // Parse xml files
+            if (_docManager.LoadData(_filePath))
+            {
+                // Update visual data
+                UpdateData();
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Формат файла не поддерживается!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private bool SaveFile()
         {
             return string.IsNullOrEmpty(_filePath) ? false : _docManager.SaveData(_filePath);
@@ -381,9 +403,8 @@ namespace GostDOC.ViewModels
             if (_selectedItem.ParentType == NodeType.Specification)
             {
                 // Is add group button enabled
-                IsAddEnabled.Value = _selectedItem.NodeType == NodeType.Group &&
-                                     _selectedItem.Name != Constants.DefaultGroupName &&
-                                     _selectedItem.Name != Constants.GroupDoc;
+                IsAddEnabled.Value = _selectedItem.NodeType == NodeType.Group && _selectedItem.Name != Constants.DefaultGroupName;
+                
                 // Is remove group button enabled
                 IsRemoveEnabled.Value = _selectedItem.NodeType == NodeType.SubGroup && _selectedItem.Name != Constants.DefaultGroupName;
             }
@@ -391,8 +412,8 @@ namespace GostDOC.ViewModels
             {
                 // Is add group button enabled
                 IsAddEnabled.Value = (_selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group) &&
-                                      _selectedItem.Name != Constants.DefaultGroupName && 
-                                      _selectedItem.Name != Constants.GroupDoc;
+                                      _selectedItem.Name != Constants.DefaultGroupName;
+
                 // Is remove group button enabled
                 IsRemoveEnabled.Value = isGroup && _selectedItem.Name != Constants.DefaultGroupName;
             }

@@ -7,6 +7,7 @@
         xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
         xmlns:converters="clr-namespace:GostDOC.Converters"
         xmlns:uc="clr-namespace:GostDOC.UserControls"
+        xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         Title="ПО формирования документов на основе перечня элементов изделия" Height="800" Width="1280" WindowStartupLocation="CenterScreen" WindowState="Maximized">
@@ -22,7 +23,8 @@
     </Window.Resources>
 
     <Window.InputBindings>
-        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenFilesCmd}"/>
+        <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewFileCmd}"/>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenFileCmd}"/>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveFileCmd}"/>
         <KeyBinding Key="A" Modifiers="Control" Command="{Binding SaveFileAsCmd}"/>
         <KeyBinding Key="F4" Modifiers="Alt" Command="{Binding ExitCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
@@ -44,7 +46,8 @@
 
         <Menu Height="20" VerticalAlignment="Top" Grid.ColumnSpan="10">
             <MenuItem Header="Файл">
-                <MenuItem Header="Открыть" InputGestureText="Ctrl+O" Command="{Binding OpenFilesCmd}"/>
+                <MenuItem Header="Новая спецификация" InputGestureText="Ctrl+N" Command="{Binding NewFileCmd}"/>
+                <MenuItem Header="Открыть" InputGestureText="Ctrl+O" Command="{Binding OpenFileCmd}"/>
                 <MenuItem Header="Сохранить" InputGestureText="Ctrl+S" Command="{Binding SaveFileCmd}"/>
                 <MenuItem Header="Сохранить как..." InputGestureText="Ctrl+A" Command="{Binding SaveFileAsCmd}"/>
                 <Separator />
@@ -65,7 +68,10 @@
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>
 
-            <TreeView x:Name="myTreeView" Margin="5" ItemsSource="{Binding DocNodes}">
+            <TreeView x:Name="myTreeView" Margin="5" ItemsSource="{Binding DocNodes}" 
+                      dd:DragDrop.IsDragSource="True"
+                      dd:DragDrop.IsDropTarget="True"
+                      dd:DragDrop.DropHandler="{Binding DragDropFile}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedItemChanged">
                         <i:InvokeCommandAction Command="{Binding TreeViewSelectionChangedCmd}" CommandParameter="{Binding ElementName=myTreeView, Path=SelectedItem}"/>

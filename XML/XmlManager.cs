@@ -31,8 +31,10 @@ namespace GostDOC.Models
 
             string dir = Path.GetDirectoryName(aFilePath);
 
-            // Set project name
+            // Set project var's
             aResult.Name = _xml.Transaction.Project.Name;
+            aResult.Type = _xml.Transaction.Type;
+            aResult.Version = _xml.Transaction.Version;
             // Clear configurations
             aResult.Configurations.Clear();
 
@@ -55,9 +57,9 @@ namespace GostDOC.Models
                 // Sort components
                 SortComponents(newCfg);
                 // Fill default graphs
-                FillDefaultGraphs(newCfg);
+                newCfg.FillDefaultGraphs();
                 // Fill default groups
-                FillDefaultGroups(newCfg);
+                newCfg.FillDefaultGroups();
 
                 aResult.Configurations.Add(newCfg.Name, newCfg);
             }
@@ -68,8 +70,17 @@ namespace GostDOC.Models
         {
             if (_xml == null)
             {
-                return false;
+                _xml = new RootXml();
             }
+
+            var dt = DateTime.Now;
+
+            _xml.Transaction.Project.Name = aPrj.Name;
+            _xml.Transaction.Type = aPrj.Type;
+            _xml.Transaction.Version = aPrj.Version;
+
+            _xml.Transaction.Date = dt.ToString("MM.dd.yyyy");
+            _xml.Transaction.Time = dt.ToString("HH:mm:ss");
 
             _xml.Transaction.Project.Configurations.Clear();
 
@@ -115,40 +126,6 @@ namespace GostDOC.Models
             }
 
             return XmlSerializeHelper.SaveXmlStructFile<RootXml>(_xml, aFilePath);
-        }
-
-        private void AddGroup(IDictionary<string, Group> aGroups, string aGroupName)
-        {
-            if (!aGroups.ContainsKey(aGroupName))
-            {
-                aGroups.Add(aGroupName, new Group() { Name = aGroupName, SubGroups = new Dictionary<string, Group>() });
-            }
-        }
-
-        private void FillDefaultGroups(Configuration aCfg)
-        {
-            AddGroup(aCfg.Specification, Constants.GroupDoc);
-            AddGroup(aCfg.Specification, Constants.GroupComplex);
-            AddGroup(aCfg.Specification, Constants.GroupAssemblyUnits);
-            AddGroup(aCfg.Specification, Constants.GroupDetails);
-            AddGroup(aCfg.Specification, Constants.GroupStandard);
-            AddGroup(aCfg.Specification, Constants.GroupOthers);
-            AddGroup(aCfg.Specification, Constants.GroupMaterials);
-            AddGroup(aCfg.Specification, Constants.GroupKits);
-        }
-
-        private void AddGraph(IDictionary<string, string> aGraphs, string aName)
-        {
-            if (!aGraphs.ContainsKey(aName))
-            {
-                aGraphs.Add(aName, string.Empty);
-            }
-        }
-
-        private void FillDefaultGraphs(Configuration aCfg)
-        {
-            AddGraph(aCfg.Graphs, Constants.GraphCommentsSp);
-            AddGraph(aCfg.Graphs, Constants.GraphCommentsB);
         }
 
         private bool IsBillComponent(SubGroupInfo aGroupInfo)

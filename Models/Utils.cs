@@ -114,5 +114,39 @@ namespace GostDOC.Models
                 current.Properties[Constants.SubGroupNameB] = info.SubGroupName;
             }
         }
+
+        public static void AddGroup(IDictionary<string, Group> aGroups, string aGroupName)
+        {
+            if (!aGroups.ContainsKey(aGroupName))
+            {
+                aGroups.Add(aGroupName, new Group() { Name = aGroupName, SubGroups = new Dictionary<string, Group>() });
+            }
+        }
+
+        public static void FillDefaultGroups(this Configuration aCfg)
+        {
+            AddGroup(aCfg.Specification, Constants.GroupDoc);
+            AddGroup(aCfg.Specification, Constants.GroupComplex);
+            AddGroup(aCfg.Specification, Constants.GroupAssemblyUnits);
+            AddGroup(aCfg.Specification, Constants.GroupDetails);
+            AddGroup(aCfg.Specification, Constants.GroupStandard);
+            AddGroup(aCfg.Specification, Constants.GroupOthers);
+            AddGroup(aCfg.Specification, Constants.GroupMaterials);
+            AddGroup(aCfg.Specification, Constants.GroupKits);
+        }
+
+        public static void AddGraph(IDictionary<string, string> aGraphs, string aName)
+        {
+            if (!aGraphs.ContainsKey(aName))
+            {
+                aGraphs.Add(aName, string.Empty);
+            }
+        }
+
+        public static void FillDefaultGraphs(this Configuration aCfg)
+        {
+            AddGraph(aCfg.Graphs, Constants.GraphCommentsSp);
+            AddGraph(aCfg.Graphs, Constants.GraphCommentsB);
+        }
     }
 }
