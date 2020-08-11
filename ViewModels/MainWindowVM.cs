@@ -234,16 +234,6 @@ namespace GostDOC.ViewModels
                 components.Add(component);
             }
 
-            if (IsAutoSortEnabled.Value)
-            {
-                SortType sortType = Utils.GetSortType(_selectedItem.ParentType, GroupName);
-                ISort<Component> sorter = SortFactory.GetSort(sortType);
-                if (sorter != null)
-                {
-                    components = sorter.Sort(components);
-                }
-            }
-
             // Move components
             foreach (var move in _moveInfo)
             {
@@ -292,29 +282,42 @@ namespace GostDOC.ViewModels
 
         private void RemoveGroup(object obj)
         {
-            bool removeComponents = true;
-            // Ask user to remove components in group
-            var groupData = GetGroupData();
-            if (groupData?.Components.Count > 0)
+            bool removeComponents = false;
+            if (_selectedItem.ParentType == NodeType.Specification)
             {
-                var result = System.Windows.MessageBox.Show("Удалить компоненты?", "Удаление группы", MessageBoxButton.YesNoCancel);
-                if (result == MessageBoxResult.Cancel)
+                // Ask user to remove components in group
+                var groupData = GetGroupData();
+                if (groupData?.Components.Count > 0)
                 {
-                    return;
+                    var result = System.Windows.MessageBox.Show("Удалить компоненты?", "Удаление группы", MessageBoxButton.YesNoCancel);
+                    if (result == MessageBoxResult.Cancel)
+                    {
+                        return;
+                    }
+                    removeComponents = (result == MessageBoxResult.Yes);
                 }
-                removeComponents = (result == MessageBoxResult.Yes);
             }
-            // Remove group or subgroup
+          
+            string name = string.Empty;
+            SubGroupInfo groupInfo = null;
+            
+            // Remove group or subgroup 
             if (_selectedItem.NodeType == NodeType.Group)
             {
-                var groupInfo = new SubGroupInfo(_selectedItem.Name, null);
-                _project.RemoveGroup(_selectedItem.Parent.Name, _selectedItem.ParentType, groupInfo, removeComponents);
+                groupInfo = new SubGroupInfo(_selectedItem.Name, null);
+                name = _selectedItem.Parent.Name;
             }
             else if (_selectedItem.NodeType == NodeType.SubGroup)
             {
-                var groupInfo = new SubGroupInfo(_selectedItem.Parent.Name, _selectedItem.Name);
-                _project.RemoveGroup(_selectedItem.Parent.Parent.Name, _selectedItem.ParentType, groupInfo, removeComponents);
+                groupInfo = new SubGroupInfo(_selectedItem.Parent.Name, _selectedItem.Name);
+                name = _selectedItem.Parent.Parent.Name;
             }
+
+            if (!string.IsNullOrEmpty(name) && groupInfo != null)
+            {
+                _project.RemoveGroup(name, _selectedItem.ParentType, groupInfo, removeComponents);
+            }
+
             // Update view
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
         }

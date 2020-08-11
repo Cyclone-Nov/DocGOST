@@ -133,6 +133,8 @@ namespace GostDOC.Models
             AddGroup(aCfg.Specification, Constants.GroupOthers);
             AddGroup(aCfg.Specification, Constants.GroupMaterials);
             AddGroup(aCfg.Specification, Constants.GroupKits);
+
+            AddGroup(aCfg.Bill, string.Empty);
         }
 
         public static void AddGraph(IDictionary<string, string> aGraphs, string aName)
