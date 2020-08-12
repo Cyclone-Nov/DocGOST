@@ -137,6 +137,7 @@
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\TreeViewSortConverter.cs" />
     <Compile Include="Events\TEventArgs.cs" />
+    <Compile Include="Models\CombineProperties.cs" />
     <Compile Include="Models\GroupData.cs" />
     <Compile Include="Models\MoveInfo.cs" />
     <Compile Include="Models\ProjectWrapper.cs" />

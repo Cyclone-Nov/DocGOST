@@ -44,7 +44,7 @@ namespace GostDOC.Models
     public class Project
     {
         public string Name { get; set; }
-        public string Type { get; set; }
+        public ProjectType Type { get; set; } = ProjectType.GostDoc;
         public string Version { get; set; }
         public IDictionary<string, Configuration> Configurations { get; } = new Dictionary<string, Configuration>();
     }

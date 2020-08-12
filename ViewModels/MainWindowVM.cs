@@ -28,7 +28,8 @@ namespace GostDOC.ViewModels
         private Node _bill_D27 = new Node() { Name = "Ведомость Д27", NodeType = NodeType.Bill_D27, Nodes = new ObservableCollection<Node>() };
         private Node _selectedItem = null;
         private string _filePath = null;
-        
+        private bool _parseAssemblyUnitsSet = false;
+
         private DocManager _docManager = DocManager.Instance;
         private ProjectWrapper _project = new ProjectWrapper();
         private List<MoveInfo> _moveInfo = new List<MoveInfo>();
@@ -128,13 +129,14 @@ namespace GostDOC.ViewModels
             DocNodes.Add(root);
 
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
+            _docManager.XmlManager.AssemblyUnitFound += OnAssemblyUnitFound;
         }
 
         #region Commands impl
         private void OpenFile(object obj)
         {
             OpenFileDialog open = new OpenFileDialog();
-            open.Filter = "All Files *.xml | *.xml";
+            open.Filter = "xml Files *.xml | *.xml";
             open.Title = "Выбрать файл...";
 
             if (open.ShowDialog() == DialogResult.OK)
@@ -158,7 +160,7 @@ namespace GostDOC.ViewModels
         private void SaveFileAs(object obj = null)
         {
             SaveFileDialog save = new SaveFileDialog();
-            save.Filter = "All Files *.xml | *.xml";
+            save.Filter = "xml Files *.xml | *.xml";
             save.Title = "Сохранить файл";
 
             if (save.ShowDialog() == DialogResult.OK)
@@ -372,6 +374,8 @@ namespace GostDOC.ViewModels
 
         private void OpenFile(string aFilePath)
         {
+            // Reset parse assebly units flag
+            _parseAssemblyUnitsSet = false;
             // Save current file name only if one file was selected
             _filePath = aFilePath;
 
@@ -549,6 +553,31 @@ namespace GostDOC.ViewModels
             {
                 aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
             }
+        }
+
+        private void OnAssemblyUnitFound(object sender, EventArgs e)
+        {
+            if (_parseAssemblyUnitsSet)
+            {
+                // Already asked
+                return;
+            }
+
+            // Ask user
+            var result = System.Windows.MessageBox.Show("Загрузить связанные компоненты (режим ВП)?", "Загрузка", MessageBoxButton.YesNo);
+            // Set parse type
+            if (result == MessageBoxResult.Yes)
+            {
+                _docManager.Project.Type = ProjectType.GostDocB;
+                _docManager.XmlManager.ParseAssemblyUnits = true;
+            }
+            else
+            {
+                _docManager.XmlManager.ParseAssemblyUnits = false;
+            }
+
+            // Set assebly units asked flag
+            _parseAssemblyUnitsSet = true;
         }
     }
 }

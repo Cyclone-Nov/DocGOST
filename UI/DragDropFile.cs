@@ -16,16 +16,20 @@ namespace GostDOC.UI
 
         private string GetFilePath(IDropInfo dropInfo)
         {
-            var dragFileList = ((DataObject)dropInfo.Data).GetFileDropList();
-            if (dragFileList.Count == 1)
+            var dataObject = dropInfo.Data as DataObject;
+            if (dataObject != null && dataObject.ContainsFileDropList())
             {
-                foreach (var file in dragFileList)
+                var dragFileList = dataObject.GetFileDropList();
+                if (dragFileList.Count == 1)
                 {
-                    var extension = Path.GetExtension(file);
-                    if (extension != null && extension.Equals(".xml"))
+                    foreach (var file in dragFileList)
                     {
-                        dropInfo.Effects = DragDropEffects.Copy;
-                        return file;
+                        var extension = Path.GetExtension(file);
+                        if (extension != null && extension.Equals(".xml"))
+                        {
+                            dropInfo.Effects = DragDropEffects.Copy;
+                            return file;
+                        }
                     }
                 }
             }

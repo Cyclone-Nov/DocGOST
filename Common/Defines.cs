@@ -41,6 +41,13 @@ namespace GostDOC.Common
         ComponentPCB
     }
 
+    public enum ProjectType
+    {
+        GostDoc,
+        GostDocB,
+        Other
+    }
+
     public static class Constants
     {
         public static readonly string DefaultGroupName = "Без группы";
@@ -73,5 +80,8 @@ namespace GostDOC.Common
 
         public static readonly string GraphCommentsSp = "Комментарии СП";
         public static readonly string GraphCommentsB = "Комментарии ВП";
+
+        public static readonly string GostDocType = "GostDoc";
+        public static readonly string GostDocTypeB = "GostDocB";
     }
 }

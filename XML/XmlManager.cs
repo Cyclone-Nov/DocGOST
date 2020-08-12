@@ -14,7 +14,11 @@ namespace GostDOC.Models
     class XmlManager
     {
         private Converter _defaults = new Converter();
-        private RootXml _xml = null; 
+        private RootXml _xml = null;
+
+        public bool ParseAssemblyUnits { get; set; } = false;
+
+        public event EventHandler AssemblyUnitFound;
 
         public XmlManager()
         {
@@ -33,11 +37,12 @@ namespace GostDOC.Models
 
             // Set project var's
             aResult.Name = _xml.Transaction.Project.Name;
-            aResult.Type = _xml.Transaction.Type;
+            aResult.Type = ParseProjectType(_xml.Transaction.Type);
             aResult.Version = _xml.Transaction.Version;
             // Clear configurations
             aResult.Configurations.Clear();
-
+            // Add to specification or not
+            bool addToSp = aResult.Type != ProjectType.GostDocB;
             // Fill configurations
             foreach (var cfg in _xml.Transaction.Project.Configurations)
             {
@@ -50,9 +55,9 @@ namespace GostDOC.Models
                     newCfg.Graphs.Add(graph.Name, graph.Text);
                 }
 
-                AddComponents(newCfg, cfg.Documents, ComponentType.Document, dir);
-                AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, dir);
-                AddComponents(newCfg, cfg.Components, ComponentType.Component, dir);
+                AddComponents(newCfg, cfg.Documents, ComponentType.Document, dir, addToSp);
+                AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, dir, addToSp);
+                AddComponents(newCfg, cfg.Components, ComponentType.Component, dir, addToSp);
 
                 // Sort components
                 SortComponents(newCfg);
@@ -76,7 +81,7 @@ namespace GostDOC.Models
             var dt = DateTime.Now;
 
             _xml.Transaction.Project.Name = aPrj.Name;
-            _xml.Transaction.Type = aPrj.Type;
+            _xml.Transaction.Type = GetProjectType(aPrj.Type);
             _xml.Transaction.Version = aPrj.Version;
 
             _xml.Transaction.Date = dt.ToString("MM.dd.yyyy");
@@ -104,7 +109,6 @@ namespace GostDOC.Models
                 {
                     ComponentXml cmp = new ComponentXml();
                     PropertiesToXml(component.Properties, cmp.Properties);
-
                     for (int i = 0; i < component.Count; i++)
                     {
                         switch (component.Type)
@@ -167,23 +171,36 @@ namespace GostDOC.Models
 
         private void AddComponents(Configuration aNewCfg, List<ComponentXml> aComponents, ComponentType aType, string aDir, bool aAddToSp = true)
         {
-            Dictionary<string, Component> components = new Dictionary<string, Component>();
+            Dictionary<CombineProperties, Component> components = new Dictionary<CombineProperties, Component>();
             foreach (var cmp in aComponents)
             {
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
-                if (name != null && !string.IsNullOrEmpty(name.Text))
+                var included = cmp.Properties.Find(x => x.Name == Constants.ComponentWhereIncluded);
+                if (name == null || included == null) 
                 {
-                    Component existing = null;
-                    if (components.TryGetValue(name.Text, out existing))
-                    {
-                        // If already added - increase count and continue
-                        existing.Count++;
-                        continue;
-                    }
+                    continue;
+                }
+
+                CombineProperties combine = new CombineProperties()
+                {
+                    Name = name.Text,
+                    Included = included.Text
+                };
+
+                // Parse component count
+                uint count = ParseCount(cmp);
+
+                Component existing = null;
+                if (components.TryGetValue(combine, out existing))
+                {
+                    // If already added - increase count and continue
+                    existing.Count += count;
+                    continue;
                 }
 
                 // Create component
-                Component component = new Component(cmp) { Type = aType };
+                Component component = new Component(cmp) { Type = aType, Count = count };
+                
                 // Fill group info
                 SubGroupInfo[] groups = UpdateGroups(cmp, component);
 
@@ -196,10 +213,19 @@ namespace GostDOC.Models
                 // Parse assembly units
                 if (groups[0].GroupName == Constants.GroupAssemblyUnits)
                 {
-                    string val;
-                    if (component.Properties.TryGetValue(Constants.ComponentSign, out val))
-                    {                        
-                        ParseAssemblyUnit(val, aDir, aNewCfg);
+                    if (_xml.Transaction.Type != Constants.GostDocTypeB)
+                    {
+                        // Allow user to update parse assembly unit flag
+                        AssemblyUnitFound?.Invoke(this, new EventArgs());
+                    }
+
+                    if (ParseAssemblyUnits)
+                    {
+                        string val;
+                        if (component.Properties.TryGetValue(Constants.ComponentSign, out val))
+                        {
+                            ParseAssemblyUnit(val, aDir, aNewCfg);
+                        }
                     }
                 }
 
@@ -209,7 +235,7 @@ namespace GostDOC.Models
                     AddComponent(aNewCfg.Bill, component, groups[1]);
                 }
                 // Save added component for counting
-                components.Add(name.Text, component);
+                components.Add(combine, component);
             }
         }
 
@@ -353,6 +379,50 @@ namespace GostDOC.Models
             {
                 SortComponents(group, group.Name, NodeType.Bill);
             }
+        }
+
+        private void SetProperty(ComponentXml aComponent, string aName, string aText)
+        {
+            var property = aComponent.Properties.FirstOrDefault(x => x.Name == aName);
+            if (property == null)
+            {
+                aComponent.Properties.Add(new PropertyXml() { Name = aName, Text = aText });
+            }
+            else
+            {
+                property.Text = aText;
+            }            
+        }
+
+        private string GetProperty(ComponentXml aComponent, string aName)
+        {
+            var property = aComponent.Properties.FirstOrDefault(x => x.Name == aName);
+            return property == null ? string.Empty : property.Text;
+        }
+
+        private uint ParseCount(ComponentXml aComponent)
+        {
+            uint count = 0;
+            // Read count if set
+            uint.TryParse(GetProperty(aComponent, Constants.ComponentCountDev), out count);
+            // Return 1 as default or count if set
+            return count > 0 ? count : 1;                
+        }
+
+        private ProjectType ParseProjectType(string aType)
+        {
+            if (aType == Constants.GostDocType)
+                return ProjectType.GostDoc;
+            if (aType == Constants.GostDocTypeB)
+                return ProjectType.GostDocB;
+            return ProjectType.Other;
+        }
+
+        private string GetProjectType(ProjectType aType)
+        {
+            if (aType == ProjectType.GostDocB)
+                return Constants.GostDocTypeB;
+            return Constants.GostDocType;
         }
     }
 }
