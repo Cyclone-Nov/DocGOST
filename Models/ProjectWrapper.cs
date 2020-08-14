@@ -13,15 +13,39 @@ namespace GostDOC.Models
         private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
         private DocManager _docManager = DocManager.Instance;
 
+        private class Updated<T>
+        {
+            public List<T> Added { get; } = new List<T>();
+            public List<T> Removed { get; } = new List<T>();
+        }
+
         #region Public
         public bool UpdateGroup(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo, GroupData aGroupData)
         {
             var groups = GetConfigGroups(aCfgName, aParentType);
-            if (groups != null)
+            if (groups == null)
             {
-                return UpdateComponents(groups, aGroupInfo, aGroupData);
-            }            
-            return false;
+                return false;
+            }
+
+            // Get sorter
+            var sortType = Utils.GetSortType(aParentType, aGroupInfo.GroupName);
+            var sorter = SortFactory.GetSort(sortType);
+            // Update components
+            var updated = UpdateComponents(groups, sorter, aGroupInfo, aGroupData);
+
+            if (aParentType == NodeType.Specification)
+            {
+                // Get Bill groups
+                var billGroups = GetConfigGroups(aCfgName, NodeType.Bill);
+                if (billGroups == null)
+                {
+                    return false;
+                }
+                // Update Bill components after add / remove in specification
+                UpdateBillGroups(billGroups, updated);
+            }
+            return true;
         }
 
         public bool AddGroup(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo)
@@ -43,11 +67,41 @@ namespace GostDOC.Models
                 var removed = RemoveGroup(groups, aGroupInfo, aRemoveComponents);
 
                 // Update components group
-                if (!aRemoveComponents)
+                if (aRemoveComponents)
                 {
-                    foreach (var component in removed)
+                    if (aParentType == NodeType.Specification)
                     {
-                        component.UpdateComponentGroupInfo(aParentType, new SubGroupInfo());
+                        // Remove components from Bill too
+                        var billGroups = GetConfigGroups(aCfgName, NodeType.Bill);
+                        if (billGroups == null)
+                        {
+                            return false;
+                        }
+                        RemoveComponents(billGroups, removed);
+                    }
+                }
+                else
+                { 
+                    if (aParentType == NodeType.Bill)
+                    {
+                        // Move components to default group
+                        Group defaultGroup = GetDefaultGroup(groups);
+                        defaultGroup.Components.AddRange(removed);
+                        // Update group info for each component
+                        UpdateComponentGroupInfo(removed, aParentType, new SubGroupInfo());
+                    }
+                    else if (aParentType == NodeType.Specification)
+                    {
+                        // Move components to specification group
+                        var groupInfo = new SubGroupInfo(aGroupInfo.GroupName, string.Empty);
+                        Group group = GetGroup(groups, groupInfo);
+                        if (group != null)
+                        {
+                            // Move components
+                            group.Components.AddRange(removed);
+                            // Update group info for each component
+                            UpdateComponentGroupInfo(removed, aParentType, groupInfo);
+                        }
                     }
                 }
                 return removed.Count > 0;
@@ -98,11 +152,33 @@ namespace GostDOC.Models
                     break;
                 }
             }
-        }       
+        }
+
+        public string GetGraphValue(string aCfgName, string aGraphName)
+        {
+            Configuration cfg;
+            if (_docManager.Project.Configurations.TryGetValue(aCfgName, out cfg))
+            {
+                string val;
+                if (cfg.Graphs.TryGetValue(aGraphName, out val))
+                {
+                    return val;
+                }
+            }
+            return string.Empty;
+        }
 
         #endregion Public
 
         #region Private
+
+        private void UpdateComponentGroupInfo(IList<Component> aComponents, NodeType aParentType, SubGroupInfo aGroupInfo)
+        {
+            foreach (var component in aComponents)
+            {
+                component.UpdateComponentGroupInfo(aParentType, aGroupInfo);
+            }
+        }
 
         private IDictionary<string, Group> GetConfigGroups(string aCfgName, NodeType aParentType)
         {
@@ -121,40 +197,107 @@ namespace GostDOC.Models
             return null;
         }
 
-        private bool UpdateComponents(IDictionary<string, Group> aGroups, SubGroupInfo aGroupInfo, GroupData aGroupData)
+        private Updated<Component> UpdateComponents(IDictionary<string, Group> aGroups, ISort<Component> aSorter, SubGroupInfo aGroupInfo, GroupData aGroupData)
         {
+            // Updated components
+            Updated<Component> updated = new Updated<Component>();
+
             Group group = GetGroup(aGroups, aGroupInfo);
             if (group != null)
             {
-                group.AutoSort = aGroupData.AutoSort;
-                UpdateComponents(group, aGroupData.Components);
-                return true;
+                List<Component> components = new List<Component>();
+
+                // Fill only remained components in new order and update their properties
+                foreach (var component in aGroupData.Components)
+                {
+                    // Search existing component
+                    Component existing = group.Components.Find(x => x.Guid == component.Guid);
+
+                    if (existing != null)
+                    {
+                        // Remove found component
+                        group.Components.Remove(existing);
+                        // Update existing properties
+                        existing.UpdateComponentProperties(component);
+                        // Add to group
+                        components.Add(existing);
+                    }
+                    else
+                    {
+                        components.Add(component);
+                        // Components that were added
+                        updated.Added.Add(component);
+                    }
+                }
+
+                // Components that were removed
+                updated.Removed.AddRange(group.Components);
+                // Set group components
+                group.Components = components;
+                // Sort components
+                if (group.AutoSort != aGroupData.AutoSort)
+                {
+                    group.AutoSort = aGroupData.AutoSort;
+                    if (aGroupData.AutoSort && aSorter != null)
+                    {                        
+                        group.Components = aSorter.Sort(components);
+                    }
+                }
             }
-            return false;
+            return updated;
         }
 
-        private void UpdateComponents(Group aGroup, IList<Component> aComponents)
+        private void RemoveComponents(IDictionary<string, Group> aGroups, IList<Component> aComponents)
         {
-            // Copy all components from group and clear them
-            var copy = aGroup.Components.ToList();
-            aGroup.Components.Clear();
-
-            // Fill only remained components in new order and update their properties
-            foreach (var component in aComponents)
+            foreach (var removed in aComponents)
             {
-                Component existing = copy.Find(x => x.Guid == component.Guid);
-                if (existing != null)
+                RemoveComponent(aGroups, removed.Guid);
+            }
+        }
+
+        private bool UpdateBillGroups(IDictionary<string, Group> aGroups, Updated<Component> aUpdated)
+        {
+            // Remove components
+            RemoveComponents(aGroups, aUpdated.Removed);
+
+            // Add new components
+            if (aUpdated.Added.Count > 0)
+            {
+                // Get default group
+                Group defaultGroup = GetDefaultGroup(aGroups);
+                if (defaultGroup == null)
                 {
-                    // Update existing properties
-                    existing.UpdateComponentProperties(component);
-                    // Add to group
-                    aGroup.Components.Add(existing);
+                    return false;
                 }
-                else
+                // Add components to default group
+                foreach (var added in aUpdated.Added)
                 {
-                    aGroup.Components.Add(component);
+                    defaultGroup.Components.Add(added);
+                }
+                // Sort components in group
+                var sortType = Utils.GetSortType(NodeType.Bill, string.Empty);
+                var sorter = SortFactory.GetSort(sortType);
+                if (sorter != null)
+                {
+                    defaultGroup.Components = sorter.Sort(defaultGroup.Components);
                 }
             }
+            return true;
+        }
+
+        private bool RemoveComponent(IDictionary<string, Group> aGroups, Guid aGuid)
+        {
+            bool removed = false;
+            foreach (var group in aGroups.AsNotNull())
+            {
+                removed = group.Value.Components.RemoveAll(x => x.Guid == aGuid) != 0;
+                if (!removed)
+                    removed = RemoveComponent(group.Value.SubGroups, aGuid);
+
+                if (removed)
+                    return true;
+            }
+            return false;
         }
 
         private bool AddGroup(IDictionary<string, Group> aGroups, SubGroupInfo aGroupInfo)
@@ -229,13 +372,6 @@ namespace GostDOC.Models
                     group.SubGroups.Remove(aGroupInfo.SubGroupName);
                 }
             }
-
-            if (!aRemoveComponents)
-            {
-                Group defaultGroup = GetDefaultGroup(aGroups);
-                defaultGroup.Components.AddRange(removed);
-            }
-
             return removed;
         }
 

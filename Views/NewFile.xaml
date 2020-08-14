@@ -1,0 +1,48 @@
+﻿<Window x:Class="GostDOC.Views.NewFile"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GostDOC.Views"
+        xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
+        xmlns:uc="clr-namespace:GostDOC.UserControls"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Создать спецификацию" Height="450" Width="600" WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <viewModels:NewFileVM x:Name="ViewModel" />
+    </Window.DataContext>
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="b2v" />
+    </Window.Resources>    
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Margin="5,9,5,5" Height="25" Text="Имя проекта:" VerticalAlignment="Center" />
+        <TextBox Margin="5" Grid.Column="1" Height="25" Text="{Binding ProjectName.Value}" />
+
+        <TextBlock Grid.Row="1" Margin="5,9,5,5" Height="25" Text="Кол-во исполнений:" VerticalAlignment="Center" />
+        <xctk:IntegerUpDown Margin="5" Grid.Row="1" Grid.Column="1" Height="25" Value="{Binding ConfigurationCount.Value}" 
+                            Increment="1" Maximum="99" Minimum="1" TextAlignment="Left"/>
+
+        <uc:NameValueControl Grid.Row="2" Grid.ColumnSpan="3" ItemsSource="{Binding GraphValues}" />
+        
+        <DockPanel Grid.Row="3" Grid.Column="2" LastChildFill="False">
+            <Button Margin="5" DockPanel.Dock="Right" Content="Создать" Width="100" Height="25" IsDefault="True"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding CreateNewCmd}" />
+        </DockPanel>
+    </Grid>
+</Window>

@@ -1,4 +1,6 @@
-﻿using GostDOC.Common;
+﻿using GongSolutions.Wpf.DragDrop;
+using GostDOC.Common;
+using GostDOC.Events;
 using GostDOC.Models;
 using GostDOC.UI;
 using GostDOC.Views;
@@ -26,8 +28,11 @@ namespace GostDOC.ViewModels
         private Node _bill_D27 = new Node() { Name = "Ведомость Д27", NodeType = NodeType.Bill_D27, Nodes = new ObservableCollection<Node>() };
         private Node _selectedItem = null;
         private string _filePath = null;
-                
+        private bool _parseAssemblyUnitsSet = false;
+
         private DocManager _docManager = DocManager.Instance;
+        private DocumentTypes _docTypes = DocumentTypes.Instance;
+
         private ProjectWrapper _project = new ProjectWrapper();
         private List<MoveInfo> _moveInfo = new List<MoveInfo>();
 
@@ -35,19 +40,30 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<ComponentVM> ComponentsSelectedItem { get; } = new ObservableProperty<ComponentVM>();
         public ObservableCollection<ComponentVM> Components { get; } = new ObservableCollection<ComponentVM>();
-        public ObservableProperty<string> CurrentPdfPath { get; } = new ObservableProperty<string>();
-        public ObservableProperty<byte[]> CurrentPdfData { get; } = new ObservableProperty<byte[]>();
+        // Graphs
         public ObservableProperty<bool> IsGeneralGraphValuesVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableCollection<GraphValueVM> GeneralGraphValues { get; } = new ObservableCollection<GraphValueVM>();
+        // Doc tree
         public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
+        // Context menu
+        public ObservableCollection<MenuNode> TableContextMenu { get; } = new ObservableCollection<MenuNode>();
+        // PDF data
+        public ObservableProperty<string> CurrentPdfPath { get; } = new ObservableProperty<string>();
+        public ObservableProperty<byte[]> CurrentPdfData { get; } = new ObservableProperty<byte[]>();
+
+        // Enable / disable buttons
         public ObservableProperty<bool> IsAddEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsAutoSortEnabled { get; } = new ObservableProperty<bool>(true);
 
         public DocType CurrentDocType = DocType.Specification;
 
+        // Drag / drop
+        public DragDropFile DragDropFile { get; } = new DragDropFile();
+
         #region Commands
-        public ICommand OpenFilesCmd => new Command(OpenFiles);
+        public ICommand NewFileCmd => new Command(NewFile);
+        public ICommand OpenFileCmd => new Command(OpenFile);
         public ICommand SaveFileCmd => new Command(SaveFile);
         public ICommand SaveFileAsCmd => new Command(SaveFileAs);
         public ICommand ExitCmd => new Command<Window>(Exit);
@@ -62,6 +78,7 @@ namespace GostDOC.ViewModels
         public ICommand UpComponentsCmd => new Command<IList<object>>(UpComponents);
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
         public ICommand UpdatePdfCmd => new Command(UpdatePdf);
+        public ICommand ClickMenuCmd => new Command<MenuNode>(ClickMenu);
         
 
         /// <summary>
@@ -125,40 +142,21 @@ namespace GostDOC.ViewModels
             root.Nodes.Add(_bill_D27);
 
             DocNodes.Add(root);
+
+            DragDropFile.FileDropped += OnDragDropFile_FileDropped;
+            _docManager.XmlManager.AssemblyUnitFound += OnAssemblyUnitFound;
         }
 
         #region Commands impl
-        private void OpenFiles(object obj)
+        private void OpenFile(object obj)
         {
             OpenFileDialog open = new OpenFileDialog();
-            open.Filter = "All Files *.xml | *.xml";
-            open.Multiselect = true;
-            open.Title = "Выбрать файлы...";
+            open.Filter = "xml Files *.xml | *.xml";
+            open.Title = "Выбрать файл...";
 
             if (open.ShowDialog() == DialogResult.OK)
             {
-                // Reset file path
-                _filePath = null;
-
-                string mainFileName = null;
-                if (open.FileNames.Length > 1)
-                {
-                    mainFileName = CommonDialogs.GetMainFileName(open.SafeFileNames);
-                    if (string.IsNullOrEmpty(mainFileName))
-                        return;
-                }
-                else
-                {
-                    // Save current file name only if one file was selected
-                    _filePath = open.FileName;
-                }
-
-                // Parse xml files
-                if (_docManager.LoadData(open.FileNames, mainFileName))
-                {
-                    // Update visual data
-                    UpdateData();                    
-                }
+                OpenFile(open.FileName);
             }
         }
 
@@ -177,7 +175,7 @@ namespace GostDOC.ViewModels
         private void SaveFileAs(object obj = null)
         {
             SaveFileDialog save = new SaveFileDialog();
-            save.Filter = "All Files *.xml | *.xml";
+            save.Filter = "xml Files *.xml | *.xml";
             save.Title = "Сохранить файл";
 
             if (save.ShowDialog() == DialogResult.OK)
@@ -253,16 +251,6 @@ namespace GostDOC.ViewModels
                 components.Add(component);
             }
 
-            if (IsAutoSortEnabled.Value)
-            {
-                SortType sortType = Utils.GetSortType(_selectedItem.ParentType, GroupName);
-                ISort<Component> sorter = SortFactory.GetSort(sortType);
-                if (sorter != null)
-                {
-                    components = sorter.Sort(components);
-                }
-            }
-
             // Move components
             foreach (var move in _moveInfo)
             {
@@ -274,7 +262,7 @@ namespace GostDOC.ViewModels
             var groupInfo = new SubGroupInfo(GroupName, SubGroupName);
             var groupData = new GroupData(IsAutoSortEnabled.Value, components);
 
-            _project.UpdateGroup(cfgName, _selectedItem.ParentType, groupInfo, groupData);
+            _project.UpdateGroup(cfgName, _selectedItem.ParentType, groupInfo, groupData);            
 
             UpdateGroupData();
         }
@@ -311,29 +299,42 @@ namespace GostDOC.ViewModels
 
         private void RemoveGroup(object obj)
         {
-            bool removeComponents = true;
-            // Ask user to remove components in group
-            var groupData = GetGroupData();
-            if (groupData?.Components.Count > 0)
+            bool removeComponents = false;
+            if (_selectedItem.ParentType == NodeType.Specification)
             {
-                var result = System.Windows.MessageBox.Show("Удалить компоненты?", "Удаление группы", MessageBoxButton.YesNoCancel);
-                if (result == MessageBoxResult.Cancel)
+                // Ask user to remove components in group
+                var groupData = GetGroupData();
+                if (groupData?.Components.Count > 0)
                 {
-                    return;
+                    var result = System.Windows.MessageBox.Show("Удалить компоненты?", "Удаление группы", MessageBoxButton.YesNoCancel);
+                    if (result == MessageBoxResult.Cancel)
+                    {
+                        return;
+                    }
+                    removeComponents = (result == MessageBoxResult.Yes);
                 }
-                removeComponents = (result == MessageBoxResult.Yes);
             }
-            // Remove group or subgroup
+          
+            string name = string.Empty;
+            SubGroupInfo groupInfo = null;
+            
+            // Remove group or subgroup 
             if (_selectedItem.NodeType == NodeType.Group)
             {
-                var groupInfo = new SubGroupInfo(_selectedItem.Name, null);
-                _project.RemoveGroup(_selectedItem.Parent.Name, _selectedItem.ParentType, groupInfo, removeComponents);
+                groupInfo = new SubGroupInfo(_selectedItem.Name, null);
+                name = _selectedItem.Parent.Name;
             }
             else if (_selectedItem.NodeType == NodeType.SubGroup)
             {
-                var groupInfo = new SubGroupInfo(_selectedItem.Parent.Name, _selectedItem.Name);
-                _project.RemoveGroup(_selectedItem.Parent.Parent.Name, _selectedItem.ParentType, groupInfo, removeComponents);
+                groupInfo = new SubGroupInfo(_selectedItem.Parent.Name, _selectedItem.Name);
+                name = _selectedItem.Parent.Parent.Name;
             }
+
+            if (!string.IsNullOrEmpty(name) && groupInfo != null)
+            {
+                _project.RemoveGroup(name, _selectedItem.ParentType, groupInfo, removeComponents);
+            }
+
             // Update view
             UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
         }
@@ -375,7 +376,53 @@ namespace GostDOC.ViewModels
             CurrentPdfData.Value = _docManager.GetPdfData(type);
         }
 
+        private void ClickMenu(MenuNode obj)
+        {
+            if (GroupName.Equals(Constants.GroupDoc))
+            {
+                Document doc = _docTypes.GetDocument(obj?.Parent?.Name, obj?.Name);
+                if (doc != null)
+                {
+                    ComponentVM cmp = new ComponentVM();
+                    cmp.Name.Value = doc.Name;
+                    cmp.Sign.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign) + doc.Code;
+                    cmp.Format.Value = "A4";
+                    Components.Add(cmp);
+                }        
+            }
+        }
+
         #endregion Commands impl
+
+        private void OnDragDropFile_FileDropped(object sender, TEventArgs<string> e)
+        {
+            OpenFile(e.Arg);
+        }
+
+        private void NewFile(object obj)
+        {
+            CommonDialogs.CreateConfiguration();
+            UpdateData();
+        }
+
+        private void OpenFile(string aFilePath)
+        {
+            // Reset parse assebly units flag
+            _parseAssemblyUnitsSet = false;
+            // Save current file name only if one file was selected
+            _filePath = aFilePath;
+
+            // Parse xml files
+            if (_docManager.LoadData(_filePath))
+            {
+                // Update visual data
+                UpdateData();
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Формат файла не поддерживается!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
         private bool SaveFile()
         {
@@ -392,11 +439,24 @@ namespace GostDOC.ViewModels
             bool isGroup = _selectedItem.NodeType == NodeType.Group || _selectedItem.NodeType == NodeType.SubGroup;
             // Is graph table visible
             IsGeneralGraphValuesVisible.Value = _selectedItem.NodeType == NodeType.Root;
-            // Is add group button enabled
-            IsAddEnabled.Value = (_selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group) && 
-                _selectedItem.Name != Constants.DefaultGroupName && _selectedItem.Name != Constants.GroupNameDoc;
-            // Is remove group button enabled
-            IsRemoveEnabled.Value = isGroup && _selectedItem.Name != Constants.DefaultGroupName;
+
+            if (_selectedItem.ParentType == NodeType.Specification)
+            {
+                // Is add group button enabled
+                IsAddEnabled.Value = _selectedItem.NodeType == NodeType.Group && _selectedItem.Name != Constants.DefaultGroupName;
+                
+                // Is remove group button enabled
+                IsRemoveEnabled.Value = _selectedItem.NodeType == NodeType.SubGroup && _selectedItem.Name != Constants.DefaultGroupName;
+            }
+            else if (_selectedItem.ParentType == NodeType.Bill)
+            {
+                // Is add group button enabled
+                IsAddEnabled.Value = (_selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group) &&
+                                      _selectedItem.Name != Constants.DefaultGroupName;
+
+                // Is remove group button enabled
+                IsRemoveEnabled.Value = isGroup && _selectedItem.Name != Constants.DefaultGroupName;
+            }
             // Is scecification table visible
             IsSpecificationTableVisible.Value = _selectedItem.ParentType == NodeType.Specification && isGroup;
             // Is bill table visible
@@ -409,6 +469,8 @@ namespace GostDOC.ViewModels
             }
             // Clear move components info
             _moveInfo.Clear();
+
+            UpdateTableContextMenu();
         }
 
         private GroupData GetGroupData()
@@ -504,7 +566,7 @@ namespace GostDOC.ViewModels
         private void UpdateComponent(ComponentVM aSrc, Component aDst)
         {
             string groupName = GroupName;
-            bool isDocument = groupName == Constants.GroupNameDoc;
+            bool isDocument = groupName == Constants.GroupDoc;
 
             aDst.Type = isDocument ? ComponentType.Document : ComponentType.Component;
             aDst.Properties.Add(Constants.GroupNameSp, groupName);
@@ -525,6 +587,49 @@ namespace GostDOC.ViewModels
             else
             {
                 aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
+            }
+        }
+
+        private void OnAssemblyUnitFound(object sender, EventArgs e)
+        {
+            if (_parseAssemblyUnitsSet)
+            {
+                // Already asked
+                return;
+            }
+
+            // Ask user
+            var result = System.Windows.MessageBox.Show("Загрузить связанные компоненты (режим ВП)?", "Загрузка", MessageBoxButton.YesNo);
+            // Set parse type
+            if (result == MessageBoxResult.Yes)
+            {
+                _docManager.Project.Type = ProjectType.GostDocB;
+                _docManager.XmlManager.ParseAssemblyUnits = true;
+            }
+            else
+            {
+                _docManager.XmlManager.ParseAssemblyUnits = false;
+            }
+
+            // Set assebly units asked flag
+            _parseAssemblyUnitsSet = true;
+        }
+
+        private void UpdateTableContextMenu()
+        {
+            TableContextMenu.Clear();
+
+            if (GroupName.Equals(Constants.GroupDoc))
+            {
+                foreach (var kvp in _docTypes.Documents)
+                {
+                    MenuNode node = new MenuNode() { Name = kvp.Key, Nodes = new ObservableCollection<MenuNode>() };
+                    foreach (var doc in kvp.Value)
+                    {
+                        node.Nodes.Add(new MenuNode() { Name = doc.Key, Parent = node });
+                    }
+                    TableContextMenu.Add(node);
+                }
             }
         }
     }

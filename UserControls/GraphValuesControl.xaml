@@ -11,26 +11,8 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
-        
-        <DataGrid Margin="5" SelectionMode="Single"  SelectionUnit="FullRow" 
-                  AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*"
-                  ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType={x:Type local:GraphValuesControl}}}">
-            <DataGrid.ColumnHeaderStyle>
-                <Style TargetType="DataGridColumnHeader">
-                    <Setter Property="ContentTemplate">
-                        <Setter.Value>
-                            <DataTemplate>
-                                <TextBlock TextWrapping="Wrap" Text="{Binding}"></TextBlock>
-                            </DataTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </DataGrid.ColumnHeaderStyle>
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Наименование графы" IsReadOnly="True" Binding="{Binding Name.Value}"/>
-                <DataGridTextColumn Header="Значение" Binding="{Binding Text.Value}"/>
-            </DataGrid.Columns>
-        </DataGrid>
+
+        <local:NameValueControl ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType={x:Type local:GraphValuesControl}}}" />
 
         <DockPanel Grid.Row="1" LastChildFill="False">
             <Button DockPanel.Dock="Right" Width="100" Margin="5" Content="Сохранить" 

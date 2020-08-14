@@ -15,21 +15,22 @@ namespace GostDOC.Models
         {
         }
         #endregion
-        private XmlManager _xmlManager { get; } = new XmlManager();
+        public XmlManager XmlManager { get; } = new XmlManager();
 
         private PdfManager _pdfManager { get; } = PdfManager.Instance;
 
         public Project Project { get; private set; } = new Project();
 
         #region Public
-        public bool LoadData(string[] aFiles, string aMainFile)
+
+        public bool LoadData(string aFilePath)
         {
-            return _xmlManager.LoadData(Project, aFiles, aMainFile);
+            return XmlManager.LoadData(Project, aFilePath);
         }
 
         public bool SaveData(string aFilePath)
         {
-            return _xmlManager.SaveData(Project, aFilePath);
+            return XmlManager.SaveData(Project, aFilePath);
         }
 
 

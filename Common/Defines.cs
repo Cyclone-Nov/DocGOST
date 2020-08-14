@@ -20,10 +20,12 @@ namespace GostDOC.Common
     }
 
     public enum SortType
-    {
-        Specification,
-        SpecificationOthers,
-        Bill,
+    {        
+        SpComplex,              // Спецификация: "Комплексы", "Сборочные единицы" и "Детали"
+        SpStandard,             // Спецификация: "Стандартные изделия"
+        SpOthers,               // Спецификация: "Прочие изделия"
+        SpKits,                 // Спецификация: "Комплекты"
+        Name,                   // По алфавиту по тегу "Наименование"
         None
     }
 
@@ -56,7 +58,9 @@ namespace GostDOC.Common
 
     public enum GraphPageType 
     {
-        General
+        General,
+        Specification,
+        Bill
     }
 
     public enum ComponentType
@@ -66,6 +70,13 @@ namespace GostDOC.Common
         ComponentPCB
     }
 
+    public enum ProjectType
+    {
+        GostDoc,
+        GostDocB,
+        Other
+    }
+    
     public static class Converters
     {
         /// <summary>
@@ -186,13 +197,19 @@ namespace GostDOC.Common
         
 
         public static readonly string DefaultGroupName = "Без группы";
-        public static readonly string GroupNameDoc = "Документация";
+        public static readonly string GroupDoc = "Документация";
+        public static readonly string GroupComplex = "Комплексы";
+        public static readonly string GroupAssemblyUnits = "Сборочные единицы";
+        public static readonly string GroupDetails = "Детали";
+        public static readonly string GroupStandard = "Стандартные изделия";
+        public static readonly string GroupOthers = "Прочие изделия";
+        public static readonly string GroupMaterials = "Материалы";
+        public static readonly string GroupKits = "Комплекты";
+
         public static readonly string GroupNameSp = "Раздел СП";
         public static readonly string SubGroupNameSp = "Подраздел СП";
         public static readonly string GroupNameB = "Раздел ВП";
         public static readonly string SubGroupNameB = "Подраздел ВП";
-        public static readonly string GroupOthers = "Прочие изделия";
-
 
         public static readonly string ComponentName = "Наименование";
         public static readonly string ComponentProductCode = "Код продукции";
@@ -204,6 +221,14 @@ namespace GostDOC.Common
         public static readonly string ComponentCountReg = "Количество на рег.";
         public static readonly string ComponentNote = "Примечание";
         public static readonly string ComponentSign = "Обозначение";
+        public static readonly string ComponentWhereIncluded = "Куда входит";
         public static readonly string ComponentDesignatiorID = "Позиционное обозначение";
+
+        public static readonly string GraphCommentsSp = "Комментарии СП";
+        public static readonly string GraphCommentsB = "Комментарии ВП";
+        public static readonly string GraphSign = "Обозначение";
+
+        public static readonly string GostDocType = "GostDoc";
+        public static readonly string GostDocTypeB = "GostDocB";
     }
 }

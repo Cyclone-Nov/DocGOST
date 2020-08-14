@@ -39,6 +39,7 @@
                 <DataGridTextColumn Header="Код продукции" Binding="{Binding Code.Value}"/>
                 <DataGridTextColumn Header="Документ на поставку" Binding="{Binding Entry.Value}"/>
                 <DataGridTextColumn Header="Поставщик" Binding="{Binding Manufacturer.Value}"/>
+                <DataGridTextColumn Header="Куда входит" Binding="{Binding WhereIncluded.Value}"/>
                 <DataGridTextColumn Header="Кол-во (на изд.)" Width="50" Binding="{Binding CountDev.Value}"/>
                 <DataGridTextColumn Header="Кол-во (в комп.)" Width="50" Binding="{Binding CountSet.Value}" />
                 <DataGridTextColumn Header="Кол-во (на рег.)" Width="50" Binding="{Binding CountReg.Value}" />
@@ -48,8 +49,6 @@
         </DataGrid>
         
         <DockPanel Grid.Row="1" LastChildFill="False">
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Добавить" Command="{Binding AddComponentCmd}"/>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Удалить" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding RemoveComponentsCmd}"/>
             <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Перенести" CommandParameter="{Binding ElementName=billDataGrid, Path=SelectedItems}" Command="{Binding MoveComponentsCmd}"/>
 
             <CheckBox x:Name="autoSortEnabled" DockPanel.Dock="Left" Margin="5,7,5,3" Content="Авто сортировка"

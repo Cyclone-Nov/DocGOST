@@ -37,7 +37,7 @@ namespace GostDOC.ViewModels
                 Node groupNode = new Node() { Name = groupName, Nodes = new ObservableCollection<Node>(), NodeType = NodeType.Group };
                 foreach (var subGroup in group.Value)
                 {
-                    Node subGroupNode = new Node() { Name = subGroup, NodeType = NodeType.SubGroup };
+                    Node subGroupNode = new Node() { Name = subGroup, NodeType = NodeType.SubGroup, Parent = groupNode };
                     groupNode.Nodes.Add(subGroupNode);
                 }
                 Groups.Add(groupNode);

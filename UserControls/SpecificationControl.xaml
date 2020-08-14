@@ -34,7 +34,23 @@
                         </Setter.Value>
                     </Setter>
                 </Style>
-            </DataGrid.ColumnHeaderStyle>
+            </DataGrid.ColumnHeaderStyle>            
+            <DataGrid.ContextMenu>
+                <ContextMenu ItemsSource="{Binding TableContextMenu}">
+                    <ContextMenu.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Nodes}">
+                            <TextBlock Text="{Binding Name}" />
+                        </HierarchicalDataTemplate>
+                    </ContextMenu.ItemTemplate>
+                    <ContextMenu.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Command" Value="{Binding PlacementTarget.DataContext.ClickMenuCmd, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <Setter Property="CommandParameter" Value="{Binding Header, RelativeSource={RelativeSource Self}}" />
+                        </Style>
+                    </ContextMenu.ItemContainerStyle>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Формат" Binding="{Binding Format.Value}"/>
                 <DataGridTextColumn Header="Позиция" Binding="{Binding Position.Value}" IsReadOnly="True" Visibility="Collapsed"/>

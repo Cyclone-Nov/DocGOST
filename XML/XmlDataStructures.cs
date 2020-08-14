@@ -84,13 +84,13 @@ namespace GostDOC.Models
         public string Time { get; set; }
 
         [XmlElement("project")]
-        public ProjectXml Project { get; set; }
+        public ProjectXml Project { get; set; } = new ProjectXml();
     }
 
     [XmlRootAttribute("xml", IsNullable = false)]
     public class RootXml
     {
         [XmlElement("transaction")]
-        public TransactionXml Transaction { get; set; }
+        public TransactionXml Transaction { get; set; } = new TransactionXml();
     }
 }

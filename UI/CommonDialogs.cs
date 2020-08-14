@@ -44,5 +44,14 @@ namespace GostDOC.UI
             }
             return null;
         }
+
+        public static void CreateConfiguration()
+        {
+            NewFile dlg = new NewFile();
+            var result = dlg.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+            }
+        }
     }
 }
