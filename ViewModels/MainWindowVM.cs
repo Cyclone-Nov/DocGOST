@@ -370,18 +370,9 @@ namespace GostDOC.ViewModels
         private void UpdatePdf(object obj)
         {
             var type = Common.Converters.GetPdfType(_selectedItem.ParentType);
-
             // TODO: async
             /*res = await*/ _docManager.SaveChangesInPdf(type);
-
-            //  = _docManager.GetPdfStream(type);
-        }
-
-        private void UpdatePdf(object obj)
-        {
-            byte[] data = File.ReadAllBytes(Path.Combine(Environment.CurrentDirectory, "example.pdf"));
-            CurrentPdfData.Value = data;
-            //CurrentPdfPath.Value = Path.Combine(Environment.CurrentDirectory, "example.pdf");
+            CurrentPdfData.Value = _docManager.GetPdfData(type);
         }
 
         #endregion Commands impl

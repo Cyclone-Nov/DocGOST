@@ -41,7 +41,13 @@ namespace GostDOC.Models
         /// <exception cref="NotImplementedException"></exception>
         public bool SaveChangesInPdf(DocType aDocType)
         {
-            throw new NotImplementedException();
+            return _pdfManager.SaveChanges(aDocType, Project);            
+        }
+
+
+        public byte[] GetPdfData(DocType aDocType)
+        {
+            return _pdfManager.GetPDFData(aDocType);            
         }
 
         /// <summary>

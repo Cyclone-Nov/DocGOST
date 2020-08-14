@@ -15,6 +15,8 @@ using Org.BouncyCastle.Asn1.Crmf;
 
 using GostDOC.Common;
 using iText.Kernel.Pdf.Canvas;
+using GostDOC.Models;
+using System.Data;
 
 namespace GostDOC.PDF
 {
@@ -23,77 +25,72 @@ namespace GostDOC.PDF
     /// </summary>
     /// <seealso cref="GostDOC.PDF.PdfCreator" />
     internal class PdfElementListCreator : PdfCreator
-    {
+    {        
 
         private const string FileName = @"Перечень элементов.pdf";
 
-        public PdfElementListCreator(string aSavePath) : base(aSavePath, DocType.ItemsList)
-        { }
+        /// <summary>
+        /// поток, содержащий PDF документ
+        /// </summary>
+        /// <value>
+        /// The main stream.
+        /// </value>
+        public MemoryStream MainStream { get; } = new MemoryStream();
 
         /// <summary>
-        /// добавить к документу первую страницу
+        /// The PDF document
         /// </summary>
-        /// <param name="aInPdfDoc">a in PDF document.</param>
-        /// <returns></returns>
-        internal override bool AddFirstPage(PdfDocument aInPdfDoc)
+        private PdfDocument pdfDoc;
+
+        /// <summary>
+        /// The document
+        /// </summary>
+        private Document doc;
+
+        /// <summary>
+        /// The PDF writer
+        /// </summary>
+        private PdfWriter pdfWriter;
+
+        public PdfElementListCreator() : base(DocType.ItemsList)
         {
-            PdfPage page = aInPdfDoc.AddNewPage();
-
-            var pdfCanvas = new PdfCanvas(page);
-                      
-
-
-            //Document doc = new Document(page,);
-            //doc.SetLeftMargin(9 * PdfDefines.mmA4);
-            //doc.SetRightMargin(9 * PdfDefines.mmA4);
-            //doc.SetTopMargin(5 * PdfDefines.mmA4);
-            //doc.SetBottomMargin(5 * PdfDefines.mmA4);
-
-
-
-            return false;
+            pdfWriter = new PdfWriter(MainStream);
+            pdfDoc = new PdfDocument(pdfWriter);
+            pdfDoc.SetDefaultPageSize(PageSize.A4);
+            doc = new Document(pdfDoc, pdfDoc.GetDefaultPageSize(), false);
         }
 
-        /// <summary>
-        /// добавить к документу последующие страницы
-        /// </summary>
-        /// <param name="aInPdfDoc">a in PDF document.</param>
-        /// <returns></returns>
-        internal override bool AddNextPage(PdfDocument aInPdfDoc)
-        {
-            return false;
+        public override byte[] GetData()
+        {            
+            pdfWriter.Flush();
+            MemoryStream stream = new MemoryStream();
+            pdfWriter.GetOutputStream().CopyTo(stream);
+            return stream.ToArray();
         }
 
         /// <summary>
         /// Создать документ
         /// </summary>
-        public override void Create()
+        public override void Create(Project project)
         {
-            string[] names = { FileName, SavePath};
-            string fullName = System.IO.Path.Combine(names);
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(fullName));
-            pdfDoc.SetDefaultPageSize(PageSize.A4);
-
-
-            bool next = AddFirstPage(pdfDoc);            
-            while (next)
+            if (project.Configurations.Count == 0)
+                return;
+                        
+            Configuration mainConfig = null;
+            if (!project.Configurations.TryGetValue(Constants.MAIN_CONFIG_INDEX, out mainConfig))
+                return;
+                        
+            var dataTable = CreateDataTable(mainConfig.Specification);
+            int next = AddFirstPage(doc, mainConfig.Graphs, dataTable);
+            while (next > 0)
             {
-                next = AddNextPage(pdfDoc);
+                next = AddNextPage(doc, mainConfig.Graphs, dataTable);
             }
-            
+
             if (pdfDoc.GetNumberOfPages() > 2)
             {
-                AddRegisterList(pdfDoc);
+                AddRegisterList(doc, mainConfig.Graphs);
             }
-
-
-            Document doc = new Document(pdfDoc, PageSize.A4, false);            
-            doc.SetLeftMargin(9 * PdfDefines.mmA4);
-            doc.SetRightMargin(9 * PdfDefines.mmA4);
-            doc.SetTopMargin(5 * PdfDefines.mmA4);
-            doc.SetBottomMargin(5 * PdfDefines.mmA4);
-
-            
 
             // var page = pdfDoc.AddNewPage();
             // var pdfCanvas = new PdfCanvas(page);
@@ -116,7 +113,7 @@ namespace GostDOC.PDF
             iText.Layout.Style verticalCellStyle = new Style();
             verticalCellStyle.SetFont(f1).SetItalic().SetFontSize(14).SetRotationAngle(DegreesToRadians(90));
 
-           
+
             var cell = new Cell();
             cell.Add(new Paragraph("Поз.").SetFont(f1));
             cell.Add(new Paragraph("обозна-").SetFont(f1).SetFixedLeading(5));
@@ -140,7 +137,7 @@ namespace GostDOC.PDF
 
             AddEmptyCells(16, PdfDefines.ROW_HEIGHT, table);
 
-            table.AddCell(AddTopAppendGraph("",""));
+            table.AddCell(AddTopAppendGraph("", ""));
 
             AddEmptyCells(28, PdfDefines.ROW_HEIGHT, table);
 
@@ -163,6 +160,375 @@ namespace GostDOC.PDF
             doc.Close();
         }
 
+
+        private DataTable CreateDataTable( IDictionary<string, Group> aData)
+        {
+            DataTable table = new DataTable();
+
+            return table;
+        }
+
+        /// <summary>
+        /// создать шаблон первой страницы документа
+        /// (таблица данных в шаблоне не создается)
+        /// </summary>
+        /// <param name="aPageSize">Размер страницы</param>
+        /// <returns></returns>
+        internal PdfDocument CreateTemplateFirstPage(PageSize aPageSize)
+        {
+            MemoryStream stream = new MemoryStream();
+            PdfDocument firstPage = new PdfDocument(new PdfWriter(stream));
+
+            firstPage.SetDefaultPageSize(aPageSize);
+            var document = new Document(firstPage, aPageSize, true);
+
+            SetPageMargins(document);
+            
+            // добавить таблицу с основной надписью для первой старницы
+            //document.Add(CreateFirstTitleBlock(aPageSize));
+
+            // добавить таблицу с верхней дополнительной графой
+            //document.Add(CreateTopAppendGraph(aPageSize));
+
+            // добавить таблицу с нижней дополнительной графой
+            //document.Add(CreateBottomAppendGraph(aPageSize));
+
+            doc.Close();
+            return firstPage;
+        }
+
+        /// <summary>
+        /// создать шаблон последующих страниц документа
+        /// таблица данных в шаблоне не создается
+        /// </summary>
+        /// <returns></returns>
+        internal PdfDocument CreateTemplateNextPage(PageSize aPageSize)
+        {
+            MemoryStream stream = new MemoryStream();
+            PdfDocument nextPage = new PdfDocument(new PdfWriter(stream));
+
+            nextPage.SetDefaultPageSize(aPageSize);
+            var document = new Document(nextPage, aPageSize, true);
+
+            SetPageMargins(document);
+
+            // добавить таблицу с основной надписью для дополнительного листа
+            //document.Add(CreateNextTitleBlock(aPageSize));
+
+
+            // добавить таблицу с нижней дополнительной графой
+            //document.Add(CreateBottomAppendGraph(aPageSize));
+
+            doc.Close();
+            return nextPage;
+        }
+
+
+        /// <summary>
+        /// создать страница регистрации изменений
+        /// вместе с таблицей данных
+        /// </summary>
+        /// <returns></returns>
+        internal PdfDocument CreateRegistrationPage()
+        {
+            MemoryStream stream = new MemoryStream();
+            PdfDocument regPage = new PdfDocument(new PdfWriter(stream));
+
+            regPage.SetDefaultPageSize(PageSize.A4);
+            var document = new Document(regPage, PageSize.A4, true);
+
+            SetPageMargins(document);
+
+            // добавить таблицу с основной надписью для дополнительного листа
+            //document.Add(CreateNextTitleBlock(PageSize.A4));
+
+            // добавить таблицу с нижней дополнительной графой
+            //document.Add(CreateBottomAppendGraph(PageSize.A4));
+
+            // добавить таблицу с данными
+
+
+            doc.Close();
+            return regPage;
+        }
+
+        /// <summary>
+        /// добавить к документу первую страницу
+        /// </summary>
+        /// <param name="aInPdfDoc">a in PDF document.</param>
+        /// <returns>номер последней записанной строки. Если 0 - то достигнут конец таблицы данных</returns>
+        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData)
+        {
+            SetPageMargins(aInDoc);
+            
+            // добавить таблицу с основной надписью для первой старницы
+            aInDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
+
+            // добавить таблицу с верхней дополнительной графой
+            aInDoc.Add(CreateTopAppendGraph(PageSize, aGraphs));
+
+            // добавить таблицу с нижней дополнительной графой
+            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+
+            // добавить таблицу с данными
+            int needNextPage = 0;
+            
+            //aInDoc.Add(CreateDataTable(aGroups, out needNextPage));
+
+            return needNextPage;
+        }
+
+        /// <summary>
+        /// добавить к документу последующие страницы
+        /// </summary>
+        /// <param name="aInPdfDoc">a in PDF document.</param>
+        /// <returns></returns>
+        internal override int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData)
+        {
+            int row = 0;
+            aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+            return row;
+        }
+
+
+        private void SetPageMargins(Document aDoc)
+        {
+            aDoc.SetLeftMargin(9 * PdfDefines.mmA4);
+            aDoc.SetRightMargin(9 * PdfDefines.mmA4);
+            aDoc.SetTopMargin(5 * PdfDefines.mmA4);
+            aDoc.SetBottomMargin(5 * PdfDefines.mmA4);
+        }
+
+        /// <summary>
+        /// создать таблицу основной надписи
+        /// </summary>
+        /// <returns></returns>
+        private Table CreateTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs)
+        {
+            Table tbl = new Table(3);
+            return tbl;
+        }
+
+        /// <summary>
+        /// создать таблицу основной надписи
+        /// </summary>
+        /// <returns></returns>
+        private Table CreateFirstTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs, int aPages)
+        {
+            //             ..........
+            //   Cell1     . cell2  .
+            //.......................
+            //.  Cell3     . cell4  .
+            //.......................
+            //.  Cell5     . cell6  .
+            //.......................            
+
+            float[] columnSizes = {65.0f,120.0f};
+            Table mainTable = new Table(UnitValue.CreatePointArray(columnSizes));
+            mainTable.SetWidth(185);            
+            mainTable.SetHeight(62);
+
+            Cell cell1 = new Cell(1, 1);
+            cell1.SetVerticalAlignment(VerticalAlignment.MIDDLE).
+                            SetHorizontalAlignment(HorizontalAlignment.CENTER).
+                            SetBorderLeft(Border.NO_BORDER).
+                            SetBorderTop(Border.NO_BORDER).
+                            SetBorderBottom(new SolidBorder(2)).
+                            SetBorderRight(new SolidBorder(2)).
+                            SetHeight(22);
+
+            mainTable.AddCell(cell1);
+
+            // fill cell 2
+            //..................................
+            //.   Cell2_1  . cell2_2 . cell2_3 .
+            //..................................
+            //.          cell2_4               .
+            //..................................
+            Table cell2Table = new Table(UnitValue.CreatePointArray(new float[] {14, 53, 53}));
+            int columns = 3;
+            for (int i = 0; i < columns; i++)
+                cell2Table.AddCell(AddEmptyCell(1, 1).SetHeight(14)); // cell2_1 - cell2_3            
+            cell2Table.AddCell(AddEmptyCell(1, 3).SetHeight(8)); // cell 2_4
+
+            Cell cell2 = AddEmptyCell(1, 1);            
+            cell2.Add(cell2Table);
+            mainTable.AddCell(cell2);
+
+            // fill cell 3 (5c х 3r)            
+            Table cell3Table = new Table(UnitValue.CreatePointArray(new float[] { 7, 10, 23, 15, 10 }));
+            columns = 5;
+            for (int i = 0; i < columns; i++) // 1 row
+                cell3Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).SetHeight(5));
+            for (int i = 0; i < columns; i++) // 2 row
+                cell3Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).SetHeight(5));
+
+            var textStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1);
+
+            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Изм.")).AddStyle(textStyle).SetFontSize(12).SetHeight(5));
+            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Лист")).AddStyle(textStyle)).SetFontSize(12).SetHeight(5);
+            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("№ докум.")).AddStyle(textStyle).SetFontSize(12).SetHeight(5));
+            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Подп.")).AddStyle(textStyle).SetFontSize(12).SetHeight(5));
+            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Дата")).AddStyle(textStyle).SetFontSize(12).SetHeight(5));
+
+            Cell cell3 = AddEmptyCell(1, 1).Add(cell3Table);
+            mainTable.AddCell(cell3);
+
+            // fill cell 4             
+            string res = string.Empty;
+            if (aGraphs.TryGetValue(Common.Constants.GRAPH_2, out res))
+            res += Common.Converters.GetDocumentCode(Type);
+            Cell cell4 = AddEmptyCell(1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetFontSize(20).SetHeight(15);
+            mainTable.AddCell(cell4);
+
+            // fill cell 5
+            textStyle = new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFontSize(12).SetFont(f1);
+            Table cell5Table = new Table(UnitValue.CreatePointArray(new float[] { 17, 23, 15, 10 }));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).Add(new Paragraph("Разраб.")).AddStyle(textStyle).SetHeight(5));
+            res = string.Empty;
+            aGraphs.TryGetValue(Common.Constants.GRAPH_11bl_dev, out res); //TODO: log не удалось распарсить;
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).SetHeight(5));
+
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph("Пров.")).AddStyle(textStyle).SetHeight(5));
+            res = string.Empty;
+            aGraphs.TryGetValue(Common.Constants.GRAPH_11bl_chk, out res); //TODO: log не удалось распарсить
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
+
+            res = string.Empty;
+            aGraphs.TryGetValue(Common.Constants.GRAPH_10, out res); //TODO: log не удалось распарсить
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
+            res = string.Empty;
+            aGraphs.TryGetValue(Common.Constants.GRAPH_11app, out res); //TODO: log не удалось распарсить
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
+
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph("Н. контр.")).AddStyle(textStyle).SetHeight(5));
+            res = string.Empty;
+            aGraphs.TryGetValue(Common.Constants.GRAPH_11norm, out res); //TODO: log не удалось распарсить
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
+
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).Add(new Paragraph("Утв.")).AddStyle(textStyle).SetHeight(5));
+            res = string.Empty;
+            aGraphs.TryGetValue(Common.Constants.GRAPH_11affirm, out res); //TODO: log не удалось распарсить
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).SetHeight(5));
+
+            Cell cell5 = AddEmptyCell(1, 1).Add(cell5Table);
+            mainTable.AddCell(cell5);
+
+            // fill Cell6
+            Table cell6Table = new Table(UnitValue.CreatePointArray(new float[] { 70, 50}));
+            textStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1);
+            res = string.Empty;
+            aGraphs.TryGetValue(Constants.GRAPH_1, out res); //TODO: log не удалось распарсить;
+            cell6Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetFontSize(16).SetHeight(25));
+
+            Table cell6_2Table = new Table(UnitValue.CreatePointArray(new float[] { 5, 5, 5, 15, 20 }));
+            cell6_2Table.AddCell(AddEmptyCell(3, 1).Add(new Paragraph("Лит.").AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Лист").AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Листов").AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+
+            res = string.Empty;
+            aGraphs.TryGetValue(Constants.GRAPH_4, out res); //TODO: log не удалось распарсить;
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res).AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+            res = string.Empty;
+            aGraphs.TryGetValue(Constants.GRAPH_4a, out res); //TODO: log не удалось распарсить;
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res).AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+            res = string.Empty;
+            aGraphs.TryGetValue(Constants.GRAPH_4b, out res); //TODO: log не удалось распарсить;
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res).AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("1").AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Х").AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+            cell6_2Table.AddCell(AddEmptyCell(5, 3).SetHeight(15));
+
+            Cell cell6_2 = AddEmptyCell(1, 1).Add(cell6_2Table);
+            cell6Table.AddCell(cell6_2);
+
+            Cell cell6 = AddEmptyCell(1, 1).Add(cell6Table);
+            mainTable.AddCell(cell6);
+
+            return mainTable;
+        }
+
+        /// <summary>
+        /// создать таблицу основной надписи
+        /// </summary>
+        /// <returns></returns>
+        private Table CreateNextTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs)
+        {
+            Table tbl = new Table(3);
+            return tbl;
+        }
+        
+
+        /// <summary>
+        /// создать таблицу для верхней дополнительной графы
+        /// </summary>
+        /// <returns></returns>
+        private Table CreateTopAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs)
+        {
+            Table tbl = new Table(3);
+            return tbl;
+        }
+
+        /// <summary>
+        /// создать таблицу для нижней дополнительной графы
+        /// </summary>
+        /// <returns></returns>
+        private Table CreateBottomAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs)
+        {
+            Table tbl = new Table(3);
+            return tbl;
+        }
+                
+
+        /// <summary>
+        /// добавить ячейку со строковым значеним в таблицу
+        /// </summary>
+        /// <param name="content">содержимое</param>
+        /// <param name="borderWidth">толщина линии</param>
+        /// <param name="colspan">количество занимаемых столбцов</param>
+        /// <param name="alignment">выравнивание текста</param>
+        /// <param name="font">шрифт текста</param>
+        /// <returns></returns>
+        public Cell createCell(String content, float borderWidth, int colspan, TextAlignment alignment, PdfFont font)
+        {
+            Cell cell = new Cell(1, colspan).Add(new Paragraph(content));
+            cell.SetTextAlignment(alignment);
+            cell.SetBorder(new SolidBorder(borderWidth));
+            cell.SetFont(font);
+            return cell;
+        }
+
+        /// <summary>
+        /// добавить ячейку со значением в виде таблицы во внешнюю таблицу
+        /// </summary>
+        /// <param name="content">содержимое</param>
+        /// <param name="borderWidth">толщина линии</param>
+        /// <param name="colspan">количество занимаемых столбцов</param>
+        /// <param name="alignment">выравнивание текста</param>
+        /// <param name="font">шрифт текста</param>
+        /// <returns></returns>
+        public Cell createCell(Table content, float borderWidth, int colspan, TextAlignment alignment, PdfFont font)
+        {
+            Cell cell = new Cell(1, colspan).Add(content);
+            cell.SetTextAlignment(alignment);
+            cell.SetBorder(new SolidBorder(borderWidth));
+            cell.SetFont(font);
+            return cell;
+        }
+
+       
         /// <summary>
         /// Добавить верхнюю дополнительную графу
         /// </summary>
@@ -357,8 +723,6 @@ namespace GostDOC.PDF
 
             var leftAlignedStyle = new Style().SetTextAlignment(TextAlignment.LEFT);
 
-            leftAlignedStyle.SetTextAlignment(TextAlignment.LEFT);
-
             void AddPersonRow(string textForPerson, string personName)
             {
                 footerTable.AddCell(
@@ -466,6 +830,27 @@ namespace GostDOC.PDF
              .SetMargin(0)
              .SetPadding(0)
              .SetBorder(new SolidBorder(2));
+        }
+
+        private Cell AddEmptyCell(int rowspan, int colspan)
+        {
+            Cell cell = new Cell(rowspan, colspan);
+            cell.SetVerticalAlignment(VerticalAlignment.MIDDLE).
+                 SetHorizontalAlignment(HorizontalAlignment.CENTER).
+                 SetBorder(new SolidBorder(2));            
+            return cell;
+        }
+
+        private Cell AddEmptyCell(int aRowspan, int aColspan, int aLeftBorder = 2, int aRightBorder = 2, int aTopBorder = 2, int aBottomBorder = 2)
+        {
+            Cell cell = new Cell(aRowspan, aColspan);
+            cell.SetVerticalAlignment(VerticalAlignment.MIDDLE).
+                 SetHorizontalAlignment(HorizontalAlignment.CENTER).
+                 SetBorderLeft(new SolidBorder(aLeftBorder)).
+                 SetBorderRight(new SolidBorder(aRightBorder)).
+                 SetBorderTop(new SolidBorder(aTopBorder)).
+                 SetBorderBottom(new SolidBorder(aBottomBorder));
+            return cell;
         }
 
         void AddEmptyCells(int numberOfCells, float height, Table aTable)

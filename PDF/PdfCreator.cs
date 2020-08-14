@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,8 @@ using iText.Layout.Properties;
 using Org.BouncyCastle.Asn1.Crmf;
 
 using GostDOC.Common;
+using GostDOC.Models;
+using System.IO;
 
 namespace GostDOC.PDF
 {
@@ -27,21 +30,45 @@ namespace GostDOC.PDF
 
         internal static PdfFont f1;
 
-        public PdfCreator(string aSavePath, DocType aType)
-        {
-            SavePath = aSavePath;
-            Type = aType;
-            f1 = PdfFontFactory.CreateFont("GOST_TYPE_A.ttf", "cp1251", true);
+        internal readonly PageSize PageSize;
+
+        public PdfCreator(DocType aType)
+        {            
+            Type = aType;           
+
+            f1 = PdfFontFactory.CreateFont(@"Font\\GOST_TYPE_A.ttf", "cp1251", true);
+            switch(aType)
+            {
+                case DocType.Bill:
+                    PageSize = new PageSize(PageSize.A3);
+                    break;
+                case DocType.D27:
+                    PageSize = new PageSize(PageSize.A3);
+                    break;
+                case DocType.ItemsList:
+                    PageSize = new PageSize(PageSize.A4);
+                    break;
+                case DocType.Specification:
+                    PageSize = new PageSize(PageSize.A4);
+                    break;
+                default:
+                    PageSize = new PageSize(PageSize.A4);
+                    break;
+            }
+            
         }
 
 
-        public abstract void Create();
+        public abstract void Create(Project project);
+
+        public abstract byte[] GetData();
+        
 
         /// <summary>
         /// добавить к документу лист регистрации изменений
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
-        internal void AddRegisterList(PdfDocument aInPdfDoc)
+        internal void AddRegisterList(Document aInPdfDoc, IDictionary<string, string> aGraphs)
         {
 
         }
@@ -51,14 +78,14 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal abstract bool AddFirstPage(PdfDocument aInPdfDoc);
+        internal abstract int AddFirstPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData);
 
         /// <summary>
         /// добавить к документу последующие страницы
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal abstract bool AddNextPage(PdfDocument aInPdfDoc);
+        internal abstract int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData);
 
 
         public static double DegreesToRadians(double degrees)
