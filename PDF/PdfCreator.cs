@@ -68,7 +68,7 @@ namespace GostDOC.PDF
         /// добавить к документу лист регистрации изменений
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
-        internal void AddRegisterList(Document aInPdfDoc, IDictionary<string, string> aGraphs)
+        internal void AddRegisterList(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs)
         {
 
         }
@@ -78,14 +78,14 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal abstract int AddFirstPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData);
+        internal abstract int AddFirstPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData);
 
         /// <summary>
         /// добавить к документу последующие страницы
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal abstract int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData);
+        internal abstract int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData);
 
 
         public static double DegreesToRadians(double degrees)

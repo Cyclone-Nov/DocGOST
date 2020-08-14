@@ -45,7 +45,7 @@ namespace GostDOC.PDF
         /// <summary>
         /// The document
         /// </summary>
-        private Document doc;
+        private iText.Layout.Document doc;
 
         /// <summary>
         /// The PDF writer
@@ -57,15 +57,15 @@ namespace GostDOC.PDF
             pdfWriter = new PdfWriter(MainStream);
             pdfDoc = new PdfDocument(pdfWriter);
             pdfDoc.SetDefaultPageSize(PageSize.A4);
-            doc = new Document(pdfDoc, pdfDoc.GetDefaultPageSize(), false);
+            doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), false);
         }
 
         public override byte[] GetData()
-        {            
+        {
+            doc.Flush();
             pdfWriter.Flush();
-            MemoryStream stream = new MemoryStream();
-            pdfWriter.GetOutputStream().CopyTo(stream);
-            return stream.ToArray();
+            var arr = MainStream.ToArray();
+            return arr;
         }
 
         /// <summary>
@@ -92,6 +92,8 @@ namespace GostDOC.PDF
                 AddRegisterList(doc, mainConfig.Graphs);
             }
 
+            doc.Close();
+
             // var page = pdfDoc.AddNewPage();
             // var pdfCanvas = new PdfCanvas(page);
             // Rectangle rectangle = new Rectangle(mmA4* 10, mmA4 * 10, A4Width, mmA4 * 40);
@@ -103,61 +105,61 @@ namespace GostDOC.PDF
             //PdfFont gostBu = PdfFontFactory.CreateFont("GOST_BU.ttf", "cp1251", true);
 
             // float[] columnWidths = {.2f, .4f, 1, 6, .2f, 2};
-            float[] columnWidths = { 1, 13, 0.1f, 5 };
-            Table table =
-                new Table(UnitValue.CreatePercentArray(columnWidths)).UseAllAvailableWidth(); //.SetHeight(A4Height);
+            //float[] columnWidths = { 1, 13, 0.1f, 5 };
+            //Table table =
+            //    new Table(UnitValue.CreatePercentArray(columnWidths)).UseAllAvailableWidth(); //.SetHeight(A4Height);
 
-            table.SetBorderBottom(new SolidBorder(2));
-            iText.Layout.Style italicHeaderStyle = new Style();
-            italicHeaderStyle.SetFont(f1).SetItalic().SetFontSize(14);
-            iText.Layout.Style verticalCellStyle = new Style();
-            verticalCellStyle.SetFont(f1).SetItalic().SetFontSize(14).SetRotationAngle(DegreesToRadians(90));
-
-
-            var cell = new Cell();
-            cell.Add(new Paragraph("Поз.").SetFont(f1));
-            cell.Add(new Paragraph("обозна-").SetFont(f1).SetFixedLeading(5));
-            cell.Add(new Paragraph("чение").SetFont(f1)); //.SetPaddings(0,0,0,0));
-            ApplyForCell(cell);
-            table.AddCell(cell);
-
-            cell = new Cell().Add(new Paragraph("Наименование").SetFont(f1));
-            ApplyForCell(cell);
-            table.AddCell(cell);
-
-            cell = new Cell().Add(new Paragraph("Кол.").SetFont(f1).SetMargin(0).SetPadding(0))
-                .SetMargin(0).SetWidth(4 * PdfDefines.mmA4).SetPaddingLeft(-10).SetPaddingRight(-10);
-            ApplyForCell(cell);
-            table.AddCell(cell);
-
-            cell = new Cell().Add(new Paragraph("Примечание").SetFont(f1));
-            ApplyForCell(cell);
-            table.AddCell(cell);
+            //table.SetBorderBottom(new SolidBorder(2));
+            //iText.Layout.Style italicHeaderStyle = new Style();
+            //italicHeaderStyle.SetFont(f1).SetItalic().SetFontSize(14);
+            //iText.Layout.Style verticalCellStyle = new Style();
+            //verticalCellStyle.SetFont(f1).SetItalic().SetFontSize(14).SetRotationAngle(DegreesToRadians(90));
 
 
-            AddEmptyCells(16, PdfDefines.ROW_HEIGHT, table);
+            //var cell = new Cell();
+            //cell.Add(new Paragraph("Поз.").SetFont(f1));
+            //cell.Add(new Paragraph("обозна-").SetFont(f1).SetFixedLeading(5));
+            //cell.Add(new Paragraph("чение").SetFont(f1)); //.SetPaddings(0,0,0,0));
+            //ApplyForCell(cell);
+            //table.AddCell(cell);
 
-            table.AddCell(AddTopAppendGraph("", ""));
+            //cell = new Cell().Add(new Paragraph("Наименование").SetFont(f1));
+            //ApplyForCell(cell);
+            //table.AddCell(cell);
 
-            AddEmptyCells(28, PdfDefines.ROW_HEIGHT, table);
+            //cell = new Cell().Add(new Paragraph("Кол.").SetFont(f1).SetMargin(0).SetPadding(0))
+            //    .SetMargin(0).SetWidth(4 * PdfDefines.mmA4).SetPaddingLeft(-10).SetPaddingRight(-10);
+            //ApplyForCell(cell);
+            //table.AddCell(cell);
 
-            cell = new Cell(3, 1).SetBorderLeft(Border.NO_BORDER).SetBorderRight(Border.NO_BORDER);
-            table.AddCell(cell);
-            cell = new Cell(3, 1).SetBorderLeft(Border.NO_BORDER);
-            table.AddCell(cell);
-
-            AddEmptyCells(12, PdfDefines.ROW_HEIGHT, table);
-
-            table.AddCell(AddBottomAppendGraph());
-
-            AddEmptyCells(12, PdfDefines.ROW_HEIGHT, table);
+            //cell = new Cell().Add(new Paragraph("Примечание").SetFont(f1));
+            //ApplyForCell(cell);
+            //table.AddCell(cell);
 
 
-            FooterTableInfo footerTableInfo = new FooterTableInfo();
-            table.AddCell(new Cell(1, 4).SetPadding(0).Add(AddFooterTable(footerTableInfo)).SetBorderRight(new SolidBorder(2)));
+            //AddEmptyCells(16, PdfDefines.ROW_HEIGHT, table);
 
-            doc.Add(table);
-            doc.Close();
+            //table.AddCell(AddTopAppendGraph("", ""));
+
+            //AddEmptyCells(28, PdfDefines.ROW_HEIGHT, table);
+
+            //cell = new Cell(3, 1).SetBorderLeft(Border.NO_BORDER).SetBorderRight(Border.NO_BORDER);
+            //table.AddCell(cell);
+            //cell = new Cell(3, 1).SetBorderLeft(Border.NO_BORDER);
+            //table.AddCell(cell);
+
+            //AddEmptyCells(12, PdfDefines.ROW_HEIGHT, table);
+
+            //table.AddCell(AddBottomAppendGraph());
+
+            //AddEmptyCells(12, PdfDefines.ROW_HEIGHT, table);
+
+
+            //FooterTableInfo footerTableInfo = new FooterTableInfo();
+            //table.AddCell(new Cell(1, 4).SetPadding(0).Add(AddFooterTable(footerTableInfo)).SetBorderRight(new SolidBorder(2)));
+
+            //doc.Add(table);
+            //doc.Close();
         }
 
 
@@ -180,7 +182,7 @@ namespace GostDOC.PDF
             PdfDocument firstPage = new PdfDocument(new PdfWriter(stream));
 
             firstPage.SetDefaultPageSize(aPageSize);
-            var document = new Document(firstPage, aPageSize, true);
+            var document = new iText.Layout.Document(firstPage, aPageSize, true);
 
             SetPageMargins(document);
             
@@ -208,7 +210,7 @@ namespace GostDOC.PDF
             PdfDocument nextPage = new PdfDocument(new PdfWriter(stream));
 
             nextPage.SetDefaultPageSize(aPageSize);
-            var document = new Document(nextPage, aPageSize, true);
+            var document = new iText.Layout.Document(nextPage, aPageSize, true);
 
             SetPageMargins(document);
 
@@ -235,7 +237,7 @@ namespace GostDOC.PDF
             PdfDocument regPage = new PdfDocument(new PdfWriter(stream));
 
             regPage.SetDefaultPageSize(PageSize.A4);
-            var document = new Document(regPage, PageSize.A4, true);
+            var document = new iText.Layout.Document(regPage, PageSize.A4, true);
 
             SetPageMargins(document);
 
@@ -257,7 +259,7 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns>номер последней записанной строки. Если 0 - то достигнут конец таблицы данных</returns>
-        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData)
+        internal override int AddFirstPage(iText.Layout.Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData)
         {
             SetPageMargins(aInDoc);
             
@@ -265,10 +267,10 @@ namespace GostDOC.PDF
             aInDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
 
             // добавить таблицу с верхней дополнительной графой
-            aInDoc.Add(CreateTopAppendGraph(PageSize, aGraphs));
+            //aInDoc.Add(CreateTopAppendGraph(PageSize, aGraphs));
 
             // добавить таблицу с нижней дополнительной графой
-            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+            //aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
 
             // добавить таблицу с данными
             int needNextPage = 0;
@@ -283,7 +285,7 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal override int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData)
+        internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData)
         {
             int row = 0;
             aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
@@ -292,7 +294,7 @@ namespace GostDOC.PDF
         }
 
 
-        private void SetPageMargins(Document aDoc)
+        private void SetPageMargins(iText.Layout.Document aDoc)
         {
             aDoc.SetLeftMargin(9 * PdfDefines.mmA4);
             aDoc.SetRightMargin(9 * PdfDefines.mmA4);
@@ -324,10 +326,10 @@ namespace GostDOC.PDF
             //.  Cell5     . cell6  .
             //.......................            
 
-            float[] columnSizes = {65.0f,120.0f};
+            float[] columnSizes = {65 * PdfDefines.mmA4, 120 * PdfDefines.mmA4 };
             Table mainTable = new Table(UnitValue.CreatePointArray(columnSizes));
-            mainTable.SetWidth(185);            
-            mainTable.SetHeight(62);
+            mainTable.SetWidth(185 * PdfDefines.mmA4);            
+            mainTable.SetHeight(62 * PdfDefines.mmA4);
 
             Cell cell1 = new Cell(1, 1);
             cell1.SetVerticalAlignment(VerticalAlignment.MIDDLE).
@@ -336,7 +338,7 @@ namespace GostDOC.PDF
                             SetBorderTop(Border.NO_BORDER).
                             SetBorderBottom(new SolidBorder(2)).
                             SetBorderRight(new SolidBorder(2)).
-                            SetHeight(22);
+                            SetHeight(22 * PdfDefines.mmA4);
 
             mainTable.AddCell(cell1);
 
@@ -346,31 +348,31 @@ namespace GostDOC.PDF
             //..................................
             //.          cell2_4               .
             //..................................
-            Table cell2Table = new Table(UnitValue.CreatePointArray(new float[] {14, 53, 53}));
+            Table cell2Table = new Table(UnitValue.CreatePointArray(new float[] {14 * PdfDefines.mmA4, 53 * PdfDefines.mmA4, 53 * PdfDefines.mmA4 }));
             int columns = 3;
             for (int i = 0; i < columns; i++)
-                cell2Table.AddCell(AddEmptyCell(1, 1).SetHeight(14)); // cell2_1 - cell2_3            
-            cell2Table.AddCell(AddEmptyCell(1, 3).SetHeight(8)); // cell 2_4
+                cell2Table.AddCell(AddEmptyCell(1, 1).SetHeight(14 * PdfDefines.mmA4)); // cell2_1 - cell2_3            
+            cell2Table.AddCell(AddEmptyCell(1, 3).SetHeight(8 * PdfDefines.mmA4)); // cell 2_4
 
             Cell cell2 = AddEmptyCell(1, 1);            
             cell2.Add(cell2Table);
             mainTable.AddCell(cell2);
 
             // fill cell 3 (5c х 3r)            
-            Table cell3Table = new Table(UnitValue.CreatePointArray(new float[] { 7, 10, 23, 15, 10 }));
+            Table cell3Table = new Table(UnitValue.CreatePointArray(new float[] { 7 * PdfDefines.mmA4, 10 * PdfDefines.mmA4, 23 * PdfDefines.mmA4, 15 * PdfDefines.mmA4, 10 * PdfDefines.mmA4 }));
             columns = 5;
             for (int i = 0; i < columns; i++) // 1 row
-                cell3Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).SetHeight(5));
+                cell3Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).SetHeight(5 * PdfDefines.mmA4));
             for (int i = 0; i < columns; i++) // 2 row
-                cell3Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).SetHeight(5));
+                cell3Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).SetHeight(5 * PdfDefines.mmA4));
 
             var textStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1);
 
-            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Изм.")).AddStyle(textStyle).SetFontSize(12).SetHeight(5));
-            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Лист")).AddStyle(textStyle)).SetFontSize(12).SetHeight(5);
-            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("№ докум.")).AddStyle(textStyle).SetFontSize(12).SetHeight(5));
-            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Подп.")).AddStyle(textStyle).SetFontSize(12).SetHeight(5));
-            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Дата")).AddStyle(textStyle).SetFontSize(12).SetHeight(5));
+            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Изм.")).AddStyle(textStyle).SetFontSize(12).SetHeight(5 * PdfDefines.mmA4));
+            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Лист")).AddStyle(textStyle)).SetFontSize(12).SetHeight(5 * PdfDefines.mmA4);
+            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("№ докум.")).AddStyle(textStyle).SetFontSize(12).SetHeight(5 * PdfDefines.mmA4));
+            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Подп.")).AddStyle(textStyle).SetFontSize(12).SetHeight(5 * PdfDefines.mmA4));
+            cell3Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Дата")).AddStyle(textStyle).SetFontSize(12).SetHeight(5 * PdfDefines.mmA4));
 
             Cell cell3 = AddEmptyCell(1, 1).Add(cell3Table);
             mainTable.AddCell(cell3);
@@ -379,77 +381,87 @@ namespace GostDOC.PDF
             string res = string.Empty;
             if (aGraphs.TryGetValue(Common.Constants.GRAPH_2, out res))
             res += Common.Converters.GetDocumentCode(Type);
-            Cell cell4 = AddEmptyCell(1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetFontSize(20).SetHeight(15);
+            Cell cell4 = AddEmptyCell(1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetFontSize(20).SetHeight(15 * PdfDefines.mmA4);
             mainTable.AddCell(cell4);
 
             // fill cell 5
             textStyle = new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFontSize(12).SetFont(f1);
-            Table cell5Table = new Table(UnitValue.CreatePointArray(new float[] { 17, 23, 15, 10 }));
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).Add(new Paragraph("Разраб.")).AddStyle(textStyle).SetHeight(5));
+            Table cell5Table = new Table(UnitValue.CreatePointArray(new float[] { 17 * PdfDefines.mmA4, 23 * PdfDefines.mmA4, 15 * PdfDefines.mmA4, 10 * PdfDefines.mmA4 }));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).Add(new Paragraph("Разраб.")).AddStyle(textStyle).SetHeight(5 * PdfDefines.mmA4));
             res = string.Empty;
-            aGraphs.TryGetValue(Common.Constants.GRAPH_11bl_dev, out res); //TODO: log не удалось распарсить;
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).SetHeight(5));
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).SetHeight(5));
+            if (!aGraphs.TryGetValue(Common.Constants.GRAPH_11bl_dev, out res))
+                res = string.Empty;//TODO: log не удалось распарсить;
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5 * PdfDefines.mmA4));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).SetHeight(5 * PdfDefines.mmA4));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).SetHeight(5 * PdfDefines.mmA4));
 
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph("Пров.")).AddStyle(textStyle).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph("Пров.")).AddStyle(textStyle).SetHeight(5 * PdfDefines.mmA4));
             res = string.Empty;
-            aGraphs.TryGetValue(Common.Constants.GRAPH_11bl_chk, out res); //TODO: log не удалось распарсить
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
+            if (!aGraphs.TryGetValue(Common.Constants.GRAPH_11bl_chk, out res))
+            res = string.Empty;//TODO: log не удалось распарсить;
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5 * PdfDefines.mmA4));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5 * PdfDefines.mmA4));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5 * PdfDefines.mmA4));
 
             res = string.Empty;
-            aGraphs.TryGetValue(Common.Constants.GRAPH_10, out res); //TODO: log не удалось распарсить
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
+            if(!aGraphs.TryGetValue(Common.Constants.GRAPH_10, out res))
+                res = string.Empty;//TODO: log не удалось распарсить;
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5 * PdfDefines.mmA4));
             res = string.Empty;
-            aGraphs.TryGetValue(Common.Constants.GRAPH_11app, out res); //TODO: log не удалось распарсить
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
+            if(!aGraphs.TryGetValue(Common.Constants.GRAPH_11app, out res))
+                res = string.Empty;//TODO: log не удалось распарсить;
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5 * PdfDefines.mmA4));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5 * PdfDefines.mmA4));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5 * PdfDefines.mmA4));
 
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph("Н. контр.")).AddStyle(textStyle).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph("Н. контр.")).AddStyle(textStyle).SetHeight(5 * PdfDefines.mmA4));
             res = string.Empty;
-            aGraphs.TryGetValue(Common.Constants.GRAPH_11norm, out res); //TODO: log не удалось распарсить
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5));
+            if(!aGraphs.TryGetValue(Common.Constants.GRAPH_11norm, out res))
+                res = string.Empty;//TODO: log не удалось распарсить;
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5 * PdfDefines.mmA4));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5 * PdfDefines.mmA4));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 1).SetHeight(5 * PdfDefines.mmA4));
 
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).Add(new Paragraph("Утв.")).AddStyle(textStyle).SetHeight(5));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).Add(new Paragraph("Утв.")).AddStyle(textStyle).SetHeight(5 * PdfDefines.mmA4));
             res = string.Empty;
-            aGraphs.TryGetValue(Common.Constants.GRAPH_11affirm, out res); //TODO: log не удалось распарсить
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5));
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).SetHeight(5));
-            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).SetHeight(5));
+            if(!aGraphs.TryGetValue(Common.Constants.GRAPH_11affirm, out res))
+                res = string.Empty;//TODO: log не удалось распарсить;
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).Add(new Paragraph(res)).AddStyle(textStyle).SetHeight(5 * PdfDefines.mmA4));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).SetHeight(5 * PdfDefines.mmA4));
+            cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 1, 2).SetHeight(5 * PdfDefines.mmA4));
 
             Cell cell5 = AddEmptyCell(1, 1).Add(cell5Table);
             mainTable.AddCell(cell5);
 
             // fill Cell6
-            Table cell6Table = new Table(UnitValue.CreatePointArray(new float[] { 70, 50}));
+            Table cell6Table = new Table(UnitValue.CreatePointArray(new float[] { 70 * PdfDefines.mmA4, 50 * PdfDefines.mmA4 }));
             textStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1);
             res = string.Empty;
-            aGraphs.TryGetValue(Constants.GRAPH_1, out res); //TODO: log не удалось распарсить;
-            cell6Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetFontSize(16).SetHeight(25));
+            if(!aGraphs.TryGetValue(Constants.GRAPH_1, out res))
+                res = string.Empty;//TODO: log не удалось распарсить;
+            cell6Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetFontSize(16).SetHeight(25 * PdfDefines.mmA4));
 
-            Table cell6_2Table = new Table(UnitValue.CreatePointArray(new float[] { 5, 5, 5, 15, 20 }));
-            cell6_2Table.AddCell(AddEmptyCell(3, 1).Add(new Paragraph("Лит.").AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
-            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Лист").AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
-            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Листов").AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+            Table cell6_2Table = new Table(UnitValue.CreatePointArray(new float[] { 5 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 15 * PdfDefines.mmA4, 20 * PdfDefines.mmA4 }));
+            cell6_2Table.AddCell(AddEmptyCell(3, 1).Add(new Paragraph("Лит.").AddStyle(textStyle).SetFontSize(12)).SetHeight(5 * PdfDefines.mmA4));
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Лист").AddStyle(textStyle).SetFontSize(12)).SetHeight(5 * PdfDefines.mmA4));
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Листов").AddStyle(textStyle).SetFontSize(12)).SetHeight(5 * PdfDefines.mmA4));
 
             res = string.Empty;
-            aGraphs.TryGetValue(Constants.GRAPH_4, out res); //TODO: log не удалось распарсить;
-            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res).AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+            if(!aGraphs.TryGetValue(Constants.GRAPH_4, out res))
+                res = string.Empty;//TODO: log не удалось распарсить;
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res).AddStyle(textStyle).SetFontSize(12)).SetHeight(5 * PdfDefines.mmA4));
             res = string.Empty;
-            aGraphs.TryGetValue(Constants.GRAPH_4a, out res); //TODO: log не удалось распарсить;
-            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res).AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+            if(!aGraphs.TryGetValue(Constants.GRAPH_4a, out res))
+                res = string.Empty;//TODO: log не удалось распарсить;
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res).AddStyle(textStyle).SetFontSize(12)).SetHeight(5 * PdfDefines.mmA4));
             res = string.Empty;
-            aGraphs.TryGetValue(Constants.GRAPH_4b, out res); //TODO: log не удалось распарсить;
-            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res).AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
+            if(!aGraphs.TryGetValue(Constants.GRAPH_4b, out res))
+                res = string.Empty;//TODO: log не удалось распарсить;
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res).AddStyle(textStyle).SetFontSize(12)).SetHeight(5 * PdfDefines.mmA4));
 
-            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("1").AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
-            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Х").AddStyle(textStyle).SetFontSize(12)).SetHeight(5));
-            cell6_2Table.AddCell(AddEmptyCell(5, 3).SetHeight(15));
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("1").AddStyle(textStyle).SetFontSize(12)).SetHeight(5 * PdfDefines.mmA4));
+            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Х").AddStyle(textStyle).SetFontSize(12)).SetHeight(5 * PdfDefines.mmA4));
+            cell6_2Table.AddCell(AddEmptyCell(5, 3).SetHeight(15 * PdfDefines.mmA4));
 
             Cell cell6_2 = AddEmptyCell(1, 1).Add(cell6_2Table);
             cell6Table.AddCell(cell6_2);

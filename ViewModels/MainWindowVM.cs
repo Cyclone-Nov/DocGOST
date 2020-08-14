@@ -370,7 +370,17 @@ namespace GostDOC.ViewModels
 
         private void UpdatePdf(object obj)
         {
-            var type = Common.Converters.GetPdfType(_selectedItem.ParentType);
+            var nodeType = _selectedItem.ParentType;
+            if (nodeType == NodeType.Root)
+                nodeType = _selectedItem.NodeType;
+            var type = Common.Converters.GetPdfType(nodeType);
+
+            if(nodeType == NodeType.Root)
+            {
+                System.Windows.MessageBox.Show("Документ для отображения не выбран! Выберите в дереве документ для отображения");
+                return;
+            }
+            
             // TODO: async
             /*res = await*/ _docManager.SaveChangesInPdf(type);
             CurrentPdfData.Value = _docManager.GetPdfData(type);
