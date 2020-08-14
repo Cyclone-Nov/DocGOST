@@ -22,13 +22,9 @@ namespace GostDOC.ViewModels
 
         public NewFileVM()
         {
-            using (var reader = new StreamReader(Path.Combine(Environment.CurrentDirectory, "DefaultGraphNames.txt")))
+            foreach (var line in Utils.ReadCfgFileLines("DefaultGraphNames"))
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    GraphValues.Add(new GraphValueVM(line, string.Empty));
-                }
+                GraphValues.Add(new GraphValueVM(line, string.Empty));
             }
         }
 

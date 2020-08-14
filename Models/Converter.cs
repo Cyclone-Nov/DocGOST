@@ -34,15 +34,12 @@ namespace GostDOC.Models
 
         private void FillGroupNames()
         {
-            using (var reader = new StreamReader(Path.Combine(Environment.CurrentDirectory, "PhysicalDesignators.txt")))
+            foreach (var line in Utils.ReadCfgFileLines("PhysicalDesignators"))
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
+                string[] split = line.Split(new char[] { '\t' });
+                if (split.Length == 3)
                 {
-                    string[] split = line.Split(new char[] { '\t' });
-                    if (split.Length == 3) {
-                        _groupNames.Add(split[0], new Tuple<string, string>(split[1], split[2]));
-                    }
+                    _groupNames.Add(split[0], new Tuple<string, string>(split[1], split[2]));
                 }
             }
         }

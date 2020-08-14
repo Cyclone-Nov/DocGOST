@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using GostDOC.Common;
 
@@ -81,13 +83,42 @@ namespace GostDOC.Models
             switch (aNodeType)
             {
                 case NodeType.Bill:
-                    sortType = SortType.Bill;
+                    sortType = SortType.Name;
                     break;
                 case NodeType.Specification:
-                    sortType = aGroupName.Equals(Constants.GroupOthers) ? SortType.SpecificationOthers : SortType.Specification;
+                    if (aGroupName.Equals(Constants.GroupComplex) || aGroupName.Equals(Constants.GroupAssemblyUnits) || aGroupName.Equals(Constants.GroupDetails))
+                    {
+                        return SortType.SpComplex;
+                    }
+                    if (aGroupName.Equals(Constants.GroupStandard))
+                    {
+                        return SortType.SpStandard;
+                    }
+                    if (aGroupName.Equals(Constants.GroupOthers))
+                    {
+                        return SortType.SpOthers;
+                    }
+                    if (aGroupName.Equals(Constants.GroupMaterials))
+                    {
+                        return SortType.Name;
+                    }
+                    if (aGroupName.Equals(Constants.GroupKits))
+                    {
+                        return SortType.SpKits;
+                    }
                     break;
             }
             return sortType;
+        }
+        
+        public static string[] ReadCfgFileLines(string aFileName)
+        {
+            string filePath = Path.Combine(Environment.CurrentDirectory, $"{aFileName}.cfg");
+            if (File.Exists(filePath))
+            {
+                return File.ReadAllLines(filePath);
+            }
+            return new string[] { };
         }
     }
 
@@ -113,6 +144,27 @@ namespace GostDOC.Models
                 current.Properties[Constants.GroupNameB] = info.GroupName;
                 current.Properties[Constants.SubGroupNameB] = info.SubGroupName;
             }
+        }
+
+        public static string GetProperty(this Component current, string name)
+        {
+            var prop = current.Properties.FirstOrDefault(x => x.Key == name);
+            return prop.Value ?? string.Empty;
+        }
+
+        public static int CompareTo(this Component first, Component second, string propertyName)
+        {
+            string x = first.GetProperty(propertyName);
+            string y = second.GetProperty(propertyName);
+
+            if (string.IsNullOrEmpty(x))
+                return -1;
+
+            if (string.IsNullOrEmpty(y))
+                return 1;
+
+            // Compare 1st letter
+            return x.CompareTo(y);
         }
 
         public static void AddGroup(IDictionary<string, Group> aGroups, string aGroupName)

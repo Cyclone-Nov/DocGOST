@@ -152,7 +152,21 @@ namespace GostDOC.Models
                     break;
                 }
             }
-        }       
+        }
+
+        public string GetGraphValue(string aCfgName, string aGraphName)
+        {
+            Configuration cfg;
+            if (_docManager.Project.Configurations.TryGetValue(aCfgName, out cfg))
+            {
+                string val;
+                if (cfg.Graphs.TryGetValue(aGraphName, out val))
+                {
+                    return val;
+                }
+            }
+            return string.Empty;
+        }
 
         #endregion Public
 

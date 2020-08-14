@@ -138,7 +138,9 @@
     <Compile Include="Converters\TreeViewSortConverter.cs" />
     <Compile Include="Events\TEventArgs.cs" />
     <Compile Include="Models\CombineProperties.cs" />
+    <Compile Include="Models\DocumentTypes.cs" />
     <Compile Include="Models\GroupData.cs" />
+    <Compile Include="Models\MenuNode.cs" />
     <Compile Include="Models\MoveInfo.cs" />
     <Compile Include="Models\ProjectWrapper.cs" />
     <Compile Include="Models\SortFactory.cs" />
@@ -245,13 +247,16 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="PhysicalDesignators.txt">
+    <Content Include="PhysicalDesignators.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="DefaultGraphNames.txt">
+    <Content Include="DefaultGraphNames.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Units.txt">
+    <Content Include="Standards.cfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Units.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -260,6 +265,9 @@
     </EmbeddedResource>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Documents.cfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>

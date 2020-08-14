@@ -18,7 +18,7 @@ namespace GostDOC.Models
     {
         public List<Component> Sort(List<Component> aItems)
         {
-            return aItems.OrderBy(x => x.Properties[Constants.ComponentName]).ToList();
+            return aItems.OrderBy(x => x.GetProperty(Constants.ComponentName)).ToList();
         }
     }
 
@@ -26,7 +26,15 @@ namespace GostDOC.Models
     {
         public List<Component> Sort(List<Component> aItems)
         {
-            return aItems.OrderBy(x => x.Properties[Constants.ComponentSign]).ToList();
+            return aItems.OrderBy(x => x.GetProperty(Constants.ComponentSign)).ToList();
+        }
+    }
+
+    class NameSignSort : ISort<Component>
+    {
+        public List<Component> Sort(List<Component> aItems)
+        {
+            return aItems.OrderBy(x => x.GetProperty(Constants.ComponentName)).ThenBy(x => x.GetProperty(Constants.ComponentSign)).ToList();
         }
     }
 
@@ -37,27 +45,23 @@ namespace GostDOC.Models
         #region Singleton
         private static readonly Lazy<NameSortRegex> _instance = new Lazy<NameSortRegex>(() => new NameSortRegex(), true);
         public static NameSortRegex Instance => _instance.Value;
-        NameSortRegex()
+        private NameSortRegex()
         {
             StringBuilder unitsGroup = new StringBuilder(@"\w*?(\d*)\s*(");
 
             bool first = true;
-            using (var reader = new StreamReader(Path.Combine(Environment.CurrentDirectory, "Units.txt")))
+            foreach (var line in Utils.ReadCfgFileLines("Units"))
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
+                foreach (var str in line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    foreach (var str in line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        if (first)
-                            first = false;
-                        else
-                            unitsGroup.Append('|');
+                    if (first)
+                        first = false;
+                    else
+                        unitsGroup.Append('|');
 
-                        unitsGroup.Append(str);
-                    }                    
+                    unitsGroup.Append(str);
                 }
-            }            
+            }          
             unitsGroup.Append(")");
 
             _regex = unitsGroup.ToString();
@@ -97,8 +101,9 @@ namespace GostDOC.Models
         {
             aItems.Sort((x, y) =>
             {
-                string nameX = x.Properties[Constants.ComponentName];
-                string nameY = y.Properties[Constants.ComponentName];
+
+                string nameX = x.GetProperty(Constants.ComponentName);
+                string nameY = y.GetProperty(Constants.ComponentName);
 
                 if (string.IsNullOrEmpty(nameX))
                     return -1;
@@ -123,18 +128,75 @@ namespace GostDOC.Models
         }
     }
 
+    class StandardSort : ISort<Component>
+    {
+        List<string> _standards = new List<string>();
+
+        #region Singleton
+        private static readonly Lazy<StandardSort> _instance = new Lazy<StandardSort>(() => new StandardSort(), true);
+        public static StandardSort Instance => _instance.Value;
+        private StandardSort()
+        {
+            _standards.AddRange(Utils.ReadCfgFileLines("Standard"));
+        }
+        #endregion
+        
+        private string ParseStandard(string aName)
+        {
+            foreach (var str in _standards)
+            {
+                if (aName.Contains(str))
+                {
+                    return str;
+                }
+            }
+            return string.Empty;
+        }
+
+        public List<Component> Sort(List<Component> aItems)
+        {
+            aItems.Sort((x, y) =>
+            {
+                string docX = x.GetProperty(Constants.ComponentDoc);
+                string docY = y.GetProperty(Constants.ComponentDoc);
+
+                if (string.IsNullOrEmpty(docX))
+                {
+                    return 1;
+                }
+                if (string.IsNullOrEmpty(docY))
+                {
+                    return -1;
+                }             
+
+                var result = ParseStandard(docX).CompareTo(ParseStandard(docY));
+                if (result == 0)
+                {
+                    result = x.CompareTo(y, Constants.ComponentName);
+                }
+                return result;
+
+            });
+            return aItems;
+        }
+    }
+
     static class SortFactory
     {        
         public static ISort<Component> GetSort(SortType aSortType)
         {
             switch (aSortType)
             {
-                case SortType.Bill:
-                    return new NameSort();
-                case SortType.Specification:
+                case SortType.SpComplex:
                     return new SignSort();
-                case SortType.SpecificationOthers:
+                case SortType.SpStandard:
+                    return StandardSort.Instance;
+                case SortType.SpOthers:
                     return NameSortRegex.Instance;
+                case SortType.SpKits:
+                    return new NameSignSort();
+                case SortType.Name:
+                    return new NameSort();
             }
             return null;
         }

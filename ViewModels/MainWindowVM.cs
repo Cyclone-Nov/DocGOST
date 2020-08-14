@@ -31,6 +31,8 @@ namespace GostDOC.ViewModels
         private bool _parseAssemblyUnitsSet = false;
 
         private DocManager _docManager = DocManager.Instance;
+        private DocumentTypes _docTypes = DocumentTypes.Instance;
+
         private ProjectWrapper _project = new ProjectWrapper();
         private List<MoveInfo> _moveInfo = new List<MoveInfo>();
 
@@ -38,14 +40,23 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<ComponentVM> ComponentsSelectedItem { get; } = new ObservableProperty<ComponentVM>();
         public ObservableCollection<ComponentVM> Components { get; } = new ObservableCollection<ComponentVM>();
-        public ObservableProperty<string> CurrentPdfPath { get; } = new ObservableProperty<string>();
-        public ObservableProperty<byte[]> CurrentPdfData { get; } = new ObservableProperty<byte[]>();
+        // Graphs
         public ObservableProperty<bool> IsGeneralGraphValuesVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableCollection<GraphValueVM> GeneralGraphValues { get; } = new ObservableCollection<GraphValueVM>();
+        // Doc tree
         public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
+        // Context menu
+        public ObservableCollection<MenuNode> TableContextMenu { get; } = new ObservableCollection<MenuNode>();
+        // PDF data
+        public ObservableProperty<string> CurrentPdfPath { get; } = new ObservableProperty<string>();
+        public ObservableProperty<byte[]> CurrentPdfData { get; } = new ObservableProperty<byte[]>();
+
+        // Enable / disable buttons
         public ObservableProperty<bool> IsAddEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsAutoSortEnabled { get; } = new ObservableProperty<bool>(true);
+
+        // Drag / drop
         public DragDropFile DragDropFile { get; } = new DragDropFile();
 
         #region Commands
@@ -65,6 +76,7 @@ namespace GostDOC.ViewModels
         public ICommand UpComponentsCmd => new Command<IList<object>>(UpComponents);
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
         public ICommand UpdatePdfCmd => new Command(UpdatePdf);
+        public ICommand ClickMenuCmd => new Command<MenuNode>(ClickMenu);
 
         /// <summary>
         /// Current selected configuration
@@ -359,6 +371,22 @@ namespace GostDOC.ViewModels
             //CurrentPdfPath.Value = Path.Combine(Environment.CurrentDirectory, "example.pdf");
         }
 
+        private void ClickMenu(MenuNode obj)
+        {
+            if (GroupName.Equals(Constants.GroupDoc))
+            {
+                Document doc = _docTypes.GetDocument(obj?.Parent?.Name, obj?.Name);
+                if (doc != null)
+                {
+                    ComponentVM cmp = new ComponentVM();
+                    cmp.Name.Value = doc.Name;
+                    cmp.Sign.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign) + doc.Code;
+                    cmp.Format.Value = "A4";
+                    Components.Add(cmp);
+                }        
+            }
+        }
+
         #endregion Commands impl
 
         private void OnDragDropFile_FileDropped(object sender, TEventArgs<string> e)
@@ -436,6 +464,8 @@ namespace GostDOC.ViewModels
             }
             // Clear move components info
             _moveInfo.Clear();
+
+            UpdateTableContextMenu();
         }
 
         private GroupData GetGroupData()
@@ -578,6 +608,24 @@ namespace GostDOC.ViewModels
 
             // Set assebly units asked flag
             _parseAssemblyUnitsSet = true;
+        }
+
+        private void UpdateTableContextMenu()
+        {
+            TableContextMenu.Clear();
+
+            if (GroupName.Equals(Constants.GroupDoc))
+            {
+                foreach (var kvp in _docTypes.Documents)
+                {
+                    MenuNode node = new MenuNode() { Name = kvp.Key, Nodes = new ObservableCollection<MenuNode>() };
+                    foreach (var doc in kvp.Value)
+                    {
+                        node.Nodes.Add(new MenuNode() { Name = doc.Key, Parent = node });
+                    }
+                    TableContextMenu.Add(node);
+                }
+            }
         }
     }
 }
