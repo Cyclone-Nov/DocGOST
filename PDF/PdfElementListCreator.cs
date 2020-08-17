@@ -27,46 +27,12 @@ namespace GostDOC.PDF
     internal class PdfElementListCreator : PdfCreator
     {        
 
-        private const string FileName = @"Перечень элементов.pdf";
-
-        /// <summary>
-        /// поток, содержащий PDF документ
-        /// </summary>
-        /// <value>
-        /// The main stream.
-        /// </value>
-        public MemoryStream MainStream { get; } = new MemoryStream();
-
-        /// <summary>
-        /// The PDF document
-        /// </summary>
-        private PdfDocument pdfDoc;
-
-        /// <summary>
-        /// The document
-        /// </summary>
-        private iText.Layout.Document doc;
-
-        /// <summary>
-        /// The PDF writer
-        /// </summary>
-        private PdfWriter pdfWriter;
+        private const string FileName = @"Перечень элементов.pdf";        
 
         public PdfElementListCreator() : base(DocType.ItemsList)
-        {
-            pdfWriter = new PdfWriter(MainStream);
-            pdfDoc = new PdfDocument(pdfWriter);
-            pdfDoc.SetDefaultPageSize(PageSize.A4);
-            doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), false);
+        {   
         }
 
-        public override byte[] GetData()
-        {
-            doc.Flush();
-            pdfWriter.Flush();
-            var arr = MainStream.ToArray();
-            return arr;
-        }
 
         /// <summary>
         /// Создать документ
@@ -81,6 +47,7 @@ namespace GostDOC.PDF
                 return;
                         
             var dataTable = CreateDataTable(mainConfig.Specification);
+
             int next = AddFirstPage(doc, mainConfig.Graphs, dataTable);
             while (next > 0)
             {
@@ -93,73 +60,6 @@ namespace GostDOC.PDF
             }
 
             doc.Close();
-
-            // var page = pdfDoc.AddNewPage();
-            // var pdfCanvas = new PdfCanvas(page);
-            // Rectangle rectangle = new Rectangle(mmA4* 10, mmA4 * 10, A4Width, mmA4 * 40);
-            // Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            // canvas.Add(table);
-            // PdfFont f1 = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.TIMES_ROMAN, true);
-
-            //PdfFont times = PdfFontFactory.CreateFont("GOST_TYPE_A.ttf", "cp1251", true);
-            //PdfFont gostBu = PdfFontFactory.CreateFont("GOST_BU.ttf", "cp1251", true);
-
-            // float[] columnWidths = {.2f, .4f, 1, 6, .2f, 2};
-            //float[] columnWidths = { 1, 13, 0.1f, 5 };
-            //Table table =
-            //    new Table(UnitValue.CreatePercentArray(columnWidths)).UseAllAvailableWidth(); //.SetHeight(A4Height);
-
-            //table.SetBorderBottom(new SolidBorder(2));
-            //iText.Layout.Style italicHeaderStyle = new Style();
-            //italicHeaderStyle.SetFont(f1).SetItalic().SetFontSize(14);
-            //iText.Layout.Style verticalCellStyle = new Style();
-            //verticalCellStyle.SetFont(f1).SetItalic().SetFontSize(14).SetRotationAngle(DegreesToRadians(90));
-
-
-            //var cell = new Cell();
-            //cell.Add(new Paragraph("Поз.").SetFont(f1));
-            //cell.Add(new Paragraph("обозна-").SetFont(f1).SetFixedLeading(5));
-            //cell.Add(new Paragraph("чение").SetFont(f1)); //.SetPaddings(0,0,0,0));
-            //ApplyForCell(cell);
-            //table.AddCell(cell);
-
-            //cell = new Cell().Add(new Paragraph("Наименование").SetFont(f1));
-            //ApplyForCell(cell);
-            //table.AddCell(cell);
-
-            //cell = new Cell().Add(new Paragraph("Кол.").SetFont(f1).SetMargin(0).SetPadding(0))
-            //    .SetMargin(0).SetWidth(4 * PdfDefines.mmA4).SetPaddingLeft(-10).SetPaddingRight(-10);
-            //ApplyForCell(cell);
-            //table.AddCell(cell);
-
-            //cell = new Cell().Add(new Paragraph("Примечание").SetFont(f1));
-            //ApplyForCell(cell);
-            //table.AddCell(cell);
-
-
-            //AddEmptyCells(16, PdfDefines.ROW_HEIGHT, table);
-
-            //table.AddCell(AddTopAppendGraph("", ""));
-
-            //AddEmptyCells(28, PdfDefines.ROW_HEIGHT, table);
-
-            //cell = new Cell(3, 1).SetBorderLeft(Border.NO_BORDER).SetBorderRight(Border.NO_BORDER);
-            //table.AddCell(cell);
-            //cell = new Cell(3, 1).SetBorderLeft(Border.NO_BORDER);
-            //table.AddCell(cell);
-
-            //AddEmptyCells(12, PdfDefines.ROW_HEIGHT, table);
-
-            //table.AddCell(AddBottomAppendGraph());
-
-            //AddEmptyCells(12, PdfDefines.ROW_HEIGHT, table);
-
-
-            //FooterTableInfo footerTableInfo = new FooterTableInfo();
-            //table.AddCell(new Cell(1, 4).SetPadding(0).Add(AddFooterTable(footerTableInfo)).SetBorderRight(new SolidBorder(2)));
-
-            //doc.Add(table);
-            //doc.Close();
         }
 
 
@@ -296,24 +196,15 @@ namespace GostDOC.PDF
 
         private void SetPageMargins(iText.Layout.Document aDoc)
         {
-            aDoc.SetLeftMargin(9 * PdfDefines.mmA4);
-            aDoc.SetRightMargin(9 * PdfDefines.mmA4);
+            aDoc.SetLeftMargin(8 * PdfDefines.mmA4);
+            aDoc.SetRightMargin(5 * PdfDefines.mmA4);
             aDoc.SetTopMargin(5 * PdfDefines.mmA4);
             aDoc.SetBottomMargin(5 * PdfDefines.mmA4);
         }
 
-        /// <summary>
-        /// создать таблицу основной надписи
-        /// </summary>
-        /// <returns></returns>
-        private Table CreateTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs)
-        {
-            Table tbl = new Table(3);
-            return tbl;
-        }
 
         /// <summary>
-        /// создать таблицу основной надписи
+        /// создать таблицу основной надписи на первой странице
         /// </summary>
         /// <returns></returns>
         private Table CreateFirstTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs, int aPages)
@@ -328,6 +219,7 @@ namespace GostDOC.PDF
 
             float[] columnSizes = {65 * PdfDefines.mmA4, 120 * PdfDefines.mmA4 };
             Table mainTable = new Table(UnitValue.CreatePointArray(columnSizes));
+            mainTable.SetMargin(0);
             mainTable.SetWidth(185 * PdfDefines.mmA4);            
             mainTable.SetHeight(62 * PdfDefines.mmA4);
 
@@ -353,6 +245,7 @@ namespace GostDOC.PDF
             for (int i = 0; i < columns; i++)
                 cell2Table.AddCell(AddEmptyCell(1, 1).SetHeight(14 * PdfDefines.mmA4)); // cell2_1 - cell2_3            
             cell2Table.AddCell(AddEmptyCell(1, 3).SetHeight(8 * PdfDefines.mmA4)); // cell 2_4
+            cell2Table.SetMargin(0);
 
             Cell cell2 = AddEmptyCell(1, 1);            
             cell2.Add(cell2Table);
@@ -360,6 +253,7 @@ namespace GostDOC.PDF
 
             // fill cell 3 (5c х 3r)            
             Table cell3Table = new Table(UnitValue.CreatePointArray(new float[] { 7 * PdfDefines.mmA4, 10 * PdfDefines.mmA4, 23 * PdfDefines.mmA4, 15 * PdfDefines.mmA4, 10 * PdfDefines.mmA4 }));
+            cell3Table.SetMargin(0);
             columns = 5;
             for (int i = 0; i < columns; i++) // 1 row
                 cell3Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).SetHeight(5 * PdfDefines.mmA4));
@@ -387,6 +281,7 @@ namespace GostDOC.PDF
             // fill cell 5
             textStyle = new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFontSize(12).SetFont(f1);
             Table cell5Table = new Table(UnitValue.CreatePointArray(new float[] { 17 * PdfDefines.mmA4, 23 * PdfDefines.mmA4, 15 * PdfDefines.mmA4, 10 * PdfDefines.mmA4 }));
+            cell5Table.SetMargin(0);
             cell5Table.AddCell(AddEmptyCell(1, 1, 2, 2, 2, 1).Add(new Paragraph("Разраб.")).AddStyle(textStyle).SetHeight(5 * PdfDefines.mmA4));
             res = string.Empty;
             if (!aGraphs.TryGetValue(Common.Constants.GRAPH_11bl_dev, out res))
@@ -435,6 +330,7 @@ namespace GostDOC.PDF
 
             // fill Cell6
             Table cell6Table = new Table(UnitValue.CreatePointArray(new float[] { 70 * PdfDefines.mmA4, 50 * PdfDefines.mmA4 }));
+            cell6Table.SetMargin(0);
             textStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1);
             res = string.Empty;
             if(!aGraphs.TryGetValue(Constants.GRAPH_1, out res))
@@ -442,6 +338,7 @@ namespace GostDOC.PDF
             cell6Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetFontSize(16).SetHeight(25 * PdfDefines.mmA4));
 
             Table cell6_2Table = new Table(UnitValue.CreatePointArray(new float[] { 5 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 15 * PdfDefines.mmA4, 20 * PdfDefines.mmA4 }));
+            cell6_2Table.SetMargin(0);
             cell6_2Table.AddCell(AddEmptyCell(3, 1).Add(new Paragraph("Лит.").AddStyle(textStyle).SetFontSize(12)).SetHeight(5 * PdfDefines.mmA4));
             cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Лист").AddStyle(textStyle).SetFontSize(12)).SetHeight(5 * PdfDefines.mmA4));
             cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Листов").AddStyle(textStyle).SetFontSize(12)).SetHeight(5 * PdfDefines.mmA4));
@@ -469,11 +366,24 @@ namespace GostDOC.PDF
             Cell cell6 = AddEmptyCell(1, 1).Add(cell6Table);
             mainTable.AddCell(cell6);
 
+            mainTable.SetFixedPosition(20 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 185 * PdfDefines.mmA4);
+
+            // отрисовать таблицу в конкретном месте документа
+            // PageSize ps = pdfDoc.getDefaultPageSize();
+            //mainTable.setFixedPosition(ps.getWidth() - doc.getRightMargin() - totalWidth, ps.getHeight() - doc.getTopMargin() - totalHeight, totalWidth);
+            //PageSize ps = pdfDoc.getDefaultPageSize();
+            //IRenderer tableRenderer = table.createRendererSubTree().setParent(doc.getRenderer());
+            //LayoutResult tableLayoutResult =
+            //        tableRenderer.layout(new LayoutContext(new LayoutArea(0, new Rectangle(ps.getWidth(), 1000))));
+            //float totalHeight = tableLayoutResult.getOccupiedArea().getBBox().getHeight();
+
+
             return mainTable;
         }
+        
 
         /// <summary>
-        /// создать таблицу основной надписи
+        /// создать таблицу основной надписи на последующих страницах
         /// </summary>
         /// <returns></returns>
         private Table CreateNextTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs)

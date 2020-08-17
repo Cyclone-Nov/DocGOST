@@ -32,6 +32,31 @@ namespace GostDOC.PDF
 
         internal readonly PageSize PageSize;
 
+        /// <summary>
+        /// поток, содержащий PDF документ
+        /// </summary>
+        /// <value>
+        /// The main stream.
+        /// </value>
+        protected MemoryStream MainStream { get; } = new MemoryStream();
+
+        /// <summary>
+        /// The PDF document
+        /// </summary>
+        protected PdfDocument pdfDoc;
+
+        /// <summary>
+        /// The document
+        /// </summary>
+        protected iText.Layout.Document doc;
+
+        /// <summary>
+        /// The PDF writer
+        /// </summary>
+        protected PdfWriter pdfWriter;
+
+
+
         public PdfCreator(DocType aType)
         {            
             Type = aType;           
@@ -55,13 +80,24 @@ namespace GostDOC.PDF
                     PageSize = new PageSize(PageSize.A4);
                     break;
             }
-            
+
+            pdfWriter = new PdfWriter(MainStream);
+            pdfDoc = new PdfDocument(pdfWriter);
+            pdfDoc.SetDefaultPageSize(PageSize);
+            doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), false);
+
         }
 
 
         public abstract void Create(Project project);
 
-        public abstract byte[] GetData();
+        public byte[] GetData()
+        {
+            doc.Flush();
+            pdfWriter.Flush();
+            return MainStream.ToArray();
+        }
+
         
 
         /// <summary>
