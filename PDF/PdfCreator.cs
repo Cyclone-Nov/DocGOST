@@ -38,7 +38,7 @@ namespace GostDOC.PDF
         /// <value>
         /// The main stream.
         /// </value>
-        protected MemoryStream MainStream { get; } = new MemoryStream();
+        protected MemoryStream MainStream;
 
         /// <summary>
         /// The PDF document
@@ -60,8 +60,6 @@ namespace GostDOC.PDF
         public PdfCreator(DocType aType)
         {            
             Type = aType;           
-
-            f1 = PdfFontFactory.CreateFont(@"Font\\GOST_TYPE_A.ttf", "cp1251", true);
             switch(aType)
             {
                 case DocType.Bill:
@@ -80,12 +78,6 @@ namespace GostDOC.PDF
                     PageSize = new PageSize(PageSize.A4);
                     break;
             }
-
-            pdfWriter = new PdfWriter(MainStream);
-            pdfDoc = new PdfDocument(pdfWriter);
-            pdfDoc.SetDefaultPageSize(PageSize);
-            doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), false);
-
         }
 
 
