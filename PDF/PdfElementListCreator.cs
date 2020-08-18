@@ -391,7 +391,7 @@ namespace GostDOC.PDF
             mainTable.AddCell(cell6);
             #endregion Cell 6
 
-            mainTable.SetFixedPosition(20 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 185 * PdfDefines.mmA4);
+            mainTable.SetFixedPosition(20 * PdfDefines.mmA4 - 2, 5 * PdfDefines.mmA4, 185 * PdfDefines.mmA4);
 
             // отрисовать таблицу в конкретном месте документа
             // PageSize ps = pdfDoc.getDefaultPageSize();
@@ -417,26 +417,29 @@ namespace GostDOC.PDF
             return tbl;
         }
 
-        private static Cell ApplyAppendGraph(Cell c, string text) {
-            c.Add(
-                new Paragraph(text).
-                    SetFont(f1).
-                    SetFontSize(14).
-                    SetRotationAngle(DegreesToRadians(90)).
-                    SetFixedLeading(10).
-                    SetPadding(0).
-                    SetPaddingRight(-10).
-                    SetPaddingLeft(-10).
-                    SetMargin(0).
-                    SetItalic().
-                    SetWidth(60 * PdfDefines.mmA4).
-                    SetTextAlignment(TextAlignment.CENTER));
+        private static Cell CreateAppendGraph(float height, string text=null) {
+            var c = new Cell();
+            if (text != null) {
+                c.Add(
+                    new Paragraph(text)
+                        .SetFont(f1)
+                        .SetFontSize(12)
+                        .SetRotationAngle(DegreesToRadians(90))
+                        .SetFixedLeading(10)
+                        .SetPadding(0)
+                        .SetPaddingRight(-10)
+                        .SetPaddingLeft(-10)
+                        .SetMargin(0)
+                        .SetItalic()
+                        .SetWidth(height)
+                        .SetTextAlignment(TextAlignment.CENTER));
+            }
 
             c.SetHorizontalAlignment(HorizontalAlignment.CENTER).
              SetVerticalAlignment(VerticalAlignment.MIDDLE).
              SetMargin(0).
              SetPadding(0).
-             SetHeight(60 * PdfDefines.mmA4).
+             SetHeight(height).
              SetBorder(new SolidBorder(2));
 
             return c;
@@ -451,13 +454,13 @@ namespace GostDOC.PDF
             float[] columnSizes = {5 * PdfDefines.mmA4, 7 * PdfDefines.mmA4 };
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
             
-            var tmpCell = new Cell();
-            tbl.AddCell(ApplyAppendGraph(tmpCell, "Перв. примен."));
-            tbl.AddCell(new Cell());
+            tbl.AddCell(CreateAppendGraph(60*PdfDefines.mmA4, "Перв. примен."));
+            tbl.AddCell(CreateAppendGraph(60*PdfDefines.mmA4));
 
-            tmpCell = new Cell();
-            tbl.AddCell(ApplyAppendGraph(tmpCell, "Справ. №"));
-            tbl.AddCell(new Cell());
+            tbl.AddCell(CreateAppendGraph(60*PdfDefines.mmA4, "Справ. №"));
+            tbl.AddCell(CreateAppendGraph(60*PdfDefines.mmA4));
+
+            tbl.SetFixedPosition((20 - 5- 7) * PdfDefines.mmA4, (5+287-60*2) * PdfDefines.mmA4, (5 + 7) * PdfDefines.mmA4);
 
             return tbl;
         }
@@ -471,25 +474,22 @@ namespace GostDOC.PDF
             float[] columnSizes = {5 * PdfDefines.mmA4, 7 * PdfDefines.mmA4 };
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
-            var tmpCell = new Cell();
-            tbl.AddCell(ApplyAppendGraph(tmpCell, "Подп. и дата"));
-            tbl.AddCell(new Cell());
+            tbl.AddCell(CreateAppendGraph(35 * PdfDefines.mmA4, "Подп. и дата"));
+            tbl.AddCell(CreateAppendGraph(35 * PdfDefines.mmA4));
 
-            tmpCell = new Cell();
-            tbl.AddCell(ApplyAppendGraph(tmpCell, "Инв. № дубл."));
-            tbl.AddCell(new Cell());
-            
-            tmpCell = new Cell();
-            tbl.AddCell(ApplyAppendGraph(tmpCell, "Взам. инв. №"));
-            tbl.AddCell(new Cell());
-            
-            tmpCell = new Cell();
-            tbl.AddCell(ApplyAppendGraph(tmpCell, "Подп. и дата"));
-            tbl.AddCell(new Cell());
-            
-            tmpCell = new Cell();
-            tbl.AddCell(ApplyAppendGraph(tmpCell, "Инв № подл."));
-            tbl.AddCell(new Cell());
+            tbl.AddCell(CreateAppendGraph(25 * PdfDefines.mmA4, "Инв. № дубл."));
+            tbl.AddCell(CreateAppendGraph(25 * PdfDefines.mmA4));
+
+            tbl.AddCell(CreateAppendGraph(25 * PdfDefines.mmA4, "Взам. инв. №"));
+            tbl.AddCell(CreateAppendGraph(25 * PdfDefines.mmA4));
+
+            tbl.AddCell(CreateAppendGraph(35 * PdfDefines.mmA4, "Подп. и дата").SetHeight(35 * PdfDefines.mmA4));
+            tbl.AddCell(CreateAppendGraph(35 * PdfDefines.mmA4));
+
+            tbl.AddCell(CreateAppendGraph(25 * PdfDefines.mmA4, "Инв № подл."));
+            tbl.AddCell(CreateAppendGraph(25 * PdfDefines.mmA4));
+
+            tbl.SetFixedPosition((20 - 5- 7) * PdfDefines.mmA4, 5 * PdfDefines.mmA4, (5 + 7) * PdfDefines.mmA4);
 
             return tbl;
         }
