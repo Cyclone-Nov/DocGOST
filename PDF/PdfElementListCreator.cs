@@ -187,10 +187,10 @@ namespace GostDOC.PDF
             aInDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
 
             // добавить таблицу с верхней дополнительной графой
-            //aInDoc.Add(CreateTopAppendGraph(PageSize, aGraphs));
+            aInDoc.Add(CreateTopAppendGraph(PageSize, aGraphs));
 
             // добавить таблицу с нижней дополнительной графой
-            //aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
 
             // добавить таблицу с данными
             int needNextPage = 0;
@@ -416,7 +416,31 @@ namespace GostDOC.PDF
             Table tbl = new Table(3);
             return tbl;
         }
-        
+
+        private static Cell ApplyAppendGraph(Cell c, string text) {
+            c.Add(
+                new Paragraph(text).
+                    SetFont(f1).
+                    SetFontSize(14).
+                    SetRotationAngle(DegreesToRadians(90)).
+                    SetFixedLeading(10).
+                    SetPadding(0).
+                    SetPaddingRight(-10).
+                    SetPaddingLeft(-10).
+                    SetMargin(0).
+                    SetItalic().
+                    SetWidth(60 * PdfDefines.mmA4).
+                    SetTextAlignment(TextAlignment.CENTER));
+
+            c.SetHorizontalAlignment(HorizontalAlignment.CENTER).
+             SetVerticalAlignment(VerticalAlignment.MIDDLE).
+             SetMargin(0).
+             SetPadding(0).
+             SetHeight(60 * PdfDefines.mmA4).
+             SetBorder(new SolidBorder(2));
+
+            return c;
+        }
 
         /// <summary>
         /// создать таблицу для верхней дополнительной графы
@@ -424,7 +448,17 @@ namespace GostDOC.PDF
         /// <returns></returns>
         private Table CreateTopAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs)
         {
-            Table tbl = new Table(3);
+            float[] columnSizes = {5 * PdfDefines.mmA4, 7 * PdfDefines.mmA4 };
+            Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
+            
+            var tmpCell = new Cell();
+            tbl.AddCell(ApplyAppendGraph(tmpCell, "Перв. примен."));
+            tbl.AddCell(new Cell());
+
+            tmpCell = new Cell();
+            tbl.AddCell(ApplyAppendGraph(tmpCell, "Справ. №"));
+            tbl.AddCell(new Cell());
+
             return tbl;
         }
 
@@ -434,7 +468,29 @@ namespace GostDOC.PDF
         /// <returns></returns>
         private Table CreateBottomAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs)
         {
-            Table tbl = new Table(3);
+            float[] columnSizes = {5 * PdfDefines.mmA4, 7 * PdfDefines.mmA4 };
+            Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
+
+            var tmpCell = new Cell();
+            tbl.AddCell(ApplyAppendGraph(tmpCell, "Подп. и дата"));
+            tbl.AddCell(new Cell());
+
+            tmpCell = new Cell();
+            tbl.AddCell(ApplyAppendGraph(tmpCell, "Инв. № дубл."));
+            tbl.AddCell(new Cell());
+            
+            tmpCell = new Cell();
+            tbl.AddCell(ApplyAppendGraph(tmpCell, "Взам. инв. №"));
+            tbl.AddCell(new Cell());
+            
+            tmpCell = new Cell();
+            tbl.AddCell(ApplyAppendGraph(tmpCell, "Подп. и дата"));
+            tbl.AddCell(new Cell());
+            
+            tmpCell = new Cell();
+            tbl.AddCell(ApplyAppendGraph(tmpCell, "Инв № подл."));
+            tbl.AddCell(new Cell());
+
             return tbl;
         }
                 
