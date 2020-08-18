@@ -370,6 +370,8 @@ namespace GostDOC.ViewModels
 
         private void UpdatePdf(object obj)
         {
+            if (_selectedItem == null)
+                return;
             var nodeType = _selectedItem.ParentType;
             if (nodeType == NodeType.Root)
                 nodeType = _selectedItem.NodeType;
