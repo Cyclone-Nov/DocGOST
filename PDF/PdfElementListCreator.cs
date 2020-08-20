@@ -258,57 +258,92 @@ namespace GostDOC.PDF
             Table cell2Table = new Table(UnitValue.CreatePointArray(new float[] {14 * PdfDefines.mmA4, 53 * PdfDefines.mmA4, 53 * PdfDefines.mmA4 }));
             cell2Table.SetMargin(0).SetPadding(0).UseAllAvailableWidth();            
             int columns = 3;
-            Cell cell = AddEmptyCell(1, 1).SetHeight(13 * PdfDefines.mmA4h);
-            for (int i = 0; i < columns; i++)
+            Cell cell = CreateEmptyCell(1, 1).SetHeight(13 * PdfDefines.mmA4h);
+            for (int i = 0; i < columns; i++) {
                 cell2Table.AddCell(cell.Clone(true)); // cell2_1 - cell2_3            
-            cell2Table.AddCell(AddEmptyCell(1, 3).SetHeight(7.5f * PdfDefines.mmA4h)); // cell 2_4
+            }
+            cell2Table.AddCell(CreateEmptyCell(1, 3).SetHeight(7.5f * PdfDefines.mmA4h)); // cell 2_4
             
-            Cell cell2 = AddEmptyCell(1, 1).SetMargin(0).SetPadding(-2f);            
+            Cell cell2 = CreateCellNoBorder(1, 1).SetMargin(0).SetPadding(-2f);            
             cell2.Add(cell2Table);            
             mainTable.AddCell(cell2);
             mainTable.StartNewRow();
             #endregion Cell 2
 
             #region Графы 14-18, не заполняются пока (Cell3, 5c х 3r)            
-            Table cell3Table = new Table(UnitValue.CreatePointArray(new float[] { 7 * PdfDefines.mmA4, 10 * PdfDefines.mmA4, 23.7f * PdfDefines.mmA4, 15f * PdfDefines.mmA4, 10 * PdfDefines.mmA4 }));
-            cell3Table.SetMargin(0).SetPadding(0).UseAllAvailableWidth();                                    
+
+            Table cell3Table =
+                new Table(UnitValue.CreatePointArray(new[] {
+                    7 * PdfDefines.mmA4,
+                    10 * PdfDefines.mmA4,
+                    23.7f * PdfDefines.mmA4,
+                    15f * PdfDefines.mmA4,
+                    10 * PdfDefines.mmA4
+                }));
+            cell3Table.SetMargin(0).SetPadding(0).UseAllAvailableWidth();
             columns = 5;
-            cell = AddEmptyCell(1, 1, 2, 2, 2, 1).SetMargin(0).SetHeight(4 * PdfDefines.mmA4);
-            for (int i = 0; i < columns; i++) // 1 row
+            cell =
+                CreateEmptyCell(1, 1, 2, 2, 2, 1).SetMargin(0).SetPadding(0).SetHeight(5 * PdfDefines.mmA4h);
+            for (int i = 0; i < columns; i++) {
+                // 1 row
                 cell3Table.AddCell(cell.Clone(false));
-            cell = AddEmptyCell(1, 1, 2, 2, 1, 2).SetMargin(0).SetHeight(4 * PdfDefines.mmA4);
-            for (int i = 0; i < columns; i++) // 2 row
+            }
+
+            cell =
+                CreateEmptyCell(1, 1, 2, 2, 1, 1).SetMargin(0).SetPadding(0).SetHeight(5 * PdfDefines.mmA4h);
+            for (int i = 0; i < columns; i++) {
+                // 2 row
                 cell3Table.AddCell(cell.Clone(false));
+            }
 
-            var textStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1);
-            cell = AddEmptyCell(1, 1).AddStyle(textStyle).SetFontSize(12).SetMargin(0).SetPaddings(-2,0,-2,0);
-            cell3Table.AddCell(cell.Clone(false).Add(new Paragraph("Изм.")));
-            cell3Table.AddCell(cell.Clone(false).Add(new Paragraph("Лист")));
-            cell3Table.AddCell(cell.Clone(false).Add(new Paragraph("№ докум.")));
-            cell3Table.AddCell(cell.Clone(false).Add(new Paragraph("Подп.")));
-            cell3Table.AddCell(cell.Clone(false).Add(new Paragraph("Дата")));          
+            var textStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1).SetFontSize(12);
 
-            Cell cell3 = AddEmptyCell(1, 1).SetMargins(0,0,0,0).SetPaddings(-2,-2,-2,-2).Add(cell3Table);
+            cell = CreateEmptyCell(1, 1, 2, 2, 1, 2).
+                SetMargin(0).
+                SetHeight(5 * PdfDefines.mmA4).
+                SetPadding(0).
+                AddStyle(textStyle);
+            cell3Table.AddCell(cell.Clone(false).Add(new Paragraph("Изм.").SetPaddingTop(-2)));
+            cell3Table.AddCell(cell.Clone(false).Add(new Paragraph("Лист").SetPaddingTop(-2)));
+            cell3Table.AddCell(cell.Clone(false).Add(new Paragraph("№ докум.").SetPaddingTop(-2)));
+            cell3Table.AddCell(cell.Clone(false).Add(new Paragraph("Подп.").SetPaddingTop(-2)));
+            cell3Table.AddCell(cell.Clone(false).Add(new Paragraph("Дата").SetPaddingTop(-2)));
+
+            Cell cell3 = CreateCellNoBorder(1, 1).
+//                SetMargins(0, 0, 0, 0).
+                SetPadding(-2).
+                Add(cell3Table);
             mainTable.AddCell(cell3);
+
             #endregion Cell 3 
 
             #region Заполнение графы 2 (Cell 4)
             string res = string.Empty;
-            if (aGraphs.TryGetValue(Common.Constants.GRAPH_2, out res))
-            res += Common.Converters.GetDocumentCode(Type);
+            if (aGraphs.TryGetValue(Common.Constants.GRAPH_2, out res)) {
+                res += Common.Converters.GetDocumentCode(Type);
+            }
             textStyle = new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFont(f1);
-            Cell cell4 = AddEmptyCell(1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetFontSize(20).SetHeight(13 * PdfDefines.mmA4h).SetPaddings(-2,0,-2,12);
+            Cell cell4 = CreateEmptyCell(1, 1).
+                Add(new Paragraph(res)).
+                AddStyle(textStyle).
+                SetFontSize(20).
+                SetPaddings(-2,0,-2,12);
             mainTable.AddCell(cell4);
             #endregion Cell 4             
 
             #region Заполнение граф 10-11, графы 12-13 не заполняются (Cell 5)
             textStyle = new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFontSize(12).SetFont(f1);
-            Table cell5Table = new Table(UnitValue.CreatePointArray(new float[] { 17.5f * PdfDefines.mmA4, 23 * PdfDefines.mmA4, 15 * PdfDefines.mmA4, 10 * PdfDefines.mmA4 }));
+            Table cell5Table = new Table(UnitValue.CreatePointArray(new[] { 17f * PdfDefines.mmA4, 23 * PdfDefines.mmA4, 15 * PdfDefines.mmA4, 10 * PdfDefines.mmA4 }));
             cell5Table.SetMargin(0).SetPadding(0).UseAllAvailableWidth();
             cell5Table.SetHorizontalAlignment(HorizontalAlignment.LEFT).SetVerticalAlignment(VerticalAlignment.TOP);
 
-            cell = AddEmptyCell(1, 1, 2, 2, 2, 1).AddStyle(textStyle).SetMargin(0).SetPaddings(-1, -2, -1, 2);
-            cell5Table.AddCell(cell.Clone(false).Add(new Paragraph("Разраб.")));
+            cell = CreateEmptyCell(1, 1, 2, 2, 0, 1).
+                SetMargin(0).
+                SetHeight(5 * PdfDefines.mmA4h).
+                SetPadding(0).
+                AddStyle(textStyle);
+
+            cell5Table.AddCell(cell.Clone(false).Add(new Paragraph("Разраб.").SetPaddingBottom(-2)));
             res = string.Empty;
             if (!aGraphs.TryGetValue(Common.Constants.GRAPH_11bl_dev, out res))
                 res = string.Empty;//TODO: log не удалось распарсить;
@@ -316,8 +351,13 @@ namespace GostDOC.PDF
             cell5Table.AddCell(cell.Clone(false));
             cell5Table.AddCell(cell.Clone(false));
 
-            cell = AddEmptyCell(1, 1, 2, 2, 1, 1).AddStyle(textStyle).SetMargin(0).SetPaddings(-1, 0, -1, 2);
-            cell5Table.AddCell(cell.Clone(false).Add(new Paragraph("Пров.")));
+            cell = CreateEmptyCell(1, 1, 2, 2, 1, 1).
+                SetMargin(0).
+                SetPadding(0).
+                SetHeight(5 * PdfDefines.mmA4h)
+                .AddStyle(textStyle);
+
+            cell5Table.AddCell(cell.Clone(false).Add(new Paragraph("Пров.").SetPaddingBottom(-2)));
             if (!aGraphs.TryGetValue(Common.Constants.GRAPH_11bl_chk, out res))
                 res = string.Empty;//TODO: log не удалось распарсить;
             cell5Table.AddCell(cell.Clone(false).Add(new Paragraph(res)));
@@ -327,7 +367,7 @@ namespace GostDOC.PDF
                         
             if (!aGraphs.TryGetValue(Common.Constants.GRAPH_10, out res))
                 res = "";//TODO: log не удалось распарсить;
-            cell5Table.AddCell(cell.Clone(true).Add(new Paragraph("X")));            
+            cell5Table.AddCell(cell.Clone(true)); //.Add(new Paragraph("X")));            
             if(!aGraphs.TryGetValue(Common.Constants.GRAPH_11app, out res))
                 res = string.Empty;//TODO: log не удалось распарсить;
             cell5Table.AddCell(cell.Clone(true).Add(new Paragraph(res)));
@@ -335,41 +375,58 @@ namespace GostDOC.PDF
             cell5Table.AddCell(cell.Clone(true));
             cell5Table.StartNewRow();
 
-            cell5Table.AddCell(cell.Clone(false).Add(new Paragraph("Н. контр.")));            
+            cell5Table.AddCell(cell.Clone(false).Add(new Paragraph("Н. контр.").SetPaddingBottom(-2)));            
             if(!aGraphs.TryGetValue(Common.Constants.GRAPH_11norm, out res))
                 res = string.Empty;//TODO: log не удалось распарсить;
             cell5Table.AddCell(cell.Clone(false).Add(new Paragraph(res)));
             cell5Table.AddCell(cell.Clone(false));
             cell5Table.AddCell(cell.Clone(false));
 
-            cell = AddEmptyCell(1, 1, 2, 2, 1, 2).AddStyle(textStyle).SetMargin(0).SetPaddings(-1, -2, -1, 2);
-            cell5Table.AddCell(cell.Clone(false).Add(new Paragraph("Утв.")));            
-            if(!aGraphs.TryGetValue(Common.Constants.GRAPH_11affirm, out res))
-                res = string.Empty;//TODO: log не удалось распарсить;
+            cell = CreateEmptyCell(1, 1, 2, 2, 1, 2).
+                AddStyle(textStyle).
+                SetMargin(0).
+                SetHeight(5 * PdfDefines.mmA4h).
+                SetPadding(0);
+            cell5Table.AddCell(cell.Clone(false).Add(new Paragraph("Утв.").SetPaddingBottom(-2)));
+            if (!aGraphs.TryGetValue(Common.Constants.GRAPH_11affirm, out res)) {
+                res = string.Empty; //TODO: log не удалось распарсить;
+            }
+
             cell5Table.AddCell(cell.Clone(false).Add(new Paragraph(res)));
             cell5Table.AddCell(cell.Clone(false));
             cell5Table.AddCell(cell.Clone(false));
 
-            Cell cell5 = AddEmptyCell(1, 1).SetMargin(0).SetPaddings(-2,-2,-2,-2).Add(cell5Table).SetHeight(30 * PdfDefines.mmA4);
+            Cell cell5 =
+                CreateCellNoBorder(1, 1).
+                    SetPaddings(-4, -2,0,-2).
+                    Add(cell5Table);
             mainTable.AddCell(cell5);
             #endregion Cell 5
 
             #region Заполнение граф 1, 4, 7, 8. Графа 9 не заполняется (Cell 6)
-            Table cell6Table = new Table(UnitValue.CreatePointArray(new float[] { 70 * PdfDefines.mmA4, 50 * PdfDefines.mmA4 }));
+            Table cell6Table = new Table(UnitValue.CreatePointArray(new[] { 70 * PdfDefines.mmA4, 50 * PdfDefines.mmA4 }));
             cell6Table.SetMargin(0).SetPadding(0).UseAllAvailableWidth();
             
-            textStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1);            
-            if(!aGraphs.TryGetValue(Constants.GRAPH_1, out res))
-                res = string.Empty;//TODO: log не удалось распарсить;
-            cell6Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph(res)).AddStyle(textStyle).SetFontSize(16).SetMargin(0).SetPadding(-2));
-            
-            Table cell6_2Table = new Table(UnitValue.CreatePointArray(new float[] { 5 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 15 * PdfDefines.mmA4, 20 * PdfDefines.mmA4 }));
-            cell6_2Table.SetMargin(0).SetPadding(0).UseAllAvailableWidth();            
-            cell6_2Table.AddCell(AddEmptyCell(1, 3).Add(new Paragraph("Лит.").AddStyle(textStyle).SetFontSize(12)).SetMargin(0).SetPaddings(-2,0, -2,0));
-            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Лист").AddStyle(textStyle).SetFontSize(12)).SetMargin(0).SetPaddings(-2, 0, -2, 0));
-            cell6_2Table.AddCell(AddEmptyCell(1, 1).Add(new Paragraph("Листов").AddStyle(textStyle).SetFontSize(12)).SetMargin(0).SetPaddings(-2, 0, -2, 0));
+            textStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1);
+            if (!aGraphs.TryGetValue(Constants.GRAPH_1, out res)) {
+                res = string.Empty; //TODO: log не удалось распарсить;
+            }
 
-            cell = AddEmptyCell(1, 1).AddStyle(textStyle).SetFontSize(12).SetMargin(0).SetPaddings(-2, 0, -2, 0);
+            cell6Table.AddCell(
+                CreateEmptyCell(1, 1).
+                    Add(new Paragraph(res)).
+                    AddStyle(textStyle).
+                    SetMargin(0).
+                    SetPadding(-2));
+
+            #region граф 4, 7, 8
+            Table cell6_2Table = new Table(UnitValue.CreatePointArray(new float[] { 5 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 15 * PdfDefines.mmA4, 20 * PdfDefines.mmA4 }));
+            cell6_2Table.SetMargin(0).SetPadding(-2).UseAllAvailableWidth();            
+            cell6_2Table.AddCell(CreateEmptyCell(1, 3).Add(new Paragraph("Лит.").AddStyle(textStyle).SetFontSize(12)).SetMargin(0).SetPaddings(-2,0, -2,0));
+            cell6_2Table.AddCell(CreateEmptyCell(1, 1).Add(new Paragraph("Лист").AddStyle(textStyle).SetFontSize(12)).SetMargin(0).SetPaddings(-2, 0, -2, 0));
+            cell6_2Table.AddCell(CreateEmptyCell(1, 1).Add(new Paragraph("Листов").AddStyle(textStyle).SetFontSize(12)).SetMargin(0).SetPaddings(-2, 0, -2, 0));
+
+            cell = CreateEmptyCell(1, 1).AddStyle(textStyle).SetFontSize(12).SetMargin(0).SetPaddings(-2, 0, -2, 0);
             if (!aGraphs.TryGetValue(Constants.GRAPH_4, out res))
                 res = string.Empty;//TODO: log не удалось распарсить;
             cell6_2Table.AddCell(cell.Clone(false).Add(new Paragraph(res)));            
@@ -382,17 +439,22 @@ namespace GostDOC.PDF
 
             cell6_2Table.AddCell(cell.Clone(false).Add(new Paragraph("1")));
             cell6_2Table.AddCell(cell.Clone(false).Add(new Paragraph("")));
-            cell6_2Table.AddCell(AddEmptyCell(3, 5).SetMargin(0).SetPaddings(-2,0,-2,0).SetHeight(19 * PdfDefines.mmA4));
+            cell6_2Table.AddCell(CreateEmptyCell(3, 5).SetMargin(0).SetPaddings(-2,0,-2,0).SetHeight(19 * PdfDefines.mmA4h));
 
-            Cell cell6_2 = AddEmptyCell(1, 1).SetPadding(-2).SetMargin(0).Add(cell6_2Table);
+            Cell cell6_2 = CreateCellNoBorder(1, 1).SetPadding(-2).SetMargin(0).Add(cell6_2Table);
             cell6Table.AddCell(cell6_2);
+            #endregion
 
-            Cell cell6 = AddEmptyCell(1, 1).SetPadding(-2).SetMargin(0).Add(cell6Table);
+            Cell cell6 = CreateCellNoBorder(1, 1).
+                SetPaddings(-2, 0, 0, 0).
+                SetMargin(0).
+                Add(cell6Table);
             mainTable.AddCell(cell6);
             #endregion Cell 6
 
-            mainTable.SetFixedPosition(20 * PdfDefines.mmA4 - 2, 5 * PdfDefines.mmA4, 185 * PdfDefines.mmA4);
+            mainTable.SetFixedPosition(20 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 185 * PdfDefines.mmA4);
 
+            #region what is it
             // отрисовать таблицу в конкретном месте документа
             // PageSize ps = pdfDoc.getDefaultPageSize();
             //mainTable.setFixedPosition(ps.getWidth() - doc.getRightMargin() - totalWidth, ps.getHeight() - doc.getTopMargin() - totalHeight, totalWidth);
@@ -401,7 +463,7 @@ namespace GostDOC.PDF
             //LayoutResult tableLayoutResult =
             //        tableRenderer.layout(new LayoutContext(new LayoutArea(0, new Rectangle(ps.getWidth(), 1000))));
             //float totalHeight = tableLayoutResult.getOccupiedArea().getBBox().getHeight();
-
+            #endregion
 
             return mainTable;
         }
@@ -835,24 +897,23 @@ namespace GostDOC.PDF
              .SetBorder(new SolidBorder(2));
         }
 
-        private Cell AddEmptyCell(int rowspan, int colspan)
+        private Cell CreateCellNoBorder(int rowspan, int colspan)
         {
             Cell cell = new Cell(rowspan, colspan);
-            cell.SetVerticalAlignment(VerticalAlignment.MIDDLE).
-                 SetHorizontalAlignment(HorizontalAlignment.CENTER).
-                 SetBorder(new SolidBorder(2));            
+            cell.SetVerticalAlignment(VerticalAlignment.MIDDLE).SetHorizontalAlignment(HorizontalAlignment.CENTER).SetBorder(Border.NO_BORDER);
             return cell;
         }
 
-        private Cell AddEmptyCell(int aRowspan, int aColspan, int aLeftBorder = 2, int aRightBorder = 2, int aTopBorder = 2, int aBottomBorder = 2)
+        private Cell CreateEmptyCell(int aRowspan, int aColspan, int aLeftBorder = 2, int aRightBorder = 2, int aTopBorder = 2, int aBottomBorder = 2)
         {
             Cell cell = new Cell(aRowspan, aColspan);
-            cell.SetVerticalAlignment(VerticalAlignment.MIDDLE).
-                 SetHorizontalAlignment(HorizontalAlignment.CENTER).
-                 SetBorderLeft(new SolidBorder(aLeftBorder)).
-                 SetBorderRight(new SolidBorder(aRightBorder)).
-                 SetBorderTop(new SolidBorder(aTopBorder)).
-                 SetBorderBottom(new SolidBorder(aBottomBorder));
+            cell.SetVerticalAlignment(VerticalAlignment.MIDDLE).SetHorizontalAlignment(HorizontalAlignment.CENTER);
+
+            cell.SetBorderBottom(aBottomBorder == 0 ? Border.NO_BORDER : new SolidBorder(aBottomBorder));
+            cell.SetBorderTop(aTopBorder == 0 ? Border.NO_BORDER : new SolidBorder(aTopBorder));
+            cell.SetBorderLeft(aLeftBorder == 0 ? Border.NO_BORDER : new SolidBorder(aLeftBorder));
+            cell.SetBorderRight(aRightBorder == 0 ? Border.NO_BORDER : new SolidBorder(aRightBorder));
+
             return cell;
         }
 
