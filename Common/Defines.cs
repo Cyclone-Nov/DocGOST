@@ -26,6 +26,7 @@ namespace GostDOC.Common
         SpOthers,               // Спецификация: "Прочие изделия"
         SpKits,                 // Спецификация: "Комплекты"
         Name,                   // По алфавиту по тегу "Наименование"
+        DesignatorID,           // Перечень элементов: сортировка по значению "Позиционное обозначение"
         None
     }
 
@@ -194,17 +195,44 @@ namespace GostDOC.Common
         /// название графы №25 Первичное применение изделия в структуре xml
         /// </summary>
         public static readonly string GRAPH_25 = "Перв. примен";
-        
 
+        /// <summary>
+        /// компоненты, не вошедшие ни в одной группу
+        /// </summary>
         public static readonly string DefaultGroupName = "Без группы";
+        /// <summary>
+        /// раздел "Документация" для спецификации
+        /// </summary>
         public static readonly string GroupDoc = "Документация";
+        /// <summary>
+        /// раздел "Комплексы" для спецификации
+        /// </summary>
         public static readonly string GroupComplex = "Комплексы";
+        /// <summary>
+        /// раздел "Сборочные единицы" для спецификации
+        /// </summary>
         public static readonly string GroupAssemblyUnits = "Сборочные единицы";
+        /// <summary>
+        /// раздел "Детали" для спецификации
+        /// </summary>
         public static readonly string GroupDetails = "Детали";
+        /// <summary>
+        /// раздел "Стандартные изделия" для спецификации
+        /// </summary>
         public static readonly string GroupStandard = "Стандартные изделия";
+        /// <summary>
+        /// раздел "Прочие изделия" для спецификации
+        /// </summary>
         public static readonly string GroupOthers = "Прочие изделия";
+        /// <summary>
+        /// раздел "Материалы" для спецификации
+        /// </summary>
         public static readonly string GroupMaterials = "Материалы";
+        /// <summary>
+        /// раздел "Комплекты" для спецификации
+        /// </summary>
         public static readonly string GroupKits = "Комплекты";
+
 
         public static readonly string GroupNameSp = "Раздел СП";
         public static readonly string SubGroupNameSp = "Подраздел СП";
@@ -215,6 +243,7 @@ namespace GostDOC.Common
         public static readonly string ComponentProductCode = "Код продукции";
         public static readonly string ComponentFormat = "Формат";
         public static readonly string ComponentDoc = "Документ на поставку";
+        public static readonly string ComponentType = "Тип";
         public static readonly string ComponentSupplier = "Поставщик";
         public static readonly string ComponentCountDev = "Количество на изд.";
         public static readonly string ComponentCountSet = "Количество в комп.";
@@ -223,6 +252,11 @@ namespace GostDOC.Common
         public static readonly string ComponentSign = "Обозначение";
         public static readonly string ComponentWhereIncluded = "Куда входит";
         public static readonly string ComponentDesignatiorID = "Позиционное обозначение";
+
+        public static readonly string ColumnPosition = "Position";
+        public static readonly string ColumnName = "Name";
+        public static readonly string ColumnQuantity = "Quantity";
+        public static readonly string ColumnFootnote = "Footnote";
 
         public static readonly string GraphCommentsSp = "Комментарии СП";
         public static readonly string GraphCommentsB = "Комментарии ВП";

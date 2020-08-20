@@ -17,6 +17,7 @@ using GostDOC.Common;
 using iText.Kernel.Pdf.Canvas;
 using GostDOC.Models;
 using System.Data;
+using System.ComponentModel;
 
 namespace GostDOC.PDF
 {
@@ -68,10 +69,10 @@ namespace GostDOC.PDF
             pdfDoc.SetDefaultPageSize(PageSize);
             doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), true);
 
-            int next = AddFirstPage(doc, mainConfig.Graphs, dataTable);
-            while (next > 0)
+            int lastProcessedRow = AddFirstPage(doc, mainConfig.Graphs, dataTable);
+            while (lastProcessedRow > 0)
             {
-                next = AddNextPage(doc, mainConfig.Graphs, dataTable);
+                lastProcessedRow = AddNextPage(doc, mainConfig.Graphs, dataTable, lastProcessedRow);
             }
 
             if (pdfDoc.GetNumberOfPages() > 2)
@@ -82,12 +83,289 @@ namespace GostDOC.PDF
             doc.Close();            
         }
 
-
-        private DataTable CreateDataTable( IDictionary<string, Group> aData)
+        /// <summary>
+        /// формирование таблицы данных
+        /// </summary>
+        /// <param name="aData"></param>
+        /// <returns></returns>
+        private DataTable CreateDataTable(IDictionary<string, Group> aData)
         {
-            DataTable table = new DataTable();
+            // только компоненты из раздела "Прочие изделия"
+            Group others;
+            if (aData.TryGetValue(Constants.GroupOthers, out others))
+            {
+                DataTable table = CreateElementListDataTable("ElementListData");                
+                var mainсomponents = others.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
+
+                AddEmptyRow(table);
+                FillDataTable(table, "" ,mainсomponents);
+                
+                foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key))
+                {
+                    // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
+                    var сomponents = subgroup.Value.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
+                    FillDataTable(table, subgroup.Value.Name, сomponents);
+                }
+
+                return table;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// создание таблицы данных для документа Перечень элементов
+        /// </summary>
+        /// <param name="aDataTableName"></param>
+        /// <returns></returns>
+        private DataTable CreateElementListDataTable(string aDataTableName)
+        {
+            DataTable table = new DataTable(aDataTableName);
+            DataColumn column = new DataColumn("id", System.Type.GetType("System.Int32"));            
+            column.Unique = true;
+            column.AutoIncrement = true;                        
+            column.Caption = "id";
+            table.Columns.Add(column);
+            table.PrimaryKey = new DataColumn[] { column };
+
+            column = new DataColumn(Constants.ColumnPosition, System.Type.GetType("System.String"));
+            column.Unique = false;
+            column.Caption = "Поз. обозначение";
+            column.AllowDBNull = true;
+            table.Columns.Add(column);            
+
+            column = new DataColumn(Constants.ColumnName, System.Type.GetType("System.String"));
+            column.Unique = false;
+            column.Caption = "Наименование";
+            column.AllowDBNull = true;
+            table.Columns.Add(column);            
+
+            column = new DataColumn(Constants.ColumnQuantity, System.Type.GetType("System.Int32"));
+            column.Unique = false;
+            column.Caption = "Кол.";
+            column.AllowDBNull = true;
+            table.Columns.Add(column);
+
+            column = new DataColumn(Constants.ColumnFootnote, System.Type.GetType("System.String"));
+            column.Unique = false;
+            column.Caption = "Примечание";
+            column.AllowDBNull = true;
+            table.Columns.Add(column);
 
             return table;
+        }
+
+        /// <summary>
+        /// заполнить таблицу данных
+        /// </summary>
+        /// <param name="aTable"></param>
+        /// <param name="aGroupName"></param>
+        /// <param name="aComponents"></param>
+        private void FillDataTable(DataTable aTable, string aGroupName,IEnumerable<Models.Component> aComponents)
+        {            
+            // записываем компоненты в таблицу данных
+            if (aComponents.Count() > 0)
+            {
+                //Cортировка компонентов по значению свойства "Позиционное обозначение"
+                Models.Component[] sortComponents = SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();
+                // для признаков составления наименования для данного компонента
+                int[] HasStandardDoc;
+
+                //ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем номера компонентов с совпадающим значением                
+                Dictionary<string /* GOST/TY string*/, List<int> /* array indexes */> StandardDic = FindComponentsWithStandardDoc(sortComponents, out HasStandardDoc);
+
+                // записываем наименование группы, если есть
+                AddGroupName(aTable, aGroupName);
+
+                // записываем строки с гост/ту в начале таблицы, если они есть для нескольких компонентов
+                AddStandardDocsToTable(aGroupName, sortComponents, aTable, StandardDic);
+                // AddEmptyRow(aTable);
+
+                //записываем таблицу данных объединяя подрядидущие компоненты с одинаковым наименованием    
+                DataRow row;
+                for (int i = 0; i < sortComponents.Length;)
+                {
+                    var component = sortComponents[i];
+                    string component_name = GetComponentName(HasStandardDoc[i] == 1, component);
+                    int component_count = GetComponentCount(component.GetProperty(Constants.ComponentCountDev));                    
+                    List<string> component_designators = new List<string> { component.GetProperty(Constants.ComponentDesignatiorID) };
+                    
+                    bool same;
+                    int j = i + 1;
+                    if (j < sortComponents.Length)
+                    {
+                        do
+                        {
+                            var componentNext = sortComponents[j];
+                            string componentNext_name = GetComponentName(HasStandardDoc[j] == 1, componentNext);
+
+                            if (string.Equals(component_name, componentNext_name))
+                            {
+                                same = true;
+                                component_count += GetComponentCount(componentNext.GetProperty(Constants.ComponentCountDev));
+                                j++;
+                            }
+                            else
+                                same = false;
+
+                        } while (same && j < sortComponents.Length);
+                    }
+                    i = j;
+
+                    string component_designator = MakeComponentDesignatorsString(component_designators);    
+
+                    row = aTable.NewRow();
+                    row[Constants.ColumnPosition] = component_designator;
+                    row[Constants.ColumnName] = component_name;
+                    row[Constants.ColumnQuantity] = component_count;
+                    row[Constants.ColumnFootnote] = component.GetProperty(Constants.ComponentNote);
+                    aTable.Rows.Add(row);
+                }
+                
+                AddEmptyRow(aTable);
+                aTable.AcceptChanges();
+            }
+        }
+
+        /// <summary>
+        /// поиск компонент с наличием ТУ/ГОСТ в свойстве "Документ на поставку", заполнение словаря с индексами найденных компонент для
+        /// значения "Документ на поставку" и сохранение номера компонентов с совпадающим значением                
+        /// </summary>
+        /// <param name="aComponents">отсортированный массив компонентов</param>
+        /// <param name="aHasStandardDoc">массив компонентов с отметками о наличии стандартных документов и объединения в группы</param>
+        /// <returns></returns>
+        private Dictionary<string, List<int>> FindComponentsWithStandardDoc(Models.Component[] aComponents, out int[] aHasStandardDoc)
+        {
+            Dictionary<string, List<int>> StandardDic = new Dictionary<string, List<int>>();
+            aHasStandardDoc = new int[aComponents.Length];
+
+            for (int i = 0; i < aComponents.Length; i++)
+            {
+                string docToSupply = aComponents[i].GetProperty(Constants.ComponentDoc);
+                if (string.Equals(docToSupply.Substring(0, 4).ToLower(), "гост") ||
+                    string.Equals(docToSupply.Substring(docToSupply.Length - 2, 2).ToLower(), "ту"))
+                {
+                    List<int> list;
+                    if (StandardDic.TryGetValue(docToSupply, out list))
+                    {
+                        if (list.Count == 1)
+                        {
+                            aHasStandardDoc[list.First()] = 2;
+                        }
+                        list.Add(i);
+                        aHasStandardDoc[i] = 2;
+                    }
+                    else
+                    {
+                        list = new List<int> { i };
+                        aHasStandardDoc[i] = 1;
+                        StandardDic.Add(docToSupply, list);
+                    }
+                }
+            }
+
+            return StandardDic;
+        }
+
+        /// <summary>
+        /// добавить пустую строку в таблицу данных
+        /// </summary>
+        /// <param name="aTable"></param>
+        private void AddEmptyRow(DataTable aTable)
+        {            
+            DataRow row = aTable.NewRow();
+            row[Constants.ColumnName] = string.Empty;
+            row[Constants.ColumnPosition] = string.Empty;
+            row[Constants.ColumnQuantity] = 0;
+            row[Constants.ColumnFootnote] = string.Empty;
+            aTable.Rows.Add(row);
+        }
+
+        /// <summary>
+        /// добавить имя группы в таблицу
+        /// </summary>
+        /// <param name="aTable"></param>
+        /// <param name="aGroupName"></param>
+        private void AddGroupName(DataTable aTable, string aGroupName)
+        {
+            if (!string.IsNullOrEmpty(aGroupName))
+            {
+                DataRow row = aTable.NewRow();
+                row[Constants.ColumnName] = aGroupName;
+                aTable.Rows.Add(row);
+            }
+        }
+
+        /// <summary>
+        /// добавить в таблиц данных стандартные документы на поставку при наличии перед перечнем компонентов
+        /// </summary>
+        /// <param name="aGroupName">имя группы</param>
+        /// <param name="aComponents">список компонентов</param>
+        /// <param name="aTable">таблица данных</param>
+        /// <param name="aStandardDic">словарь со стандартными документами на поставку</param>
+        private void AddStandardDocsToTable(string aGroupName, Models.Component[] aComponents, DataTable aTable, Dictionary<string, List<int>> aStandardDic)
+        {
+            DataRow row;
+            foreach (var item in aStandardDic)
+            {
+                if (item.Value.Count() > 1)
+                {
+                    row = aTable.NewRow();
+                    var index = item.Value.First();
+                    string name = $"{aGroupName} {aComponents[index].GetProperty(Constants.ComponentType)} {item.Key}";
+                    row[Constants.ColumnName] = name;
+                    aTable.Rows.Add(row);
+                }
+            }
+        }
+
+        /// <summary>
+        /// получить имя компонента для столбца "Наименование"
+        /// </summary>
+        /// <param name="aHasStandardDoc">признак наличия ГОСТ/ТУ символов в документе на поставку</param>
+        /// <param name="component">компонент</param>
+        /// <returns></returns>
+        private string GetComponentName(bool aHasStandardDoc, Models.Component component)
+        {
+            return (aHasStandardDoc) ? $"{component.GetProperty(Constants.ComponentName)} {component.GetProperty(Constants.ComponentDoc)}" 
+                                     : component.GetProperty(Constants.ComponentName);
+        }
+
+        /// <summary>
+        /// получить количество компонентов
+        /// </summary>
+        /// <param name="aCountStr"></param>
+        /// <returns></returns>
+        private int GetComponentCount(string aCountStr)
+        {
+            int count = 1;
+            if (!string.IsNullOrEmpty(aCountStr))
+            {
+                if (!Int32.TryParse(aCountStr, out count))
+                {
+                    count = 1;
+                    //throw new Exception($"Не удалось распарсить значение свойства \"Количество на изд.\" для компонента с именем {component_name}");
+                }
+            }
+            return count;
+        }
+
+        /// <summary>
+        /// составить строку для столбца "Поз. обозначение"
+        /// </summary>
+        /// <param name="aDesignators">список позиционных обозначений всех индентичных элементов</param>
+        /// <returns></returns>
+        private string MakeComponentDesignatorsString(List<string> aDesignators)
+        {
+            string designator = string.Empty;
+            if (aDesignators.Count() == 1)
+                designator = aDesignators.First();
+            else if (aDesignators.Count() == 2)
+                designator = $"{aDesignators.First()},{aDesignators.Last()}";
+            else
+                designator = $"{aDesignators.First()} - {aDesignators.Last()}";
+
+            return designator;
         }
 
         /// <summary>
@@ -182,7 +460,11 @@ namespace GostDOC.PDF
         internal override int AddFirstPage(iText.Layout.Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData)
         {
             SetPageMargins(aInDoc);
-            
+
+            int lastProcessedRow = 0;
+            // добавить таблицу с данными
+            aInDoc.Add(CreateDataTable(aData, true, 0, out lastProcessedRow));
+
             // добавить таблицу с основной надписью для первой старницы
             aInDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
 
@@ -191,13 +473,9 @@ namespace GostDOC.PDF
 
             // добавить таблицу с нижней дополнительной графой
             aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+                        
 
-            // добавить таблицу с данными
-            int needNextPage = 0;
-            
-            //aInDoc.Add(CreateDataTable(aGroups, out needNextPage));
-
-            return needNextPage;
+            return lastProcessedRow;
         }
 
         /// <summary>
@@ -205,12 +483,26 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData)
-        {
-            int row = 0;
+        internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aStartRow)
+        {            
             aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
-            return row;
+            SetPageMargins(aInPdfDoc);
+
+            // добавить таблицу с основной надписью для последуюших старницы
+            aInPdfDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
+
+            // добавить таблицу с верхней дополнительной графой
+            aInPdfDoc.Add(CreateTopAppendGraph(PageSize, aGraphs));
+
+            // добавить таблицу с нижней дополнительной графой
+            aInPdfDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+
+            // добавить таблицу с данными
+            int lastNextProcessedRow;
+            aInPdfDoc.Add(CreateDataTable(aData, false, aStartRow, out lastNextProcessedRow));
+
+            return lastNextProcessedRow;
         }
 
 
@@ -493,7 +785,136 @@ namespace GostDOC.PDF
 
             return tbl;
         }
-                
+
+        /// <summary>
+        /// создание таблицы данных
+        /// </summary>
+        /// <param name="aData">таблица данных</param>
+        /// <param name="firstPage">признак первой или последующих страниц</param>
+        /// <param name="aStartRow">строка таблицы данных с которой надо начинать запись в PDF страницу</param>
+        /// <param name="outLastProcessedRow">последняя обработанная строка таблицы данных</param>
+        /// <returns></returns>
+        private Table CreateDataTable(DataTable aData, bool firstPage, int aStartRow, out int outLastProcessedRow)
+        {            
+            float[] columnSizes = { 20 * PdfDefines.mmA4, 110 * PdfDefines.mmA4, 10 * PdfDefines.mmA4, 45 * PdfDefines.mmA4 };
+            Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
+            tbl.SetMargin(0).SetPadding(0);
+
+            // add header
+            var headerTextStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1).SetFontSize(16);
+            Cell cell = AddEmptyCell(1, 1).AddStyle(headerTextStyle).SetMargin(0).SetPaddings(-2, -2, -2, -2).SetHeight(15 * PdfDefines.mmA4h);            
+            tbl.AddHeaderCell(cell.Clone(false).Add(new Paragraph("Поз. обозначение")));
+            tbl.AddHeaderCell(cell.Clone(false).Add(new Paragraph("Наименование")));
+            tbl.AddHeaderCell(cell.Clone(false).Add(new Paragraph("Кол.")));
+            tbl.AddHeaderCell(cell.Clone(false).Add(new Paragraph("Примечание")));
+
+            // fill table
+            Cell groupCell = AddEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 0).SetHeight(8* PdfDefines.mmA4h).
+                                                            SetTextAlignment(TextAlignment.CENTER).SetItalic().SetBold().SetUnderline().SetFont(f1).SetFontSize(14);
+            Cell mainCell = AddEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 0).SetHeight(8 * PdfDefines.mmA4h).
+                                                           SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFont(f1).SetFontSize(14);
+            //UnitValue uFontSize = mainCell.GetProperty<UnitValue>(24); // 24 - index for FontSize property
+            //float fontSize = uFontSize.GetValue();
+            float fontSize = 14;
+            PdfFont font = mainCell.GetProperty<PdfFont>(20); // 20 - index for Font property
+
+            int remainingPdfTabeRows = (firstPage) ? CountStringsOnFirstPage : CountStringsOnNextPage;
+            outLastProcessedRow = aStartRow;            
+
+            foreach (DataRow row in aData.Rows)
+            {
+                string position = (row[Constants.ColumnPosition] == System.DBNull.Value) ? string.Empty : (string)row[Constants.ColumnPosition];
+                string name = (row[Constants.ColumnName] == System.DBNull.Value) ? string.Empty : (string)row[Constants.ColumnName];
+                int quantity = (row[Constants.ColumnQuantity] == System.DBNull.Value) ? 0 : (int)row[Constants.ColumnQuantity];
+                string note = (row[Constants.ColumnFootnote] == System.DBNull.Value) ? string.Empty : (string)row[Constants.ColumnFootnote];
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    // это пустая строка   
+                    AddEmptyRowToPdfTable(tbl,1, 4, mainCell);
+                    remainingPdfTabeRows--;                    
+                }
+                else if (string.IsNullOrEmpty(position))
+                {
+                    // это наименование группы
+                    if (remainingPdfTabeRows > 4) // если есть место для записи более 4 строк то записываем группу, иначе выходим
+                    {
+                        tbl.AddCell(mainCell.Clone(false));
+                        tbl.AddCell(groupCell.Clone(true).Add(new Paragraph(name)));
+                        tbl.AddCell(mainCell.Clone(false));
+                        tbl.AddCell(mainCell.Clone(false));
+                        remainingPdfTabeRows--;
+                    }
+                    else
+                        break;
+                }
+                else
+                {
+                    // оценим длину наименования
+                    string[] namestrings = GetNameStrings(110 * PdfDefines.mmA4, fontSize, font, name).ToArray();
+                    if (namestrings.Length <= remainingPdfTabeRows)
+                    {
+                        tbl.AddCell(mainCell.Clone(false).Add(new Paragraph(position)));
+                        tbl.AddCell(mainCell.Clone(false).Add(new Paragraph(namestrings[0])));
+                        tbl.AddCell(mainCell.Clone(false).Add(new Paragraph(quantity.ToString())));
+                        tbl.AddCell(mainCell.Clone(false).Add(new Paragraph(note)));
+                        remainingPdfTabeRows--;
+
+                        if (namestrings.Length > 1)
+                        {
+                            for (int i = 1; i < namestrings.Length; i++)
+                            {
+                                tbl.AddCell(mainCell.Clone(false));
+                                tbl.AddCell(mainCell.Clone(false).Add(new Paragraph(namestrings[i])));
+                                tbl.AddCell(mainCell.Clone(false));
+                                tbl.AddCell(mainCell.Clone(false));
+                                remainingPdfTabeRows--;
+                            }
+                        }
+                    }
+                    else
+                        break;
+                }
+                outLastProcessedRow++;
+            }
+
+            // дополним таблицу пустыми строками если она не полностью заполнена
+            if (remainingPdfTabeRows > 0)
+            {
+                AddEmptyRowToPdfTable(tbl, remainingPdfTabeRows, 4, mainCell, true);
+            }
+
+            if(outLastProcessedRow == aData.Rows.Count)
+            {
+                outLastProcessedRow = 0;
+            }
+
+            tbl.SetFixedPosition(20 * PdfDefines.mmA4, 77 * PdfDefines.mmA4, 185 * PdfDefines.mmA4);
+
+            return tbl;
+        }
+
+        /// <summary>
+        /// добавить пустые строки в таблицу PDF
+        /// </summary>
+        /// <param name="aTable">таблица PDF</param>
+        /// <param name="aRows">количество пустых строк которые надо добавить</param>
+        /// <param name="aColumns">количество столбцов в таблице</param>
+        /// <param name="aTemplateCell">шаблон ячейки</param>
+        /// <param name="aLastRowIsFinal">признак, что последняя строка - это последняя строка таблицы</param>
+        private void AddEmptyRowToPdfTable(Table aTable, int aRows, int aColumns, Cell aTemplateCell, bool aLastRowIsFinal = false)
+        {
+            int bodyRowsCnt = aRows - 1;
+            for (int i = 0; i < bodyRowsCnt*aColumns; i++)
+            {
+                aTable.AddCell(aTemplateCell.Clone(false));
+            }
+
+            int borderWidth = (aLastRowIsFinal) ? 2 : 1;
+            for (int i = 0; i < aColumns;i++)
+                aTable.AddCell(aTemplateCell.Clone(false).SetBorderBottom(new SolidBorder(borderWidth)));
+        }
+
 
         /// <summary>
         /// добавить ячейку со строковым значеним в таблицу
@@ -530,288 +951,6 @@ namespace GostDOC.PDF
             cell.SetFont(font);
             return cell;
         }
-
-       
-        /// <summary>
-        /// Добавить верхнюю дополнительную графу
-        /// </summary>
-        /// <param name="aFirstApp">значение для первичного применения</param>
-        /// <param name="aRefNumber">значение для справочного номера</param>
-        /// <returns></returns>
-        private Table AddTopAppendGraph(string aFirstApp, string aRefNumber)
-        {
-            float[] columnWidths = { 0.6f, 1.1f};
-            Table table =
-                new Table(UnitValue.CreatePercentArray(columnWidths)).UseAllAvailableWidth(); //.SetHeight(A4Height);
-
-            table.SetBorderBottom(new SolidBorder(2));
-            iText.Layout.Style italicHeaderStyle = new Style();
-            italicHeaderStyle.SetFont(f1).SetItalic().SetFontSize(14);
-            iText.Layout.Style verticalCellStyle = new Style();
-            verticalCellStyle.SetFont(f1).SetItalic().SetFontSize(14).SetRotationAngle(DegreesToRadians(90));
-
-            var cell = new Cell(5, 1);
-            ApplyVerticalCell(cell, "Перв. примен.");
-            cell.SetWidth(5 * PdfDefines.mmA4);
-            table.AddCell(cell);
-
-            cell = new Cell(5, 1);
-            ApplyVerticalCell(cell, aFirstApp);
-            cell.SetWidth(9 * PdfDefines.mmA4).SetPaddingLeft(4);
-            table.AddCell(cell);
-
-            cell = new Cell(7, 1);
-            ApplyVerticalCell(cell, "Справ. №");
-            table.AddCell(cell);
-            ApplyVerticalCell(cell, "");
-            cell = new Cell(7, 1);
-            table.AddCell(cell);
-
-            return table;
-
-        }
-
-        /// <summary>
-        /// добавить нижнюю дополнительную графу
-        /// </summary>
-        private Table AddBottomAppendGraph()
-        {
-            float[] columnWidths = { 0.6f, 1.1f };
-            Table table =
-                new Table(UnitValue.CreatePercentArray(columnWidths)).UseAllAvailableWidth(); //.SetHeight(A4Height);
-
-            table.SetBorderBottom(new SolidBorder(2));
-            iText.Layout.Style italicHeaderStyle = new Style();
-            italicHeaderStyle.SetFont(f1).SetItalic().SetFontSize(14);
-            iText.Layout.Style verticalCellStyle = new Style();
-            verticalCellStyle.SetFont(f1).SetItalic().SetFontSize(14).SetRotationAngle(DegreesToRadians(90));
-
-            var cell = new Cell(4, 1);
-            ApplyVerticalCell(cell, "Подп. и дата");
-            table.AddCell(cell);
-            cell = new Cell(4, 1);
-            ApplyVerticalCell(cell, "");
-            table.AddCell(cell);
-
-            AddEmptyCells(16, PdfDefines.ROW_HEIGHT, table);
-
-            cell = new Cell(3, 1);
-            ApplyVerticalCell(cell, "Инв. № дубл");
-            table.AddCell(cell);
-            cell = new Cell(3, 1);
-            ApplyVerticalCell(cell, "");
-            table.AddCell(cell);
-
-            AddEmptyCells(12, PdfDefines.ROW_HEIGHT, table);
-
-            cell = new Cell(3, 1);
-            ApplyVerticalCell(cell, "Взам. инв. №");
-            table.AddCell(cell);
-            cell = new Cell(3, 1);
-            ApplyVerticalCell(cell, "");
-            table.AddCell(cell);
-
-            AddEmptyCells(12, PdfDefines.ROW_HEIGHT, table);
-
-            cell = new Cell(4, 1);
-            ApplyVerticalCell(cell, "Подп. и дата");
-            table.AddCell(cell);
-            cell = new Cell(4, 1);
-            ApplyVerticalCell(cell, "");
-            table.AddCell(cell);
-
-            return table;
-        }
-
-        class FooterTableInfo
-        {
-            public string Abvgd = "ПАКБ.436122.800ПЭЗ";
-            public string DevelopedBy = "Горбач";
-            public string CheckedBy = "Васильев";
-            public string ControlBy = "Корнева";
-            public string ApprovedBy = "Гульцов";
-            public string Name = "Модуль питания (МП)";
-
-            public int PageNumber = 1;
-            public int PagesCount = 8;
-        }
-
-        /// <summary>
-        /// Добавить основную надпись
-        /// </summary>
-        private Table AddFooterTable(FooterTableInfo footerTableInfo)
-        {
-            var columnWidths = new[] { 0.8f, 1.2f, 3f, 2.5f, 1.1f, 7, 6 };
-            var footerTable = new Table(UnitValue.CreatePercentArray(columnWidths)).UseAllAvailableWidth().SetMargin(0);
-            var centerAlignedStyle = new Style().SetFont(f1).SetItalic().SetFontSize(12).SetTextAlignment(TextAlignment.CENTER);
-
-            footerTable.AddStyle(centerAlignedStyle);
-            footerTable.SetBorderTop(new SolidBorder(2));
-
-            bool isBigCellAdded = false;
-            for (int row = 0; row < 3; row++)
-            {
-                for (int col = 0; col < 6; ++col)
-                {
-                    Cell tmp = null;
-                    if (col != 5)
-                    {
-                        tmp = new Cell();
-                        tmp.SetHeight(PdfDefines.INNER_TABLE_ROW_HEIGHT).SetBorderRight(new SolidBorder(2));
-                    }
-                    else if (!isBigCellAdded)
-                    {
-                        tmp = new Cell(3, 2);
-                        tmp.SetVerticalAlignment(VerticalAlignment.MIDDLE).
-                            SetHorizontalAlignment(HorizontalAlignment.CENTER).
-                            SetBorderRight(Border.NO_BORDER).
-                            SetBorderTop(Border.NO_BORDER).
-                            SetBorderBottom(new SolidBorder(2));
-                        tmp.Add(new Paragraph(footerTableInfo.Abvgd).
-                            SetFont(f1).
-                            SetFontSize(20).
-                            SetItalic().
-                            SetTextAlignment(TextAlignment.CENTER));
-                        isBigCellAdded = true;
-                    }
-                    if (tmp == null) continue;
-
-                    if (col != 0)
-                    {
-                        tmp.SetBorderLeft(new SolidBorder(2));
-                    }
-                    else
-                    {
-                        tmp.SetBorderLeft(Border.NO_BORDER);
-                    }
-
-                    string text = "";
-                    if (row == 2)
-                    {
-                        switch (col)
-                        {
-                            case 0:
-                                {
-                                    text = "Изм";
-                                    break;
-                                }
-                            case 1:
-                                {
-                                    text = "Лист";
-                                    break;
-                                }
-                            case 2:
-                                {
-                                    text = "№ докум";
-                                    break;
-                                }
-                            case 3:
-                                {
-                                    text = "Подп.";
-                                    break;
-                                }
-                            case 4:
-                                {
-                                    text = "Дата";
-                                    break;
-                                }
-                        }
-                        tmp.Add(new Paragraph(text)
-                            .SetFixedLeading(12).SetPaddingBottom(-5)
-                        );
-                    }
-                    footerTable.AddCell(tmp);
-                }
-            }
-
-            var leftAlignedStyle = new Style().SetTextAlignment(TextAlignment.LEFT);
-
-            void AddPersonRow(string textForPerson, string personName)
-            {
-                footerTable.AddCell(
-                    new Cell(1, 2).
-                        Add(new Paragraph(textForPerson).
-                            /*SetPaddingBottom(-7).*/SetPaddingLeft(-1)).
-                        AddStyle(leftAlignedStyle).
-                        SetHeight(PdfDefines.INNER_TABLE_ROW_HEIGHT).
-                        SetBorderRight(new SolidBorder(2)).
-                        SetBorderLeft(Border.NO_BORDER));
-                footerTable.AddCell(
-                    new Cell().
-                        Add(new Paragraph(personName).
-                            SetPaddingBottom(-5).SetPaddingLeft(-1)).
-                        AddStyle(leftAlignedStyle).
-                        SetBorderRight(new SolidBorder(2)));
-
-                for (int i = 0; i < 2; ++i)
-                {
-                    footerTable.AddCell(new Cell().SetBorderRight(new SolidBorder(2)));
-                }
-            }
-
-            AddPersonRow("Разраб.", footerTableInfo.DevelopedBy);
-
-            footerTable.AddCell(new Cell(5, 1).Add(new Paragraph(footerTableInfo.Name)).SetBorderRight(new SolidBorder(2)));
-            var pageInfoSubTable = CreatePagesInfoTable(footerTableInfo);
-            footerTable.AddCell(new Cell(5, 1).Add(pageInfoSubTable).SetPadding(0));
-
-            AddPersonRow("Пров.", footerTableInfo.CheckedBy);
-            AddPersonRow("", "");
-            AddPersonRow("Н. контр", footerTableInfo.ControlBy);
-            AddPersonRow("Утв.", footerTableInfo.ApprovedBy);
-
-            return footerTable;
-        }
-
-        private static Table CreatePagesInfoTable(FooterTableInfo footerTableInfo)
-        {
-            Cell createCell(int rowspan = 1, int colspan = 1)
-            {
-                return new Cell(rowspan, colspan).SetBorderBottom(new SolidBorder(2))
-                    .SetHeight(PdfDefines.INNER_TABLE_ROW_HEIGHT);
-            }
-            Paragraph createParagraph()
-            {
-                return new Paragraph().SetPaddingBottom(-10); //.SetMarginBottom(-5);
-            }
-
-            var columnWidths = new[] { 1f, 1f, 1f, 3f, 4f };
-            var pageInfoSubTable = new Table(UnitValue.CreatePercentArray(columnWidths)).UseAllAvailableWidth()
-                .SetMargin(0).SetBorder(Border.NO_BORDER);
-
-            pageInfoSubTable.AddCell(createCell(1, 3).Add(createParagraph().Add("Лит")).
-                SetBorderLeft(Border.NO_BORDER).
-                SetBorderRight(new SolidBorder(2)).
-                SetBorderTop(Border.NO_BORDER));
-            pageInfoSubTable.AddCell(createCell().Add(createParagraph().Add("Лист")).
-                SetBorderRight(new SolidBorder(2)).
-                SetBorderLeft(new SolidBorder(2)).
-                SetBorderTop(Border.NO_BORDER));
-            pageInfoSubTable.AddCell(createCell().Add(createParagraph().Add("Листов").SetBorderRight(Border.NO_BORDER)).
-                SetBorderTop(Border.NO_BORDER).
-                SetBorderRight(Border.NO_BORDER));
-
-            for (int i = 0; i < 3; ++i)
-            {
-                var c = createCell();
-                if (i == 0)
-                {
-                    c.SetBorderLeft(Border.NO_BORDER);
-                }
-                else
-                {
-                    c.SetBorderLeft(new SolidBorder(2));
-                }
-                c.SetBorderRight(new SolidBorder(2));
-                pageInfoSubTable.AddCell(c);
-            }
-
-            pageInfoSubTable.AddCell(createCell().Add(createParagraph().Add(footerTableInfo.PageNumber.ToString())).SetBorderRight(new SolidBorder(2)));
-            pageInfoSubTable.AddCell(createCell().Add(createParagraph().Add(footerTableInfo.PagesCount.ToString())).SetBorderRight(Border.NO_BORDER));
-
-            return pageInfoSubTable;
-        }
-
 
         void ApplyVerticalCell(Cell c, string text)
         {
@@ -864,15 +1003,48 @@ namespace GostDOC.PDF
                     new Cell().SetHeight(height).SetBorderLeft(new SolidBorder(2)).SetBorderRight(new SolidBorder(2)));
             }
         }
+               
 
-        void ApplyForCell(Cell c)
+        /// <summary>
+        /// Gets the name strings.
+        /// </summary>
+        /// <param name="aLength">a length.</param>
+        /// <param name="aFontSize">Size of a font.</param>
+        /// <param name="aFont">a font.</param>
+        /// <param name="aName">a name.</param>
+        /// <returns></returns>
+        private List<string> GetNameStrings(float aLength, float aFontSize, PdfFont aFont, string aName)
         {
-            iText.Layout.Style italicHeaderStyle = new Style();
-            c.SetTextAlignment(TextAlignment.CENTER);
-            c.SetHeight(PdfDefines.mmA4 * 15);
-            c.SetVerticalAlignment(VerticalAlignment.MIDDLE);
-            c.AddStyle(italicHeaderStyle);
-            c.SetBorder(new SolidBorder(2));
+            List<string> name_strings = new List<string>();
+            int default_padding = 4;
+            float maxLength = aLength - default_padding;
+            float currLength = aFont.GetWidth(aName, aFontSize);
+
+            GetLimitSubstring(name_strings, maxLength, currLength, aName );
+            
+
+            return name_strings;
         }
+
+
+        private void GetLimitSubstring(List<string> name_strings, float maxLength, float currLength, string aFullName)
+        {
+            if (currLength < maxLength)
+            {
+                name_strings.Add(aFullName);
+            }
+            else
+            {
+                string fullName = aFullName;
+                int symbOnMaxLength = (int)((fullName.Length / currLength) * maxLength);
+                string partName = fullName.Substring(0, symbOnMaxLength);
+                int index = partName.LastIndexOfAny(new char[] { ' ', '-', '.' });
+                name_strings.Add(fullName.Substring(0, index));
+                fullName = fullName.Substring(index + 1);
+                currLength = fullName.Length;
+                GetLimitSubstring(name_strings, maxLength, currLength, fullName);
+            }
+        }
+
     }
 }

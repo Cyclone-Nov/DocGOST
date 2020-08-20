@@ -33,6 +33,20 @@ namespace GostDOC.PDF
         internal readonly PageSize PageSize;
 
         /// <summary>
+        /// количетсов строк в таблице данных на первой странице документа
+        /// </summary>
+        protected readonly int CountStringsOnFirstPage;
+        /// <summary>
+        /// количетсов строк в таблице данных на остальных страницах документа
+        /// </summary>
+        protected readonly int CountStringsOnNextPage;
+
+        /// <summary>
+        /// количество строк в таблице данных на листе регистрации изменений
+        /// </summary>
+        protected readonly int CountStringsOnChangelist = 31;
+
+        /// <summary>
         /// поток, содержащий PDF документ
         /// </summary>
         /// <value>
@@ -63,19 +77,27 @@ namespace GostDOC.PDF
             switch(aType)
             {
                 case DocType.Bill:
-                    PageSize = new PageSize(PageSize.A3);
-                    break;
                 case DocType.D27:
-                    PageSize = new PageSize(PageSize.A3);
-                    break;
-                case DocType.ItemsList:
-                    PageSize = new PageSize(PageSize.A4);
+                    {
+                        PageSize = new PageSize(PageSize.A3);
+                        CountStringsOnFirstPage = 24;
+                        CountStringsOnNextPage = 29;
+                    }
                     break;
                 case DocType.Specification:
-                    PageSize = new PageSize(PageSize.A4);
-                    break;
+                case DocType.ItemsList:
+                    {
+                        PageSize = new PageSize(PageSize.A4);
+                        CountStringsOnFirstPage = 24;
+                        CountStringsOnNextPage = 33;
+                    }
+                    break;                
                 default:
-                    PageSize = new PageSize(PageSize.A4);
+                    {
+                        PageSize = new PageSize(PageSize.A4);
+                        CountStringsOnFirstPage = 26;
+                        CountStringsOnNextPage = 33;
+                    }
                     break;
             }
         }
@@ -113,7 +135,7 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal abstract int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData);
+        internal abstract int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow);
 
 
         public static double DegreesToRadians(double degrees)
