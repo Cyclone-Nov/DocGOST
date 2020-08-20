@@ -227,8 +227,203 @@ namespace GostDOC.PDF
         /// создать таблицу основной надписи на первой странице
         /// </summary>
         /// <returns></returns>
-        private Table CreateFirstTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs, int aPages)
-        {
+        private Table CreateFirstTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs, int aPages) {
+            float thickLineWidth = 0.5f;
+
+            float[] columnSizes = {65 * PdfDefines.mmA4, 120 * PdfDefines.mmA4 };
+            Table mainTable = new Table(UnitValue.CreatePointArray(columnSizes));
+
+            Cell CreateMainTableCell() {
+                return new Cell().SetBorder(Border.NO_BORDER).SetMargin(0).SetPadding(0);
+            }
+
+            #region Пустая ячейка слева
+
+            mainTable.AddCell(CreateMainTableCell());
+
+            #endregion
+
+            #region Правая верхняя таблица
+            var rightTopTable = new Table(UnitValue.CreatePointArray(new[] {
+                14 * PdfDefines.mmA4,
+                53 * PdfDefines.mmA4,
+                53 * PdfDefines.mmA4,
+            }));
+
+            float rightTopTableCellHeight1 = 14 * PdfDefines.mmA4h;
+            float rightTopTableCellHeight2 = 8 * PdfDefines.mmA4h;
+            Cell CreateRightTopTableCell(float height, int rowspan=1, int colspan=1) {
+                return new Cell(rowspan, colspan).SetHeight(height).SetBorder(new SolidBorder(thickLineWidth));
+            }
+            for (int i = 0; i < 3; ++i) {
+                rightTopTable.AddCell(CreateRightTopTableCell(rightTopTableCellHeight1));
+            }
+
+            rightTopTable.AddCell(CreateRightTopTableCell(rightTopTableCellHeight2, 1, 3).SetBorderBottom(Border.NO_BORDER));
+
+            mainTable.AddCell(CreateMainTableCell().Add(rightTopTable).SetPaddingLeft(-0.5f).SetPaddingRight(-5));
+            #endregion
+
+            #region Левая таблица
+            var leftTableTextStyle = new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFontSize(12).SetFont(f1);
+            var leftTable = new Table(UnitValue.CreatePointArray(new[] {
+                7 * PdfDefines.mmA4,
+                10 * PdfDefines.mmA4,
+                23 * PdfDefines.mmA4,
+                15 * PdfDefines.mmA4,
+                10 * PdfDefines.mmA4
+            })).AddStyle(leftTableTextStyle);
+            float leftTableCellHeight = 5 * PdfDefines.mmA4h;
+            Cell CreateLeftTableCell(int rowspan=1, int colspan=1) {
+                return new Cell(rowspan, colspan).SetHeight(leftTableCellHeight).SetPadding(0);
+            }
+            for (int i = 0; i < 5; ++i) {
+                leftTable.AddCell(CreateLeftTableCell().SetBorderRight(new SolidBorder(thickLineWidth)).SetBorderTop(new SolidBorder(thickLineWidth)));
+            }
+            for (int i = 0; i < 5; ++i) {
+                leftTable.AddCell(CreateLeftTableCell().SetBorderRight(new SolidBorder(thickLineWidth)));
+            }
+
+            Paragraph CreateLeftTableTopParagraph(string text) {
+                var style = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFontSize(12).SetFont(f1).SetPaddingTop(-2);
+                return new Paragraph(text).AddStyle(style);
+            }
+
+            void AddToTopLeftTable(string text) {
+                leftTable.AddCell(
+                    CreateLeftTableCell().
+                        SetBorderRight(new SolidBorder(thickLineWidth)).
+                        Add(CreateLeftTableTopParagraph(text)));
+            }
+
+            AddToTopLeftTable("Изм.");
+            AddToTopLeftTable("Лист");
+            AddToTopLeftTable("№ Докум.");
+            AddToTopLeftTable("Подп.");
+            AddToTopLeftTable("Дата");
+            
+            Paragraph CreateLeftTableBottomParagraph(string text) {
+                var style = new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFontSize(12).SetFont(f1).SetPaddingTop(-2);
+                return new Paragraph(text).AddStyle(style);
+            }
+
+            void AddToBottomLeftTable(string text, bool topBorder=false, bool bottomBorder=false) {
+                var c = CreateLeftTableCell(1, 2).
+                    SetBorderRight(new SolidBorder(thickLineWidth))
+                    .Add(CreateLeftTableBottomParagraph(text));
+                if (topBorder) {
+                    c.SetBorderTop(new SolidBorder(thickLineWidth));
+                }
+                if (bottomBorder) {
+                    c.SetBorderBottom(new SolidBorder(thickLineWidth));
+                }
+                leftTable.AddCell(c);
+
+                for (int i = 0; i < 3; ++i) {
+                    c = CreateLeftTableCell().SetBorderRight(new SolidBorder(thickLineWidth));
+                    if (topBorder) {
+                        c.SetBorderTop(new SolidBorder(thickLineWidth));
+                    }
+                    if (bottomBorder) {
+                        c.SetBorderBottom(new SolidBorder(thickLineWidth));
+                    }
+                    leftTable.AddCell(c);
+                }
+            }
+            AddToBottomLeftTable("Разраб.", true);
+            AddToBottomLeftTable("Пров.");
+            AddToBottomLeftTable("");
+            AddToBottomLeftTable("Н. контр");
+            AddToBottomLeftTable("Утв.", false, true);
+
+            mainTable.AddCell(CreateMainTableCell().Add(leftTable));
+
+            #endregion
+
+            #region Правая нижняя таблица
+            var rightBottomTable = new Table(UnitValue.CreatePercentArray(new[] {1f})).UseAllAvailableWidth();
+            rightBottomTable.AddCell(
+                new Cell().SetHeight(15 * PdfDefines.mmA4h).
+                    SetPaddings(0,0,1,0).
+                    SetBorderLeft(Border.NO_BORDER).
+                    SetBorderBottom(Border.NO_BORDER).
+                    SetBorderTop(new SolidBorder(thickLineWidth)).
+                    SetBorderRight(new SolidBorder(thickLineWidth)));
+
+            var innerRightBottomTable =
+                new Table(UnitValue.CreatePointArray(new[] {
+                    (53 * 2 + 14 - 50) * PdfDefines.mmA4,
+                    50 * PdfDefines.mmA4,
+                }));//.SetPadding(-2);
+            var innerRightBottomTableCellHeight = 25 * PdfDefines.mmA4h+ 3;
+            innerRightBottomTable.AddCell(
+                new Cell().
+                    SetHeight(innerRightBottomTableCellHeight).
+                    SetBorderLeft(Border.NO_BORDER).
+                    SetBorderRight(Border.NO_BORDER).
+                    SetBorderTop(new SolidBorder(thickLineWidth)).
+                    SetBorderBottom(new SolidBorder(thickLineWidth)).
+                    SetPaddings(-1,0,0,0) 
+                    );
+
+            var tableGraph478 = 
+                new Table(UnitValue.CreatePointArray(new[] {
+                5 * PdfDefines.mmA4,
+                5 * PdfDefines.mmA4,
+                5 * PdfDefines.mmA4,
+                15 * PdfDefines.mmA4,
+                20 * PdfDefines.mmA4,
+            }));
+
+            Cell CreateTableGraph478Cell(int colspan=1, int rowspan=1, bool borderTop=false, bool borderLeft=false) {
+                var height = 5 * PdfDefines.mmA4h;
+                var c= new Cell(colspan, rowspan).
+                    SetHeight(height).
+                    SetPadding(0).
+                    SetBorderRight(new SolidBorder(thickLineWidth));
+                if (borderTop) {
+                    c.SetBorderTop(new SolidBorder(thickLineWidth));
+                }
+                if (borderLeft) {
+                    c.SetBorderLeft(new SolidBorder(thickLineWidth));
+                }
+                return c;
+            }
+            Paragraph CreateTableGraph478Paragraph(string text) {
+                var style = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFontSize(12).SetFont(f1).SetPaddingTop(-2);
+                return new Paragraph(text).AddStyle(style);
+            }
+
+            tableGraph478.AddCell(CreateTableGraph478Cell(1,3, borderTop:true, borderLeft:true).Add(CreateTableGraph478Paragraph("Лит.")));
+            tableGraph478.AddCell(CreateTableGraph478Cell(borderTop:true).Add(CreateTableGraph478Paragraph("Лист")));
+            tableGraph478.AddCell(CreateTableGraph478Cell(borderTop:true).Add(CreateTableGraph478Paragraph("Листов")));
+
+            tableGraph478.AddCell(CreateTableGraph478Cell(borderLeft:true));
+            for (int i = 0; i < 4; ++i) {
+                tableGraph478.AddCell(CreateTableGraph478Cell());
+            }
+
+            tableGraph478.AddCell(
+                new Cell(1,5).
+                    SetHeight(15 * PdfDefines.mmA4h+1).
+                    SetPaddings(0,0,0,0).
+                    SetBorderLeft(new SolidBorder(thickLineWidth)).
+                    SetBorderRight(new SolidBorder(thickLineWidth)).
+                    SetBorderTop(new SolidBorder(thickLineWidth)).
+                    SetBorderBottom(new SolidBorder(thickLineWidth)));
+
+            innerRightBottomTable.AddCell(new Cell().Add(tableGraph478).SetBorder(Border.NO_BORDER).SetPaddings(0,-1,-2,0));
+
+            rightBottomTable.AddCell(new Cell().SetPadding(0).SetBorder(Border.NO_BORDER).Add(innerRightBottomTable));
+            mainTable.AddCell(CreateMainTableCell().Add(rightBottomTable));
+
+            #endregion
+
+            mainTable.SetFixedPosition(20 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 185 * PdfDefines.mmA4);
+            return mainTable;
+
+
+            /*
             //             ..........
             //   Cell1     . cell2  .
             //.......................
@@ -453,19 +648,9 @@ namespace GostDOC.PDF
             #endregion Cell 6
 
             mainTable.SetFixedPosition(20 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 185 * PdfDefines.mmA4);
-
-            #region what is it
-            // отрисовать таблицу в конкретном месте документа
-            // PageSize ps = pdfDoc.getDefaultPageSize();
-            //mainTable.setFixedPosition(ps.getWidth() - doc.getRightMargin() - totalWidth, ps.getHeight() - doc.getTopMargin() - totalHeight, totalWidth);
-            //PageSize ps = pdfDoc.getDefaultPageSize();
-            //IRenderer tableRenderer = table.createRendererSubTree().setParent(doc.getRenderer());
-            //LayoutResult tableLayoutResult =
-            //        tableRenderer.layout(new LayoutContext(new LayoutArea(0, new Rectangle(ps.getWidth(), 1000))));
-            //float totalHeight = tableLayoutResult.getOccupiedArea().getBBox().getHeight();
-            #endregion
-
+            
             return mainTable;
+            */
         }
         
 
