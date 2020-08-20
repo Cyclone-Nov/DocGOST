@@ -38,6 +38,15 @@ namespace GostDOC.Models
         }
     }
 
+    class DesignatorIDSort : ISort<Component>
+    {
+        public List<Component> Sort(List<Component> aItems)
+        {
+            return aItems.OrderBy(x => x.GetProperty(Constants.ComponentDesignatiorID)).ToList();
+        }
+    }
+    
+
     class NameSortRegex : ISort<Component>
     {
         private string _regex = string.Empty;
@@ -197,6 +206,8 @@ namespace GostDOC.Models
                     return new NameSignSort();
                 case SortType.Name:
                     return new NameSort();
+                case SortType.DesignatorID:
+                    return new DesignatorIDSort();
             }
             return null;
         }
