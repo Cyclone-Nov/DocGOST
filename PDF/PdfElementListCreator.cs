@@ -228,7 +228,7 @@ namespace GostDOC.PDF
         /// </summary>
         /// <returns></returns>
         private Table CreateFirstTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs, int aPages) {
-            float thickLineWidth = 0.5f;
+            float thickLineWidth = 2f;
 
             float[] columnSizes = {65 * PdfDefines.mmA4, 120 * PdfDefines.mmA4 };
             Table mainTable = new Table(UnitValue.CreatePointArray(columnSizes));
@@ -261,7 +261,7 @@ namespace GostDOC.PDF
 
             rightTopTable.AddCell(CreateRightTopTableCell(rightTopTableCellHeight2, 1, 3).SetBorderBottom(Border.NO_BORDER));
 
-            mainTable.AddCell(CreateMainTableCell().Add(rightTopTable).SetPaddingLeft(-0.5f).SetPaddingRight(-5));
+            mainTable.AddCell(CreateMainTableCell().Add(rightTopTable).SetPaddingLeft(-2).SetPaddingRight(-5));
             #endregion
 
             #region Левая таблица
@@ -354,17 +354,21 @@ namespace GostDOC.PDF
                 new Table(UnitValue.CreatePointArray(new[] {
                     (53 * 2 + 14 - 50) * PdfDefines.mmA4,
                     50 * PdfDefines.mmA4,
-                }));//.SetPadding(-2);
-            var innerRightBottomTableCellHeight = 25 * PdfDefines.mmA4h+ 3;
+                }));
+
+            var textStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1);
+            string res;
+            if (!aGraphs.TryGetValue(Constants.GRAPH_1, out res)) {
+                res = string.Empty; //TODO: log не удалось распарсить;
+            }
             innerRightBottomTable.AddCell(
                 new Cell().
-                    SetHeight(innerRightBottomTableCellHeight).
+                    AddStyle(textStyle).
                     SetBorderLeft(Border.NO_BORDER).
                     SetBorderRight(Border.NO_BORDER).
                     SetBorderTop(new SolidBorder(thickLineWidth)).
                     SetBorderBottom(new SolidBorder(thickLineWidth)).
-                    SetPaddings(-1,0,0,0) 
-                    );
+                    SetPaddings(-1,0,0,0).Add(new Paragraph(res)));
 
             var tableGraph478 = 
                 new Table(UnitValue.CreatePointArray(new[] {
@@ -375,7 +379,7 @@ namespace GostDOC.PDF
                 20 * PdfDefines.mmA4,
             }));
 
-            Cell CreateTableGraph478Cell(int colspan=1, int rowspan=1, bool borderTop=false, bool borderLeft=false) {
+            Cell CreateTableGraph478Cell(int colspan=1, int rowspan=1, bool borderTop=false, bool borderLeft=false, bool borderBottom=false) {
                 var height = 5 * PdfDefines.mmA4h;
                 var c= new Cell(colspan, rowspan).
                     SetHeight(height).
@@ -387,6 +391,9 @@ namespace GostDOC.PDF
                 if (borderLeft) {
                     c.SetBorderLeft(new SolidBorder(thickLineWidth));
                 }
+                if (borderBottom) {
+                    c.SetBorderBottom(new SolidBorder(thickLineWidth));
+                }
                 return c;
             }
             Paragraph CreateTableGraph478Paragraph(string text) {
@@ -394,9 +401,9 @@ namespace GostDOC.PDF
                 return new Paragraph(text).AddStyle(style);
             }
 
-            tableGraph478.AddCell(CreateTableGraph478Cell(1,3, borderTop:true, borderLeft:true).Add(CreateTableGraph478Paragraph("Лит.")));
-            tableGraph478.AddCell(CreateTableGraph478Cell(borderTop:true).Add(CreateTableGraph478Paragraph("Лист")));
-            tableGraph478.AddCell(CreateTableGraph478Cell(borderTop:true).Add(CreateTableGraph478Paragraph("Листов")));
+            tableGraph478.AddCell(CreateTableGraph478Cell(1,3, borderTop:true, borderLeft:true, borderBottom:true).Add(CreateTableGraph478Paragraph("Лит.")));
+            tableGraph478.AddCell(CreateTableGraph478Cell(borderTop:true, borderBottom:true).Add(CreateTableGraph478Paragraph("Лист")));
+            tableGraph478.AddCell(CreateTableGraph478Cell(borderTop:true, borderBottom:true).Add(CreateTableGraph478Paragraph("Листов")));
 
             tableGraph478.AddCell(CreateTableGraph478Cell(borderLeft:true));
             for (int i = 0; i < 4; ++i) {
@@ -405,21 +412,24 @@ namespace GostDOC.PDF
 
             tableGraph478.AddCell(
                 new Cell(1,5).
-                    SetHeight(15 * PdfDefines.mmA4h+1).
+                    SetHeight(15 * PdfDefines.mmA4h-2).
                     SetPaddings(0,0,0,0).
                     SetBorderLeft(new SolidBorder(thickLineWidth)).
                     SetBorderRight(new SolidBorder(thickLineWidth)).
                     SetBorderTop(new SolidBorder(thickLineWidth)).
                     SetBorderBottom(new SolidBorder(thickLineWidth)));
 
-            innerRightBottomTable.AddCell(new Cell().Add(tableGraph478).SetBorder(Border.NO_BORDER).SetPaddings(0,-1,-2,0));
+            innerRightBottomTable.AddCell(new Cell().Add(tableGraph478).SetBorder(Border.NO_BORDER).SetPaddings(-1,-1,0,0));
 
-            rightBottomTable.AddCell(new Cell().SetPadding(0).SetBorder(Border.NO_BORDER).Add(innerRightBottomTable));
+            rightBottomTable.AddCell(new Cell().
+                SetPadding(0).
+                SetBorder(Border.NO_BORDER).
+                Add(innerRightBottomTable));
             mainTable.AddCell(CreateMainTableCell().Add(rightBottomTable));
 
             #endregion
 
-            mainTable.SetFixedPosition(20 * PdfDefines.mmA4, 5 * PdfDefines.mmA4, 185 * PdfDefines.mmA4);
+            mainTable.SetFixedPosition(20 * PdfDefines.mmA4, 5 * PdfDefines.mmA4-1.5f, 185 * PdfDefines.mmA4);
             return mainTable;
 
 
