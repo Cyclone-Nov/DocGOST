@@ -520,7 +520,7 @@ namespace GostDOC.PDF
         /// </summary>
         /// <returns></returns>
         private Table CreateFirstTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs, int aPages) {
-            float thickLineWidth = 0.5f;
+            float thickLineWidth = 2f;
 
             float[] columnSizes = {65 * PdfDefines.mmA4, 120 * PdfDefines.mmA4 };
             Table mainTable = new Table(UnitValue.CreatePointArray(columnSizes));
@@ -1047,23 +1047,25 @@ namespace GostDOC.PDF
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
             tbl.SetMargin(0).SetPadding(0);
 
-            // add header
-            var headerTextStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1).SetFontSize(16);
-            Cell cell = AddEmptyCell(1, 1).AddStyle(headerTextStyle).SetMargin(0).SetPaddings(-2, -2, -2, -2).SetHeight(15 * PdfDefines.mmA4h);            
-            tbl.AddHeaderCell(cell.Clone(false).Add(new Paragraph("Поз. обозначение")));
-            tbl.AddHeaderCell(cell.Clone(false).Add(new Paragraph("Наименование")));
-            tbl.AddHeaderCell(cell.Clone(false).Add(new Paragraph("Кол.")));
-            tbl.AddHeaderCell(cell.Clone(false).Add(new Paragraph("Примечание")));
+            // add header            
+            Cell headerCell = CreateEmptyCell(1, 1).SetMargin(0).SetPaddings(-2, -2, -2, -2).SetHeight(15 * PdfDefines.mmA4h).
+                                                    SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1).SetFontSize(16);            
+            tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Поз. обозначение")));
+            tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Наименование")));
+            tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Кол.")));
+            tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Примечание")));
 
             // fill table
-            Cell groupCell = AddEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 0).SetHeight(8* PdfDefines.mmA4h).
+            Cell groupCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 0).SetHeight(8* PdfDefines.mmA4h).
                                                             SetTextAlignment(TextAlignment.CENTER).SetItalic().SetBold().SetUnderline().SetFont(f1).SetFontSize(14);
-            Cell mainCell = AddEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 0).SetHeight(8 * PdfDefines.mmA4h).
+            Cell centrAlignCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 0).SetHeight(8 * PdfDefines.mmA4h).
+                                                           SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1).SetFontSize(14);
+            Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2).SetHeight(8 * PdfDefines.mmA4h).
                                                            SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFont(f1).SetFontSize(14);
             //UnitValue uFontSize = mainCell.GetProperty<UnitValue>(24); // 24 - index for FontSize property
             //float fontSize = uFontSize.GetValue();
             float fontSize = 14;
-            PdfFont font = mainCell.GetProperty<PdfFont>(20); // 20 - index for Font property
+            PdfFont font = leftPaddCell.GetProperty<PdfFont>(20); // 20 - index for Font property
 
             int remainingPdfTabeRows = (firstPage) ? CountStringsOnFirstPage : CountStringsOnNextPage;
             outLastProcessedRow = aStartRow;            
@@ -1071,14 +1073,13 @@ namespace GostDOC.PDF
             foreach (DataRow row in aData.Rows)
             {
                 string position = (row[Constants.ColumnPosition] == System.DBNull.Value) ? string.Empty : (string)row[Constants.ColumnPosition];
-                string name = (row[Constants.ColumnName] == System.DBNull.Value) ? string.Empty : (string)row[Constants.ColumnName];
-                int quantity = (row[Constants.ColumnQuantity] == System.DBNull.Value) ? 0 : (int)row[Constants.ColumnQuantity];
-                string note = (row[Constants.ColumnFootnote] == System.DBNull.Value) ? string.Empty : (string)row[Constants.ColumnFootnote];
+                string name     = (row[Constants.ColumnName]     == System.DBNull.Value) ? string.Empty : (string)row[Constants.ColumnName];
+                int quantity    = (row[Constants.ColumnQuantity] == System.DBNull.Value) ? 0            : (int)row[Constants.ColumnQuantity];
+                string note     = (row[Constants.ColumnFootnote] == System.DBNull.Value) ? string.Empty : (string)row[Constants.ColumnFootnote];
 
                 if (string.IsNullOrEmpty(name))
-                {
-                    // это пустая строка   
-                    AddEmptyRowToPdfTable(tbl,1, 4, mainCell);
+                {                    
+                    AddEmptyRowToPdfTable(tbl,1, 4, leftPaddCell);
                     remainingPdfTabeRows--;                    
                 }
                 else if (string.IsNullOrEmpty(position))
@@ -1086,10 +1087,10 @@ namespace GostDOC.PDF
                     // это наименование группы
                     if (remainingPdfTabeRows > 4) // если есть место для записи более 4 строк то записываем группу, иначе выходим
                     {
-                        tbl.AddCell(mainCell.Clone(false));
+                        tbl.AddCell(centrAlignCell.Clone(false));
                         tbl.AddCell(groupCell.Clone(true).Add(new Paragraph(name)));
-                        tbl.AddCell(mainCell.Clone(false));
-                        tbl.AddCell(mainCell.Clone(false));
+                        tbl.AddCell(centrAlignCell.Clone(false));
+                        tbl.AddCell(leftPaddCell.Clone(false));
                         remainingPdfTabeRows--;
                     }
                     else
@@ -1097,24 +1098,24 @@ namespace GostDOC.PDF
                 }
                 else
                 {
-                    // оценим длину наименования
+                    // разобем наименование на несколько строк исходя из длины текста
                     string[] namestrings = GetNameStrings(110 * PdfDefines.mmA4, fontSize, font, name).ToArray();
                     if (namestrings.Length <= remainingPdfTabeRows)
                     {
-                        tbl.AddCell(mainCell.Clone(false).Add(new Paragraph(position)));
-                        tbl.AddCell(mainCell.Clone(false).Add(new Paragraph(namestrings[0])));
-                        tbl.AddCell(mainCell.Clone(false).Add(new Paragraph(quantity.ToString())));
-                        tbl.AddCell(mainCell.Clone(false).Add(new Paragraph(note)));
+                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
+                        tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(namestrings[0])));
+                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity.ToString())));
+                        tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));
                         remainingPdfTabeRows--;
 
                         if (namestrings.Length > 1)
                         {
                             for (int i = 1; i < namestrings.Length; i++)
                             {
-                                tbl.AddCell(mainCell.Clone(false));
-                                tbl.AddCell(mainCell.Clone(false).Add(new Paragraph(namestrings[i])));
-                                tbl.AddCell(mainCell.Clone(false));
-                                tbl.AddCell(mainCell.Clone(false));
+                                tbl.AddCell(centrAlignCell.Clone(false));
+                                tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(namestrings[i])));
+                                tbl.AddCell(centrAlignCell.Clone(false));
+                                tbl.AddCell(leftPaddCell.Clone(false));
                                 remainingPdfTabeRows--;
                             }
                         }
@@ -1126,17 +1127,14 @@ namespace GostDOC.PDF
             }
 
             // дополним таблицу пустыми строками если она не полностью заполнена
-            if (remainingPdfTabeRows > 0)
-            {
-                AddEmptyRowToPdfTable(tbl, remainingPdfTabeRows, 4, mainCell, true);
-            }
+            if (remainingPdfTabeRows > 0)            
+                AddEmptyRowToPdfTable(tbl, remainingPdfTabeRows, 4, centrAlignCell, true);
+            
+            // если заполнили всю таблицу то обнуляем
+            if(outLastProcessedRow == aData.Rows.Count)            
+                outLastProcessedRow = 0;            
 
-            if(outLastProcessedRow == aData.Rows.Count)
-            {
-                outLastProcessedRow = 0;
-            }
-
-            tbl.SetFixedPosition(20 * PdfDefines.mmA4, 77 * PdfDefines.mmA4, 185 * PdfDefines.mmA4);
+            tbl.SetFixedPosition(19.3f * PdfDefines.mmA4, 78 * PdfDefines.mmA4, 185 * PdfDefines.mmA4);
 
             return tbl;
         }
