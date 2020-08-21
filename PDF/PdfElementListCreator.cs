@@ -17,7 +17,9 @@ using GostDOC.Common;
 using iText.Kernel.Pdf.Canvas;
 using GostDOC.Models;
 using System.Data;
-using System.ComponentModel;
+using System.Runtime;
+
+
 
 namespace GostDOC.PDF
 {
@@ -98,7 +100,7 @@ namespace GostDOC.PDF
                 var mainсomponents = others.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
 
                 AddEmptyRow(table);
-                FillDataTable(table, "" ,mainсomponents);
+                FillDataTable(table, "" , mainсomponents);
                 
                 foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key))
                 {
@@ -178,9 +180,11 @@ namespace GostDOC.PDF
                 AddGroupName(aTable, aGroupName);
 
                 // записываем строки с гост/ту в начале таблицы, если они есть для нескольких компонентов
-                AddStandardDocsToTable(aGroupName, sortComponents, aTable, StandardDic);
-                // AddEmptyRow(aTable);
-
+                if (!AddStandardDocsToTable(aGroupName, sortComponents, aTable, StandardDic))
+                {
+                    AddEmptyRow(aTable);
+                }
+                
                 //записываем таблицу данных объединяя подрядидущие компоненты с одинаковым наименованием    
                 DataRow row;
                 for (int i = 0; i < sortComponents.Length;)
@@ -297,14 +301,16 @@ namespace GostDOC.PDF
         }
 
         /// <summary>
-        /// добавить в таблиц данных стандартные документы на поставку при наличии перед перечнем компонентов
+        /// добавить в таблицу данных стандартные документы на поставку при наличии перед перечнем компонентов
         /// </summary>
         /// <param name="aGroupName">имя группы</param>
         /// <param name="aComponents">список компонентов</param>
         /// <param name="aTable">таблица данных</param>
         /// <param name="aStandardDic">словарь со стандартными документами на поставку</param>
-        private void AddStandardDocsToTable(string aGroupName, Models.Component[] aComponents, DataTable aTable, Dictionary<string, List<int>> aStandardDic)
+        /// <returns>true - стандартные документы добавлены </returns>
+        private bool AddStandardDocsToTable(string aGroupName, Models.Component[] aComponents, DataTable aTable, Dictionary<string, List<int>> aStandardDic)
         {
+            bool isApplied = false;
             DataRow row;
             foreach (var item in aStandardDic)
             {
@@ -315,8 +321,10 @@ namespace GostDOC.PDF
                     string name = $"{aGroupName} {aComponents[index].GetProperty(Constants.ComponentType)} {item.Key}";
                     row[Constants.ColumnName] = name;
                     aTable.Rows.Add(row);
+                    isApplied = true;
                 }
             }
+            return isApplied;
         }
 
         /// <summary>
@@ -1056,8 +1064,6 @@ namespace GostDOC.PDF
             tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Примечание")));
 
             // fill table
-            Cell groupCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 0).SetHeight(8* PdfDefines.mmA4h).
-                                                            SetTextAlignment(TextAlignment.CENTER).SetItalic().SetBold().SetUnderline().SetFont(f1).SetFontSize(14);
             Cell centrAlignCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 0).SetHeight(8 * PdfDefines.mmA4h).
                                                            SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1).SetFontSize(14);
             Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2).SetHeight(8 * PdfDefines.mmA4h).
@@ -1068,10 +1074,14 @@ namespace GostDOC.PDF
             PdfFont font = leftPaddCell.GetProperty<PdfFont>(20); // 20 - index for Font property
 
             int remainingPdfTabeRows = (firstPage) ? CountStringsOnFirstPage : CountStringsOnNextPage;
-            outLastProcessedRow = aStartRow;            
+            outLastProcessedRow = aStartRow;
 
-            foreach (DataRow row in aData.Rows)
+
+            var Rows = aData.Rows.Cast<DataRow>().ToArray();
+            DataRow row;
+            for (int ind = aStartRow; ind < Rows.Length; ind++)
             {
+                row = Rows[ind];
                 string position = (row[Constants.ColumnPosition] == System.DBNull.Value) ? string.Empty : (string)row[Constants.ColumnPosition];
                 string name     = (row[Constants.ColumnName]     == System.DBNull.Value) ? string.Empty : (string)row[Constants.ColumnName];
                 int quantity    = (row[Constants.ColumnQuantity] == System.DBNull.Value) ? 0            : (int)row[Constants.ColumnQuantity];
@@ -1088,7 +1098,7 @@ namespace GostDOC.PDF
                     if (remainingPdfTabeRows > 4) // если есть место для записи более 4 строк то записываем группу, иначе выходим
                     {
                         tbl.AddCell(centrAlignCell.Clone(false));
-                        tbl.AddCell(groupCell.Clone(true).Add(new Paragraph(name)));
+                        tbl.AddCell(centrAlignCell.Clone(true).Add(new Paragraph(name)));
                         tbl.AddCell(centrAlignCell.Clone(false));
                         tbl.AddCell(leftPaddCell.Clone(false));
                         remainingPdfTabeRows--;
@@ -1098,8 +1108,8 @@ namespace GostDOC.PDF
                 }
                 else
                 {
-                    // разобем наименование на несколько строк исходя из длины текста
-                    string[] namestrings = GetNameStrings(110 * PdfDefines.mmA4, fontSize, font, name).ToArray();
+                    // разобьем наименование на несколько строк исходя из длины текста
+                    string[] namestrings = SplitNameByWidth(110 * PdfDefines.mmA4, fontSize, font, name).ToArray();
                     if (namestrings.Length <= remainingPdfTabeRows)
                     {
                         tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
@@ -1130,7 +1140,7 @@ namespace GostDOC.PDF
             if (remainingPdfTabeRows > 0)            
                 AddEmptyRowToPdfTable(tbl, remainingPdfTabeRows, 4, centrAlignCell, true);
             
-            // если заполнили всю таблицу то обнуляем
+            // если записали всю табица с данными, то обнуляем количество оставшихся строк
             if(outLastProcessedRow == aData.Rows.Count)            
                 outLastProcessedRow = 0;            
 
@@ -1247,30 +1257,35 @@ namespace GostDOC.PDF
                     new Cell().SetHeight(height).SetBorderLeft(new SolidBorder(2)).SetBorderRight(new SolidBorder(2)));
             }
         }
-               
+
 
         /// <summary>
-        /// Gets the name strings.
+        /// Разбить строку на несколько строк исходя из длины текста
         /// </summary>
-        /// <param name="aLength">a length.</param>
-        /// <param name="aFontSize">Size of a font.</param>
-        /// <param name="aFont">a font.</param>
-        /// <param name="aName">a name.</param>
+        /// <param name="aLength">максимальная длина в мм</param>
+        /// <param name="aFontSize">размер шрифта</param>
+        /// <param name="aFont">шрифт</param>
+        /// <param name="aString">строка для разбивки</param>
         /// <returns></returns>
-        private List<string> GetNameStrings(float aLength, float aFontSize, PdfFont aFont, string aName)
+        private List<string> SplitNameByWidth(float aLength, float aFontSize, PdfFont aFont, string aString)
         {
             List<string> name_strings = new List<string>();
             int default_padding = 4;
             float maxLength = aLength - default_padding;
-            float currLength = aFont.GetWidth(aName, aFontSize);
+            float currLength = aFont.GetWidth(aString, aFontSize);
 
-            GetLimitSubstring(name_strings, maxLength, currLength, aName );
-            
+            GetLimitSubstring(name_strings, maxLength, currLength, aString);            
 
             return name_strings;
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name_strings"></param>
+        /// <param name="maxLength"></param>
+        /// <param name="currLength"></param>
+        /// <param name="aFullName"></param>
         private void GetLimitSubstring(List<string> name_strings, float maxLength, float currLength, string aFullName)
         {
             if (currLength < maxLength)
