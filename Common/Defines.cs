@@ -139,6 +139,13 @@ namespace GostDOC.Common
         /// название графы №4б Обозначение Литеры О1 изделия в структуре xml
         /// </summary>
         public static readonly string GRAPH_4b = "Литера3";
+        
+        
+        public static readonly string GRAPH_5 = "";
+        public static readonly string GRAPH_6 = "";
+        public static readonly string GRAPH_7 = "";
+        public static readonly string GRAPH_8 = "";
+
         /// <summary>
         /// название графы №9 Наименование организации в структуре xml
         /// </summary>
@@ -147,6 +154,11 @@ namespace GostDOC.Common
         /// название графы №10 Должность контролирующего в структуре xml
         /// </summary>
         public static readonly string GRAPH_10 = "Дополнительная графа";
+
+        public static readonly string GRAPH_11 = "";
+        public static readonly string GRAPH_12 = "";
+        public static readonly string GRAPH_13 = "";
+
         /// <summary>
         /// название графы №11 Фамилия разработчика для спецификации в структуре xml
         /// </summary>
@@ -187,6 +199,10 @@ namespace GostDOC.Common
         /// название графы №16 Номер документа изменение в структуре xml
         /// </summary>
         public static readonly string GRAPH_16 = "Номер документа изменение";
+        
+        
+        public static readonly string GRAPH_17 = "";
+
         /// <summary>
         /// название графы №18 Дата изменения документа в структуре xml
         /// </summary>
@@ -195,6 +211,12 @@ namespace GostDOC.Common
         /// название графы №25 Первичное применение изделия в структуре xml
         /// </summary>
         public static readonly string GRAPH_25 = "Перв. примен";
+
+        public static readonly string GRAPH_27 = "";
+        public static readonly string GRAPH_28 = "";
+        public static readonly string GRAPH_29 = "";
+        public static readonly string GRAPH_30 = "";
+
 
         /// <summary>
         /// компоненты, не вошедшие ни в одной группу
