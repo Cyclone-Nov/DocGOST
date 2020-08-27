@@ -33,6 +33,7 @@ namespace GostDOC.PDF
         private const string FileName = @"Перечень элементов.pdf";
         private const float thickLineWidth = 2f;            
         private readonly float bottomMargin = 5 * PdfDefines.mmA4;
+        private readonly float TOP_APPEND_GRAPH_BOTTOM = (5 + 287 - 60 * 2) * PdfDefines.mmA4;
 
         public PdfElementListCreator() : base(DocType.ItemsList)
         {   
@@ -489,7 +490,15 @@ namespace GostDOC.PDF
 
             // добавить таблицу с нижней дополнительной графой
             aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
-                        
+
+
+            var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
+            var p = new Paragraph("САВиП").SetRotationAngle(DegreesToRadians(90)).AddStyle(style).SetFixedPosition(10*PdfDefines.mmA4+2,TOP_APPEND_GRAPH_BOTTOM+45*PdfDefines.mmA4,100);
+            aInDoc.Add(p);
+            p = new Paragraph("Копировал").AddStyle(style).SetFixedPosition((7+10+32+15+10+14)*PdfDefines.mmA4,0,100);
+            aInDoc.Add(p);
+            p = new Paragraph("Формат А4").AddStyle(style).SetFixedPosition((7+10+32+15+10 + 70)*PdfDefines.mmA4 + 20,0,100);
+            aInDoc.Add(p);
 
             return lastProcessedRow;
         }
@@ -536,8 +545,6 @@ namespace GostDOC.PDF
         /// </summary>
         /// <returns></returns>
         private Table CreateFirstTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs, int aPages) {
-            //float thickLineWidth = 2f;
-
             float[] columnSizes = {65 * PdfDefines.mmA4, 120 * PdfDefines.mmA4 };
             Table mainTable = new Table(UnitValue.CreatePointArray(columnSizes));
 
@@ -835,6 +842,7 @@ namespace GostDOC.PDF
             return c;
         }
 
+
         /// <summary>
         /// создать таблицу для верхней дополнительной графы
         /// </summary>
@@ -850,7 +858,7 @@ namespace GostDOC.PDF
             tbl.AddCell(CreateAppendGraph(60*PdfDefines.mmA4, "Справ. №"));
             tbl.AddCell(CreateAppendGraph(60*PdfDefines.mmA4));
 
-            tbl.SetFixedPosition((20 - 5- 7) * PdfDefines.mmA4, (5+287-60*2) * PdfDefines.mmA4, (5 + 7) * PdfDefines.mmA4);
+            tbl.SetFixedPosition((20 - 5- 7) * PdfDefines.mmA4, TOP_APPEND_GRAPH_BOTTOM, (5 + 7) * PdfDefines.mmA4);
 
             return tbl;
         }
@@ -901,7 +909,7 @@ namespace GostDOC.PDF
             // add header            
             Cell headerCell = CreateEmptyCell(1, 1).SetMargin(0).SetPaddings(-2, -2, -2, -2).SetHeight(15 * PdfDefines.mmA4h).
                                                     SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1).SetFontSize(16);            
-            tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Поз. обозначение")));
+            tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Поз. обозна-\nчение").SetFixedLeading(11.0f)));
             tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Наименование")));
             tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Кол.")));
             tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Примечание")));
@@ -1014,72 +1022,6 @@ namespace GostDOC.PDF
                 aTable.AddCell(aTemplateCell.Clone(false).SetBorderBottom(new SolidBorder(borderWidth)));
         }
 
-
-        /// <summary>
-        /// добавить ячейку со строковым значеним в таблицу
-        /// </summary>
-        /// <param name="content">содержимое</param>
-        /// <param name="borderWidth">толщина линии</param>
-        /// <param name="colspan">количество занимаемых столбцов</param>
-        /// <param name="alignment">выравнивание текста</param>
-        /// <param name="font">шрифт текста</param>
-        /// <returns></returns>
-        public Cell createCell(String content, float borderWidth, int colspan, TextAlignment alignment, PdfFont font)
-        {
-            Cell cell = new Cell(1, colspan).Add(new Paragraph(content));
-            cell.SetTextAlignment(alignment);
-            cell.SetBorder(new SolidBorder(borderWidth));
-            cell.SetFont(font);
-            return cell;
-        }
-
-        /// <summary>
-        /// добавить ячейку со значением в виде таблицы во внешнюю таблицу
-        /// </summary>
-        /// <param name="content">содержимое</param>
-        /// <param name="borderWidth">толщина линии</param>
-        /// <param name="colspan">количество занимаемых столбцов</param>
-        /// <param name="alignment">выравнивание текста</param>
-        /// <param name="font">шрифт текста</param>
-        /// <returns></returns>
-        public Cell createCell(Table content, float borderWidth, int colspan, TextAlignment alignment, PdfFont font)
-        {
-            Cell cell = new Cell(1, colspan).Add(content);
-            cell.SetTextAlignment(alignment);
-            cell.SetBorder(new SolidBorder(borderWidth));
-            cell.SetFont(font);
-            return cell;
-        }
-
-        void ApplyVerticalCell(Cell c, string text)
-        {
-            c.Add(
-                new Paragraph(text).
-                    SetFont(f1).
-                    SetFontSize(12).
-                    SetRotationAngle(DegreesToRadians(90)).
-                    SetFixedLeading(10).
-                    SetPadding(0).
-                    SetPaddingRight(-10).
-                    SetPaddingLeft(-10).
-                    SetMargin(0).
-                    SetItalic().
-                    SetTextAlignment(TextAlignment.CENTER));
-
-            c.SetHorizontalAlignment(HorizontalAlignment.CENTER)
-             .SetVerticalAlignment(VerticalAlignment.MIDDLE)
-             .SetMargin(0)
-             .SetPadding(0)
-             .SetBorder(new SolidBorder(2));
-        }
-
-        private Cell CreateCellNoBorder(int rowspan, int colspan)
-        {
-            Cell cell = new Cell(rowspan, colspan);
-            cell.SetVerticalAlignment(VerticalAlignment.MIDDLE).SetHorizontalAlignment(HorizontalAlignment.CENTER).SetBorder(Border.NO_BORDER);
-            return cell;
-        }
-
         private Cell CreateEmptyCell(int aRowspan, int aColspan, int aLeftBorder = 2, int aRightBorder = 2, int aTopBorder = 2, int aBottomBorder = 2)
         {
             Cell cell = new Cell(aRowspan, aColspan);
@@ -1092,16 +1034,6 @@ namespace GostDOC.PDF
 
             return cell;
         }
-
-        void AddEmptyCells(int numberOfCells, float height, Table aTable)
-        {
-            for (int i = 0; i < numberOfCells; ++i)
-            {
-                aTable.AddCell(
-                    new Cell().SetHeight(height).SetBorderLeft(new SolidBorder(2)).SetBorderRight(new SolidBorder(2)));
-            }
-        }
-
 
         /// <summary>
         /// Разбить строку на несколько строк исходя из длины текста
