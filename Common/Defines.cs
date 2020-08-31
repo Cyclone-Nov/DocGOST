@@ -114,8 +114,12 @@ namespace GostDOC.Common
 
     }
 
-    public static class Constants
-    {
+    public static class Constants {
+        /// <summary>
+        /// Название проекта
+        /// </summary>
+        public static readonly string GRAPH_PJOJECT = "Проект";
+
         /// <summary>
         /// индекс основного исполнения (конфигурации) в виде строки
         /// </summary>
