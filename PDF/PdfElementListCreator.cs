@@ -45,6 +45,8 @@ namespace GostDOC.PDF
         private readonly float DEFAULT_TITLE_BLOCK_CELL_HEIGHT = 5 * PdfDefines.mmA4h;
         private readonly float TITLE_BLOCK_WIDTH = 185 * PdfDefines.mmA4;
 
+        private int _currentPageNumber;
+
         Border CreateThickBorder() {
             return new SolidBorder(THICK_LINE_WIDTH);
         } 
@@ -93,8 +95,10 @@ namespace GostDOC.PDF
             // TODO: remove this
             lastProcessedRow = 1;
 
+            _currentPageNumber = 1;
             while (lastProcessedRow > 0)
             {
+                _currentPageNumber++;
                 lastProcessedRow = AddNextPage(doc, mainConfig.Graphs, dataTable, lastProcessedRow);
             }
 
@@ -535,7 +539,7 @@ namespace GostDOC.PDF
             // добавить таблицу с данными
             int lastNextProcessedRow;
             var dataTable = CreateDataTable(aData, false, aStartRow, out lastNextProcessedRow);
-            dataTable.SetFixedPosition(19.3f * PdfDefines.mmA4, BOTTOM_MARGIN + 24 * PdfDefines.mmA4, TITLE_BLOCK_WIDTH+2f);
+            dataTable.SetFixedPosition(19.3f * PdfDefines.mmA4, BOTTOM_MARGIN + 16 * PdfDefines.mmA4, TITLE_BLOCK_WIDTH+2f);
             aInPdfDoc.Add(dataTable);
 
 
@@ -547,6 +551,11 @@ namespace GostDOC.PDF
             
             // TODO: remove this
             lastNextProcessedRow = 0;
+
+            // нарисовать недостающую линию
+//            var fromLeft = 19.3f * PdfDefines.mmA4 + TITLE_BLOCK_WIDTH;
+//            Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetPage(_currentPageNumber)), new Rectangle(fromLeft,BOTTOM_MARGIN + (13)*PdfDefines.mmA4+2f, 2, 30));
+//            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(20).SetRotationAngle(DegreesToRadians(90)));
 
             return lastNextProcessedRow;
         }
