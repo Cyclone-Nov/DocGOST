@@ -89,7 +89,7 @@ namespace GostDOC.PDF
                     {
                         PageSize = new PageSize(PageSize.A4);
                         CountStringsOnFirstPage = 24;
-                        CountStringsOnNextPage = 30;
+                        CountStringsOnNextPage = 31;
                     }
                     break;                
                 default:
