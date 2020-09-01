@@ -1,0 +1,2673 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!--Версия XML 1.0--><!--Раздел документации // Вид документа#Код документа#Обозначение#Формат#Примечание--><!--BOARD_OUTLINE       // SEGMENT;X;Y#--><!--BOARD_CUTOUT        // SEGMENT;X;Y#--><!--DRILLED_HOLES       // HOLE_NUMBER;HOLE_D;HOLE_X;HOLE_Y;HOLE_STYLE#--><!--STYLE_HOLE          // PTH=1, NPTH=0--><!--LAYER_COMPONENT     // TOP=1, BOTTOM=0-->
+<xml>
+<transaction	Type="AltiumDesigner"	version="1.0"	Date="21.08.2020"	Time="12:07:02">
+<project	Project_Path="D:\Lib\Altium\test_gitlab\COL_MP.PrjPcb"	Project_Name="COL_MP.PrjPcb">
+<configurations>
+<!-- -00 из 1 -->
+	<configuration	name="-00">
+	<graphs>
+		<graph name="Шифр PCB"	value=""/>
+		<graph name="Характер работы"	value=""/>
+		<graph name="Формат PCB"	value=""/>
+		<graph name="Утвердил"	value="Гульцов"/>
+		<graph name="Указания изменение"	value=""/>
+		<graph name="Разработал схемотехник"	value="Струнков"/>
+		<graph name="Разработал конструктор"	value="Струнков"/>
+		<graph name="Раздел"	value="Документация"/>
+		<graph name="Проект"	value="ТВ-80"/>
+		<graph name="Проверил схемотехник"	value="Васильев"/>
+		<graph name="Проверил конструктор"	value="Васильев"/>
+		<graph name="Примечание"	value=""/>
+		<graph name="Порядковый номер изменения"	value=""/>
+		<graph name="Первичная применяемость"	value="ПАКБ.201501.003"/>
+		<graph name="Обозначение PCB"	value="ПАКБ.681501.003"/>
+		<graph name="Обозначение"	value="ПАКБ.201501.003"/>
+		<graph name="Нормоконтроль"	value="Корнева"/>
+		<graph name="Номер документа изменение"	value=""/>
+		<graph name="Наименование PCB"	value="Плата печатная"/>
+		<graph name="Наименование"	value="Модуль индикации(МИ)"/>
+		<graph name="Литера"	value=""/>
+		<graph name="Код документа"	value="Т6М"/>
+		<graph name="Дополнительная графа"	value=""/>
+		<graph name="Дата изменения"	value=""/>
+		<graph name="Вид документа"	value="Файл проекта печатной платы"/>
+	</graphs>
+	<documents>
+		<document>
+			<properties>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Раздел СП"	value="Документация"/>
+				<property name="Наименование"	value="Схема"/>
+				<property name="Обозначение"	value="ПАКБ.201501.003Э3"/>
+				<property name="Код документа"	value="Э3"/>
+				<property name="Формат"	value="А1"/>
+				<property name="Примечание"	value=""/>
+			</properties>
+		</document>
+	</documents>
+	<components>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="БКЯЮ.436630.030ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="ООО «АЕИЭ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="A1"/>
+				<property name="Наименование"	value="МДМ100-1ВСУФ"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="БКЯЮ.436630.030ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="ООО «АЕИЭ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="A2"/>
+				<property name="Наименование"	value="МДМ100-1ВСУФ"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="БКЯЮ.436630.030ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="ООО «АЕИЭ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="A3"/>
+				<property name="Наименование"	value="МДМ100-1ВСУФ"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="БКЯЮ.436630.030ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="ООО «АЕИЭ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="A4"/>
+				<property name="Наименование"	value="МДМ100-1ВСУФ"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="БКЯЮ.436630.001ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="ООО «АЕДОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="A5"/>
+				<property name="Наименование"	value="МДМ3-1А05МУП"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="БКЯЮ.436630.001ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="ООО «АЕДОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="A6"/>
+				<property name="Наименование"	value="МДМ5-1А105TУП"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="БКЯЮ.436630.001ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="ООО «АЕДОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="A7"/>
+				<property name="Наименование"	value="МДМ3-1А05МУП"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="БКЯЮ.436630.001ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="ООО «АЕДОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="A8"/>
+				<property name="Наименование"	value="МДМ5-1А105TУП"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C1"/>
+				<property name="Наименование"	value="К10-79-50 В-4700 пФ ±10 % МП0"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C2"/>
+				<property name="Наименование"	value="К10-79-10 В-10 мкФ +80/-20 % Н90"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C3"/>
+				<property name="Наименование"	value="К10-79-50 В-4700 пФ ±10 % МП0"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C4"/>
+				<property name="Наименование"	value="К10-79-10 В-10 мкФ +80/-20 % Н90"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673546.015ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «ЭЛЕКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C5"/>
+				<property name="Наименование"	value="К53-68 &quot;Е&quot;-50 В -15 мкФ ±10 %"/>
+				<property name="Тип"	value="К53-68"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673546.015ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «ЭЛЕКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C6"/>
+				<property name="Наименование"	value="К53-68 &quot;Е&quot;-50 В -15 мкФ ±10 %"/>
+				<property name="Тип"	value="К53-68"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C7"/>
+				<property name="Наименование"	value="К10-79-100 В-10 пФ ±10 % МП0"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C8"/>
+				<property name="Наименование"	value="К10-79-100 В-10 пФ ±10 % МП0"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673546.015ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «ЭЛЕКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C9"/>
+				<property name="Наименование"	value="К53-68 &quot;Е&quot;-50 В-6.8 мкФ ±10 %"/>
+				<property name="Тип"	value="К53-68"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673546.015ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «ЭЛЕКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C10"/>
+				<property name="Наименование"	value="К53-68 &quot;Е&quot;-50 В-6.8 мкФ ±10 %"/>
+				<property name="Тип"	value="К53-68"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673546.007ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «ЭЛЕКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C11"/>
+				<property name="Наименование"	value="К53-68 &quot;D&quot;-50 В-4.7 мкФ ±10 %"/>
+				<property name="Тип"	value="К53-68"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673546.007ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «ЭЛЕКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C12"/>
+				<property name="Наименование"	value="К53-68 &quot;D&quot;-50 В-4.7 мкФ ±10 %"/>
+				<property name="Тип"	value="К53-68"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C13"/>
+				<property name="Наименование"	value="К10-79-50 В-1.0 мкФ ±20 % Н30"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C14"/>
+				<property name="Наименование"	value="К10-79-50 В-1.0 мкФ ±20 % Н30"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C15"/>
+				<property name="Наименование"	value="К10-79-50 В-0.022 мкФ ±10 % МП0"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C16"/>
+				<property name="Наименование"	value="К10-79-50 В-0.022 мкФ ±10 % МП0"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673546.015ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «ЭЛЕКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C17"/>
+				<property name="Наименование"	value="К53-68 &quot;Е&quot;-20 В-100 мкФ ±10 %"/>
+				<property name="Тип"	value="К53-68"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673546.015ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «ЭЛЕКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C18"/>
+				<property name="Наименование"	value="К53-68 &quot;Е&quot;-20 В-100 мкФ ±10 %"/>
+				<property name="Тип"	value="К53-68"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C19"/>
+				<property name="Наименование"	value="К10-79-50 В-680 пФ ±10 % МП0"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C20"/>
+				<property name="Наименование"	value="К10-79-50 В-680 пФ ±10 % МП0"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C21"/>
+				<property name="Наименование"	value="К10-79-50 В-3600 пФ ±10 % МП0"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="АО «НИИ «Гириконд»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C22"/>
+				<property name="Наименование"	value="К10-79-50 В-3600 пФ ±10 % МП0"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="IMX252LQR-C"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="SONY"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="DD1"/>
+				<property name="Наименование"	value="IMX252LQR-C"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="бК0.347.364-01ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="ОАО «ИНТЕГРАЛ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="DD2"/>
+				<property name="Наименование"	value="1533ЛН1"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕНВ.431320.152ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ПКК Миландр»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="DD3"/>
+				<property name="Наименование"	value="5101НВ015"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АФТП.433520.007ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ЛИТ-ФОНОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="G1"/>
+				<property name="Наименование"	value="ГК108-П-15ГР-3-4М"/>
+				<property name="Тип"	value="ГК108-П"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АФТП.433520.007ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ЛИТ-ФОНОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="G2"/>
+				<property name="Наименование"	value="ГК108-П-15ГР-3-4М"/>
+				<property name="Тип"	value="ГК108-П"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АФТП.433520.007ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ЛИТ-ФОНОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="G3"/>
+				<property name="Наименование"	value="ГК108-П-15ГР-3-12М"/>
+				<property name="Тип"	value="ГК108-П"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L1"/>
+				<property name="Наименование"	value="МДГ3-10000"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L2"/>
+				<property name="Наименование"	value="МДГ3-6000"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L3"/>
+				<property name="Наименование"	value="МДГ3-10000"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L4"/>
+				<property name="Наименование"	value="МДГ3-6000"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L5"/>
+				<property name="Наименование"	value="МДГ3-10000"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L6"/>
+				<property name="Наименование"	value="МДГ3-6000"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L7"/>
+				<property name="Наименование"	value="МДГ3-10000"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L8"/>
+				<property name="Наименование"	value="МДГ3-6000"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L9"/>
+				<property name="Наименование"	value="МДГ3-6800"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L10"/>
+				<property name="Наименование"	value="МДГ3-6800"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L11"/>
+				<property name="Наименование"	value="МДГ3-6800"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="L12"/>
+				<property name="Наименование"	value="МДГ3-6800"/>
+				<property name="Тип"	value="МДГ3"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R1"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1.5 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R2"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -110 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R3"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -13 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R4"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -39 Ом ±5 % -Т -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R5"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1.5 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R6"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -180 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R7"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -39 Ом ±5 % -Т -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R8"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -300 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R9"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -150 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R10"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -300 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R11"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1.8 Ом ±5 % -Т -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R12"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -240 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R13"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -110 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R14"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1.5 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R15"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -13 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R16"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -180 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R17"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1.5 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R18"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -150 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R19"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -240 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R20"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1.8 Ом ±5 % -Т -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R21"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -110 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R22"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1.5 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R23"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -13 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R24"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -39 Ом ±5 % -Т -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R25"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -180 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R26"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1.5 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R27"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -300 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R28"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -150 кОм ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R29"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -240 Ом ±5 % -Л -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R30"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1.8 Ом ±5 % -Т -А -М"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="27.11.4"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="TV1"/>
+				<property name="Наименование"	value="ТИС2-3"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АГ0.472.105ТУ"/>
+				<property name="Код продукции"	value="27.11.4"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="TV2"/>
+				<property name="Наименование"	value="ТИЛ6В"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="КВШУ.670114.001ТУ"/>
+				<property name="Код продукции"	value="27.11.4"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="TV3"/>
+				<property name="Наименование"	value="ТИС2-3"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АГ0.472.105ТУ"/>
+				<property name="Код продукции"	value="27.11.4"/>
+				<property name="Поставщик"	value="ПАО «МСТАТОР»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="TV4"/>
+				<property name="Наименование"	value="ТИЛ6В"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.297ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ВЗПП-С»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD1"/>
+				<property name="Наименование"	value="2ДШ2123Д94"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.177ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО Орбита"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD2"/>
+				<property name="Наименование"	value="2Д212А/СО"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.297ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ВЗПП-С»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD3"/>
+				<property name="Наименование"	value="2ДШ2123Д94"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.177ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО Орбита"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD4"/>
+				<property name="Наименование"	value="2Д212А/СО"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.177ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО Орбита"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD5"/>
+				<property name="Наименование"	value="2Д212А/СО"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.297ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ВЗПП-С»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD6"/>
+				<property name="Наименование"	value="2ДШ2123Д94"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.177ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО Орбита"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD7"/>
+				<property name="Наименование"	value="2Д212А/СО"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.297ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ВЗПП-С»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD8"/>
+				<property name="Наименование"	value="2ДШ2123Д94"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.567ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ВЗПП-С»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD9"/>
+				<property name="Наименование"	value="2ДШ2123Г95"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.567ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ВЗПП-С»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD10"/>
+				<property name="Наименование"	value="2ДШ2123Г95"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.567ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ВЗПП-С»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD11"/>
+				<property name="Наименование"	value="2ДШ2123Г95"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="АЕЯР.432120.567ТУ"/>
+				<property name="Код продукции"	value="26.11.30.000"/>
+				<property name="Поставщик"	value="АО «ВЗПП-С»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VD12"/>
+				<property name="Наименование"	value="2ДШ2123Г95"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="аАО.336.448ТУ -02"/>
+				<property name="Код продукции"	value="26.11.21.120"/>
+				<property name="Поставщик"	value="ОАО «ИНТЕГРАЛ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VT1"/>
+				<property name="Наименование"	value="КТ3130Б9"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="аАО.336.447ТУ -02"/>
+				<property name="Код продукции"	value="26.11.21.120"/>
+				<property name="Поставщик"	value="ОАО «ИНТЕГРАЛ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VT2"/>
+				<property name="Наименование"	value="КТ3129Б9"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="аАО.336.448ТУ -02"/>
+				<property name="Код продукции"	value="26.11.21.120"/>
+				<property name="Поставщик"	value="ОАО «ИНТЕГРАЛ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VT3"/>
+				<property name="Наименование"	value="КТ3130Б9"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="аАО.336.448ТУ -02"/>
+				<property name="Код продукции"	value="26.11.21.120"/>
+				<property name="Поставщик"	value="ОАО «ИНТЕГРАЛ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VT4"/>
+				<property name="Наименование"	value="КТ3130Б9"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="аА0.336.692ТУ"/>
+				<property name="Код продукции"	value="26.11.21.120"/>
+				<property name="Поставщик"	value="АО «ГРУППА КРЕМНИЙ ЭЛ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VT5"/>
+				<property name="Наименование"	value="КТ665А9"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="аАО.336.447ТУ -02"/>
+				<property name="Код продукции"	value="26.11.21.120"/>
+				<property name="Поставщик"	value="ОАО «ИНТЕГРАЛ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VT6"/>
+				<property name="Наименование"	value="КТ3129Б9"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="аАО.336.447ТУ -02"/>
+				<property name="Код продукции"	value="26.11.21.120"/>
+				<property name="Поставщик"	value="ОАО «ИНТЕГРАЛ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VT7"/>
+				<property name="Наименование"	value="КТ3129Б9"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="аА0.336.692ТУ"/>
+				<property name="Код продукции"	value="26.11.21.120"/>
+				<property name="Поставщик"	value="АО «ГРУППА КРЕМНИЙ ЭЛ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VT8"/>
+				<property name="Наименование"	value="КТ665А9"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="аА0.336.692ТУ"/>
+				<property name="Код продукции"	value="26.11.21.120"/>
+				<property name="Поставщик"	value="АО «ГРУППА КРЕМНИЙ ЭЛ»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="VT9"/>
+				<property name="Наименование"	value="КТ665А9"/>
+				<property name="Тип"	value=""/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РЮМК.430420.011ТУ"/>
+				<property name="Код продукции"	value="27.33.13.120"/>
+				<property name="Поставщик"	value="АО «Карачевский завод «Электродеталь»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="XP1"/>
+				<property name="Наименование"	value="СНП346-10ВП22-2-В"/>
+				<property name="Тип"	value="СНП346"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РЮМК.430420.011ТУ"/>
+				<property name="Код продукции"	value="27.33.13.120"/>
+				<property name="Поставщик"	value="АО «Карачевский завод «Электродеталь»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="XP2"/>
+				<property name="Наименование"	value="СНП346-10ВП22-2-В"/>
+				<property name="Тип"	value="СНП346"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РЮМК.430420.011ТУ"/>
+				<property name="Код продукции"	value="27.33.13.120"/>
+				<property name="Поставщик"	value="АО «Карачевский завод «Электродеталь»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="XP3"/>
+				<property name="Наименование"	value="СНП346-10ВП31-2"/>
+				<property name="Тип"	value="СНП346"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РЮМК.430420.011ТУ"/>
+				<property name="Код продукции"	value="27.33.13.120"/>
+				<property name="Поставщик"	value="АО «Карачевский завод «Электродеталь»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="XP4"/>
+				<property name="Наименование"	value="СНП346-10ВП31-2"/>
+				<property name="Тип"	value="СНП346"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z1"/>
+				<property name="Наименование"	value="КИФ 1608 -120 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z2"/>
+				<property name="Наименование"	value="КИФ 1608 -120 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z3"/>
+				<property name="Наименование"	value="КИФ 1608 -680 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z4"/>
+				<property name="Наименование"	value="КИФ 1608 -15 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z5"/>
+				<property name="Наименование"	value="КИФ 1608 -680 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z6"/>
+				<property name="Наименование"	value="КИФ 1608 -15 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z7"/>
+				<property name="Наименование"	value="КИФ 1608 -120 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z8"/>
+				<property name="Наименование"	value="КИФ 1608 -680 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z9"/>
+				<property name="Наименование"	value="КИФ 1608 -15 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z10"/>
+				<property name="Наименование"	value="КИФ 1608 -120 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z11"/>
+				<property name="Наименование"	value="КИФ 1608 -680 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Обозначение"	value=""/>
+				<property name="Документ на поставку"	value="РКМУ.671340.002ТУ"/>
+				<property name="Код продукции"	value="26.51.43.150"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Формат"	value=""/>
+				<property name="Количество на изд."	value=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие компонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="Z12"/>
+				<property name="Наименование"	value="КИФ 1608 -15 нГн ±10 % Зл-А"/>
+				<property name="Тип"	value="КИФ 1608"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+			</properties>
+		</component>
+	</components>
+	</configuration>
+</configurations>
+</project>
+</transaction>
+</xml>

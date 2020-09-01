@@ -59,6 +59,8 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsAutoSortEnabled { get; } = new ObservableProperty<bool>(true);
 
+        public DocType CurrentDocType = DocType.Specification;
+
         // Drag / drop
         public DragDropFile DragDropFile { get; } = new DragDropFile();
 
@@ -80,6 +82,7 @@ namespace GostDOC.ViewModels
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
         public ICommand UpdatePdfCmd => new Command(UpdatePdf);
         public ICommand ClickMenuCmd => new Command<MenuNode>(ClickMenu);
+        
 
         /// <summary>
         /// Current selected configuration
@@ -372,11 +375,25 @@ namespace GostDOC.ViewModels
             }
         }
 
+
         private void UpdatePdf(object obj)
         {
-            byte[] data = File.ReadAllBytes(Path.Combine(Environment.CurrentDirectory, "example.pdf"));
-            CurrentPdfData.Value = data;
-            //CurrentPdfPath.Value = Path.Combine(Environment.CurrentDirectory, "example.pdf");
+            if (_selectedItem == null)
+                return;
+            var nodeType = _selectedItem.ParentType;
+            if (nodeType == NodeType.Root)
+                nodeType = _selectedItem.NodeType;
+            var type = Common.Converters.GetPdfType(nodeType);
+
+            if(nodeType == NodeType.Root)
+            {
+                System.Windows.MessageBox.Show("Документ для отображения не выбран! Выберите в дереве документ для отображения");
+                return;
+            }
+            
+            // TODO: async
+            /*res = await*/ _docManager.SaveChangesInPdf(type);
+            CurrentPdfData.Value = _docManager.GetPdfData(type);
         }
 
         private void ClickMenu(MenuNode obj)

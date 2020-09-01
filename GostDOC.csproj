@@ -88,6 +88,7 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.IO.Compression" />
@@ -145,6 +146,12 @@
     <Compile Include="Models\ProjectWrapper.cs" />
     <Compile Include="Models\SortFactory.cs" />
     <Compile Include="Models\SubGroupInfo.cs" />
+    <Compile Include="PDF\PdfBillCreator.cs" />
+    <Compile Include="PDF\PdfCreator.cs" />
+    <Compile Include="PDF\PdfElementListCreator.cs" />
+    <Compile Include="PDF\PdfDefines.cs" />
+    <Compile Include="PDF\PdfManager.cs" />
+    <Compile Include="PDF\PdfSpecificationCreator.cs" />
     <Compile Include="UI\DragDropFile.cs" />
     <Compile Include="UserControls\NameValueControl.xaml.cs">
       <DependentUpon>NameValueControl.xaml</DependentUpon>
@@ -270,6 +277,15 @@
     <Content Include="Documents.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Font\GOST_BU.TTF">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Font\GOST_ITALIC.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Font\GOST_TYPE_A.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>

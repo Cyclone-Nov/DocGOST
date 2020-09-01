@@ -17,6 +17,8 @@ namespace GostDOC.Common
         #region Singleton
         private static readonly Lazy<HttpDataToBrowser> _instance = new Lazy<HttpDataToBrowser>(() => new HttpDataToBrowser(), true);
         public static HttpDataToBrowser Instance => _instance.Value;
+        #endregion
+
         HttpDataToBrowser()
         {
             _httpListener.Prefixes.Add(HostUri);
@@ -47,6 +49,6 @@ namespace GostDOC.Common
                 response.Close();
             }, null);
         }
-        #endregion
+        
     }
 }
