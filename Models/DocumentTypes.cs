@@ -16,10 +16,11 @@ namespace GostDOC.Models
     {
         public IDictionary<string, IDictionary<string, Document>> Documents { get; private set; } = new Dictionary<string, IDictionary<string, Document>>();
 
-        #region Singleton
-        private static readonly Lazy<DocumentTypes> _instance = new Lazy<DocumentTypes>(() => new DocumentTypes(), true);
-        public static DocumentTypes Instance => _instance.Value;
-        DocumentTypes()
+        public DocumentTypes()
+        {
+        }
+
+        public void Load()
         {
             string current = string.Empty;
             foreach (var line in Utils.ReadCfgFileLines("Documents"))
@@ -48,7 +49,6 @@ namespace GostDOC.Models
                 }
             }
         }
-        #endregion
 
         public Document GetDocument(string aType, string aName)
         {

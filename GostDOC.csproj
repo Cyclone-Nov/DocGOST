@@ -160,6 +160,7 @@
     <Compile Include="Views\NewFile.xaml.cs">
       <DependentUpon>NewFile.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\MaterialTypes.cs" />
     <Compile Include="XML\XUtils.cs" />
     <Compile Include="Models\Converter.cs" />
     <Compile Include="Models\DataStructures.cs" />
