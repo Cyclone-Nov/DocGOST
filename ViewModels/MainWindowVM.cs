@@ -31,7 +31,9 @@ namespace GostDOC.ViewModels
         private bool _parseAssemblyUnitsSet = false;
 
         private DocManager _docManager = DocManager.Instance;
-        private DocumentTypes _docTypes = DocumentTypes.Instance;
+
+        private DocumentTypes _docTypes = new DocumentTypes();
+        private MaterialTypes _materials = new MaterialTypes();
 
         private ProjectWrapper _project = new ProjectWrapper();
         private List<MoveInfo> _moveInfo = new List<MoveInfo>();
@@ -47,6 +49,7 @@ namespace GostDOC.ViewModels
         public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
         // Context menu
         public ObservableCollection<MenuNode> TableContextMenu { get; } = new ObservableCollection<MenuNode>();
+        public ObservableProperty<bool> TableContextMenuEnabled { get; } = new ObservableProperty<bool>(false);
         // PDF data
         public ObservableProperty<string> CurrentPdfPath { get; } = new ObservableProperty<string>();
         public ObservableProperty<byte[]> CurrentPdfData { get; } = new ObservableProperty<byte[]>();
@@ -139,9 +142,14 @@ namespace GostDOC.ViewModels
             root.Nodes.Add(_bill_D27);
 
             DocNodes.Add(root);
-
+            // Subscribe to drag and drop events
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
+            // Subscribe to assembly unit found event
             _docManager.XmlManager.AssemblyUnitFound += OnAssemblyUnitFound;
+            // Load document types
+            _docTypes.Load();
+            // Load material types
+            _materials.Load();
         }
 
         #region Commands impl
@@ -613,6 +621,7 @@ namespace GostDOC.ViewModels
         private void UpdateTableContextMenu()
         {
             TableContextMenu.Clear();
+            TableContextMenuEnabled.Value = false;
 
             if (GroupName.Equals(Constants.GroupDoc))
             {
@@ -625,6 +634,21 @@ namespace GostDOC.ViewModels
                     }
                     TableContextMenu.Add(node);
                 }
+                TableContextMenuEnabled.Value = true;
+            }
+            else if (GroupName.Equals(Constants.GroupMaterials))
+            {
+                foreach (var kvp in _materials.Materials)
+                {
+                    MenuNode node = new MenuNode() { Name = kvp.Key, Nodes = new ObservableCollection<MenuNode>() };
+                    foreach (var doc in kvp.Value)
+                    {
+                        node.Nodes.Add(new MenuNode() { Name = doc.Key, Parent = node });
+                    }
+                    node.Nodes.Add(new MenuNode() { Name = "<Новый материал>", Parent = node });
+                    TableContextMenu.Add(node);
+                }
+                TableContextMenuEnabled.Value = true;
             }
         }
     }

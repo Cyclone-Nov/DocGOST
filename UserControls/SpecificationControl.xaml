@@ -11,6 +11,7 @@
 
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="inverseConverter" />
+        <BooleanToVisibilityConverter x:Key="b2v" />
     </UserControl.Resources>
     
     <Grid>
@@ -22,7 +23,7 @@
         <DataGrid x:Name="specificationDataGrid" Margin="5" SelectionMode="Extended" SelectionUnit="FullRow" 
                   AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="Auto"
                   SelectedItem="{Binding ComponentsSelectedItem.Value}"
-                  ItemsSource="{Binding Components}">
+                  ItemsSource="{Binding Components}" ContextMenuService.IsEnabled="{Binding TableContextMenuEnabled.Value}">
             
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
