@@ -21,7 +21,7 @@
         </Grid.RowDefinitions>
 
         <DataGrid x:Name="specificationDataGrid" Margin="5" SelectionMode="Extended" SelectionUnit="FullRow" 
-                  AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="Auto"
+                  AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="Auto" CanUserSortColumns="False"
                   SelectedItem="{Binding ComponentsSelectedItem.Value}"
                   ItemsSource="{Binding Components}" ContextMenuService.IsEnabled="{Binding TableContextMenuEnabled.Value}">
             

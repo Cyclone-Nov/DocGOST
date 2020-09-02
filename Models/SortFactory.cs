@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -56,7 +57,7 @@ namespace GostDOC.Models
         public static NameSortRegex Instance => _instance.Value;
         private NameSortRegex()
         {
-            StringBuilder unitsGroup = new StringBuilder(@"\w*?(\d*)\s*(");
+            StringBuilder unitsGroup = new StringBuilder(@"\w*?(\d+(?:\.\d+)?)\w*\s*(");
 
             bool first = true;
             foreach (var line in Utils.ReadCfgFileLines("Units"))
@@ -99,7 +100,7 @@ namespace GostDOC.Models
             Match match = regex.Match(aInput);
             if (match.Success)
             {
-                var num = Convert.ToUInt32(match.Groups[1].Value);
+                var num = double.Parse(match.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture);
                 var multiplier = ParseMultiplier(match.Groups[2].Value);
                 return num * multiplier;
             }
@@ -107,10 +108,9 @@ namespace GostDOC.Models
         }
 
         public List<Component> Sort(List<Component> aItems)
-        {
+        {            
             aItems.Sort((x, y) =>
             {
-
                 string nameX = x.GetProperty(Constants.ComponentName);
                 string nameY = y.GetProperty(Constants.ComponentName);
 
@@ -132,7 +132,6 @@ namespace GostDOC.Models
                 }
                 return result;
             });
-
             return aItems;
         }
     }
