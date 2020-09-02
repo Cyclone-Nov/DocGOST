@@ -47,9 +47,6 @@ namespace GostDOC.PDF
 
         private int _currentPageNumber;
 
-        Border CreateThickBorder() {
-            return new SolidBorder(THICK_LINE_WIDTH);
-        } 
 
         public PdfElementListCreator() : base(DocType.ItemsList)
         {   
@@ -271,6 +268,7 @@ namespace GostDOC.PDF
             for (int i = 0; i < aComponents.Length; i++)
             {
                 string docToSupply = aComponents[i].GetProperty(Constants.ComponentDoc);
+                if (docToSupply == "") continue;
                 if (string.Equals(docToSupply.Substring(0, 4).ToLower(), "гост") ||
                     string.Equals(docToSupply.Substring(docToSupply.Length - 2, 2).ToLower(), "ту"))
                 {
@@ -1193,6 +1191,9 @@ namespace GostDOC.PDF
                 GetLimitSubstring(name_strings, maxLength, currLength, fullName);
             }
         }
+        Border CreateThickBorder() {
+            return new SolidBorder(THICK_LINE_WIDTH);
+        } 
 
     }
 }
