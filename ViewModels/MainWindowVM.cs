@@ -477,6 +477,12 @@ namespace GostDOC.ViewModels
                 // Is remove group button enabled
                 IsRemoveEnabled.Value = isGroup && _selectedItem.Name != Constants.DefaultGroupName;
             }
+            else
+            {
+                IsAddEnabled.Value = false;
+                IsRemoveEnabled.Value = false;
+            }
+
             // Is scecification table visible
             IsSpecificationTableVisible.Value = _selectedItem.ParentType == NodeType.Specification && isGroup;
             // Is bill table visible
