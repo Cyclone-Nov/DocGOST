@@ -23,9 +23,9 @@ namespace GostDOC.PDF
 
         PdfManager()
         {
-            //BillCreator = new PdfBillCreator();
+            BillCreator = new PdfBillCreator();
             ElementListCreator = new PdfElementListCreator();
-            //SpecificationCreator = new PdfSpecificationCreator();
+            SpecificationCreator = new PdfSpecificationCreator();
         }
         #endregion
 
@@ -74,49 +74,39 @@ namespace GostDOC.PDF
 
         public bool SaveChanges(DocType aDocType, Project aProject)
         {
-            bool res = false;
-            switch (aDocType)
-            {
-                case DocType.Specification:
-                    break;
-
-                case DocType.ItemsList:
-                    ElementListCreator.Create(aProject);
-                    res = true;
-                    break;
-
-                case DocType.Bill:
-                    break;
-
-                case DocType.D27:
-                    throw new NotSupportedException("Экспорт в pdf документа Д27 не поддерживается");                    
-            }
-
-            return res;
+            GetCreator(aDocType).Create(aProject);
+            return true;
         }
 
 
-        public byte[] GetPDFData(DocType aDocType)
-        {
+        public byte[] GetPDFData(DocType aDocType) {
+            return GetCreator(aDocType).GetData();
+        }
+
+        PdfCreator GetCreator(DocType aDocType) {
+            PdfCreator creator;
             switch (aDocType)
             {
                 case DocType.Specification:
-                    throw new NotImplementedException();
+                    creator = SpecificationCreator;
                     break;
 
-                case DocType.ItemsList:                    
-                    return ElementListCreator.GetData();
+                case DocType.ItemsList:
+                    creator = ElementListCreator;
+                    break;
 
                 case DocType.Bill:
-                    throw new NotImplementedException();
+                    creator = BillCreator;
                     break;
 
                 case DocType.D27:
                     throw new NotSupportedException("Экспорт в pdf документа Д27 не поддерживается");
                 default:
                     throw new NotSupportedException("Экспорт в pdf документа Д27 не поддерживается");
+                
             }
-            
+
+            return creator;
         }
     }
 }
