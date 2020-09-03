@@ -565,7 +565,7 @@ internal class PdfElementListCreator : PdfCreator {
         float fontSize = 14;
         PdfFont font = leftPaddCell.GetProperty<PdfFont>(20); // 20 - index for Font property
 
-        int remainingPdfTabeRows = (firstPage) ? CountStringsOnFirstPage : CountStringsOnNextPage;
+        int remainingPdfTabeRows = (firstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
         outLastProcessedRow = aStartRow;
 
 

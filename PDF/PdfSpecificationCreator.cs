@@ -31,8 +31,6 @@ namespace GostDOC.PDF
             Configuration mainConfig = null;
             if (!project.Configurations.TryGetValue(Constants.MAIN_CONFIG_INDEX, out mainConfig))
                 return;
-                        
-            //var dataTable = CreateDataTable(mainConfig.Specification);
 
             if (pdfWriter != null)
             {
@@ -55,7 +53,9 @@ namespace GostDOC.PDF
             doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), true);
             
             DataTable dataTable = new DataTable();
-            int lastProcessedRow = AddFirstPage(doc, mainConfig.Graphs, dataTable);
+
+            AddFirstPage(doc, mainConfig.Graphs, dataTable);
+            AddNextPage(doc, mainConfig.Graphs, dataTable, 0);
 
             doc.Close();            
         }
@@ -64,8 +64,9 @@ namespace GostDOC.PDF
 
             SetPageMargins(aInDoc);
 
-            var table = CreateMainTable(aGraphs, aData);
-            aInDoc.Add(table);
+            var mainTable = CreateMainTable(aGraphs, aData, true);
+            mainTable.SetFixedPosition(19.3f * PdfDefines.mmA4, 79 * PdfDefines.mmA4+5f, TITLE_BLOCK_WIDTH+2f);
+            aInDoc.Add(mainTable);
             
             // добавить таблицу с основной надписью для первой старницы
             aInDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
@@ -81,11 +82,27 @@ namespace GostDOC.PDF
             return 0;
         }
 
-        internal override int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow) {
-            throw new NotImplementedException();
+        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow) {
+            aInDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+            SetPageMargins(aInDoc);
+
+            var mainTable = CreateMainTable(aGraphs, aData, false);
+            mainTable.SetFixedPosition(19.3f * PdfDefines.mmA4, 37 * PdfDefines.mmA4+5f, TITLE_BLOCK_WIDTH+2f);
+            aInDoc.Add(mainTable);
+            
+            // добавить таблицу с основной надписью 
+            aInDoc.Add(CreateNextTitleBlock(PageSize, aGraphs));
+
+            // добавить таблицу с нижней дополнительной графой
+            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+
+            DrawMissingLinesNextPage(2);
+
+            return 0;
         }
 
-        Table CreateMainTable(IDictionary<string, string> aGraphs, DataTable aData) {
+        Table CreateMainTable(IDictionary<string, string> aGraphs, DataTable aData, bool firstPage) {
             float[] columnSizes = { 
                 6  * PdfDefines.mmA4, 
                 6  * PdfDefines.mmA4, 
@@ -111,7 +128,8 @@ namespace GostDOC.PDF
             AddHeaderCell90("Кол.");
             AddHeaderCell("Приме-\nчание");
 
-            for (int i = 0; i < 23 * 7; ++i) {
+            var rowsNumber = firstPage ? RowNumberOnFirstPage : RowNumberOnNextPage;
+            for (int i = 0; i < (rowsNumber-1) * 7; ++i) {
                 tbl.AddCell(new Cell().SetHeight(8*PdfDefines.mmA4h).SetPadding(0).SetBorderLeft(CreateThickBorder())).SetBorderRight(CreateThickBorder());
             }
             for (int i = 0; i < 7; ++i) {
@@ -123,7 +141,6 @@ namespace GostDOC.PDF
                         SetBorderBottom(CreateThickBorder()));
             }
 
-            tbl.SetFixedPosition(19.3f * PdfDefines.mmA4, 79 * PdfDefines.mmA4+5f, TITLE_BLOCK_WIDTH+2f);
 
             return tbl;
         }
@@ -147,13 +164,12 @@ namespace GostDOC.PDF
                 .SetRotationAngle(DegreesToRadians(90)));
 
         }
-        private void DrawMissingLinesNextPage() {
-
+        private void DrawMissingLinesNextPage(int pageNumber) {
             // нарисовать недостающую линию
             var fromLeft = 19.3f * PdfDefines.mmA4 + TITLE_BLOCK_WIDTH;
-            Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
-                new Rectangle(fromLeft, BOTTOM_MARGIN + (15 + 5 + 5 + 15 + 8 + 14) * PdfDefines.mmA4 + 2f, 2, 30));
-            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(15)
+            Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetPage(pageNumber)),
+                new Rectangle(fromLeft, BOTTOM_MARGIN + (8+7) * PdfDefines.mmA4-6f, 2, 60));
+            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(50)
                 .SetRotationAngle(DegreesToRadians(90)));
 
         }

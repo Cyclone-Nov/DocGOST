@@ -45,16 +45,16 @@ namespace GostDOC.PDF
         /// <summary>
         /// количетсов строк в таблице данных на первой странице документа
         /// </summary>
-        protected readonly int CountStringsOnFirstPage;
+        protected readonly int RowNumberOnFirstPage;
         /// <summary>
         /// количетсов строк в таблице данных на остальных страницах документа
         /// </summary>
-        protected readonly int CountStringsOnNextPage;
+        protected readonly int RowNumberOnNextPage;
 
         /// <summary>
         /// количество строк в таблице данных на листе регистрации изменений
         /// </summary>
-        protected readonly int CountStringsOnChangelist = 31;
+        protected readonly int RowNumberOnChangelist = 31;
 
         /// <summary>
         /// поток, содержащий PDF документ
@@ -90,23 +90,28 @@ namespace GostDOC.PDF
                 case DocType.D27:
                     {
                         PageSize = new PageSize(PageSize.A3);
-                        CountStringsOnFirstPage = 24;
-                        CountStringsOnNextPage = 29;
+                        RowNumberOnFirstPage = 24;
+                        RowNumberOnNextPage = 29;
                     }
                     break;
-                case DocType.Specification:
+                case DocType.Specification: {
+                        PageSize = new PageSize(PageSize.A4);
+                        RowNumberOnFirstPage = 24;
+                        RowNumberOnNextPage = 29;
+                    }
+                    break;
                 case DocType.ItemsList:
                     {
                         PageSize = new PageSize(PageSize.A4);
-                        CountStringsOnFirstPage = 24;
-                        CountStringsOnNextPage = 31;
+                        RowNumberOnFirstPage = 24;
+                        RowNumberOnNextPage = 31;
                     }
                     break;                
                 default:
                     {
                         PageSize = new PageSize(PageSize.A4);
-                        CountStringsOnFirstPage = 26;
-                        CountStringsOnNextPage = 33;
+                        RowNumberOnFirstPage = 26;
+                        RowNumberOnNextPage = 33;
                     }
                     break;
             }
