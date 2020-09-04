@@ -55,7 +55,10 @@ namespace GostDOC.ViewModels
             NoteSP.Value = string.IsNullOrEmpty(DesignatorID.Value) ? Note.Value : DesignatorID.Value;
             WhereIncluded.Value = GetValue(Constants.ComponentWhereIncluded, aComponent);
 
-            CountDev.Value = aComponent.Count;
+            if (CountDev.Value == 0)
+            {
+                CountDev.Value = aComponent.Count;
+            }
         }
 
         private uint Convert(string aValue)

@@ -235,13 +235,10 @@ namespace GostDOC.Models
                 // Set group components
                 group.Components = components;
                 // Sort components
-                if (group.AutoSort != aGroupData.AutoSort)
-                {
-                    group.AutoSort = aGroupData.AutoSort;
-                    if (aGroupData.AutoSort && aSorter != null)
-                    {                        
-                        group.Components = aSorter.Sort(components);
-                    }
+                group.AutoSort = aGroupData.AutoSort;
+                if (aGroupData.AutoSort && aSorter != null)
+                {                        
+                    group.Components = aSorter.Sort(components);
                 }
             }
             return updated;
