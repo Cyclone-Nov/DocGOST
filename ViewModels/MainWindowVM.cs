@@ -7,6 +7,7 @@ using GostDOC.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -38,6 +39,9 @@ namespace GostDOC.ViewModels
         private ProjectWrapper _project = new ProjectWrapper();
         private List<MoveInfo> _moveInfo = new List<MoveInfo>();
 
+        private UndoRedoStack<IList<object>> _undoRedoComponents = new UndoRedoStack<IList<object>>();
+        private UndoRedoStack<IList<object>> _undoRedoGraphs = new UndoRedoStack<IList<object>>();
+
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<ComponentVM> ComponentsSelectedItem { get; } = new ObservableProperty<ComponentVM>();
@@ -65,6 +69,8 @@ namespace GostDOC.ViewModels
         public DragDropFile DragDropFile { get; } = new DragDropFile();
 
         #region Commands
+        public ICommand UndoCmd => new Command<MenuNode>(Undo);
+        public ICommand RedoCmd => new Command<MenuNode>(Redo);
         public ICommand NewFileCmd => new Command(NewFile);
         public ICommand OpenFileCmd => new Command(OpenFile);
         public ICommand SaveFileCmd => new Command(SaveFile);
@@ -82,7 +88,8 @@ namespace GostDOC.ViewModels
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
         public ICommand UpdatePdfCmd => new Command(UpdatePdf);
         public ICommand ClickMenuCmd => new Command<MenuNode>(ClickMenu);
-        
+        public ICommand EditNameValueCmd => new Command<System.Windows.Controls.DataGrid>(EditNameValue);
+        public ICommand EditComponentsCmd => new Command<System.Windows.Controls.DataGrid>(EditComponents);
 
         /// <summary>
         /// Current selected configuration
@@ -156,6 +163,65 @@ namespace GostDOC.ViewModels
         }
 
         #region Commands impl
+        private void Undo(MenuNode obj)
+        {
+            if (_selectedItem.NodeType == NodeType.Root)
+            {
+                GeneralGraphValues.SetMementos(_undoRedoGraphs.Undo());
+            }
+            else if (!string.IsNullOrEmpty(GroupName))
+            {
+                Components.SetMementos(_undoRedoComponents.Undo());
+            }
+        }
+
+        private void Redo(MenuNode obj)
+        {
+            if (_selectedItem.NodeType == NodeType.Root)
+            {
+                GeneralGraphValues.SetMementos(_undoRedoGraphs.Redo());
+            }
+            else if (!string.IsNullOrEmpty(GroupName))
+            {
+                Components.SetMementos(_undoRedoComponents.Redo());
+            }
+        }
+
+        private bool locker = true;
+        private void EditNameValue(System.Windows.Controls.DataGrid e)
+        {
+            if (locker)
+            {
+                try
+                {
+                    locker = false;
+                    e.CommitEdit(DataGridEditingUnit.Row, false);
+                    _undoRedoGraphs.Add(GeneralGraphValues.GetMementos());
+                }
+                finally
+                {
+                    locker = true;
+                }
+            }
+        }
+
+        private void EditComponents(System.Windows.Controls.DataGrid e)
+        {
+            if (locker)
+            {
+                try
+                {
+                    locker = false;
+                    e.CommitEdit(DataGridEditingUnit.Row, false);
+                    _undoRedoComponents.Add(Components.GetMementos());
+                }
+                finally
+                {
+                    locker = true;
+                }
+            }
+        }
+
         private void OpenFile(object obj)
         {
             OpenFileDialog open = new OpenFileDialog();
@@ -511,11 +577,16 @@ namespace GostDOC.ViewModels
 
             IsAutoSortEnabled.Value = groupData.AutoSort;
 
+            // Fill components
             Components.Clear();
             foreach (var component in groupData.Components)
             {
                 Components.Add(new ComponentVM(component));
-            }            
+            }
+
+            // Add initial value to undo / redo stack
+            _undoRedoComponents.Clear();
+            _undoRedoComponents.Add(Components.GetMementos());
         }
 
         private void UpdateConfiguration(Node aCollection, string aCfgName, IDictionary<string, Group> aGroups)
@@ -556,6 +627,10 @@ namespace GostDOC.ViewModels
                     break;
                 }
             }
+
+            // Add initial value to undo / redo stack
+            _undoRedoGraphs.Clear();
+            _undoRedoGraphs.Add(GeneralGraphValues.GetMementos());
         }
 
         private void UpdateGroups(bool aUpdateSp = true, bool aUpdateB = true)

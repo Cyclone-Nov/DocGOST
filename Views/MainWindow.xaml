@@ -27,6 +27,8 @@
         <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenFileCmd}"/>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveFileCmd}"/>
         <KeyBinding Key="A" Modifiers="Control" Command="{Binding SaveFileAsCmd}"/>
+        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCmd}"/>
+        <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCmd}"/>
         <KeyBinding Key="F4" Modifiers="Alt" Command="{Binding ExitCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
     </Window.InputBindings>
 
@@ -57,8 +59,8 @@
                 <MenuItem Header="Выход" InputGestureText="Alt+F4" Command="{Binding ExitCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"></MenuItem>
             </MenuItem>
             <MenuItem Header="Правка">
-                <MenuItem Header="Отменить" InputGestureText="Ctrl+Z" Command="ApplicationCommands.Undo"/>
-                <MenuItem Header="Вернуть" InputGestureText="Ctrl+Y" Command="ApplicationCommands.Redo"/>
+                <MenuItem Header="Отменить" InputGestureText="Ctrl+Z" Command="{Binding UndoCmd}"/>
+                <MenuItem Header="Вернуть" InputGestureText="Ctrl+Y" Command="{Binding RedoCmd}"/>
             </MenuItem>
         </Menu>
 
