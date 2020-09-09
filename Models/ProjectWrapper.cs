@@ -32,19 +32,7 @@ namespace GostDOC.Models
             var sortType = Utils.GetSortType(aDocType, aGroupInfo.GroupName);
             var sorter = SortFactory.GetSort(sortType);
             // Update components
-            var updated = UpdateComponents(groups, sorter, aGroupInfo, aGroupData);
-
-            if (aDocType == DocType.Specification)
-            {
-                // Get Bill groups
-                var billGroups = GetConfigGroups(aCfgName, DocType.Bill);
-                if (billGroups == null)
-                {
-                    return false;
-                }
-                // Update Bill components after add / remove in specification
-                UpdateBillGroups(billGroups, updated);
-            }
+            UpdateComponents(groups, sorter, aGroupInfo, aGroupData);            
             return true;
         }
 
@@ -67,21 +55,8 @@ namespace GostDOC.Models
                 var removed = RemoveGroup(groups, aGroupInfo, aRemoveComponents);
 
                 // Update components group
-                if (aRemoveComponents)
+                if (!aRemoveComponents)
                 {
-                    if (aDocType == DocType.Specification)
-                    {
-                        // Remove components from Bill too
-                        var billGroups = GetConfigGroups(aCfgName, DocType.Bill);
-                        if (billGroups == null)
-                        {
-                            return false;
-                        }
-                        RemoveComponents(billGroups, removed);
-                    }
-                }
-                else
-                { 
                     if (aDocType == DocType.Bill)
                     {
                         // Move components to default group
@@ -250,36 +225,6 @@ namespace GostDOC.Models
             {
                 RemoveComponent(aGroups, removed.Guid);
             }
-        }
-
-        private bool UpdateBillGroups(IDictionary<string, Group> aGroups, Updated<Component> aUpdated)
-        {
-            // Remove components
-            RemoveComponents(aGroups, aUpdated.Removed);
-
-            // Add new components
-            if (aUpdated.Added.Count > 0)
-            {
-                // Get default group
-                Group defaultGroup = GetDefaultGroup(aGroups);
-                if (defaultGroup == null)
-                {
-                    return false;
-                }
-                // Add components to default group
-                foreach (var added in aUpdated.Added)
-                {
-                    defaultGroup.Components.Add(added);
-                }
-                // Sort components in group
-                var sortType = Utils.GetSortType(DocType.Bill, string.Empty);
-                var sorter = SortFactory.GetSort(sortType);
-                if (sorter != null)
-                {
-                    defaultGroup.Components = sorter.Sort(defaultGroup.Components);
-                }
-            }
-            return true;
         }
 
         private bool RemoveComponent(IDictionary<string, Group> aGroups, Guid aGuid)
