@@ -272,6 +272,7 @@ namespace GostDOC.Common
         public static readonly string GraphCommentsSp = "Комментарии СП";
         public static readonly string GraphCommentsB = "Комментарии ВП";
         public static readonly string GraphSign = "Обозначение";
+        public static readonly string GraphName = "Наименование";
 
         public static readonly string GostDocType = "GostDoc";
         public static readonly string GostDocTypeB = "GostDocB";
