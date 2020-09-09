@@ -24,11 +24,14 @@
 
     <Window.InputBindings>
         <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewFileCmd}"/>
-        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenFileCmd}"/>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveFileCmd}"/>
         <KeyBinding Key="A" Modifiers="Control" Command="{Binding SaveFileAsCmd}"/>
         <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCmd}"/>
         <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCmd}"/>
+        <KeyBinding Key="N" Modifiers="Control" Command="{Binding OpenFileSpCmd}"/>
+        <KeyBinding Key="B" Modifiers="Control" Command="{Binding OpenFileBCmd}"/>
+        <KeyBinding Key="D" Modifiers="Control" Command="{Binding OpenFileD27Cmd}"/>
+        <KeyBinding Key="E" Modifiers="Control" Command="{Binding OpenFileElCmd}"/>
         <KeyBinding Key="F4" Modifiers="Alt" Command="{Binding ExitCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
     </Window.InputBindings>
 
@@ -48,15 +51,20 @@
 
         <Menu Height="20" VerticalAlignment="Top" Grid.ColumnSpan="10">
             <MenuItem Header="Файл">
-                <MenuItem Header="Новая спецификация" InputGestureText="Ctrl+N" Command="{Binding NewFileCmd}"/>
-                <MenuItem Header="Открыть" InputGestureText="Ctrl+O" Command="{Binding OpenFileCmd}"/>
                 <MenuItem Header="Сохранить" InputGestureText="Ctrl+S" Command="{Binding SaveFileCmd}"/>
                 <MenuItem Header="Сохранить как..." InputGestureText="Ctrl+A" Command="{Binding SaveFileAsCmd}"/>
                 <Separator />
-                <MenuItem Header="Экспорт в PDF" />
-                <MenuItem Header="Экспорт в XLSX" />
+                <MenuItem Header="Экспорт в PDF" Command="{Binding ExportPDFCmd}" />
+                <MenuItem Header="Экспорт в XLSX" Command="{Binding ExportExcelCmd}" />
                 <Separator/>
                 <MenuItem Header="Выход" InputGestureText="Alt+F4" Command="{Binding ExitCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="Документы">
+                <MenuItem Header="Новая спецификация" InputGestureText="Ctrl+N" Command="{Binding NewFileCmd}"/>
+                <MenuItem Header="Импорт спецификации" InputGestureText="Ctrl+N" Command="{Binding OpenFileSpCmd}"/>
+                <MenuItem Header="Импорт ведомости покупных изделий" InputGestureText="Ctrl+B" Command="{Binding OpenFileBCmd}"/>
+                <MenuItem Header="Импорт ведомости комплектации" InputGestureText="Ctrl+D" Command="{Binding OpenFileD27Cmd}"/>
+                <MenuItem Header="Импорт перечня элементов" InputGestureText="Ctrl+E" Command="{Binding OpenFileElCmd}"/>
             </MenuItem>
             <MenuItem Header="Правка">
                 <MenuItem Header="Отменить" InputGestureText="Ctrl+Z" Command="{Binding UndoCmd}"/>

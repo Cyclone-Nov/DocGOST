@@ -20,37 +20,25 @@ namespace GostDOC.Models
         }
 
         #region Public
-        public bool UpdateGroup(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo, GroupData aGroupData)
+        public bool UpdateGroup(string aCfgName, DocType aDocType, SubGroupInfo aGroupInfo, GroupData aGroupData)
         {
-            var groups = GetConfigGroups(aCfgName, aParentType);
+            var groups = GetConfigGroups(aCfgName, aDocType);
             if (groups == null)
             {
                 return false;
             }
 
             // Get sorter
-            var sortType = Utils.GetSortType(aParentType, aGroupInfo.GroupName);
+            var sortType = Utils.GetSortType(aDocType, aGroupInfo.GroupName);
             var sorter = SortFactory.GetSort(sortType);
             // Update components
-            var updated = UpdateComponents(groups, sorter, aGroupInfo, aGroupData);
-
-            if (aParentType == NodeType.Specification)
-            {
-                // Get Bill groups
-                var billGroups = GetConfigGroups(aCfgName, NodeType.Bill);
-                if (billGroups == null)
-                {
-                    return false;
-                }
-                // Update Bill components after add / remove in specification
-                UpdateBillGroups(billGroups, updated);
-            }
+            UpdateComponents(groups, sorter, aGroupInfo, aGroupData);            
             return true;
         }
 
-        public bool AddGroup(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo)
+        public bool AddGroup(string aCfgName, DocType aDocType, SubGroupInfo aGroupInfo)
         {
-            var groups = GetConfigGroups(aCfgName, aParentType);
+            var groups = GetConfigGroups(aCfgName, aDocType);
             if (groups != null)
             {
                 return AddGroup(groups, aGroupInfo);
@@ -58,39 +46,26 @@ namespace GostDOC.Models
             return false;
         }
 
-        public bool RemoveGroup(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo, bool aRemoveComponents)
+        public bool RemoveGroup(string aCfgName, DocType aDocType, SubGroupInfo aGroupInfo, bool aRemoveComponents)
         {
-            var groups = GetConfigGroups(aCfgName, aParentType);
+            var groups = GetConfigGroups(aCfgName, aDocType);
             if (groups != null)
             {
                 // Remove components 
                 var removed = RemoveGroup(groups, aGroupInfo, aRemoveComponents);
 
                 // Update components group
-                if (aRemoveComponents)
+                if (!aRemoveComponents)
                 {
-                    if (aParentType == NodeType.Specification)
-                    {
-                        // Remove components from Bill too
-                        var billGroups = GetConfigGroups(aCfgName, NodeType.Bill);
-                        if (billGroups == null)
-                        {
-                            return false;
-                        }
-                        RemoveComponents(billGroups, removed);
-                    }
-                }
-                else
-                { 
-                    if (aParentType == NodeType.Bill)
+                    if (aDocType == DocType.Bill)
                     {
                         // Move components to default group
                         Group defaultGroup = GetDefaultGroup(groups);
                         defaultGroup.Components.AddRange(removed);
                         // Update group info for each component
-                        UpdateComponentGroupInfo(removed, aParentType, new SubGroupInfo());
+                        UpdateComponentGroupInfo(removed, aDocType, new SubGroupInfo());
                     }
-                    else if (aParentType == NodeType.Specification)
+                    else if (aDocType == DocType.Specification)
                     {
                         // Move components to specification group
                         var groupInfo = new SubGroupInfo(aGroupInfo.GroupName, string.Empty);
@@ -100,7 +75,7 @@ namespace GostDOC.Models
                             // Move components
                             group.Components.AddRange(removed);
                             // Update group info for each component
-                            UpdateComponentGroupInfo(removed, aParentType, groupInfo);
+                            UpdateComponentGroupInfo(removed, aDocType, groupInfo);
                         }
                     }
                 }
@@ -109,18 +84,18 @@ namespace GostDOC.Models
             return false;
         }
 
-        public void MoveComponents(string aCfgName, NodeType aParentType, MoveInfo aMoveInfo)
+        public void MoveComponents(string aCfgName, DocType aDocType, MoveInfo aMoveInfo)
         {
-            var groups = GetConfigGroups(aCfgName, aParentType);
+            var groups = GetConfigGroups(aCfgName, aDocType);
             if (groups != null)
             {
-                MoveComponents(groups, aParentType, aMoveInfo);
+                MoveComponents(groups, aDocType, aMoveInfo);
             }
         }
 
-        public GroupData GetGroupData(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo)
+        public GroupData GetGroupData(string aCfgName, DocType aDocType, SubGroupInfo aGroupInfo)
         {
-            Group group = GetGroup(aCfgName, aParentType, aGroupInfo);
+            Group group = GetGroup(aCfgName, aDocType, aGroupInfo);
             if (group != null)
             {
                 return new GroupData() { AutoSort = group.AutoSort, Components = group.Components };
@@ -128,10 +103,10 @@ namespace GostDOC.Models
             return null;
         }
 
-        public IDictionary<string, IEnumerable<string>> GetGroupNames(string aCfgName, NodeType aParentType)
+        public IDictionary<string, IEnumerable<string>> GetGroupNames(string aCfgName, DocType aDocType)
         {
             Dictionary<string, IEnumerable<string>> result = new Dictionary<string, IEnumerable<string>>();
-            var groups = GetConfigGroups(aCfgName, aParentType);
+            var groups = GetConfigGroups(aCfgName, aDocType);
             if (groups != null)
             {
                 GetGroupInfo(groups, result);
@@ -172,24 +147,24 @@ namespace GostDOC.Models
 
         #region Private
 
-        private void UpdateComponentGroupInfo(IList<Component> aComponents, NodeType aParentType, SubGroupInfo aGroupInfo)
+        private void UpdateComponentGroupInfo(IList<Component> aComponents, DocType aDocType, SubGroupInfo aGroupInfo)
         {
             foreach (var component in aComponents)
             {
-                component.UpdateComponentGroupInfo(aParentType, aGroupInfo);
+                component.UpdateComponentGroupInfo(aDocType, aGroupInfo);
             }
         }
 
-        private IDictionary<string, Group> GetConfigGroups(string aCfgName, NodeType aParentType)
+        private IDictionary<string, Group> GetConfigGroups(string aCfgName, DocType aDocType)
         {
             Configuration cfg;
             if (_docManager.Project.Configurations.TryGetValue(aCfgName, out cfg))
             {
-                if (aParentType == NodeType.Specification)
+                if (aDocType == DocType.Specification)
                 {
                     return cfg.Specification;
                 }
-                else if (aParentType == NodeType.Bill)
+                else if (aDocType == DocType.Bill)
                 {
                     return cfg.Bill;
                 }
@@ -250,36 +225,6 @@ namespace GostDOC.Models
             {
                 RemoveComponent(aGroups, removed.Guid);
             }
-        }
-
-        private bool UpdateBillGroups(IDictionary<string, Group> aGroups, Updated<Component> aUpdated)
-        {
-            // Remove components
-            RemoveComponents(aGroups, aUpdated.Removed);
-
-            // Add new components
-            if (aUpdated.Added.Count > 0)
-            {
-                // Get default group
-                Group defaultGroup = GetDefaultGroup(aGroups);
-                if (defaultGroup == null)
-                {
-                    return false;
-                }
-                // Add components to default group
-                foreach (var added in aUpdated.Added)
-                {
-                    defaultGroup.Components.Add(added);
-                }
-                // Sort components in group
-                var sortType = Utils.GetSortType(NodeType.Bill, string.Empty);
-                var sorter = SortFactory.GetSort(sortType);
-                if (sorter != null)
-                {
-                    defaultGroup.Components = sorter.Sort(defaultGroup.Components);
-                }
-            }
-            return true;
         }
 
         private bool RemoveComponent(IDictionary<string, Group> aGroups, Guid aGuid)
@@ -385,9 +330,9 @@ namespace GostDOC.Models
             }
         }
 
-        private Group GetGroup(string aCfgName, NodeType aParentType, SubGroupInfo aGroupInfo)
+        private Group GetGroup(string aCfgName, DocType aDocType, SubGroupInfo aGroupInfo)
         {
-            var groups = GetConfigGroups(aCfgName, aParentType);
+            var groups = GetConfigGroups(aCfgName, aDocType);
             if (groups != null)
             {
                 return GetGroup(groups, aGroupInfo);
@@ -408,7 +353,7 @@ namespace GostDOC.Models
             return group;
         }
 
-        private void MoveComponents(IDictionary<string, Group> aGroups, NodeType aParentType, MoveInfo aMoveInfo)
+        private void MoveComponents(IDictionary<string, Group> aGroups, DocType aDocType, MoveInfo aMoveInfo)
         {
             var src = GetGroup(aGroups, aMoveInfo.Source);
             var dst = GetGroup(aGroups, aMoveInfo.Destination);
@@ -417,10 +362,15 @@ namespace GostDOC.Models
             {
                 // Find component in source group
                 var component = src.Components.Find(x => x.Guid == cmp.Guid);
+                if (component == null)
+                {
+                    dst.Components.Add(cmp);
+                    continue;
+                }
                 // Save changes in properties
                 component.UpdateComponentProperties(cmp);
                 // Update group info
-                component.UpdateComponentGroupInfo(aParentType, aMoveInfo.Destination);
+                component.UpdateComponentGroupInfo(aDocType, aMoveInfo.Destination);
                 // Add component to destination group
                 dst.Components.Add(component);
                 // Remove component from source group

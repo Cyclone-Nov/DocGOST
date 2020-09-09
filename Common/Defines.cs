@@ -10,10 +10,6 @@ namespace GostDOC.Common
     public enum NodeType
     {
         Root,
-        Elements,
-        Specification,
-        Bill,
-        Bill_D27,
         Configuration,
         Group,
         SubGroup
@@ -38,19 +34,19 @@ namespace GostDOC.Common
         /// <summary>
         /// Спецификация
         /// </summary>
-        Specification = NodeType.Specification,
+        Specification,
         /// <summary>
         /// Ведомость покупных изделий
         /// </summary>
-        Bill = NodeType.Bill,
+        Bill,
         /// <summary>
         /// Ведомость Д27
         /// </summary>
-        D27 = NodeType.Bill_D27,
+        D27,
         /// <summary>
         /// Перечень элементов
         /// </summary>
-        ItemsList = NodeType.Elements,
+        ItemsList,
         /// <summary>
         /// Тип не определен
         /// </summary>
@@ -80,17 +76,6 @@ namespace GostDOC.Common
     
     public static class Converters
     {
-        /// <summary>
-        /// Gets the type of the PDF.
-        /// </summary>
-        /// <param name="aNodeType">Type of a node.</param>
-        /// <returns></returns>
-        public static DocType GetPdfType(NodeType aNodeType)
-        {
-            DocType res = (DocType)aNodeType;
-            return res;
-        }
-
         /// <summary>
         /// Получить строку с кодом документа по типу документа
         /// </summary>

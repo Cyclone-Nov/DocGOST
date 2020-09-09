@@ -23,9 +23,9 @@ namespace GostDOC.Models
 
         #region Public
 
-        public bool LoadData(string aFilePath)
+        public bool LoadData(string aFilePath, DocType aDocType)
         {
-            return XmlManager.LoadData(Project, aFilePath);
+            return XmlManager.LoadData(Project, aFilePath, aDocType);
         }
 
         public bool SaveData(string aFilePath)

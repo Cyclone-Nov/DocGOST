@@ -15,18 +15,16 @@ namespace GostDOC.Models
     {
         private Converter _defaults = new Converter();
         private RootXml _xml = null;
-
-        public bool ParseAssemblyUnits { get; set; } = false;
-
-        public event EventHandler AssemblyUnitFound;
+        private DocType _docType = DocType.None;
 
         public XmlManager()
         {
         }
 
-        public bool LoadData(Project aResult, string aFilePath)
+        public bool LoadData(Project aResult, string aFilePath, DocType aDocType)
         {
             _xml = new RootXml();
+            _docType = aDocType;
 
             if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref _xml, aFilePath))
             {
@@ -38,6 +36,12 @@ namespace GostDOC.Models
             // Set project var's
             aResult.Name = _xml.Transaction.Project.Name;
             aResult.Type = ParseProjectType(_xml.Transaction.Type);
+
+            if (aResult.Type == ProjectType.GostDocB && (_docType != DocType.Bill || _docType != DocType.D27))
+            {
+                return false;
+            }
+
             aResult.Version = _xml.Transaction.Version;
             // Clear configurations
             aResult.Configurations.Clear();
@@ -213,13 +217,7 @@ namespace GostDOC.Models
                 // Parse assembly units
                 if (groups[0].GroupName == Constants.GroupAssemblyUnits)
                 {
-                    if (_xml.Transaction.Type != Constants.GostDocTypeB)
-                    {
-                        // Allow user to update parse assembly unit flag
-                        AssemblyUnitFound?.Invoke(this, new EventArgs());
-                    }
-
-                    if (ParseAssemblyUnits)
+                    if (_docType == DocType.Bill || _docType == DocType.D27)
                     {
                         string val;
                         if (component.Properties.TryGetValue(Constants.ComponentSign, out val))
@@ -352,16 +350,16 @@ namespace GostDOC.Models
             }
         }
 
-        private void SortComponents(Group aGroup, string aGroupName, NodeType aNodeType)
+        private void SortComponents(Group aGroup, string aGroupName, DocType aDocType)
         {
             foreach (var subGroup in aGroup.SubGroups.AsNotNull())
             {
                 // Recursive call for subgroups
-                SortComponents(subGroup.Value, aGroupName, aNodeType);
+                SortComponents(subGroup.Value, aGroupName, aDocType);
             }
 
             // Sort components
-            SortType sortType = Utils.GetSortType(aNodeType, aGroupName);
+            SortType sortType = Utils.GetSortType(aDocType, aGroupName);
             ISort<Component> sorter = SortFactory.GetSort(sortType);
             if (sorter != null) {
                 aGroup.Components = sorter.Sort(aGroup.Components);
@@ -372,12 +370,12 @@ namespace GostDOC.Models
         {
             foreach (var group in aCfg.Specification.Values)
             {
-                SortComponents(group, group.Name, NodeType.Specification);
+                SortComponents(group, group.Name, DocType.Specification);
             }
 
             foreach (var group in aCfg.Bill.Values)
             {
-                SortComponents(group, group.Name, NodeType.Bill);
+                SortComponents(group, group.Name, DocType.Bill);
             }
         }
 
