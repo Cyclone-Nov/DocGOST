@@ -129,13 +129,83 @@ namespace GostDOC.PDF
 
         
 
+        protected void SetPageMargins(iText.Layout.Document aDoc) {
+            aDoc.SetLeftMargin(8 * PdfDefines.mmA4);
+            aDoc.SetRightMargin(5 * PdfDefines.mmA4);
+            aDoc.SetTopMargin(5 * PdfDefines.mmA4);
+            aDoc.SetBottomMargin(5 * PdfDefines.mmA4);
+        }
+
         /// <summary>
         /// добавить к документу лист регистрации изменений
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         internal void AddRegisterList(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs)
         {
+            aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
+            SetPageMargins(aInPdfDoc);
+
+            aInPdfDoc.Add(CreateRegisterTable());
+
+            // добавить таблицу с основной надписью для последуюших старницы
+            aInPdfDoc.Add(CreateNextTitleBlock(PageSize, aGraphs));
+
+            // добавить таблицу с нижней дополнительной графой
+            aInPdfDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+        }
+
+        Table CreateRegisterTable() {
+            float[] columnSizes = {
+                8 * PdfDefines.mmA4, 
+                20 * PdfDefines.mmA4,
+                20 * PdfDefines.mmA4,
+                20 * PdfDefines.mmA4,
+                20 * PdfDefines.mmA4,
+                20 * PdfDefines.mmA4,
+                25 * PdfDefines.mmA4,
+                25 * PdfDefines.mmA4,
+                15 * PdfDefines.mmA4,
+                12 * PdfDefines.mmA4,
+            };
+            Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
+
+            Paragraph CreateParagraph(string text) {
+                var style = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFontSize(12).SetFont(f1).SetPaddingTop(-2);
+                return new Paragraph(text).AddStyle(style);
+            }
+
+            Cell CreateCell(int rowspan , int colspan) => new Cell(rowspan, colspan).SetBorder(CreateThickBorder());
+
+            tbl.AddCell(new Cell(1, 10).
+                SetBorder(CreateThickBorder()).
+                SetHeight(10*PdfDefines.mmA4h).
+                Add(CreateParagraph("Лист регистрации изменений")));
+
+            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Изм.")));
+            tbl.AddCell(CreateCell(1,4).Add(CreateParagraph("Номера листов (страниц)")));
+            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Всего листов (страниц) в докум.")));
+            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("№ докум.")));
+            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Входящий #")));
+            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Подп.")));
+            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Дата")));
+
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("измененных")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("заменяемых")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("новых")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("аннулированных")));
+
+
+            for (int i = 0; i < (RowNumberOnNextPage-4) * 10; ++i) {
+                tbl.AddCell(new Cell().SetHeight(8*PdfDefines.mmA4h).SetPadding(0).SetBorderLeft(CreateThickBorder())).SetBorderRight(CreateThickBorder());
+            }
+            for (int i = 0; i < 10; ++i) {
+                tbl.AddCell(new Cell().SetHeight(8 * PdfDefines.mmA4h).SetPadding(0).SetBorderLeft(CreateThickBorder()).SetBorderRight(CreateThickBorder()).SetBorderBottom(CreateThickBorder()));
+            }
+
+            tbl.SetFixedPosition(19.3f * PdfDefines.mmA4, 20 * PdfDefines.mmA4 + 3f, TITLE_BLOCK_WIDTH + 2f);
+
+            return tbl;
         }
 
         /// <summary>
@@ -592,10 +662,4 @@ namespace GostDOC.PDF
 
 
     }
-
-//    class static CellExt {
-//    public static void SetA(this Cell c) {
-//
-//    }
-//    }
 }
