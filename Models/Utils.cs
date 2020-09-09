@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using GostDOC.Common;
+using GostDOC.Interfaces;
 
 namespace GostDOC.Models
 {
@@ -52,7 +53,6 @@ namespace GostDOC.Models
                 dic.Add((T)val.Key, (V)val.Value);
             }
         }
-
         public static IEnumerable<T> AsNotNull<T>(this IEnumerable<T> original)
         {
             return original ?? Enumerable.Empty<T>();
@@ -61,6 +61,28 @@ namespace GostDOC.Models
         public static IEnumerable<KeyValuePair<T, V>> AsNotNull<T, V>(this IDictionary<T, V> original)
         {
             return original ?? Enumerable.Empty<KeyValuePair<T, V>>();
+        }
+
+        public static IList<object> GetMementos<V>(this ObservableCollection<V> src) where V : IMemento<object>
+        {
+            List<object> result = new List<object>();
+            foreach (var obj in src)
+            {
+                result.Add(obj.Memento);
+            }
+            return result;
+        }
+
+        public static void SetMementos<V>(this ObservableCollection<V> dst, IList<object> src) where V : IMemento<object>, new()
+        {
+            if (src != null)
+            {
+                dst.Clear();
+                foreach (var mem in src)
+                {
+                    dst.Add(new V() { Memento = mem });
+                }
+            }
         }
 
         public static int IndexOf<T>(this OrderedDictionary dictionary, T key)
@@ -77,15 +99,15 @@ namespace GostDOC.Models
             return -1;
         }
 
-        public static SortType GetSortType(NodeType aNodeType, string aGroupName)
+        public static SortType GetSortType(DocType aDocType, string aGroupName)
         {
             SortType sortType = SortType.None;
-            switch (aNodeType)
+            switch (aDocType)
             {
-                case NodeType.Bill:
+                case DocType.Bill:
                     sortType = SortType.Name;
                     break;
-                case NodeType.Specification:
+                case DocType.Specification:
                     if (aGroupName.Equals(Constants.GroupComplex) || aGroupName.Equals(Constants.GroupAssemblyUnits) || aGroupName.Equals(Constants.GroupDetails))
                     {
                         return SortType.SpComplex;
@@ -131,15 +153,15 @@ namespace GostDOC.Models
                 current.Properties[prop.Key] = prop.Value;
             }
         }
-        public static void UpdateComponentGroupInfo(this Component current, NodeType aParentType, SubGroupInfo info)
+        public static void UpdateComponentGroupInfo(this Component current, DocType aDocType, SubGroupInfo info)
         {
-            if (aParentType == NodeType.Specification)
+            if (aDocType == DocType.Specification)
             {
                 current.Properties[Constants.GroupNameSp] = info.GroupName;
                 current.Properties[Constants.SubGroupNameSp] = info.SubGroupName;
             }
 
-            if (aParentType == NodeType.Bill)
+            if (aDocType == DocType.Bill)
             {
                 current.Properties[Constants.GroupNameB] = info.GroupName;
                 current.Properties[Constants.SubGroupNameB] = info.SubGroupName;

@@ -6,6 +6,7 @@
              xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
              xmlns:local="clr-namespace:GostDOC.UserControls"
              xmlns:converters="clr-namespace:GostDOC.Converters"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -24,6 +25,12 @@
                   AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="Auto" CanUserSortColumns="False"
                   SelectedItem="{Binding ComponentsSelectedItem.Value}"
                   ItemsSource="{Binding Components}" ContextMenuService.IsEnabled="{Binding TableContextMenuEnabled.Value}">
+            
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="CellEditEnding">
+                    <i:InvokeCommandAction Command="{Binding EditComponentsCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}}"  />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">

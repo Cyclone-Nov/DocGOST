@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Common;
+using GostDOC.Interfaces;
 using GostDOC.Models;
 
 namespace GostDOC.ViewModels
 {
-    class ComponentVM
+    class ComponentVM : IMemento<object>
     {
-        public Guid Guid { get; } = Guid.NewGuid();
+        public Guid Guid { get; private set; } = Guid.NewGuid();
         public ObservableProperty<string> Name { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> Code { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> Format { get; } = new ObservableProperty<string>();
@@ -26,6 +27,70 @@ namespace GostDOC.ViewModels
         public ObservableProperty<string> NoteSP { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> Sign { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> WhereIncluded { get; } = new ObservableProperty<string>();
+
+        private class ComponentMemento
+        {
+            public Guid Guid { get; set; }
+            public string Name { get; set; }
+            public string Code { get; set; }
+            public string Format { get; set; }
+            public string Entry { get; set; }
+            public string Manufacturer { get; set; }
+            public int Position { get; set; }
+            public uint CountDev { get; set; }
+            public uint CountSet { get; set; }
+            public uint CountReg { get; set; }
+            public string DesignatorID { get; set; }
+            public string Note { get; set; }
+            public string NoteSP { get; set; }
+            public string Sign { get; set; }
+            public string WhereIncluded { get; set; }
+        }
+
+        public object Memento
+        {
+            get
+            {
+                return new ComponentMemento()
+                {
+                    Guid = Guid,
+                    Name = Name.Value,
+                    Code = Code.Value,
+                    Format = Format.Value,
+                    Entry = Entry.Value,
+                    Manufacturer = Manufacturer.Value,
+                    Position = Position.Value,
+                    CountDev = CountDev.Value,
+                    CountSet = CountSet.Value,
+                    CountReg = CountReg.Value,
+                    DesignatorID = DesignatorID.Value,
+                    Note = Note.Value,
+                    NoteSP = NoteSP.Value,
+                    Sign = Sign.Value,
+                    WhereIncluded = WhereIncluded.Value
+                };
+            }
+
+            set
+            {
+                ComponentMemento memento = value as ComponentMemento;
+                Guid = memento.Guid;
+                Name.Value = memento.Name;
+                Code.Value = memento.Code;
+                Format.Value = memento.Format;
+                Entry.Value = memento.Entry;
+                Manufacturer.Value = memento.Manufacturer;
+                Position.Value = memento.Position;
+                CountDev.Value = memento.CountDev;
+                CountSet.Value = memento.CountSet;
+                CountReg.Value = memento.CountReg;
+                DesignatorID.Value = memento.DesignatorID;
+                Note.Value = memento.Note;
+                NoteSP.Value = memento.NoteSP;
+                Sign.Value = memento.Sign;
+                WhereIncluded.Value = memento.WhereIncluded;
+            }
+        }
 
         public ComponentVM()
         {

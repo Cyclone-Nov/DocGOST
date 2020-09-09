@@ -1,12 +1,14 @@
 ﻿using GongSolutions.Wpf.DragDrop;
 using GostDOC.Common;
 using GostDOC.Events;
+using GostDOC.ExcelExport;
 using GostDOC.Models;
 using GostDOC.UI;
 using GostDOC.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,13 +24,15 @@ namespace GostDOC.ViewModels
     {
         private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
 
-        private Node _elements = new Node() { Name = "Перечень элементов", NodeType = NodeType.Elements, Nodes = new ObservableCollection<Node>() };
-        private Node _specification = new Node() { Name = "Спецификация", NodeType = NodeType.Specification, Nodes = new ObservableCollection<Node>() };
-        private Node _bill = new Node() { Name = "Ведомость покупных изделий", NodeType = NodeType.Bill, Nodes = new ObservableCollection<Node>() };
-        private Node _bill_D27 = new Node() { Name = "Ведомость Д27", NodeType = NodeType.Bill_D27, Nodes = new ObservableCollection<Node>() };
+        private Node _elements = new Node() { Name = "Перечень элементов", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
+        private Node _specification = new Node() { Name = "Спецификация", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
+        private Node _bill = new Node() { Name = "Ведомость покупных изделий", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
+        private Node _bill_D27 = new Node() { Name = "Ведомость Д27", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
+
+        private DocType _docType = DocType.None;
+
         private Node _selectedItem = null;
         private string _filePath = null;
-        private bool _parseAssemblyUnitsSet = false;
 
         private DocManager _docManager = DocManager.Instance;
 
@@ -37,6 +41,11 @@ namespace GostDOC.ViewModels
 
         private ProjectWrapper _project = new ProjectWrapper();
         private List<MoveInfo> _moveInfo = new List<MoveInfo>();
+
+        private UndoRedoStack<IList<object>> _undoRedoComponents = new UndoRedoStack<IList<object>>();
+        private UndoRedoStack<IList<object>> _undoRedoGraphs = new UndoRedoStack<IList<object>>();
+
+        private ExcelManager _excelManager = new ExcelManager();
 
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
@@ -59,14 +68,17 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsAutoSortEnabled { get; } = new ObservableProperty<bool>(true);
 
-        public DocType CurrentDocType = DocType.Specification;
-
         // Drag / drop
         public DragDropFile DragDropFile { get; } = new DragDropFile();
 
         #region Commands
+        public ICommand UndoCmd => new Command<MenuNode>(Undo);
+        public ICommand RedoCmd => new Command<MenuNode>(Redo);
         public ICommand NewFileCmd => new Command(NewFile);
-        public ICommand OpenFileCmd => new Command(OpenFile);
+        public ICommand OpenFileSpCmd => new Command(OpenFileSp);
+        public ICommand OpenFileBCmd => new Command(OpenFileB);
+        public ICommand OpenFileD27Cmd => new Command(OpenFileD27);
+        public ICommand OpenFileElCmd => new Command(OpenFileEl);
         public ICommand SaveFileCmd => new Command(SaveFile);
         public ICommand SaveFileAsCmd => new Command(SaveFileAs);
         public ICommand ExitCmd => new Command<Window>(Exit);
@@ -82,7 +94,10 @@ namespace GostDOC.ViewModels
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
         public ICommand UpdatePdfCmd => new Command(UpdatePdf);
         public ICommand ClickMenuCmd => new Command<MenuNode>(ClickMenu);
-        
+        public ICommand EditNameValueCmd => new Command<System.Windows.Controls.DataGrid>(EditNameValue);
+        public ICommand EditComponentsCmd => new Command<System.Windows.Controls.DataGrid>(EditComponents);
+        public ICommand ExportPDFCmd => new Command(ExportPDF);
+        public ICommand ExportExcelCmd => new Command(ExportExcel);
 
         /// <summary>
         /// Current selected configuration
@@ -138,17 +153,8 @@ namespace GostDOC.ViewModels
 
         public MainWindowVM()
         {
-            var root = new Node() { Name = "Документы", Nodes = new ObservableCollection<Node>() };
-            root.Nodes.Add(_elements);
-            root.Nodes.Add(_specification);
-            root.Nodes.Add(_bill);
-            root.Nodes.Add(_bill_D27);
-
-            DocNodes.Add(root);
             // Subscribe to drag and drop events
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
-            // Subscribe to assembly unit found event
-            _docManager.XmlManager.AssemblyUnitFound += OnAssemblyUnitFound;
             // Load document types
             _docTypes.Load();
             // Load material types
@@ -156,16 +162,83 @@ namespace GostDOC.ViewModels
         }
 
         #region Commands impl
-        private void OpenFile(object obj)
+        private void Undo(MenuNode obj)
         {
-            OpenFileDialog open = new OpenFileDialog();
-            open.Filter = "xml Files *.xml | *.xml";
-            open.Title = "Выбрать файл...";
-
-            if (open.ShowDialog() == DialogResult.OK)
+            if (_selectedItem.NodeType == NodeType.Root)
             {
-                OpenFile(open.FileName);
+                GeneralGraphValues.SetMementos(_undoRedoGraphs.Undo());
             }
+            else if (!string.IsNullOrEmpty(GroupName))
+            {
+                Components.SetMementos(_undoRedoComponents.Undo());
+            }
+        }
+
+        private void Redo(MenuNode obj)
+        {
+            if (_selectedItem.NodeType == NodeType.Root)
+            {
+                GeneralGraphValues.SetMementos(_undoRedoGraphs.Redo());
+            }
+            else if (!string.IsNullOrEmpty(GroupName))
+            {
+                Components.SetMementos(_undoRedoComponents.Redo());
+            }
+        }
+
+        private bool locker = true;
+        private void EditNameValue(System.Windows.Controls.DataGrid e)
+        {
+            if (locker)
+            {
+                try
+                {
+                    locker = false;
+                    e.CommitEdit(DataGridEditingUnit.Row, false);
+                    _undoRedoGraphs.Add(GeneralGraphValues.GetMementos());
+                }
+                finally
+                {
+                    locker = true;
+                }
+            }
+        }
+
+        private void EditComponents(System.Windows.Controls.DataGrid e)
+        {
+            if (locker)
+            {
+                try
+                {
+                    locker = false;
+                    e.CommitEdit(DataGridEditingUnit.Row, false);
+                    _undoRedoComponents.Add(Components.GetMementos());
+                }
+                finally
+                {
+                    locker = true;
+                }
+            }
+        }
+
+        private void OpenFileSp(object obj)
+        {
+            OpenFile(_specification, DocType.Specification);
+        }
+
+        private void OpenFileB(object obj)
+        {
+            OpenFile(_bill, DocType.Bill);
+        }
+
+        private void OpenFileD27(object obj)
+        {
+            OpenFile(_bill_D27, DocType.D27);
+        }
+
+        private void OpenFileEl(object obj)
+        {
+            OpenFile(_elements, DocType.ItemsList);
         }
 
         private void SaveFile(object obj = null)
@@ -182,13 +255,10 @@ namespace GostDOC.ViewModels
 
         private void SaveFileAs(object obj = null)
         {
-            SaveFileDialog save = new SaveFileDialog();
-            save.Filter = "xml Files *.xml | *.xml";
-            save.Title = "Сохранить файл";
-
-            if (save.ShowDialog() == DialogResult.OK)
+            var path = CommonDialogs.SaveFileAs("xml Files *.xml | *.xml", "Сохранить файл");
+            if (!string.IsNullOrEmpty(path))
             {
-                _filePath = save.FileName;
+                _filePath = path;
                 SaveFile();
             }
         }
@@ -219,7 +289,7 @@ namespace GostDOC.ViewModels
 
         private void MoveComponents(IList<object> lst)
         {
-            var groups = _project.GetGroupNames(ConfigurationName, _selectedItem.ParentType);
+            var groups = _project.GetGroupNames(ConfigurationName, _docType);
             var subGroupInfo = CommonDialogs.SelectGroup(groups);
             if (subGroupInfo != null)
             {
@@ -262,7 +332,7 @@ namespace GostDOC.ViewModels
             // Move components
             foreach (var move in _moveInfo)
             {
-                _project.MoveComponents(cfgName, _selectedItem.ParentType, move);
+                _project.MoveComponents(cfgName, _docType, move);
             }
             _moveInfo.Clear();
 
@@ -270,7 +340,7 @@ namespace GostDOC.ViewModels
             var groupInfo = new SubGroupInfo(GroupName, SubGroupName);
             var groupData = new GroupData(IsAutoSortEnabled.Value, components);
 
-            _project.UpdateGroup(cfgName, _selectedItem.ParentType, groupInfo, groupData);            
+            _project.UpdateGroup(cfgName, _docType, groupInfo, groupData);
 
             UpdateGroupData();
         }
@@ -295,20 +365,20 @@ namespace GostDOC.ViewModels
             // Add group or subgroup
             if (_selectedItem.NodeType == NodeType.Configuration)
             {
-                _project.AddGroup(_selectedItem.Name, _selectedItem.ParentType, new SubGroupInfo(name, null));
+                _project.AddGroup(_selectedItem.Name, _docType, new SubGroupInfo(name, null));
             }
             else if (_selectedItem.NodeType == NodeType.Group)
             {
-                _project.AddGroup(_selectedItem.Parent.Name, _selectedItem.ParentType, new SubGroupInfo(_selectedItem.Name, name));
+                _project.AddGroup(_selectedItem.Parent.Name, _docType, new SubGroupInfo(_selectedItem.Name, name));
             }
             // Update view
-            UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
+            UpdateGroups();
         }
 
         private void RemoveGroup(object obj)
         {
             bool removeComponents = false;
-            if (_selectedItem.ParentType == NodeType.Specification)
+            if (_docType == DocType.Specification)
             {
                 // Ask user to remove components in group
                 var groupData = GetGroupData();
@@ -340,11 +410,11 @@ namespace GostDOC.ViewModels
 
             if (!string.IsNullOrEmpty(name) && groupInfo != null)
             {
-                _project.RemoveGroup(name, _selectedItem.ParentType, groupInfo, removeComponents);
+                _project.RemoveGroup(name, _docType, groupInfo, removeComponents);
             }
 
             // Update view
-            UpdateGroups(_selectedItem.ParentType == NodeType.Specification, _selectedItem.ParentType == NodeType.Bill);
+            UpdateGroups();
         }
 
         private void UpComponents(IList<object> lst)
@@ -375,25 +445,14 @@ namespace GostDOC.ViewModels
             }
         }
 
-
         private void UpdatePdf(object obj)
         {
             if (_selectedItem == null)
                 return;
-            var nodeType = _selectedItem.ParentType;
-            if (nodeType == NodeType.Root)
-                nodeType = _selectedItem.NodeType;
-            var type = Common.Converters.GetPdfType(nodeType);
-
-            if(nodeType == NodeType.Root)
-            {
-                System.Windows.MessageBox.Show("Документ для отображения не выбран! Выберите в дереве документ для отображения");
-                return;
-            }
             
             // TODO: async
-            /*res = await*/ _docManager.SaveChangesInPdf(type);
-            CurrentPdfData.Value = _docManager.GetPdfData(type);
+            /*res = await*/ _docManager.SaveChangesInPdf(_docType);
+            CurrentPdfData.Value = _docManager.GetPdfData(_docType);
         }
 
         private void ClickMenu(MenuNode obj)
@@ -412,6 +471,23 @@ namespace GostDOC.ViewModels
             }
         }
 
+        private void ExportPDF(object obj)
+        {
+
+        }
+
+        private void ExportExcel(object obj)
+        {
+            if (_docType != DocType.None)
+            {
+                var path = CommonDialogs.SaveFileAs("Excel Files *.xlsx | *.xlsx", "Сохранить файл");
+                if (!string.IsNullOrEmpty(path))
+                {
+                    _excelManager.Export(_docType, path);
+                }
+            }
+        }
+
         #endregion Commands impl
 
         private void OnDragDropFile_FileDropped(object sender, TEventArgs<string> e)
@@ -425,22 +501,34 @@ namespace GostDOC.ViewModels
             UpdateData();
         }
 
+        private void OpenFile(Node aNode, DocType aDocType)
+        {
+            string path = CommonDialogs.OpenFile("xml Files *.xml | *.xml", "Выбрать файл...");
+            if (!string.IsNullOrEmpty(path))
+            {
+                DocNodes.Clear();
+                DocNodes.Add(aNode);
+                _docType = aDocType;
+                OpenFile(path);
+            }
+        }
         private void OpenFile(string aFilePath)
         {
-            // Reset parse assebly units flag
-            _parseAssemblyUnitsSet = false;
             // Save current file name only if one file was selected
             _filePath = aFilePath;
 
             // Parse xml files
-            if (_docManager.LoadData(_filePath))
+            if (_docManager.LoadData(_filePath, _docType))
             {
+                Components.Clear();
+                GeneralGraphValues.Clear();
+
                 // Update visual data
                 UpdateData();
             }
             else
             {
-                System.Windows.MessageBox.Show("Формат файла не поддерживается!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show("Некорректный Формат файла!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -460,7 +548,7 @@ namespace GostDOC.ViewModels
             // Is graph table visible
             IsGeneralGraphValuesVisible.Value = _selectedItem.NodeType == NodeType.Root;
 
-            if (_selectedItem.ParentType == NodeType.Specification)
+            if (_docType == DocType.Specification)
             {
                 // Is add group button enabled
                 IsAddEnabled.Value = _selectedItem.NodeType == NodeType.Group && _selectedItem.Name != Constants.DefaultGroupName;
@@ -468,7 +556,7 @@ namespace GostDOC.ViewModels
                 // Is remove group button enabled
                 IsRemoveEnabled.Value = _selectedItem.NodeType == NodeType.SubGroup && _selectedItem.Name != Constants.DefaultGroupName;
             }
-            else if (_selectedItem.ParentType == NodeType.Bill)
+            else if (_docType == DocType.Bill)
             {
                 // Is add group button enabled
                 IsAddEnabled.Value = (_selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group) &&
@@ -483,10 +571,10 @@ namespace GostDOC.ViewModels
                 IsRemoveEnabled.Value = false;
             }
 
-            // Is scecification table visible
-            IsSpecificationTableVisible.Value = _selectedItem.ParentType == NodeType.Specification && isGroup;
+            // Is specification table visible
+            IsSpecificationTableVisible.Value = _docType == DocType.Specification && isGroup;
             // Is bill table visible
-            IsBillTableVisible.Value = _selectedItem.ParentType == NodeType.Bill && isGroup;
+            IsBillTableVisible.Value = _docType == DocType.Bill && isGroup;
 
             if (isGroup)
             {
@@ -502,7 +590,7 @@ namespace GostDOC.ViewModels
         private GroupData GetGroupData()
         {
             var groupInfo = new SubGroupInfo(GroupName, SubGroupName);
-            return _project.GetGroupData(ConfigurationName, _selectedItem.ParentType, groupInfo);
+            return _project.GetGroupData(ConfigurationName, _docType, groupInfo);
         }
 
         private void UpdateGroupData()
@@ -511,17 +599,22 @@ namespace GostDOC.ViewModels
 
             IsAutoSortEnabled.Value = groupData.AutoSort;
 
+            // Fill components
             Components.Clear();
             foreach (var component in groupData.Components)
             {
                 Components.Add(new ComponentVM(component));
-            }            
+            }
+
+            // Add initial value to undo / redo stack
+            _undoRedoComponents.Clear();
+            _undoRedoComponents.Add(Components.GetMementos());
         }
 
         private void UpdateConfiguration(Node aCollection, string aCfgName, IDictionary<string, Group> aGroups)
         {
             // Populate configuration tree
-            Node treeItemCfg = new Node() { Name = aCfgName, NodeType = NodeType.Configuration, ParentType = aCollection.NodeType, Parent = aCollection, Nodes = new ObservableCollection<Node>() };
+            Node treeItemCfg = new Node() { Name = aCfgName, NodeType = NodeType.Configuration, Parent = aCollection, Nodes = new ObservableCollection<Node>() };
             foreach (var grp in aGroups)
             {
                 string groupName = grp.Key;
@@ -530,10 +623,10 @@ namespace GostDOC.ViewModels
                     groupName = Constants.DefaultGroupName;
                 }
 
-                Node treeItemGroup = new Node() { Name = groupName, NodeType = NodeType.Group, ParentType = aCollection.NodeType, Parent = treeItemCfg, Nodes = new ObservableCollection<Node>() };              
+                Node treeItemGroup = new Node() { Name = groupName, NodeType = NodeType.Group, Parent = treeItemCfg, Nodes = new ObservableCollection<Node>() };              
                 foreach (var sub in grp.Value.SubGroups.AsNotNull())
                 {
-                    Node treeItemSubGroup = new Node() { Name = sub.Key, NodeType = NodeType.SubGroup, ParentType = aCollection.NodeType, Parent = treeItemGroup };
+                    Node treeItemSubGroup = new Node() { Name = sub.Key, NodeType = NodeType.SubGroup, Parent = treeItemGroup };
                     treeItemGroup.Nodes.Add(treeItemSubGroup);
                 }
                 treeItemCfg.Nodes.Add(treeItemGroup);
@@ -556,31 +649,31 @@ namespace GostDOC.ViewModels
                     break;
                 }
             }
+
+            // Add initial value to undo / redo stack
+            _undoRedoGraphs.Clear();
+            _undoRedoGraphs.Add(GeneralGraphValues.GetMementos());
         }
 
-        private void UpdateGroups(bool aUpdateSp = true, bool aUpdateB = true)
+        private void UpdateGroups()
         {
-            // Clear group nodes
-            if (aUpdateSp)
+            switch (_docType)
             {
-                _specification.Nodes.Clear();
-            }
-            if (aUpdateB)
-            {
-                _bill.Nodes.Clear();
-            }
-            // Update visual view
-            foreach (var cfg in _docManager.Project.Configurations)
-            {
-                if (aUpdateSp)
-                {
-                    UpdateConfiguration(_specification, cfg.Key, cfg.Value.Specification);
-                }
-                if (aUpdateB)
-                {
-                    UpdateConfiguration(_bill, cfg.Key, cfg.Value.Bill);
-                }
-            }
+                case DocType.Specification:
+                    _specification.Nodes.Clear();
+                    foreach (var cfg in _docManager.Project.Configurations)
+                    {
+                        UpdateConfiguration(_specification, cfg.Key, cfg.Value.Specification);
+                    }
+                    break;
+                case DocType.Bill:
+                    _bill.Nodes.Clear();
+                    foreach (var cfg in _docManager.Project.Configurations)
+                    {
+                        UpdateConfiguration(_bill, cfg.Key, cfg.Value.Bill);
+                    }
+                    break;
+            }            
         }
 
         private void UpdateData()
@@ -614,31 +707,6 @@ namespace GostDOC.ViewModels
             {
                 aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
             }
-        }
-
-        private void OnAssemblyUnitFound(object sender, EventArgs e)
-        {
-            if (_parseAssemblyUnitsSet)
-            {
-                // Already asked
-                return;
-            }
-
-            // Ask user
-            var result = System.Windows.MessageBox.Show("Загрузить связанные компоненты (режим ВП)?", "Загрузка", MessageBoxButton.YesNo);
-            // Set parse type
-            if (result == MessageBoxResult.Yes)
-            {
-                _docManager.Project.Type = ProjectType.GostDocB;
-                _docManager.XmlManager.ParseAssemblyUnits = true;
-            }
-            else
-            {
-                _docManager.XmlManager.ParseAssemblyUnits = false;
-            }
-
-            // Set assebly units asked flag
-            _parseAssemblyUnitsSet = true;
         }
 
         private void UpdateTableContextMenu()

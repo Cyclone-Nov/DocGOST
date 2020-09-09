@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using GostDOC.Models;
 using GostDOC.Views;
 
@@ -52,6 +53,31 @@ namespace GostDOC.UI
             if (result.HasValue && result.Value)
             {
             }
+        }
+
+        public static string SaveFileAs(string aFilter, string aTitle)
+        {
+            SaveFileDialog save = new SaveFileDialog();
+            save.Filter = aFilter;
+            save.Title = aTitle;
+            if (save.ShowDialog() == DialogResult.OK)
+            {
+                return save.FileName;
+            }
+            return null;
+        }
+
+        public static string OpenFile(string aFilter, string aTitle)
+        {
+            OpenFileDialog open = new OpenFileDialog();
+            open.Filter = aFilter;
+            open.Title = aTitle;
+
+            if (open.ShowDialog() == DialogResult.OK)
+            {
+                return open.FileName;
+            }
+            return null;
         }
     }
 }
