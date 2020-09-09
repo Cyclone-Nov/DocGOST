@@ -99,15 +99,15 @@ namespace GostDOC.Models
             return -1;
         }
 
-        public static SortType GetSortType(NodeType aNodeType, string aGroupName)
+        public static SortType GetSortType(DocType aDocType, string aGroupName)
         {
             SortType sortType = SortType.None;
-            switch (aNodeType)
+            switch (aDocType)
             {
-                case NodeType.Bill:
+                case DocType.Bill:
                     sortType = SortType.Name;
                     break;
-                case NodeType.Specification:
+                case DocType.Specification:
                     if (aGroupName.Equals(Constants.GroupComplex) || aGroupName.Equals(Constants.GroupAssemblyUnits) || aGroupName.Equals(Constants.GroupDetails))
                     {
                         return SortType.SpComplex;
@@ -153,15 +153,15 @@ namespace GostDOC.Models
                 current.Properties[prop.Key] = prop.Value;
             }
         }
-        public static void UpdateComponentGroupInfo(this Component current, NodeType aParentType, SubGroupInfo info)
+        public static void UpdateComponentGroupInfo(this Component current, DocType aDocType, SubGroupInfo info)
         {
-            if (aParentType == NodeType.Specification)
+            if (aDocType == DocType.Specification)
             {
                 current.Properties[Constants.GroupNameSp] = info.GroupName;
                 current.Properties[Constants.SubGroupNameSp] = info.SubGroupName;
             }
 
-            if (aParentType == NodeType.Bill)
+            if (aDocType == DocType.Bill)
             {
                 current.Properties[Constants.GroupNameB] = info.GroupName;
                 current.Properties[Constants.SubGroupNameB] = info.SubGroupName;
