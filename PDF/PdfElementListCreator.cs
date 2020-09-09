@@ -83,8 +83,9 @@ internal class PdfElementListCreator : PdfCreator {
             _currentPageNumber++;
             lastProcessedRow = AddNextPage(doc, mainConfig.Graphs, dataTable, lastProcessedRow);
         }
-
-        if (pdfDoc.GetNumberOfPages() > 2) {
+        
+        // TODO: change to 2
+        if (pdfDoc.GetNumberOfPages() > 1) {
             AddRegisterList(doc, mainConfig.Graphs);
         }
 
@@ -426,26 +427,7 @@ internal class PdfElementListCreator : PdfCreator {
     /// вместе с таблицей данных
     /// </summary>
     /// <returns></returns>
-    internal PdfDocument CreateRegistrationPage() {
-        MemoryStream stream = new MemoryStream();
-        PdfDocument regPage = new PdfDocument(new PdfWriter(stream));
-
-        regPage.SetDefaultPageSize(PageSize.A4);
-        var document = new iText.Layout.Document(regPage, PageSize.A4, true);
-
-        SetPageMargins(document);
-
-        // добавить таблицу с основной надписью для дополнительного листа
-        //document.Add(CreateNextTitleBlock(PageSize.A4));
-
-        // добавить таблицу с нижней дополнительной графой
-        //document.Add(CreateBottomAppendGraph(PageSize.A4));
-
-        // добавить таблицу с данными
-
-
-        doc.Close();
-        return regPage;
+    internal void AddRegistrationPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData) {
     }
 
     /// <summary>
@@ -497,8 +479,7 @@ internal class PdfElementListCreator : PdfCreator {
     /// </summary>
     /// <param name="aInPdfDoc">a in PDF document.</param>
     /// <returns></returns>
-    internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs,
-        DataTable aData, int aStartRow) {
+    internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aStartRow) {
         aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
         SetPageMargins(aInPdfDoc);
@@ -523,7 +504,7 @@ internal class PdfElementListCreator : PdfCreator {
         return lastNextProcessedRow;
     }
 
-    private void SetPageMargins(iText.Layout.Document aDoc) {
+    private new void SetPageMargins(iText.Layout.Document aDoc) {
         aDoc.SetLeftMargin(8 * PdfDefines.mmA4);
         aDoc.SetRightMargin(5 * PdfDefines.mmA4);
         aDoc.SetTopMargin(5 * PdfDefines.mmA4);
