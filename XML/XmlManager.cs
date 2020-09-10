@@ -16,6 +16,8 @@ namespace GostDOC.Models
         private Converter _defaults = new Converter();
         private RootXml _xml = null;
         private DocType _docType = DocType.None;
+        private string _dir = string.Empty;
+        private Group _currentAssemblyD27 = null;
 
         public XmlManager()
         {
@@ -31,7 +33,7 @@ namespace GostDOC.Models
                 return false;
             }
 
-            string dir = Path.GetDirectoryName(aFilePath);
+            _dir = Path.GetDirectoryName(aFilePath);
 
             // Set project var's
             aResult.Name = _xml.Transaction.Project.Name;
@@ -45,23 +47,24 @@ namespace GostDOC.Models
             aResult.Version = _xml.Transaction.Version;
             // Clear configurations
             aResult.Configurations.Clear();
-            // Add to specification or not
-            bool addToSp = aResult.Type != ProjectType.GostDocB;
             // Fill configurations
             foreach (var cfg in _xml.Transaction.Project.Configurations)
             {
                 // Set cfg name
                 Configuration newCfg = new Configuration() { Name = cfg.Name };
-
                 // Fill graphs
                 foreach (var graph in cfg.Graphs)
                 {
                     newCfg.Graphs.Add(graph.Name, graph.Text);
                 }
 
-                AddComponents(newCfg, cfg.Documents, ComponentType.Document, dir, addToSp);
-                AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, dir, addToSp);
-                AddComponents(newCfg, cfg.Components, ComponentType.Component, dir, addToSp);
+                // Set current D27 group
+                _currentAssemblyD27 = newCfg.D27;
+                _currentAssemblyD27.Name = ParseNameSign(newCfg.Graphs);
+
+                AddComponents(newCfg, cfg.Documents, ComponentType.Document);
+                AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB);
+                AddComponents(newCfg, cfg.Components, ComponentType.Component);
 
                 // Sort components
                 SortComponents(newCfg);
@@ -132,7 +135,6 @@ namespace GostDOC.Models
 
                 _xml.Transaction.Project.Configurations.Add(cfgXml);
             }
-
             return XmlSerializeHelper.SaveXmlStructFile<RootXml>(_xml, aFilePath);
         }
 
@@ -143,7 +145,14 @@ namespace GostDOC.Models
                 || aGroupInfo.GroupName == Constants.GroupMaterials;
         }
 
-        private bool ParseAssemblyUnit(string aUnitName, string aDir, Configuration aNewCfg)
+        private bool IsComplexComponent(SubGroupInfo aGroupInfo)
+        {
+            return aGroupInfo.GroupName == Constants.GroupAssemblyUnits
+                || aGroupInfo.GroupName == Constants.GroupComplex
+                || aGroupInfo.GroupName == Constants.GroupKits;
+        }
+
+        private bool ParseAssemblyUnit(Configuration aNewCfg, string aUnitName)
         {
             string searchCfg = "-00";
 
@@ -155,7 +164,7 @@ namespace GostDOC.Models
             }
 
             RootXml xml = new RootXml();
-            string filePath = Path.Combine(aDir, aUnitName + ".xml");            
+            string filePath = Path.Combine(_dir, aUnitName + ".xml");            
             if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref xml, filePath))
             {
                 return false;
@@ -165,16 +174,25 @@ namespace GostDOC.Models
             {
                 if (cfg.Name == searchCfg)
                 {
-                    AddComponents(aNewCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, aDir, false);
-                    AddComponents(aNewCfg, cfg.Components, ComponentType.Component, aDir, false);
+                    Group newAssembly = new Group() { Name = ParseNameSign(cfg.Graphs) };
+                    if (_currentAssemblyD27.SubGroups == null)
+                    {
+                        _currentAssemblyD27.SubGroups = new Dictionary<string, Group>();
+                    }
+                    _currentAssemblyD27.SubGroups.Add(newAssembly.Name, newAssembly);
+                    _currentAssemblyD27 = newAssembly;
+
+                    AddComponents(aNewCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB);
+                    AddComponents(aNewCfg, cfg.Components, ComponentType.Component);
                     break;
                 }
             }
             return true;
         }
 
-        private void AddComponents(Configuration aNewCfg, List<ComponentXml> aComponents, ComponentType aType, string aDir, bool aAddToSp = true)
+        private void AddComponents(Configuration aNewCfg, List<ComponentXml> aComponents, ComponentType aType)
         {
+            var groupD27 = _currentAssemblyD27;
             Dictionary<CombineProperties, Component> components = new Dictionary<CombineProperties, Component>();
             foreach (var cmp in aComponents)
             {
@@ -203,35 +221,41 @@ namespace GostDOC.Models
                 }
 
                 // Create component
-                Component component = new Component(cmp) { Type = aType, Count = count };
-                
+                Component component = new Component(cmp) { Type = aType, Count = count };                
                 // Fill group info
                 SubGroupInfo[] groups = UpdateGroups(cmp, component);
 
-                if (aAddToSp)
+                // Add component to specification
+                if (_docType == DocType.Specification)
                 {
-                    // Add component to specification
                     AddComponent(aNewCfg.Specification, component, groups[0]);
                 }
 
-                // Parse assembly units
-                if (groups[0].GroupName == Constants.GroupAssemblyUnits)
-                {
-                    if (_docType == DocType.Bill || _docType == DocType.D27)
+                // Add component to bill
+                if (_docType == DocType.Bill || _docType == DocType.D27)
+                {                   
+                    // Parse complex components
+                    if (IsComplexComponent(groups[0]))
                     {
                         string val;
                         if (component.Properties.TryGetValue(Constants.ComponentSign, out val))
                         {
-                            ParseAssemblyUnit(val, aDir, aNewCfg);
+                            ParseAssemblyUnit(aNewCfg, val);
                         }
+                    }                    
+
+                    if (IsBillComponent(groups[0]))
+                    {
+                        // Add to Bill
+                        AddComponent(aNewCfg.Bill, component, groups[1]);
+                        // Add to D27
+                        groupD27.Components.Add(component);
                     }
+
+                    // Reset current D27 group
+                    _currentAssemblyD27 = groupD27;
                 }
 
-                // Add component to bill
-                if (IsBillComponent(groups[0]))
-                {
-                    AddComponent(aNewCfg.Bill, component, groups[1]);
-                }
                 // Save added component for counting
                 components.Add(combine, component);
             }
@@ -421,6 +445,36 @@ namespace GostDOC.Models
             if (aType == ProjectType.GostDocB)
                 return Constants.GostDocTypeB;
             return Constants.GostDocType;
+        }
+
+        private string ParseGraphValue(IDictionary<string, string> aGraphs, string aName)
+        {
+            string txt;
+            if (aGraphs.TryGetValue(aName, out txt))
+            {
+                return txt;
+            }
+            return string.Empty;
+        }
+
+        private string ParseGraphValue(IList<GraphXml> aGraphs, string aName)
+        {
+            string txt = aGraphs.FirstOrDefault(x => x.Name == aName)?.Text;
+            if (txt == null)
+            {
+                return string.Empty;
+            }
+            return txt;
+        }
+
+        private string ParseNameSign(IDictionary<string, string> aGraphs)
+        {
+            return ParseGraphValue(aGraphs, Constants.GraphName) + " " + ParseGraphValue(aGraphs, Constants.GraphSign);
+        }
+
+        private string ParseNameSign(IList<GraphXml> aGraphs)
+        {
+            return ParseGraphValue(aGraphs, Constants.GraphName) + " " + ParseGraphValue(aGraphs, Constants.GraphSign);
         }
     }
 }
