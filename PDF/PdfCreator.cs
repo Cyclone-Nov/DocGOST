@@ -186,14 +186,14 @@ namespace GostDOC.PDF
             tbl.AddCell(CreateCell(1,4).Add(CreateParagraph("Номера листов (страниц)")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Всего листов (страниц) в докум.")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("№ докум.")));
-            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Входящий #")));
+            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Входящий № сопроводительного докум. и дата")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Подп.")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Дата")));
 
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("измененных")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("заменяемых")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("новых")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("аннулированных")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Измененных")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Заменяемых")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Новых")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Аннулированных")));
 
 
             for (int i = 0; i < (RowNumberOnNextPage-4) * 10; ++i) {
