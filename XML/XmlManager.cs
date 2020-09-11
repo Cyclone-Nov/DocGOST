@@ -226,7 +226,7 @@ namespace GostDOC.Models
                 SubGroupInfo[] groups = UpdateGroups(cmp, component);
 
                 // Add component to specification
-                if (_docType == DocType.Specification)
+                if (_docType == DocType.Specification || _docType == DocType.ItemsList)
                 {
                     AddComponent(aNewCfg.Specification, component, groups[0]);
                 }

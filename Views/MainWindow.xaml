@@ -71,8 +71,8 @@
                 <MenuItem Header="Импорт перечня элементов" InputGestureText="Ctrl+E" Command="{Binding OpenFileElCmd}"/>
             </MenuItem>
             <MenuItem Header="Правка">
-                <MenuItem Header="Отменить" InputGestureText="Ctrl+Z" Command="{Binding UndoCmd}"/>
-                <MenuItem Header="Вернуть" InputGestureText="Ctrl+Y" Command="{Binding RedoCmd}"/>
+                <MenuItem Header="Отменить" InputGestureText="Ctrl+Z" Command="{Binding UndoCmd}" IsEnabled="{Binding IsUndoEnabled.Value}" />
+                <MenuItem Header="Вернуть" InputGestureText="Ctrl+Y" Command="{Binding RedoCmd}" IsEnabled="{Binding IsRedoEnabled.Value}" />
             </MenuItem>
         </Menu>
 
