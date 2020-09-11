@@ -13,6 +13,11 @@ namespace GostDOC.DataPreparation
     internal class ElementListDataPreparer : BasePreparer
     {
         /// <summary>
+        /// минимальное количество компонентов, свыше которого необходимо объединить компоненты при одинаковом стандартном документе (для ГОСТ и ТУ)
+        /// </summary>
+        private const int MIN_ITEMS_FOR_COMBINE_BY_STANDARD = 3;
+
+        /// <summary>
         /// формирование таблицы данных
         /// </summary>
         /// <param name="aConfigs"></param>
@@ -37,17 +42,20 @@ namespace GostDOC.DataPreparation
             if (data.TryGetValue(Constants.GroupOthers, out others))
             {
                 DataTable table = CreateTable("ElementListData");
-                // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
-                var mainсomponents = others.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
-
-                AddEmptyRow(table);
-                FillDataTable(table, "", mainсomponents, otherConfigsElements, schema_desigantion);
-
-                foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key))
+                if (others.Components.Count() > 0 || others.SubGroups.Count() > 0)
                 {
                     // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
-                    var сomponents = subgroup.Value.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
-                    FillDataTable(table, subgroup.Value.Name, сomponents, otherConfigsElements, schema_desigantion);
+                    var mainсomponents = others.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
+
+                    AddEmptyRow(table);
+                    FillDataTable(table, "", mainсomponents, otherConfigsElements, schema_desigantion);
+
+                    foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key))
+                    {
+                        // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
+                        var сomponents = subgroup.Value.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
+                        FillDataTable(table, subgroup.Value.Name, сomponents, otherConfigsElements, schema_desigantion);
+                    }
                 }
 
                 return table;
@@ -283,16 +291,20 @@ namespace GostDOC.DataPreparation
                     List<int> list;
                     if (StandardDic.TryGetValue(docToSupply, out list)) 
                     {
-                        if (list.Count > 2) 
+                        if (list.Count < MIN_ITEMS_FOR_COMBINE_BY_STANDARD) 
                         {
-                            aHasStandardDoc[list.First()] = 2;
-                            aHasStandardDoc[list.First() + 1] = 2;
-                            aHasStandardDoc[list.First() + 2] = 2;
+                            aHasStandardDoc[i] = 1;                            
+                        }
+                        else if (list.Count > MIN_ITEMS_FOR_COMBINE_BY_STANDARD)
+                        {
                             aHasStandardDoc[i] = 2;
                         }
                         else
                         {   
-                            aHasStandardDoc[i] = 1;
+                            aHasStandardDoc[list[0]] = 2;
+                            aHasStandardDoc[list[1]] = 2;
+                            aHasStandardDoc[list[2]] = 2;
+                            aHasStandardDoc[i] = 2;
                         }
                         list.Add(i);
                     }
@@ -387,7 +399,7 @@ namespace GostDOC.DataPreparation
             DataRow row;
             bool applied = false;
             foreach (var item in aStandardDic) {
-                if (item.Value.Count() > 3) {
+                if (item.Value.Count() > MIN_ITEMS_FOR_COMBINE_BY_STANDARD) {
                     if (!applied)
                     {                    
                         applied = true;
@@ -414,8 +426,8 @@ namespace GostDOC.DataPreparation
         private string GetComponentName(bool aHasStandardDoc, Models.Component component)
         {
             return (aHasStandardDoc)
-                ? $"{component.GetProperty(Constants.ComponentName)} {component.GetProperty(Constants.ComponentDoc)}"
-                : component.GetProperty(Constants.ComponentName);
+                ? component.GetProperty(Constants.ComponentName)
+                : $"{component.GetProperty(Constants.ComponentName)} {component.GetProperty(Constants.ComponentDoc)}";
         }
 
         /// <summary>
