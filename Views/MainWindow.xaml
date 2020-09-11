@@ -57,11 +57,11 @@
 
         <Menu Height="20" VerticalAlignment="Top" Grid.ColumnSpan="10">
             <MenuItem Header="Файл">
-                <MenuItem Header="Сохранить" InputGestureText="Ctrl+S" Command="{Binding SaveFileCmd}"/>
-                <MenuItem Header="Сохранить как..." InputGestureText="Ctrl+A" Command="{Binding SaveFileAsCmd}"/>
+                <MenuItem Header="Сохранить" InputGestureText="Ctrl+S" Command="{Binding SaveFileCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
+                <MenuItem Header="Сохранить как..." InputGestureText="Ctrl+A" Command="{Binding SaveFileAsCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
                 <Separator />
-                <MenuItem Header="Экспорт в PDF" Command="{Binding ExportPDFCmd}" />
-                <MenuItem Header="Экспорт в XLSX" Command="{Binding ExportExcelCmd}" />
+                <MenuItem Header="Экспорт в PDF" Command="{Binding ExportPDFCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
+                <MenuItem Header="Экспорт в XLSX" Command="{Binding ExportExcelCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
             </MenuItem>
             <MenuItem Header="Документы">
                 <MenuItem Header="Новая спецификация" InputGestureText="Ctrl+N" Command="{Binding NewFileCmd}"/>
@@ -131,7 +131,8 @@
 
             <WebBrowser common:WebBrowserUtility.BindableSource="{Binding CurrentPdfPath.Value}" 
                         common:WebBrowserUtility.BindableData="{Binding CurrentPdfData.Value}"/>
-            <Button Grid.Row="1" Width="200" Margin="5" HorizontalAlignment="Center" Command="{Binding UpdatePdfCmd}">Предварительный просмотр</Button>
+            <Button Grid.Row="1" Width="200" Margin="5" HorizontalAlignment="Center" 
+                    Content="Предварительный просмотр" Command="{Binding UpdatePdfCmd}" IsEnabled="{Binding IsSaveEnabled.Value}" />
         </Grid>
     </Grid>
 </Window>
