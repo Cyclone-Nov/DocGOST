@@ -69,6 +69,8 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsAddEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsAutoSortEnabled { get; } = new ObservableProperty<bool>(true);
+        public ObservableProperty<bool> IsUndoEnabled { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<bool> IsRedoEnabled { get; } = new ObservableProperty<bool>(false);
 
         // Drag / drop
         public DragDropFile DragDropFile { get; } = new DragDropFile();
@@ -177,10 +179,12 @@ namespace GostDOC.ViewModels
             if (_selectedItem.NodeType == NodeType.Root)
             {
                 GeneralGraphValues.SetMementos(_undoRedoGraphs.Undo());
+                UpdateUndoRedoMenu(_undoRedoGraphs);
             }
             else if (!string.IsNullOrEmpty(GroupName))
             {
                 Components.SetMementos(_undoRedoComponents.Undo());
+                UpdateUndoRedoMenu(_undoRedoComponents);
             }
         }
 
@@ -189,10 +193,12 @@ namespace GostDOC.ViewModels
             if (_selectedItem.NodeType == NodeType.Root)
             {
                 GeneralGraphValues.SetMementos(_undoRedoGraphs.Redo());
+                UpdateUndoRedoMenu(_undoRedoGraphs);
             }
             else if (!string.IsNullOrEmpty(GroupName))
             {
                 Components.SetMementos(_undoRedoComponents.Redo());
+                UpdateUndoRedoMenu(_undoRedoComponents);
             }
         }
 
@@ -206,6 +212,7 @@ namespace GostDOC.ViewModels
                     locker = false;
                     e.CommitEdit(DataGridEditingUnit.Row, false);
                     _undoRedoGraphs.Add(GeneralGraphValues.GetMementos());
+                    IsUndoEnabled.Value = true;
                 }
                 finally
                 {
@@ -223,6 +230,7 @@ namespace GostDOC.ViewModels
                     locker = false;
                     e.CommitEdit(DataGridEditingUnit.Row, false);
                     _undoRedoComponents.Add(Components.GetMementos());
+                    IsUndoEnabled.Value = true;
                 }
                 finally
                 {
@@ -305,6 +313,7 @@ namespace GostDOC.ViewModels
                     }
                 }
             }
+            _shouldSave = false;
         }
         
         private void AddComponent(object obj)
@@ -709,6 +718,12 @@ namespace GostDOC.ViewModels
                     }
                     break;
             }            
+        }
+
+        private void UpdateUndoRedoMenu(UndoRedoStack<IList<object>> undoRedoStack)
+        {
+            IsUndoEnabled.Value = undoRedoStack.IsUndoEnabled;
+            IsRedoEnabled.Value = undoRedoStack.IsRedoEnabled;
         }
 
         private void UpdateData()

@@ -13,6 +13,22 @@ namespace GostDOC.Models
 
         private List<T> _items = new List<T>();
 
+        public bool IsUndoEnabled
+        {
+            get
+            {
+                return _currentIndex > 0;
+            }
+        }
+
+        public bool IsRedoEnabled
+        {
+            get
+            {
+                return _currentIndex < _items.Count - 1;
+            }
+        }
+
         public UndoRedoStack(int aStackSize = 10)
         {
             _stackSize = aStackSize;
@@ -52,6 +68,6 @@ namespace GostDOC.Models
                 return default(T);
             }
             return _items.ElementAtOrDefault(_currentIndex);
-        }
+        }        
     }
 }
