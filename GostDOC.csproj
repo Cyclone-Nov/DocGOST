@@ -157,9 +157,15 @@
     <Compile Include="Common\XmlSerializerHelper.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\TreeViewSortConverter.cs" />
+    <Compile Include="DataPreparation\BasePreparer.cs" />
+    <Compile Include="DataPreparation\BillDataPreparer.cs" />
+    <Compile Include="DataPreparation\ElementListDataPreparer.cs" />
+    <Compile Include="DataPreparation\EquipmentBillDataPreparer.cs" />
+    <Compile Include="DataPreparation\SpecificationDataPreparer.cs" />
     <Compile Include="Events\TEventArgs.cs" />
     <Compile Include="Interfaces\IMemento.cs" />
     <Compile Include="Models\CombineProperties.cs" />
+    <Compile Include="DataPreparation\PrepareManager.cs" />
     <Compile Include="Models\DocumentTypes.cs" />
     <Compile Include="ExcelExport\ExcelManager.cs" />
     <Compile Include="Models\GroupData.cs" />
