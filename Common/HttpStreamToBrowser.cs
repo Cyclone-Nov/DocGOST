@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,8 +11,6 @@ namespace GostDOC.Common
 {
     class HttpDataToBrowser
     {
-        public const string HostUri = "http://localhost:40000/pdf/";
-
         private HttpListener _httpListener = new HttpListener();
 
         #region Singleton
@@ -19,11 +18,28 @@ namespace GostDOC.Common
         public static HttpDataToBrowser Instance => _instance.Value;
         #endregion
 
+        public string HostUri { get; private set; }
+
         HttpDataToBrowser()
         {
-            _httpListener.Prefixes.Add(HostUri);
-            _httpListener.Start();
+            for (int port = 40000; port < 45000; port++)
+            {
+                if (!IsPortBisy(port))
+                {
+                    HostUri = $"http://localhost:{port}/pdf/";
+                    _httpListener.Prefixes.Add(HostUri);
+                    _httpListener.Start();
+                    break;
+                }
+            }
         }
+
+        private bool IsPortBisy(int port)
+        {
+            System.Net.IPEndPoint[] tcpListenersArray = IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners();
+            bool portIsBusy = tcpListenersArray.Any(tcp => tcp.Port == port);
+            return portIsBusy;
+        } 
 
         public void SetData(byte[] aData)
         {

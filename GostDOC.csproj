@@ -163,6 +163,10 @@
     <Compile Include="DataPreparation\EquipmentBillDataPreparer.cs" />
     <Compile Include="DataPreparation\SpecificationDataPreparer.cs" />
     <Compile Include="Events\TEventArgs.cs" />
+    <Compile Include="ExcelExport\ExcelExportFactory.cs" />
+    <Compile Include="ExcelExport\ExcelExtensions.cs" />
+    <Compile Include="ExcelExport\ExportD27.cs" />
+    <Compile Include="Interfaces\IExcelExport.cs" />
     <Compile Include="Interfaces\IMemento.cs" />
     <Compile Include="Models\CombineProperties.cs" />
     <Compile Include="DataPreparation\PrepareManager.cs" />

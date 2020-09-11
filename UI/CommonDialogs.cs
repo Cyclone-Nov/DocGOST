@@ -46,13 +46,15 @@ namespace GostDOC.UI
             return null;
         }
 
-        public static void CreateConfiguration()
+        public static bool CreateConfiguration()
         {
             NewFile dlg = new NewFile();
             var result = dlg.ShowDialog();
             if (result.HasValue && result.Value)
             {
+                return true;
             }
+            return false;
         }
 
         public static string SaveFileAs(string aFilter, string aTitle)

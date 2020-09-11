@@ -62,8 +62,9 @@ namespace GostDOC.Common
                 byte[] data = e.NewValue as byte[];
                 if (data != null)
                 {
-                    HttpDataToBrowser.Instance.SetData(data);
-                    browser.Navigate(new Uri(HttpDataToBrowser.HostUri), string.Empty, null, null);
+                    var http = HttpDataToBrowser.Instance;
+                    http.SetData(data);
+                    browser.Navigate(new Uri(http.HostUri), string.Empty, null, null);
                 }
                 else
                 {
