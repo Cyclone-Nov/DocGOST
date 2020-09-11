@@ -71,6 +71,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsAutoSortEnabled { get; } = new ObservableProperty<bool>(true);
         public ObservableProperty<bool> IsUndoEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsRedoEnabled { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<bool> IsSaveEnabled { get; } = new ObservableProperty<bool>(false);
 
         // Drag / drop
         public DragDropFile DragDropFile { get; } = new DragDropFile();
@@ -264,6 +265,7 @@ namespace GostDOC.ViewModels
             if (CommonDialogs.CreateConfiguration())
             {
                 _shouldSave = true;
+                IsSaveEnabled.Value = true;
 
                 DocNodes.Clear();
                 DocNodes.Add(_specification);
@@ -550,11 +552,12 @@ namespace GostDOC.ViewModels
             string path = CommonDialogs.OpenFile("xml Files *.xml | *.xml", "Выбрать файл...");
             if (!string.IsNullOrEmpty(path))
             {
+                IsSaveEnabled.Value = true;
                 DocNodes.Clear();
                 DocNodes.Add(aNode);
                 _docType = aDocType;
                 OpenFile(path);
-            }
+            }            
         }
         private void OpenFile(string aFilePath)
         {
