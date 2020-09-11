@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -99,6 +100,14 @@ namespace GostDOC.ViewModels
         public ICommand ExportPDFCmd => new Command(ExportPDF);
         public ICommand ExportExcelCmd => new Command(ExportExcel);
 
+        public string WindowTitle
+        {
+            get
+            {
+                Version version = Assembly.GetExecutingAssembly().GetName().Version;
+                return "ПО формирования документов на основе перечня элементов изделия " + version;
+            }
+        }
         /// <summary>
         /// Current selected configuration
         /// </summary>
