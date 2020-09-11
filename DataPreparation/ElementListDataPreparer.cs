@@ -151,20 +151,26 @@ namespace GostDOC.DataPreparation
             Group docs;
             if (aConfig.Specification.TryGetValue(Constants.GroupDoc, out docs))
             {
-                var docсomponents = docs.Components.Where(val => !string.Equals(val.GetProperty(Constants.ComponentName.ToLower()), Constants.DOC_SCHEMA.ToLower()));
-                if(docсomponents.Count() > 0)
-                {
-                   if(docсomponents.Count() > 1)
-                   {
-                        // TODO: чего делать если несколько схем на документ?
-                        throw new Exception("В файле спецификации указано несколько схем для перечня элементов...не смог выбрать (((");
-                   }
-                   else
-                   {
-                        designation = docсomponents.First().GetProperty(Constants.ComponentSign);
-                   }
+                if (docs.Components.Count() > 0 || docs.SubGroups.Count() > 0)
+                { 
+                    var docсomponents = docs.Components.Where(val => !string.Equals(val.GetProperty(Constants.ComponentName.ToLower()), Constants.DOC_SCHEMA.ToLower()));
+                    if(docсomponents.Count() > 0)
+                    {
+                       if(docсomponents.Count() > 1)
+                       {
+                            // TODO: чего делать если несколько схем на документ?
+                            throw new Exception("В файле спецификации указано несколько схем для перечня элементов...не смог выбрать (((");
+                       }
+                       else
+                       {
+                            designation = docсomponents.First().GetProperty(Constants.ComponentSign);
+                       }
+                    }
                 }
-
+                else
+                {
+                    // log: в исходном xml файле документов не найдено (раздел Документация пуст)
+                }
             }
             return designation;
         }
@@ -230,21 +236,24 @@ namespace GostDOC.DataPreparation
                 Dictionary<string, Component> dic = new Dictionary<string, Component>();
                 Group others;
                 if (config.Value.Specification.TryGetValue(Constants.GroupOthers, out others))
-                {                
-                    // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
-                    var mainсomponents = others.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
-                    foreach(var comp in mainсomponents)
-                        dic.Add(comp.GetProperty(Constants.ComponentDesignatiorID), comp);                
-             
-                    foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key))
-                    {
+                {
+                    if(others.Components.Count() > 0 || others.SubGroups.Count() > 0)
+                    { 
                         // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
-                        var сomponents = subgroup.Value.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
-                        foreach(var comp in сomponents)
-                            dic.Add(comp.GetProperty(Constants.ComponentDesignatiorID), comp);                    
+                        var mainсomponents = others.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
+                        foreach(var comp in mainсomponents)
+                            dic.Add(comp.GetProperty(Constants.ComponentDesignatiorID), comp);                
+             
+                        foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key))
+                        {
+                            // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
+                            var сomponents = subgroup.Value.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
+                            foreach(var comp in сomponents)
+                                dic.Add(comp.GetProperty(Constants.ComponentDesignatiorID), comp);                    
+                        }
+                        result.Add(dic);
                     }
                 }
-                result.Add(dic);
             }        
             return result;
         }
