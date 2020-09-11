@@ -15,7 +15,7 @@ namespace GostDOC.PDF
         public PdfBillCreator() : base(DocType.Bill) {
         }
 
-        public override void Create(Project project) {
+        public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs) {
             throw new NotImplementedException();
         }
 

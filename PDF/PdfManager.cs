@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
 
 using GostDOC.Common;
 using GostDOC.Models;
@@ -29,29 +30,6 @@ namespace GostDOC.PDF
         }
         #endregion
 
-
-
-
-        public void CreateDocument(DocType aType)
-        {
-            switch (aType)
-            {
-                case DocType.Specification:
-                    break;
-
-                case DocType.ItemsList:
-                    break;
-
-                case DocType.Bill:
-                    break;
-
-                case DocType.D27:
-                    throw new NotSupportedException("Экспорт в pdf документа Д27 не поддерживается");                    
-            }
-            throw new NotImplementedException();
-        }
-
-
         public string GetFileName(DocType aDocType)
         {
             switch (aDocType)
@@ -71,19 +49,55 @@ namespace GostDOC.PDF
             throw new NotImplementedException();
         }
 
-
-        public bool SaveChanges(DocType aDocType, Project aProject)
+        /// <summary>
+        /// подготовить PDF документ
+        /// </summary>
+        /// <param name="aDocType">тип документа</param>
+        /// <param name="aData">подготовленная к выводу таблица данных</param>
+        /// <param name="aMainGraphs"></param>
+        /// <returns></returns>
+        public bool PreparePDF(DocType aDocType, DataTable aData, IDictionary<string,string> aMainGraphs)
         {
-            GetCreator(aDocType).Create(aProject);
+            GetCreator(aDocType).Create(aData, aMainGraphs);
             return true;
         }
 
 
+        /// <summary>
+        /// Gets the PDF data.
+        /// </summary>
+        /// <param name="aDocType">Type of a document.</param>
+        /// <returns></returns>
         public byte[] GetPDFData(DocType aDocType) {
             return GetCreator(aDocType).GetData();
         }
 
-        PdfCreator GetCreator(DocType aDocType) {
+        /// <summary>
+        /// Creates the document.
+        /// </summary>
+        /// <param name="aType">a type.</param>
+        /// <exception cref="NotSupportedException">Экспорт в pdf документа Д27 не поддерживается</exception>
+        /// <exception cref="NotImplementedException"></exception>
+        public void SavePDF(DocType aType)
+        {
+            switch (aType)
+            {
+            case DocType.Specification:
+                break;
+
+            case DocType.ItemsList:
+                break;
+
+            case DocType.Bill:
+                break;
+
+            case DocType.D27:
+                throw new NotSupportedException("Экспорт в pdf документа Д27 не поддерживается");
+            }
+            throw new NotImplementedException();
+        }
+
+        private PdfCreator GetCreator(DocType aDocType) {
             PdfCreator creator;
             switch (aDocType)
             {

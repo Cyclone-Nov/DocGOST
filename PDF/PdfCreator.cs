@@ -34,6 +34,11 @@ namespace GostDOC.PDF
 
         internal readonly PageSize PageSize;
 
+        /// <summary>
+        /// допустимое количество страниц для документа без добавления листа регистрации изменений
+        /// </summary>
+        protected const int MAX_PAGES_WITHOUT_CHANGELIST = 3;
+
         protected const float THICK_LINE_WIDTH = 2f;         
         protected readonly float TITLE_BLOCK_WIDTH = 185 * PdfDefines.mmA4;
         protected readonly float BOTTOM_MARGIN = 5 * PdfDefines.mmA4;
@@ -118,7 +123,7 @@ namespace GostDOC.PDF
         }
 
 
-        public abstract void Create(Project project);
+        public abstract void Create(DataTable aData, IDictionary<string, string> aMainGraphs);
 
         public byte[] GetData()
         {
@@ -126,8 +131,7 @@ namespace GostDOC.PDF
             pdfWriter.Flush();
             return MainStream.ToArray();
         }
-
-        
+                
 
         protected void SetPageMargins(iText.Layout.Document aDoc) {
             aDoc.SetLeftMargin(8 * PdfDefines.mmA4);
