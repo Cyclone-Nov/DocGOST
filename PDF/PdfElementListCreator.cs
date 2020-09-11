@@ -33,26 +33,20 @@ internal class PdfElementListCreator : PdfCreator {
 
     private const string FileName = @"Перечень элементов.pdf";
 
+    private int _currentPageNumber = 0;
 
-
-    private int _currentPageNumber;
-
-    public PdfElementListCreator() : base(DocType.ItemsList) {
+    public PdfElementListCreator() : base(DocType.ItemsList) 
+    {
     }
 
 
     /// <summary>
-    /// Создать документ
+    /// Создать PDF документ
     /// </summary>
-    public override void Create(Project project) {
-        if (project.Configurations.Count == 0)
-            return;
-
-        Configuration mainConfig = null;
-        if (!project.Configurations.TryGetValue(Constants.MAIN_CONFIG_INDEX, out mainConfig))
-            return;
-
-        var dataTable = CreateDataTable(mainConfig.Specification);
+    public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs) 
+    {   
+        var dataTable = aData;
+        var graphs = aMainGraphs;
 
         if (pdfWriter != null) {
             doc.Close();
@@ -73,354 +67,20 @@ internal class PdfElementListCreator : PdfCreator {
         pdfDoc.SetDefaultPageSize(PageSize);
         doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), true);
 
-        int lastProcessedRow = AddFirstPage(doc, mainConfig.Graphs, dataTable);
-
-        // TODO: remove this
-        lastProcessedRow = 1;
+        int lastProcessedRow = AddFirstPage(doc, graphs, dataTable);
 
         _currentPageNumber = 1;
         while (lastProcessedRow > 0) {
             _currentPageNumber++;
-            lastProcessedRow = AddNextPage(doc, mainConfig.Graphs, dataTable, lastProcessedRow);
+            lastProcessedRow = AddNextPage(doc, graphs, dataTable, lastProcessedRow);
         }
-        
-        // TODO: change to 2
-        if (pdfDoc.GetNumberOfPages() > 1) {
-            AddRegisterList(doc, mainConfig.Graphs);
+                
+        if (pdfDoc.GetNumberOfPages() > MAX_PAGES_WITHOUT_CHANGELIST) {
+            AddRegisterList(doc, graphs);
         }
 
         doc.Close();
     }
-
-    /// <summary>
-    /// формирование таблицы данных
-    /// </summary>
-    /// <param name="aData"></param>
-    /// <returns></returns>
-    private DataTable CreateDataTable(IDictionary<string, Group> aData) {
-        // только компоненты из раздела "Прочие изделия"
-        Group others;
-        if (aData.TryGetValue(Constants.GroupOthers, out others)) {
-            DataTable table = CreateElementListDataTable("ElementListData");
-            var mainсomponents = others.Components.Where(val =>
-                !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
-
-            AddEmptyRow(table);
-            FillDataTable(table, "", mainсomponents);
-
-            foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key)) {
-                // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
-                var сomponents = subgroup.Value.Components.Where(val =>
-                    !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
-                FillDataTable(table, subgroup.Value.Name, сomponents);
-            }
-
-            return table;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// создание таблицы данных для документа Перечень элементов
-    /// </summary>
-    /// <param name="aDataTableName"></param>
-    /// <returns></returns>
-    private DataTable CreateElementListDataTable(string aDataTableName) {
-        DataTable table = new DataTable(aDataTableName);
-        DataColumn column = new DataColumn("id", System.Type.GetType("System.Int32"));
-        column.Unique = true;
-        column.AutoIncrement = true;
-        column.Caption = "id";
-        table.Columns.Add(column);
-        table.PrimaryKey = new DataColumn[] {column};
-
-        column = new DataColumn(Constants.ColumnPosition, System.Type.GetType("System.String"));
-        column.Unique = false;
-        column.Caption = "Поз. обозначение";
-        column.AllowDBNull = true;
-        table.Columns.Add(column);
-
-        column = new DataColumn(Constants.ColumnName, System.Type.GetType("System.String"));
-        column.Unique = false;
-        column.Caption = "Наименование";
-        column.AllowDBNull = true;
-        table.Columns.Add(column);
-
-        column = new DataColumn(Constants.ColumnQuantity, System.Type.GetType("System.Int32"));
-        column.Unique = false;
-        column.Caption = "Кол.";
-        column.AllowDBNull = true;
-        table.Columns.Add(column);
-
-        column = new DataColumn(Constants.ColumnFootnote, System.Type.GetType("System.String"));
-        column.Unique = false;
-        column.Caption = "Примечание";
-        column.AllowDBNull = true;
-        table.Columns.Add(column);
-
-        return table;
-    }
-
-    /// <summary>
-    /// заполнить таблицу данных
-    /// </summary>
-    /// <param name="aTable"></param>
-    /// <param name="aGroupName"></param>
-    /// <param name="aComponents"></param>
-    private void FillDataTable(DataTable aTable, string aGroupName, IEnumerable<Models.Component> aComponents) {
-        // записываем компоненты в таблицу данных
-        if (aComponents.Count() > 0) {
-            //Cортировка компонентов по значению свойства "Позиционное обозначение"
-            Models.Component[] sortComponents =
-                SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();
-            // для признаков составления наименования для данного компонента
-            int[] HasStandardDoc;
-
-            //ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем номера компонентов с совпадающим значением                
-            Dictionary<string /* GOST/TY string*/, List<int> /* array indexes */> StandardDic =
-                FindComponentsWithStandardDoc(sortComponents, out HasStandardDoc);
-
-            // записываем наименование группы, если есть
-            AddGroupName(aTable, aGroupName);
-
-            // записываем строки с гост/ту в начале таблицы, если они есть для нескольких компонентов
-            if (!AddStandardDocsToTable(aGroupName, sortComponents, aTable, StandardDic)) {
-                AddEmptyRow(aTable);
-            }
-
-            //записываем таблицу данных объединяя подрядидущие компоненты с одинаковым наименованием    
-            DataRow row;
-            for (int i = 0; i < sortComponents.Length;) {
-                var component = sortComponents[i];
-                string component_name = GetComponentName(HasStandardDoc[i] == 1, component);
-                int component_count = GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
-                List<string> component_designators = new List<string>
-                    {component.GetProperty(Constants.ComponentDesignatiorID)};
-
-                bool same;
-                int j = i + 1;
-                if (j < sortComponents.Length) {
-                    do {
-                        var componentNext = sortComponents[j];
-                        string componentNext_name = GetComponentName(HasStandardDoc[j] == 1, componentNext);
-
-                        if (string.Equals(component_name, componentNext_name)) {
-                            same = true;
-                            component_count +=
-                                GetComponentCount(componentNext.GetProperty(Constants.ComponentCountDev));
-                            j++;
-                        }
-                        else
-                            same = false;
-                    } while (same && j < sortComponents.Length);
-                }
-
-                i = j;
-
-                string component_designator = MakeComponentDesignatorsString(component_designators);
-
-                row = aTable.NewRow();
-                row[Constants.ColumnPosition] = component_designator;
-                row[Constants.ColumnName] = component_name;
-                row[Constants.ColumnQuantity] = component_count;
-                row[Constants.ColumnFootnote] = component.GetProperty(Constants.ComponentNote);
-                aTable.Rows.Add(row);
-            }
-
-            AddEmptyRow(aTable);
-            aTable.AcceptChanges();
-        }
-    }
-
-    /// <summary>
-    /// поиск компонент с наличием ТУ/ГОСТ в свойстве "Документ на поставку", заполнение словаря с индексами найденных компонент для
-    /// значения "Документ на поставку" и сохранение номера компонентов с совпадающим значением                
-    /// </summary>
-    /// <param name="aComponents">отсортированный массив компонентов</param>
-    /// <param name="aHasStandardDoc">массив компонентов с отметками о наличии стандартных документов и объединения в группы</param>
-    /// <returns></returns>
-    private Dictionary<string, List<int>> FindComponentsWithStandardDoc(Models.Component[] aComponents,
-        out int[] aHasStandardDoc) {
-        Dictionary<string, List<int>> StandardDic = new Dictionary<string, List<int>>();
-        aHasStandardDoc = new int[aComponents.Length];
-
-        for (int i = 0; i < aComponents.Length; i++) {
-            string docToSupply = aComponents[i].GetProperty(Constants.ComponentDoc);
-            if (docToSupply == "") continue;
-            if (string.Equals(docToSupply.Substring(0, 4).ToLower(), "гост") ||
-                string.Equals(docToSupply.Substring(docToSupply.Length - 2, 2).ToLower(), "ту")) {
-                List<int> list;
-                if (StandardDic.TryGetValue(docToSupply, out list)) {
-                    if (list.Count == 1) {
-                        aHasStandardDoc[list.First()] = 2;
-                    }
-
-                    list.Add(i);
-                    aHasStandardDoc[i] = 2;
-                }
-                else {
-                    list = new List<int> {i};
-                    aHasStandardDoc[i] = 1;
-                    StandardDic.Add(docToSupply, list);
-                }
-            }
-        }
-
-        return StandardDic;
-    }
-
-    /// <summary>
-    /// добавить пустую строку в таблицу данных
-    /// </summary>
-    /// <param name="aTable"></param>
-    private void AddEmptyRow(DataTable aTable) {
-        DataRow row = aTable.NewRow();
-        row[Constants.ColumnName] = string.Empty;
-        row[Constants.ColumnPosition] = string.Empty;
-        row[Constants.ColumnQuantity] = 0;
-        row[Constants.ColumnFootnote] = string.Empty;
-        aTable.Rows.Add(row);
-    }
-
-    /// <summary>
-    /// добавить имя группы в таблицу
-    /// </summary>
-    /// <param name="aTable"></param>
-    /// <param name="aGroupName"></param>
-    private void AddGroupName(DataTable aTable, string aGroupName) {
-        if (!string.IsNullOrEmpty(aGroupName)) {
-            DataRow row = aTable.NewRow();
-            row[Constants.ColumnName] = aGroupName;
-            aTable.Rows.Add(row);
-        }
-    }
-
-    /// <summary>
-    /// добавить в таблицу данных стандартные документы на поставку при наличии перед перечнем компонентов
-    /// </summary>
-    /// <param name="aGroupName">имя группы</param>
-    /// <param name="aComponents">список компонентов</param>
-    /// <param name="aTable">таблица данных</param>
-    /// <param name="aStandardDic">словарь со стандартными документами на поставку</param>
-    /// <returns>true - стандартные документы добавлены </returns>
-    private bool AddStandardDocsToTable(string aGroupName, Models.Component[] aComponents, DataTable aTable,
-        Dictionary<string, List<int>> aStandardDic) {
-        bool isApplied = false;
-        DataRow row;
-        foreach (var item in aStandardDic) {
-            if (item.Value.Count() > 1) {
-                row = aTable.NewRow();
-                var index = item.Value.First();
-                string name = $"{aGroupName} {aComponents[index].GetProperty(Constants.ComponentType)} {item.Key}";
-                row[Constants.ColumnName] = name;
-                aTable.Rows.Add(row);
-                isApplied = true;
-            }
-        }
-
-        return isApplied;
-    }
-
-    /// <summary>
-    /// получить имя компонента для столбца "Наименование"
-    /// </summary>
-    /// <param name="aHasStandardDoc">признак наличия ГОСТ/ТУ символов в документе на поставку</param>
-    /// <param name="component">компонент</param>
-    /// <returns></returns>
-    private string GetComponentName(bool aHasStandardDoc, Models.Component component) {
-        return (aHasStandardDoc)
-            ? $"{component.GetProperty(Constants.ComponentName)} {component.GetProperty(Constants.ComponentDoc)}"
-            : component.GetProperty(Constants.ComponentName);
-    }
-
-    /// <summary>
-    /// получить количество компонентов
-    /// </summary>
-    /// <param name="aCountStr"></param>
-    /// <returns></returns>
-    private int GetComponentCount(string aCountStr) {
-        int count = 1;
-        if (!string.IsNullOrEmpty(aCountStr)) {
-            if (!Int32.TryParse(aCountStr, out count)) {
-                count = 1;
-                //throw new Exception($"Не удалось распарсить значение свойства \"Количество на изд.\" для компонента с именем {component_name}");
-            }
-        }
-
-        return count;
-    }
-
-    /// <summary>
-    /// составить строку для столбца "Поз. обозначение"
-    /// </summary>
-    /// <param name="aDesignators">список позиционных обозначений всех индентичных элементов</param>
-    /// <returns></returns>
-    private string MakeComponentDesignatorsString(List<string> aDesignators) {
-        string designator = string.Empty;
-        if (aDesignators.Count() == 1)
-            designator = aDesignators.First();
-        else if (aDesignators.Count() == 2)
-            designator = $"{aDesignators.First()},{aDesignators.Last()}";
-        else
-            designator = $"{aDesignators.First()} - {aDesignators.Last()}";
-
-        return designator;
-    }
-
-    /// <summary>
-    /// создать шаблон первой страницы документа
-    /// (таблица данных в шаблоне не создается)
-    /// </summary>
-    /// <param name="aPageSize">Размер страницы</param>
-    /// <returns></returns>
-    internal PdfDocument CreateTemplateFirstPage(PageSize aPageSize) {
-        MemoryStream stream = new MemoryStream();
-        PdfDocument firstPage = new PdfDocument(new PdfWriter(stream));
-
-        firstPage.SetDefaultPageSize(aPageSize);
-        var document = new iText.Layout.Document(firstPage, aPageSize, true);
-
-        SetPageMargins(document);
-
-        // добавить таблицу с основной надписью для первой старницы
-        //document.Add(CreateFirstTitleBlock(aPageSize));
-
-        // добавить таблицу с верхней дополнительной графой
-        //document.Add(CreateTopAppendGraph(aPageSize));
-
-        // добавить таблицу с нижней дополнительной графой
-        //document.Add(CreateBottomAppendGraph(aPageSize));
-
-        doc.Close();
-        return firstPage;
-    }
-
-    /// <summary>
-    /// создать шаблон последующих страниц документа
-    /// таблица данных в шаблоне не создается
-    /// </summary>
-    /// <returns></returns>
-    internal PdfDocument CreateTemplateNextPage(PageSize aPageSize) {
-        MemoryStream stream = new MemoryStream();
-        PdfDocument nextPage = new PdfDocument(new PdfWriter(stream));
-
-        nextPage.SetDefaultPageSize(aPageSize);
-        var document = new iText.Layout.Document(nextPage, aPageSize, true);
-
-        SetPageMargins(document);
-
-        // добавить таблицу с основной надписью для дополнительного листа
-        //document.Add(CreateNextTitleBlock(aPageSize));
-
-
-        // добавить таблицу с нижней дополнительной графой
-        //document.Add(CreateBottomAppendGraph(aPageSize));
-
-        doc.Close();
-        return nextPage;
-    }
-
 
     /// <summary>
     /// создать страница регистрации изменений
@@ -460,7 +120,7 @@ internal class PdfElementListCreator : PdfCreator {
 
 
         var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
-        var p = new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PJOJECT)).SetRotationAngle(DegreesToRadians(90))
+        var p = new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT)).SetRotationAngle(DegreesToRadians(90))
             .AddStyle(style).SetFixedPosition(10 * PdfDefines.mmA4 + 2,
                 TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * PdfDefines.mmA4, 100);
         aInDoc.Add(p);
@@ -497,9 +157,6 @@ internal class PdfElementListCreator : PdfCreator {
 
         // добавить таблицу с нижней дополнительной графой
         aInPdfDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
-
-        // TODO: remove this
-        lastNextProcessedRow = 0;
 
         return lastNextProcessedRow;
     }
@@ -622,7 +279,6 @@ internal class PdfElementListCreator : PdfCreator {
 
         tbl.SetFixedPosition(19.3f * PdfDefines.mmA4, 78 * PdfDefines.mmA4 + 0.5f, TITLE_BLOCK_WIDTH + 2f);
 
-
         return tbl;
     }
 
@@ -646,6 +302,16 @@ internal class PdfElementListCreator : PdfCreator {
             aTable.AddCell(aTemplateCell.Clone(false).SetBorderBottom(new SolidBorder(borderWidth)));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="aRowspan"></param>
+    /// <param name="aColspan"></param>
+    /// <param name="aLeftBorder"></param>
+    /// <param name="aRightBorder"></param>
+    /// <param name="aTopBorder"></param>
+    /// <param name="aBottomBorder"></param>
+    /// <returns></returns>
     private Cell CreateEmptyCell(int aRowspan, int aColspan, int aLeftBorder = 2, int aRightBorder = 2,
         int aTopBorder = 2, int aBottomBorder = 2) {
         Cell cell = new Cell(aRowspan, aColspan);
@@ -667,7 +333,8 @@ internal class PdfElementListCreator : PdfCreator {
     /// <param name="aFont">шрифт</param>
     /// <param name="aString">строка для разбивки</param>
     /// <returns></returns>
-    private List<string> SplitNameByWidth(float aLength, float aFontSize, PdfFont aFont, string aString) {
+    private List<string> SplitNameByWidth(float aLength, float aFontSize, PdfFont aFont, string aString) 
+    {
         List<string> name_strings = new List<string>();
         int default_padding = 4;
         float maxLength = aLength - default_padding;
@@ -685,7 +352,8 @@ internal class PdfElementListCreator : PdfCreator {
     /// <param name="maxLength"></param>
     /// <param name="currLength"></param>
     /// <param name="aFullName"></param>
-    private void GetLimitSubstring(List<string> name_strings, float maxLength, float currLength, string aFullName) {
+    private void GetLimitSubstring(List<string> name_strings, float maxLength, float currLength, string aFullName) 
+    {
         if (currLength < maxLength) {
             name_strings.Add(aFullName);
         }

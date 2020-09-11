@@ -103,7 +103,7 @@ namespace GostDOC.Common
         /// <summary>
         /// Название проекта
         /// </summary>
-        public static readonly string GRAPH_PJOJECT = "Проект";
+        public static readonly string GRAPH_PROJECT = "Проект";
 
         /// <summary>
         /// индекс основного исполнения (конфигурации) в виде строки
@@ -260,6 +260,7 @@ namespace GostDOC.Common
         public static readonly string ComponentCountSet = "Количество в комп.";
         public static readonly string ComponentCountReg = "Количество на рег.";
         public static readonly string ComponentNote = "Примечание";
+        public static readonly string ComponentPresence = "Наличие компонента";
         public static readonly string ComponentSign = "Обозначение";
         public static readonly string ComponentWhereIncluded = "Куда входит";
         public static readonly string ComponentDesignatiorID = "Позиционное обозначение";
@@ -273,6 +274,8 @@ namespace GostDOC.Common
         public static readonly string GraphCommentsB = "Комментарии ВП";
         public static readonly string GraphSign = "Обозначение";
         public static readonly string GraphName = "Наименование";
+
+        public static readonly string DOC_SCHEMA = "Схема";
 
         public static readonly string GostDocType = "GostDoc";
         public static readonly string GostDocTypeB = "GostDocB";

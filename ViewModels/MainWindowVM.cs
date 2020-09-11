@@ -499,8 +499,12 @@ namespace GostDOC.ViewModels
                 return;
             
             // TODO: async
-            /*res = await*/ _docManager.SaveChangesInPdf(_docType);
-            CurrentPdfData.Value = _docManager.GetPdfData(_docType);
+            /*res = await*/ 
+            if(_docManager.PrepareData(_docType))
+            { 
+                _docManager.PreparePDF(_docType);
+                CurrentPdfData.Value = _docManager.GetPdfData(_docType);
+            }
         }
 
         private void ClickMenu(MenuNode obj)

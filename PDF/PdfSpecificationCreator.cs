@@ -24,14 +24,8 @@ namespace GostDOC.PDF
         public PdfSpecificationCreator() : base(DocType.Specification) {
         }
 
-        public override void Create(Project project) {
-            if (project.Configurations.Count == 0)
-                return;
-                        
-            Configuration mainConfig = null;
-            if (!project.Configurations.TryGetValue(Constants.MAIN_CONFIG_INDEX, out mainConfig))
-                return;
-
+        public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs) 
+        {
             if (pdfWriter != null)
             {
                 doc.Close();
@@ -52,10 +46,10 @@ namespace GostDOC.PDF
             pdfDoc.SetDefaultPageSize(PageSize);
             doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), true);
             
-            DataTable dataTable = new DataTable();
+            var dataTable = aData;
 
-            AddFirstPage(doc, mainConfig.Graphs, dataTable);
-            AddNextPage(doc, mainConfig.Graphs, dataTable, 0);
+            AddFirstPage(doc, aMainGraphs, dataTable);
+            AddNextPage(doc, aMainGraphs, dataTable, 0);
 
             doc.Close();            
         }
@@ -144,7 +138,6 @@ namespace GostDOC.PDF
 
             return tbl;
         }
-
 
         private void SetPageMargins(iText.Layout.Document aDoc)
         {
