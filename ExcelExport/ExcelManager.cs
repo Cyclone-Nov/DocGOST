@@ -16,6 +16,8 @@ namespace GostDOC.ExcelExport
             var app = new Excel.Application();
             // Set app visible
             // app.Visible = true;
+            // Skip dialog messages
+            app.DisplayAlerts = false;
             // Create workbook
             var wb = app.Workbooks.Add();
             // Get exporter
