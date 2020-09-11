@@ -14,25 +14,16 @@ namespace GostDOC.ExcelExport
         {
             // Open excel application
             var app = new Excel.Application();
-            
-            app.Visible = true;
+            // Set app visible
+            // app.Visible = true;
+            // Create workbook
             var wb = app.Workbooks.Add();
-
-            // Get current sheet
-            Excel._Worksheet ws = (Excel.Worksheet)app.ActiveSheet;
-
-            // TODO: Fill excel file
-            switch (aDocType)
-            {
-                case DocType.Bill:
-                case DocType.D27:
-                case DocType.Specification:
-                case DocType.ItemsList:
-                    break;
-            }
-
-            // Save file
-            ws.SaveAs(aFilePath);
+            // Get exporter
+            var export = ExcelExportFactory.GetExporter(aDocType);
+            // Export
+            export?.Export(app, aFilePath);
+            // Save
+            wb.SaveAs(aFilePath);
             // App quit
             app.Quit();
         } 

@@ -497,8 +497,13 @@ namespace GostDOC.ViewModels
 
         private void NewFile(object obj)
         {
-            CommonDialogs.CreateConfiguration();
-            UpdateData();
+            if (CommonDialogs.CreateConfiguration())
+            {
+                DocNodes.Clear();
+                DocNodes.Add(_specification);
+                _docType = DocType.Specification;
+                UpdateData();
+            }
         }
 
         private void OpenFile(Node aNode, DocType aDocType)
