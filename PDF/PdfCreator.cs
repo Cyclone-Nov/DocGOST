@@ -87,6 +87,12 @@ namespace GostDOC.PDF
             switch(aType)
             {
                 case DocType.Bill:
+                    {
+                        PageSize = new PageSize(PageSize.A3);
+                        RowNumberOnFirstPage = 24;
+                        RowNumberOnNextPage = 29;
+                    }
+                    break;
                 case DocType.D27:
                     {
                         PageSize = new PageSize(PageSize.A3);
@@ -186,14 +192,14 @@ namespace GostDOC.PDF
             tbl.AddCell(CreateCell(1,4).Add(CreateParagraph("Номера листов (страниц)")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Всего листов (страниц) в докум.")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("№ докум.")));
-            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Входящий #")));
+            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Входящий № сопроводительного докум. и дата")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Подп.")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Дата")));
 
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("измененных")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("заменяемых")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("новых")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("аннулированных")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Измененных")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Заменяемых")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Новых")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Аннулированных")));
 
 
             for (int i = 0; i < (RowNumberOnNextPage-4) * 10; ++i) {
@@ -313,13 +319,18 @@ namespace GostDOC.PDF
             }
 
             for (int i = 0; i < 5; ++i) {
-                leftTable.AddCell(CreateLeftTableCell().SetBorderRight(CreateThickBorder())
+                leftTable.AddCell(CreateLeftTableCell()
+                    .SetBorderLeft(CreateThickBorder())
+                    .SetBorderRight(CreateThickBorder())
                     .SetBorderTop(CreateThickBorder()));
             }
 
             void Add14to18Graph(string graph) {
                 leftTable.AddCell(
-                    CreateLeftTableCell().Add(new Paragraph(GetGraph(graph))).SetBorderRight(CreateThickBorder()));
+                    CreateLeftTableCell()
+                        .Add(new Paragraph(GetGraph(graph)))
+                        .SetBorderLeft(CreateThickBorder())
+                        .SetBorderRight(CreateThickBorder()));
             }
 
             Add14to18Graph(Constants.GRAPH_14);
@@ -336,7 +347,10 @@ namespace GostDOC.PDF
 
             void AddToTopLeftTable(string text) {
                 leftTable.AddCell(
-                    CreateLeftTableCell().SetBorderRight(CreateThickBorder()).Add(CreateLeftTableTopParagraph(text)));
+                    CreateLeftTableCell()
+                        .SetBorderRight(CreateThickBorder())
+                        .SetBorderLeft(CreateThickBorder())
+                        .Add(CreateLeftTableTopParagraph(text)));
             }
 
             AddToTopLeftTable("Изм.");
@@ -362,12 +376,15 @@ namespace GostDOC.PDF
             }
 
             void AddToBottomLeftTable(string text, string graph, bool topBorder = false, bool bottomBorder = false) {
-                var c = CreateLeftTableCell(1, 2).SetBorderRight(CreateThickBorder())
+                var c = CreateLeftTableCell(1, 2)
+                    .SetBorderLeft(CreateThickBorder())
+                    .SetBorderRight(CreateThickBorder())
                     .Add(CreateLeftTableBottomParagraph(text));
                 SetThickBorder(c, topBorder, bottomBorder);
                 leftTable.AddCell(c);
 
-                c = CreateLeftTableCell().SetBorderRight(CreateThickBorder())
+                c = CreateLeftTableCell()
+                    .SetBorderRight(CreateThickBorder())
                     .Add(CreateLeftTableBottomParagraph(GetGraph(graph)));
                 SetThickBorder(c, topBorder, bottomBorder);
                 leftTable.AddCell(c);
@@ -384,7 +401,9 @@ namespace GostDOC.PDF
             AddToBottomLeftTable("Пров.", Constants.GRAPH_11sp_chk);
 
 
-            leftTable.AddCell(CreateLeftTableCell(1, 2).SetBorderRight(CreateThickBorder())
+            leftTable.AddCell(CreateLeftTableCell(1, 2)
+                .SetBorderLeft(CreateThickBorder())
+                .SetBorderRight(CreateThickBorder())
                 .Add(CreateLeftTableBottomParagraph(GetGraph(Constants.GRAPH_10))));
             leftTable.AddCell(CreateLeftTableCell().SetBorderRight(CreateThickBorder())
                 .Add(CreateLeftTableBottomParagraph(GetGraph(Constants.GRAPH_11))));
@@ -489,12 +508,23 @@ namespace GostDOC.PDF
 
             #endregion
 
-            mainTable.SetFixedPosition(20 * PdfDefines.mmA4, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            // switch A3/A4
+            if (Math.Abs(aPageSize.GetWidth() - PageSize.A3.GetWidth()) < 0.1) {
+                mainTable.SetFixedPosition(415 * PdfDefines.mmA4-TITLE_BLOCK_WIDTH, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+                
+                Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
+                    new Rectangle((295)* PdfDefines.mmA4, BOTTOM_MARGIN, PdfDefines.A4Width, 2));
+                canvas.Add(
+                    new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((53 * 2 + 14 - 50) * PdfDefines.mmA4));
 
-            Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
-                new Rectangle((20 + 7 + 10 + 23 + 15 + 10) * PdfDefines.mmA4, BOTTOM_MARGIN, PdfDefines.A4Width, 2));
-            canvas.Add(
-                new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((53 * 2 + 14 - 50) * PdfDefines.mmA4));
+            } else {
+                mainTable.SetFixedPosition(20 * PdfDefines.mmA4, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+
+                Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
+                    new Rectangle((20 + 7 + 10 + 23 + 15 + 10) * PdfDefines.mmA4, BOTTOM_MARGIN, PdfDefines.A4Width, 2));
+                canvas.Add(
+                    new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((53 * 2 + 14 - 50) * PdfDefines.mmA4));
+            }
 
             return mainTable;
         }
@@ -588,7 +618,8 @@ namespace GostDOC.PDF
 
             return tbl;
         }
-  protected static Cell CreateAppendGraphCell(float height, string text = null) {
+ 
+        protected static Cell CreateAppendGraphCell(float height, string text = null) {
         var c = new Cell();
         if (text != null) {
             c.Add(
@@ -654,7 +685,7 @@ namespace GostDOC.PDF
 
         tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4, "Инв № подл."));
         tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4 + 2f));
-
+       
         tbl.SetFixedPosition(APPEND_GRAPHS_LEFT, BOTTOM_MARGIN, APPEND_GRAPHS_WIDTH);
 
         return tbl;
