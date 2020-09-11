@@ -34,6 +34,7 @@ namespace GostDOC.ViewModels
 
         private Node _selectedItem = null;
         private string _filePath = null;
+        private bool _shouldSave = false;
 
         private DocManager _docManager = DocManager.Instance;
 
@@ -82,7 +83,7 @@ namespace GostDOC.ViewModels
         public ICommand OpenFileElCmd => new Command(OpenFileEl);
         public ICommand SaveFileCmd => new Command(SaveFile);
         public ICommand SaveFileAsCmd => new Command(SaveFileAs);
-        public ICommand ExitCmd => new Command<Window>(Exit);
+        public ICommand ClosingCmd => new Command(Closing);
         public ICommand AddComponentCmd => new Command(AddComponent);
         public ICommand RemoveComponentsCmd => new Command<IList<object>>(RemoveComponents);
         public ICommand MoveComponentsCmd => new Command<IList<object>>(MoveComponents);
@@ -250,6 +251,19 @@ namespace GostDOC.ViewModels
             OpenFile(_elements, DocType.ItemsList);
         }
 
+        private void NewFile(object obj)
+        {
+            if (CommonDialogs.CreateConfiguration())
+            {
+                _shouldSave = true;
+
+                DocNodes.Clear();
+                DocNodes.Add(_specification);
+                _docType = DocType.Specification;
+                UpdateData();
+            }
+        }
+
         private void SaveFile(object obj = null)
         {
             if (string.IsNullOrEmpty(_filePath))
@@ -278,9 +292,19 @@ namespace GostDOC.ViewModels
             UpdateSelectedDocument();
         }
 
-        private void Exit(Window wnd)
+        private void Closing(object obj = null)
         {
-            wnd.Close();
+            if (_shouldSave)
+            {
+                var result = System.Windows.MessageBox.Show("Сохранить изменения в xml файле?", "Сохранение изменений", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    if (string.IsNullOrEmpty(_filePath))
+                    {
+                        SaveFileAs();
+                    }
+                }
+            }
         }
         
         private void AddComponent(object obj)
@@ -327,6 +351,8 @@ namespace GostDOC.ViewModels
 
         private void SaveComponents(object obj)
         {
+            _shouldSave = true;
+
             string cfgName = ConfigurationName;
 
             // Update components properties
@@ -356,6 +382,8 @@ namespace GostDOC.ViewModels
 
         private void SaveGraphValues(GraphPageType tp)
         {
+            _shouldSave = true;
+
             Dictionary<string, string> values = new Dictionary<string, string>();
             foreach (var value in GeneralGraphValues)
             {
@@ -504,19 +532,12 @@ namespace GostDOC.ViewModels
             OpenFile(e.Arg);
         }
 
-        private void NewFile(object obj)
-        {
-            if (CommonDialogs.CreateConfiguration())
-            {
-                DocNodes.Clear();
-                DocNodes.Add(_specification);
-                _docType = DocType.Specification;
-                UpdateData();
-            }
-        }
-
         private void OpenFile(Node aNode, DocType aDocType)
         {
+            // Ask to save previous file if needed
+            Closing();
+
+            // Open new file
             string path = CommonDialogs.OpenFile("xml Files *.xml | *.xml", "Выбрать файл...");
             if (!string.IsNullOrEmpty(path))
             {
