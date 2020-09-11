@@ -23,12 +23,10 @@ namespace GostDOC.PDF
         public PdfBillCreator() : base(DocType.Bill) {
         }
 
-        public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs) {
-            if (project.Configurations.Count == 0)
-                return;
-
-            if (!project.Configurations.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))
-                return;
+        public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs) 
+        {
+            var dataTable = aData;
+            var graphs = aMainGraphs;
 
             if (pdfWriter != null)
             {
@@ -50,10 +48,8 @@ namespace GostDOC.PDF
             pdfDoc.SetDefaultPageSize(PageSize);
             doc = new Document(pdfDoc, pdfDoc.GetDefaultPageSize().Rotate(), true);
             
-            DataTable dataTable = new DataTable();
-
-            AddFirstPage(doc, mainConfig.Graphs, dataTable);
-            AddNextPage(doc, mainConfig.Graphs, dataTable, 0);
+            AddFirstPage(doc, graphs, dataTable);
+            AddNextPage(doc, graphs, dataTable, 0);
 
             doc.Close();            
         }
