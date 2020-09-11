@@ -39,6 +39,7 @@ namespace GostDOC.Models
         public IDictionary<string, string> Graphs { get; } = new Dictionary<string, string>();
         public IDictionary<string, Group> Specification { get; set; } = new Dictionary<string, Group>();
         public IDictionary<string, Group> Bill { get; set; } = new Dictionary<string, Group>();
+        public Group D27 { get; set; } = new Group();
     }
 
     public class Project
