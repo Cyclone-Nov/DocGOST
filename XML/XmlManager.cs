@@ -198,7 +198,8 @@ namespace GostDOC.Models
             {
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
                 var included = cmp.Properties.Find(x => x.Name == Constants.ComponentWhereIncluded);
-                if (name == null || included == null) 
+                var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
+                if (name == null || (included == null && sign == null)) 
                 {
                     continue;
                 }
@@ -206,7 +207,7 @@ namespace GostDOC.Models
                 CombineProperties combine = new CombineProperties()
                 {
                     Name = name.Text,
-                    Included = included.Text
+                    Included = included?.Text ?? sign.Text 
                 };
 
                 // Parse component count
