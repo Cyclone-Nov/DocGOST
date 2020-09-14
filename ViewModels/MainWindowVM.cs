@@ -166,14 +166,15 @@ namespace GostDOC.ViewModels
         #endregion Commands
 
         public MainWindowVM()
-        {
-            Title.Value = WindowTitle;
+        {            
             // Subscribe to drag and drop events
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
             // Load document types
             _docTypes.Load();
             // Load material types
             _materials.Load();
+            // Update title
+            UpdateTitle();
         }
 
         #region Commands impl
@@ -272,9 +273,9 @@ namespace GostDOC.ViewModels
                 DocNodes.Clear();
                 DocNodes.Add(_specification);
                 _docType = DocType.Specification;
-
-                Title.Value = WindowTitle;
-
+                
+                _filePath = string.Empty;
+                UpdateTitle();
                 UpdateData();
             }
         }
@@ -299,9 +300,9 @@ namespace GostDOC.ViewModels
             if (!string.IsNullOrEmpty(path))
             {
                 _filePath = path;
-
-                Title.Value = WindowTitle + " - " + Path.GetFileName(_filePath);
-
+                // Save file path to title
+                UpdateTitle();
+                // Save file
                 SaveFile();
             }
         }
@@ -577,9 +578,8 @@ namespace GostDOC.ViewModels
         {
             // Save current file name only if one file was selected
             _filePath = aFilePath;
-
             // Save file path to title
-            Title.Value = WindowTitle + " - " + Path.GetFileName(_filePath);
+            UpdateTitle();
 
             // Parse xml files
             if (_docManager.LoadData(_filePath, _docType))
@@ -811,6 +811,11 @@ namespace GostDOC.ViewModels
                 }
                 TableContextMenuEnabled.Value = true;
             }
+        }
+
+        private void UpdateTitle()
+        {
+            Title.Value = WindowTitle + " - " + Path.GetFileName(_filePath);
         }
     }
 }
