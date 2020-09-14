@@ -9,12 +9,13 @@
         xmlns:uc="clr-namespace:GostDOC.UserControls"
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:cmd="http://www.galasoft.ch/mvvmlight"
         mc:Ignorable="d"
         Title="{Binding Title.Value}" Height="800" Width="1280" WindowStartupLocation="CenterScreen" WindowState="Maximized">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing" >
-            <i:InvokeCommandAction Command="{Binding ClosingCmd}" />
+            <cmd:EventToCommand PassEventArgsToCommand="True" Command="{Binding ClosingCmd}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     
