@@ -87,7 +87,7 @@ namespace GostDOC.ViewModels
         public ICommand OpenFileElCmd => new Command(OpenFileEl);
         public ICommand SaveFileCmd => new Command(SaveFile);
         public ICommand SaveFileAsCmd => new Command(SaveFileAs);
-        public ICommand ClosingCmd => new Command(Closing);
+        public ICommand ClosingCmd => new Command<System.ComponentModel.CancelEventArgs>(Closing);
         public ICommand AddComponentCmd => new Command(AddComponent);
         public ICommand RemoveComponentsCmd => new Command<IList<object>>(RemoveComponents);
         public ICommand MoveComponentsCmd => new Command<IList<object>>(MoveComponents);
@@ -166,14 +166,15 @@ namespace GostDOC.ViewModels
         #endregion Commands
 
         public MainWindowVM()
-        {
-            Title.Value = WindowTitle;
+        {            
             // Subscribe to drag and drop events
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
             // Load document types
             _docTypes.Load();
             // Load material types
             _materials.Load();
+            // Update title
+            UpdateTitle();
         }
 
         #region Commands impl
@@ -264,6 +265,12 @@ namespace GostDOC.ViewModels
 
         private void NewFile(object obj)
         {
+            if (!SavePreviousFile())
+            {
+                // Operation cancelled
+                return;
+            }
+
             if (CommonDialogs.CreateConfiguration())
             {
                 _shouldSave = true;
@@ -272,9 +279,9 @@ namespace GostDOC.ViewModels
                 DocNodes.Clear();
                 DocNodes.Add(_specification);
                 _docType = DocType.Specification;
-
-                Title.Value = WindowTitle;
-
+                
+                _filePath = string.Empty;
+                UpdateTitle();
                 UpdateData();
             }
         }
@@ -287,9 +294,8 @@ namespace GostDOC.ViewModels
             }
             else
             {
-                SaveFile();
+                Save();
             }
-
             _shouldSave = false;
         }
 
@@ -299,10 +305,10 @@ namespace GostDOC.ViewModels
             if (!string.IsNullOrEmpty(path))
             {
                 _filePath = path;
-
-                Title.Value = WindowTitle + " - " + Path.GetFileName(_filePath);
-
-                SaveFile();
+                // Save file path to title
+                UpdateTitle();
+                // Save file
+                Save();
             }
         }
 
@@ -312,20 +318,28 @@ namespace GostDOC.ViewModels
             UpdateSelectedDocument();
         }
 
-        private void Closing(object obj = null)
+        private void Closing(System.ComponentModel.CancelEventArgs e)
         {
             if (_shouldSave)
             {
-                var result = System.Windows.MessageBox.Show("Сохранить изменения в xml файле?", "Сохранение изменений", MessageBoxButton.YesNo);
-                if (result == MessageBoxResult.Yes)
+                var result = System.Windows.MessageBox.Show("Сохранить изменения в xml файле?", "Сохранение изменений", MessageBoxButton.YesNoCancel);
+
+                switch (result)
                 {
-                    if (string.IsNullOrEmpty(_filePath))
-                    {
-                        SaveFileAs();
-                    }
+                    case MessageBoxResult.Yes:
+                        SaveFile();
+                        break;
+                    case MessageBoxResult.No:
+                        _shouldSave = false;
+                        break;
+                    default:
+                        if (e != null)
+                        {
+                            e.Cancel = true;
+                        }
+                        break;
                 }
             }
-            _shouldSave = false;
         }
         
         private void AddComponent(object obj)
@@ -535,7 +549,6 @@ namespace GostDOC.ViewModels
 
         private void ExportPDF(object obj)
         {
-
         }
 
         private void ExportExcel(object obj)
@@ -559,8 +572,11 @@ namespace GostDOC.ViewModels
 
         private void OpenFile(Node aNode, DocType aDocType)
         {
-            // Ask to save previous file if needed
-            Closing();
+            if (!SavePreviousFile())
+            {
+                // Operation cancelled
+                return;
+            }
 
             // Open new file
             string path = CommonDialogs.OpenFile("xml Files *.xml | *.xml", "Выбрать файл...");
@@ -577,9 +593,8 @@ namespace GostDOC.ViewModels
         {
             // Save current file name only if one file was selected
             _filePath = aFilePath;
-
             // Save file path to title
-            Title.Value = WindowTitle + " - " + Path.GetFileName(_filePath);
+            UpdateTitle();
 
             // Parse xml files
             if (_docManager.LoadData(_filePath, _docType))
@@ -596,9 +611,17 @@ namespace GostDOC.ViewModels
             }
         }
 
-        private bool SaveFile()
+        private bool Save()
         {
             return string.IsNullOrEmpty(_filePath) ? false : _docManager.SaveData(_filePath);
+        }
+
+        private bool SavePreviousFile()
+        {
+            // Ask to save previous file if needed
+            System.ComponentModel.CancelEventArgs e = new System.ComponentModel.CancelEventArgs(false);
+            Closing(e);
+            return !e.Cancel;
         }
 
         private void UpdateSelectedDocument()
@@ -810,6 +833,18 @@ namespace GostDOC.ViewModels
                     TableContextMenu.Add(node);
                 }
                 TableContextMenuEnabled.Value = true;
+            }
+        }
+
+        private void UpdateTitle()
+        {
+            if (string.IsNullOrEmpty(_filePath))
+            {
+                Title.Value = WindowTitle;
+            }
+            else
+            {
+                Title.Value = WindowTitle + " - " + Path.GetFileName(_filePath);
             }
         }
     }

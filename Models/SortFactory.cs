@@ -43,10 +43,9 @@ namespace GostDOC.Models
     {
         public List<Component> Sort(List<Component> aItems)
         {
-            return aItems.OrderBy(x => x.GetProperty(Constants.ComponentDesignatiorID)).ToList();
+            return aItems.OrderBy(x => x.Count).ThenBy(x => x.GetProperty(Constants.ComponentDesignatiorID)).ToList();
         }
-    }
-    
+    }    
 
     class NameSortRegex : ISort<Component>
     {
