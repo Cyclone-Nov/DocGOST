@@ -10,7 +10,7 @@
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
-        Title="{Binding WindowTitle}" Height="800" Width="1280" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+        Title="{Binding Title.Value}" Height="800" Width="1280" WindowStartupLocation="CenterScreen" WindowState="Maximized">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing" >

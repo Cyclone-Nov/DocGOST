@@ -49,6 +49,7 @@ namespace GostDOC.ViewModels
 
         private ExcelManager _excelManager = new ExcelManager();
 
+        public ObservableProperty<string> Title { get; } = new ObservableProperty<string>();
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<ComponentVM> ComponentsSelectedItem { get; } = new ObservableProperty<ComponentVM>();
@@ -166,6 +167,7 @@ namespace GostDOC.ViewModels
 
         public MainWindowVM()
         {
+            Title.Value = WindowTitle;
             // Subscribe to drag and drop events
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
             // Load document types
@@ -270,6 +272,9 @@ namespace GostDOC.ViewModels
                 DocNodes.Clear();
                 DocNodes.Add(_specification);
                 _docType = DocType.Specification;
+
+                Title.Value = WindowTitle;
+
                 UpdateData();
             }
         }
@@ -284,6 +289,8 @@ namespace GostDOC.ViewModels
             {
                 SaveFile();
             }
+
+            _shouldSave = false;
         }
 
         private void SaveFileAs(object obj = null)
@@ -292,6 +299,9 @@ namespace GostDOC.ViewModels
             if (!string.IsNullOrEmpty(path))
             {
                 _filePath = path;
+
+                Title.Value = WindowTitle + " - " + Path.GetFileName(_filePath);
+
                 SaveFile();
             }
         }
@@ -567,6 +577,9 @@ namespace GostDOC.ViewModels
         {
             // Save current file name only if one file was selected
             _filePath = aFilePath;
+
+            // Save file path to title
+            Title.Value = WindowTitle + " - " + Path.GetFileName(_filePath);
 
             // Parse xml files
             if (_docManager.LoadData(_filePath, _docType))
