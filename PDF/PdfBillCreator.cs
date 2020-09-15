@@ -14,6 +14,7 @@ using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Pdf.Canvas.Draw;
 using iText.Layout;
 using iText.Layout.Element;
+using iText.Layout.Properties;
 using Document = iText.Layout.Document;
 
 namespace GostDOC.PDF
@@ -58,27 +59,17 @@ namespace GostDOC.PDF
         }
 
         internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData) {
-            
             SetPageMargins(aInDoc);
-
-            // добавить таблицу с нижней дополнительной графой
             aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
-
-            // добавить таблицу с основной надписью для первой старницы
             aInDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
-
-
-            DrawLines();
-
-
+            DrawLines(pdfDoc.GetFirstPage());
             return 0;
         }
 
-        void DrawLines() {
-            var pageWidth = pdfDoc.GetFirstPage().GetPageSize().GetWidth();
-            var pageHeight = pdfDoc.GetFirstPage().GetPageSize().GetHeight();
+        void DrawLines(PdfPage aPage) {
+            var pageWidth = aPage.GetPageSize().GetWidth();
 
-            Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
+            Canvas canvas = new Canvas(new PdfCanvas(aPage),
                 new Rectangle(APPEND_GRAPHS_LEFT, BOTTOM_MARGIN, PdfDefines.A3Width, 2));
             canvas.Add(
                 new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((228) * PdfDefines.mmA3));
@@ -86,22 +77,27 @@ namespace GostDOC.PDF
             var leftVertLineHeight = PdfDefines.A3Width - BOTTOM_MARGIN * 2;
             var x = APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f;
             var y = BOTTOM_MARGIN;
-            canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()), new Rectangle(x, y, 2, leftVertLineHeight));
+            canvas = new Canvas(new PdfCanvas(aPage), new Rectangle(x, y, 2, leftVertLineHeight));
             canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(leftVertLineHeight).SetRotationAngle(DegreesToRadians(90)));
 
             var upperHorizLineWidth = pageWidth - (x+RIGHT_MARGIN) + 4;
             y = BOTTOM_MARGIN + leftVertLineHeight;
-            canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()), new Rectangle(x, y, upperHorizLineWidth, 2));
+            canvas = new Canvas(new PdfCanvas(aPage), new Rectangle(x, y, upperHorizLineWidth, 2));
             canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(upperHorizLineWidth));
 
             var rightVertLineHeight = PdfDefines.A3Width - BOTTOM_MARGIN * 2;//+ upperHorizLineWidth;
             x = APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f + upperHorizLineWidth;
             y = BOTTOM_MARGIN+2f;
-            canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()), new Rectangle(x, y, 2, rightVertLineHeight));
+            canvas = new Canvas(new PdfCanvas(aPage), new Rectangle(x, y, 2, rightVertLineHeight));
             canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(rightVertLineHeight).SetRotationAngle(DegreesToRadians(90)));
         }
 
-        internal override int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow) {
+        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow) {
+            aInDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+            SetPageMargins(aInDoc);
+            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+            aInDoc.Add(CreateNextTitleBlock(PageSize, aGraphs));
+            DrawLines(pdfDoc.GetPage(2));
             return 0;
         }
     }

@@ -622,7 +622,15 @@ namespace GostDOC.PDF
             AddGraphCell( "Подп.", bottomBorder:true);
             AddGraphCell( "Дата", bottomBorder:true);
 
-            tbl.SetFixedPosition(20 * PdfDefines.mmA4, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+
+
+            // switch A3/A4
+            if (Math.Abs(aPageSize.GetWidth() - PageSize.A3.GetWidth()) < 0.1) {
+                tbl.SetFixedPosition(PdfDefines.A3Height - TITLE_BLOCK_WIDTH - RIGHT_MARGIN, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            } else {
+                tbl.SetFixedPosition(20 * PdfDefines.mmA4, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            }
+
 
             return tbl;
         }
