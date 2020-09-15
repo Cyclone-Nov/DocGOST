@@ -295,8 +295,7 @@ namespace GostDOC.ViewModels
             else
             {
                 Save();
-            }
-            _shouldSave = false;
+            }            
         }
 
         private void SaveFileAs(object obj = null)
@@ -323,7 +322,6 @@ namespace GostDOC.ViewModels
             if (_shouldSave)
             {
                 var result = System.Windows.MessageBox.Show("Сохранить изменения в xml файле?", "Сохранение изменений", MessageBoxButton.YesNoCancel);
-
                 switch (result)
                 {
                     case MessageBoxResult.Yes:
@@ -332,12 +330,11 @@ namespace GostDOC.ViewModels
                     case MessageBoxResult.No:
                         _shouldSave = false;
                         break;
-                    default:
-                        if (e != null)
-                        {
-                            e.Cancel = true;
-                        }
-                        break;
+                }
+
+                if (_shouldSave && e != null)
+                {
+                    e.Cancel = true;
                 }
             }
         }
@@ -668,6 +665,7 @@ namespace GostDOC.ViewModels
 
         private bool Save()
         {
+            _shouldSave = false;
             return string.IsNullOrEmpty(_filePath) ? false : _docManager.SaveData(_filePath);
         }
 
