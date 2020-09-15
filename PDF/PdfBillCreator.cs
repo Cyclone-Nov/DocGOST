@@ -62,9 +62,71 @@ namespace GostDOC.PDF
             SetPageMargins(aInDoc);
             aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
             aInDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
+            aInDoc.Add(CreateTable(null, true, 0, out var lpr));
             DrawLines(pdfDoc.GetFirstPage());
             return 0;
         }
+
+
+        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow) {
+            aInDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+            SetPageMargins(aInDoc);
+            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+            aInDoc.Add(CreateNextTitleBlock(PageSize, aGraphs));
+            DrawLines(pdfDoc.GetPage(2));
+            return 0;
+        }
+
+        Table CreateTable(DataTable aData, bool firstPage, int aStartRow, out int outLastProcessedRow) {
+            float[] columnSizes = {
+                60 * PdfDefines.mmA3h, 
+                45 * PdfDefines.mmA3h, 
+                70 * PdfDefines.mmA3h, 
+                55 * PdfDefines.mmA3h,
+                70 * PdfDefines.mmA3h,
+                16 * PdfDefines.mmA3h,
+                16 * PdfDefines.mmA3h,
+                16 * PdfDefines.mmA3h,
+                16 * PdfDefines.mmA3h,
+                24 * PdfDefines.mmA3h,
+            };
+            Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
+            tbl.SetMargin(0).SetPadding(0).SetFont(f1).SetFontSize(12).SetItalic().SetTextAlignment(TextAlignment.CENTER);
+
+            Cell CreateCell(int rowspan=1, int colspan=1) => new Cell(rowspan, colspan).SetPadding(0).SetMargin(0).SetBorderLeft(CreateThickBorder()).SetBorderRight(CreateThickBorder());
+
+            void AddMainHeaderCell(string text) => tbl.AddCell(CreateCell(2,1).SetBorder(CreateThickBorder()).Add(new Paragraph("Наименование")));
+
+            AddMainHeaderCell("Наименование");
+            AddMainHeaderCell("Код продукции");
+            AddMainHeaderCell("Обозначение документа на поставку");
+            AddMainHeaderCell("Поставщик");
+            AddMainHeaderCell("Куда входит (обозначение)");
+
+            tbl.AddCell(CreateCell(1, 4).SetBorder(CreateThickBorder()).SetHeight(9*PdfDefines.mmA3).Add(new Paragraph("Количество")));
+            AddMainHeaderCell("Примечание");
+            
+            void AddSecondaryHeaderCell(string text) => tbl.AddCell(CreateCell().SetBorder(CreateThickBorder()).SetHeight(18*PdfDefines.mmA3).Add(new Paragraph(text)));
+
+            AddSecondaryHeaderCell("на изделие");
+            AddSecondaryHeaderCell("в комплекте");
+            AddSecondaryHeaderCell("на регулир");
+            AddSecondaryHeaderCell("всего");
+
+
+            var rowNumber = firstPage ? RowNumberOnFirstPage : RowNumberOnNextPage;
+            for (int i = 0; i < rowNumber*10; ++i) {
+                tbl.AddCell(CreateCell().SetHeight(5*PdfDefines.mmA3));
+            }
+
+
+            //tbl.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, 78 * PdfDefines.mmA3, (60+45+70+55+70+16*4+24)*PdfDefines.mmA3 ) ;
+            tbl.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, 78 * PdfDefines.mmA3, 280*PdfDefines.mmA3h-0.5f) ;
+
+            outLastProcessedRow = 0;
+            return tbl;
+        }
+
 
         void DrawLines(PdfPage aPage) {
             var pageWidth = aPage.GetPageSize().GetWidth();
@@ -90,15 +152,6 @@ namespace GostDOC.PDF
             y = BOTTOM_MARGIN+2f;
             canvas = new Canvas(new PdfCanvas(aPage), new Rectangle(x, y, 2, rightVertLineHeight));
             canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(rightVertLineHeight).SetRotationAngle(DegreesToRadians(90)));
-        }
-
-        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow) {
-            aInDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-            SetPageMargins(aInDoc);
-            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
-            aInDoc.Add(CreateNextTitleBlock(PageSize, aGraphs));
-            DrawLines(pdfDoc.GetPage(2));
-            return 0;
         }
     }
 }

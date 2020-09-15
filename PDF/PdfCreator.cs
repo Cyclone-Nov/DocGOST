@@ -98,7 +98,7 @@ namespace GostDOC.PDF
                 case DocType.Bill:
                     {
                         PageSize = new PageSize(PageSize.A3);
-                        RowNumberOnFirstPage = 24;
+                        RowNumberOnFirstPage = 10;
                         RowNumberOnNextPage = 29;
                     }
                     break;
