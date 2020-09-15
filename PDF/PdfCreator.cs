@@ -39,9 +39,13 @@ namespace GostDOC.PDF
         /// </summary>
         protected const int MAX_PAGES_WITHOUT_CHANGELIST = 3;
 
+        protected readonly float BOTTOM_MARGIN = 5 * PdfDefines.mmA4;
+        protected readonly float LEFT_MARGIN = 8 * PdfDefines.mmA4;
+        protected readonly float TOP_MARGIN = 5 * PdfDefines.mmA4;
+        protected readonly float RIGHT_MARGIN = 5 * PdfDefines.mmA4;
+
         protected const float THICK_LINE_WIDTH = 2f;         
         protected readonly float TITLE_BLOCK_WIDTH = 185 * PdfDefines.mmA4;
-        protected readonly float BOTTOM_MARGIN = 5 * PdfDefines.mmA4;
         protected readonly float DEFAULT_TITLE_BLOCK_CELL_HEIGHT = 5 * PdfDefines.mmA4h;
         protected readonly float TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE = (5 + 287 - 60 * 2) * PdfDefines.mmA4;
         protected readonly float APPEND_GRAPHS_LEFT = (20 - 5 - 7) * PdfDefines.mmA4;
@@ -140,10 +144,10 @@ namespace GostDOC.PDF
                 
 
         protected void SetPageMargins(iText.Layout.Document aDoc) {
-            aDoc.SetLeftMargin(8 * PdfDefines.mmA4);
-            aDoc.SetRightMargin(5 * PdfDefines.mmA4);
-            aDoc.SetTopMargin(5 * PdfDefines.mmA4);
-            aDoc.SetBottomMargin(5 * PdfDefines.mmA4);
+            aDoc.SetLeftMargin(LEFT_MARGIN);
+            aDoc.SetRightMargin(RIGHT_MARGIN);
+            aDoc.SetTopMargin(TOP_MARGIN);
+            aDoc.SetBottomMargin(BOTTOM_MARGIN);
         }
 
         /// <summary>

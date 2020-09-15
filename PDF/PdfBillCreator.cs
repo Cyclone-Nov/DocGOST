@@ -20,6 +20,9 @@ namespace GostDOC.PDF
 {
     class PdfBillCreator : PdfCreator
     {
+        protected new readonly float LEFT_MARGIN = 5 * PdfDefines.mmA3;
+        protected new readonly float RIGHT_MARGIN = 5 * PdfDefines.mmA3;
+
         public PdfBillCreator() : base(DocType.Bill) {
         }
 
@@ -65,13 +68,37 @@ namespace GostDOC.PDF
             aInDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
 
 
-            Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
-                new Rectangle(APPEND_GRAPHS_LEFT, BOTTOM_MARGIN, PdfDefines.A3Width, 2));
-            canvas.Add(
-                new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((228) * PdfDefines.mmA4));
+            DrawLines();
 
 
             return 0;
+        }
+
+        void DrawLines() {
+            var pageWidth = pdfDoc.GetFirstPage().GetPageSize().GetWidth();
+            var pageHeight = pdfDoc.GetFirstPage().GetPageSize().GetHeight();
+
+            Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
+                new Rectangle(APPEND_GRAPHS_LEFT, BOTTOM_MARGIN, PdfDefines.A3Width, 2));
+            canvas.Add(
+                new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((228) * PdfDefines.mmA3));
+
+            var leftVertLineHeight = PdfDefines.A3Width - BOTTOM_MARGIN * 2;
+            var x = APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f;
+            var y = BOTTOM_MARGIN;
+            canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()), new Rectangle(x, y, 2, leftVertLineHeight));
+            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(leftVertLineHeight).SetRotationAngle(DegreesToRadians(90)));
+
+            var upperHorizLineWidth = pageWidth - (x+RIGHT_MARGIN) + 4;
+            y = BOTTOM_MARGIN + leftVertLineHeight;
+            canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()), new Rectangle(x, y, upperHorizLineWidth, 2));
+            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(upperHorizLineWidth));
+
+            var rightVertLineHeight = PdfDefines.A3Width - BOTTOM_MARGIN * 2;//+ upperHorizLineWidth;
+            x = APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f + upperHorizLineWidth;
+            y = BOTTOM_MARGIN+2f;
+            canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()), new Rectangle(x, y, 2, rightVertLineHeight));
+            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(rightVertLineHeight).SetRotationAngle(DegreesToRadians(90)));
         }
 
         internal override int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow) {
