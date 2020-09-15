@@ -215,7 +215,7 @@ namespace GostDOC.ViewModels
                 {
                     locker = false;
                     e.CommitEdit(DataGridEditingUnit.Row, false);
-                    _undoRedoGraphs.Add(GeneralGraphValues.GetMementos());
+                    UpdateUndoRedoGraph();
                     IsUndoEnabled.Value = true;
                 }
                 finally
@@ -233,7 +233,7 @@ namespace GostDOC.ViewModels
                 {
                     locker = false;
                     e.CommitEdit(DataGridEditingUnit.Row, false);
-                    _undoRedoComponents.Add(Components.GetMementos());
+                    UpdateUndoRedoComponents();
                     IsUndoEnabled.Value = true;
                 }
                 finally
@@ -345,6 +345,7 @@ namespace GostDOC.ViewModels
         private void AddComponent(object obj)
         {
             Components.Add(new ComponentVM());
+            UpdateUndoRedoComponents();
         }
 
         private void RemoveComponents(IList<object> lst)
@@ -353,6 +354,7 @@ namespace GostDOC.ViewModels
             {
                 Components.Remove(item);
             }
+            UpdateUndoRedoComponents();
         }
 
         private void MoveComponents(IList<object> lst)
@@ -533,9 +535,14 @@ namespace GostDOC.ViewModels
 
         private void ClickMenu(MenuNode obj)
         {
+            if (obj == null)
+            {
+                return;
+            }
+
             if (GroupName.Equals(Constants.GroupDoc))
             {
-                Document doc = _docTypes.GetDocument(obj?.Parent?.Name, obj?.Name);
+                Document doc = _docTypes.GetDocument(obj.Parent?.Name, obj.Name);
                 if (doc != null)
                 {
                     ComponentVM cmp = new ComponentVM();
@@ -544,6 +551,54 @@ namespace GostDOC.ViewModels
                     cmp.Format.Value = "A4";
                     Components.Add(cmp);
                 }        
+            }
+            else if (GroupName.Equals(Constants.GroupMaterials))
+            {
+                Material material = null;
+                if (obj.Name == Constants.NewMaterialMenuItem)
+                {
+                    // Add material
+                    material = CommonDialogs.AddMaterial();
+
+                    if (material != null)
+                    {
+                        if (_materials.AddMaterial(obj.Parent.Name, material))
+                        {
+                            // Add node
+                            obj.Parent.Nodes.InsertSorted(new MenuNode() { Name = material.Name, Parent = obj.Parent });
+                            // Save file
+                            _materials.Save();
+                        }
+                    }
+                }
+                else if (obj.Name == Constants.NewMaterialGroupMenuItem)
+                {
+                    // Add group
+                    var group = CommonDialogs.GetGroupName();
+                    if (_materials.AddGroup(group))
+                    {
+                        // Create new group node
+                        var node = new MenuNode() { Name = group, Nodes = new ObservableCollection<MenuNode>() };
+                        // Add default node 
+                        node.Nodes.Add(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = node });
+                        // Add new group to collection
+                        TableContextMenu.InsertSorted(node);
+                        // Save file
+                        _materials.Save();
+                    }
+                }
+                else
+                {
+                    // Find material
+                    material = _materials.GetMaterial(obj.Parent?.Name, obj.Name);
+                    if (material != null)
+                    {
+                        ComponentVM cmp = new ComponentVM();
+                        cmp.Name.Value = material.Name;
+                        cmp.Note.Value = material.Note;
+                        Components.Add(cmp);
+                    }
+                }
             }
         }
 
@@ -695,7 +750,7 @@ namespace GostDOC.ViewModels
 
             // Add initial value to undo / redo stack
             _undoRedoComponents.Clear();
-            _undoRedoComponents.Add(Components.GetMementos());
+            UpdateUndoRedoComponents();
         }
 
         private void UpdateConfiguration(Node aCollection, string aCfgName, IDictionary<string, Group> aGroups)
@@ -739,7 +794,7 @@ namespace GostDOC.ViewModels
 
             // Add initial value to undo / redo stack
             _undoRedoGraphs.Clear();
-            _undoRedoGraphs.Add(GeneralGraphValues.GetMementos());
+            UpdateUndoRedoGraph();
         }
 
         private void UpdateGroups()
@@ -829,9 +884,10 @@ namespace GostDOC.ViewModels
                     {
                         node.Nodes.Add(new MenuNode() { Name = doc.Key, Parent = node });
                     }
-                    node.Nodes.Add(new MenuNode() { Name = "<Новый материал>", Parent = node });
+                    node.Nodes.Add(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = node });
                     TableContextMenu.Add(node);
                 }
+                TableContextMenu.Add(new MenuNode() { Name = Constants.NewMaterialGroupMenuItem });
                 TableContextMenuEnabled.Value = true;
             }
         }
@@ -846,6 +902,18 @@ namespace GostDOC.ViewModels
             {
                 Title.Value = WindowTitle + " - " + Path.GetFileName(_filePath);
             }
+        }
+
+        private void UpdateUndoRedoComponents()
+        {
+            // Update undo / redo stack
+            _undoRedoComponents.Add(Components.GetMementos());
+        }
+
+        private void UpdateUndoRedoGraph()
+        {
+            // Update undo / redo stack
+            _undoRedoGraphs.Add(GeneralGraphValues.GetMementos());
         }
     }
 }

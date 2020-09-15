@@ -7,10 +7,15 @@ using System.Threading.Tasks;
 
 namespace GostDOC.Models
 {
-    class MenuNode
+    class MenuNode : IComparable<MenuNode>
     {
         public string Name { get; set; }
         public MenuNode Parent { get; set; }
         public ObservableCollection<MenuNode> Nodes { get; set; }
+
+        public int CompareTo(MenuNode other)
+        {
+            return Name.CompareTo(other.Name);
+        }
     }
 }

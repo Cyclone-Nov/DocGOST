@@ -12,7 +12,7 @@
 
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="inverseConverter" />
-        <BooleanToVisibilityConverter x:Key="b2v" />
+        <BooleanToVisibilityConverter x:Key="b2v" />       
     </UserControl.Resources>
     
     <Grid>
