@@ -9,7 +9,7 @@ using GostDOC.Views;
 
 namespace GostDOC.UI
 {
-    public static class CommonDialogs
+    internal static class CommonDialogs
     {
         public static string GetGroupName()
         {
@@ -78,6 +78,21 @@ namespace GostDOC.UI
             if (open.ShowDialog() == DialogResult.OK)
             {
                 return open.FileName;
+            }
+            return null;
+        }
+
+        public static Material AddMaterial()
+        {
+            NewMaterial newMaterialDlg = new NewMaterial();
+            var result = newMaterialDlg.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                return new Material()
+                {
+                    Name = newMaterialDlg.MaterialName.Text,
+                    Note = newMaterialDlg.MaterialNote.Text
+                };
             }
             return null;
         }

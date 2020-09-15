@@ -9,7 +9,7 @@ using GostDOC.Common;
 
 namespace GostDOC.Models
 {
-    class Material
+    public class Material
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
@@ -17,18 +17,18 @@ namespace GostDOC.Models
         public string Note { get; set; }
     }
 
-    class MaterialGroupsXml
+    public class MaterialGroupsXml
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
 
         [XmlArray("materials")]
-        [XmlArrayItem(typeof(MaterialGroupsXml), ElementName = "material")]
+        [XmlArrayItem(typeof(Material), ElementName = "material")]
         public List<Material> Materials { get; set; } = new List<Material>();
     }
 
     [XmlRootAttribute("root", IsNullable = false)]
-    class MaterialsXml
+    public class MaterialsXml
     {
         [XmlArray("groups")]
         [XmlArrayItem(typeof(MaterialGroupsXml), ElementName = "group")]
@@ -95,13 +95,47 @@ namespace GostDOC.Models
             XmlSerializeHelper.SaveXmlStructFile(materials, _filePath);
         }
 
-        public void AddMaterial(string aGroup, Material aMaterial)
+        public bool AddMaterial(string aGroup, Material aMaterial)
         {
             IDictionary<string, Material> group;
             if (Materials.TryGetValue(aGroup, out group))
             {
-                group.Add(aMaterial.Name, aMaterial);
+                if (!group.ContainsKey(aMaterial.Name))
+                {
+                    group.Add(aMaterial.Name, aMaterial);
+                    return true;
+                }
             }
+            return false;
+        }
+
+        public bool AddGroup(string aGroup)
+        {
+            if (!Materials.ContainsKey(aGroup))
+            {
+                Materials.Add(aGroup, new Dictionary<string, Material>());
+                return true;
+            }
+            return false;
+        }
+
+        public Material GetMaterial(string aGroup, string aName)
+        {
+            if (string.IsNullOrEmpty(aName))
+            {
+                return null;
+            }
+
+            IDictionary<string, Material> materials;
+            if (Materials.TryGetValue(aGroup, out materials))
+            {
+                Material material;
+                if (materials.TryGetValue(aName, out material))
+                {
+                    return material;
+                }
+            }
+            return null;
         }
     }
 }

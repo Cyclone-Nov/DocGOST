@@ -36,11 +36,22 @@ namespace GostDOC.Models
 
         public void Add(T aItem)
         {
+            if (_items.Count > 0 && _currentIndex != _items.Count - 1)
+            {
+                // Remove "future" items
+                _items.RemoveRange(_currentIndex + 1, _items.Count - _currentIndex - 1);
+            }
+
+            // Add item
             _items.Add(aItem);
+
             if (_items.Count > _stackSize)
             {
+                // Remove oldest item
                 _items.RemoveAt(0);
             }
+
+            // Set current index
             _currentIndex = _items.Count - 1;
         }
 
