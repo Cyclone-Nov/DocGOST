@@ -148,7 +148,7 @@ internal class PdfElementListCreator : PdfCreator {
     /// </summary>
     /// <param name="aInPdfDoc">a in PDF document.</param>
     /// <returns></returns>
-    internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aStartRow) {
+    internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow) {
         aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
         SetPageMargins(aInPdfDoc);
@@ -156,8 +156,7 @@ internal class PdfElementListCreator : PdfCreator {
         // добавить таблицу с данными
         int lastNextProcessedRow;
         var dataTable = CreateDataTable(aData, false, aStartRow, out lastNextProcessedRow);
-        dataTable.SetFixedPosition(19.3f * PdfDefines.mmA4, BOTTOM_MARGIN + 16 * PdfDefines.mmA4,
-            TITLE_BLOCK_WIDTH + 2f);
+        dataTable.SetFixedPosition(19.3f * PdfDefines.mmA4, BOTTOM_MARGIN + 16 * PdfDefines.mmA4, TITLE_BLOCK_WIDTH + 2f);
         aInPdfDoc.Add(dataTable);
 
 
