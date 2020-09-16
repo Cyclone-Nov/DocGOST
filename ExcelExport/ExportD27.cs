@@ -12,16 +12,21 @@ namespace GostDOC.ExcelExport
 {
     class ExportD27 : IExcelExport
     {
+
         private DocManager _docManager = DocManager.Instance;
-        private int _nextColor = 15;
+        private int _nextColor;
+        private const int FirstColor = 15;
 
         public void Export(Excel.Application aApp, string aFilePath)
         {
             Excel._Worksheet ws = aApp.ActiveSheet;
-
+            Excel._Worksheet firstSheet = aApp.ActiveSheet;
+                        
             bool first = true;
             foreach (var cfg in _docManager.Project.Configurations)
             {
+                _nextColor = FirstColor;
+
                 if (first)
                 {
                     first = false;
@@ -49,10 +54,12 @@ namespace GostDOC.ExcelExport
 
                 // Process main group
                 ProcessGroup(ws, 1, 3, maxLevelHeight + 2, cfg.Value.D27);
+
+                ws.Columns.AutoFit();
+                ws.Rows.AutoFit();
             }
 
-            ws.Columns.AutoFit();
-            ws.Rows.AutoFit();
+            firstSheet.Select();
         }
 
         private int ProcessGroup(Excel._Worksheet aWs, int aHeaderRow, int aHeaderColumn, int aDataRow, Group aGroup)

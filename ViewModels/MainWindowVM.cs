@@ -589,7 +589,7 @@ namespace GostDOC.ViewModels
 
         private void ExportExcel(object obj)
         {
-            if (_docType != DocType.None)
+            if (_excelManager.CanExport(_docType))
             {
                 var path = CommonDialogs.SaveFileAs("Excel Files *.xlsx | *.xlsx", "Сохранить файл");
                 if (!string.IsNullOrEmpty(path))
@@ -601,6 +601,11 @@ namespace GostDOC.ViewModels
 
         private void ImportMaterials(object obj)
         {
+            var path = CommonDialogs.OpenFile("Material Files *.xml | *.xml", "Открыть файл материалов");
+            if (!string.IsNullOrEmpty(path))
+            {
+                _materials.Import(path);
+            }
         }
 
         private void SaveMaterials(object obj)
