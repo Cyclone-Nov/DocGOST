@@ -7,36 +7,44 @@ namespace GostDOC
     public class Command : ICommand
     {
         private Action<object> _execute;
-        private Func<object, bool> _canExecute;
+        private readonly ObservableProperty<bool> _canExecute;
 
-        public event EventHandler CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
+        public event EventHandler CanExecuteChanged;
 
-        public Command(Action<object> execute, Func<object, bool> canExecute = null)
+        public Command(Action<object> execute, ObservableProperty<bool> canExecute = null)
         {
             _execute = execute ?? throw new ArgumentNullException("execute");
             _canExecute = canExecute;
+
+            if (_canExecute != null)
+            {
+                _canExecute.PropertyChanged += (o, i) => {
+                    RaiseCanExecuteChanged();
+                };
+            }
         }
 
         public bool CanExecute(object parameter)
         {
-            return _canExecute == null || _canExecute(parameter);
+            return _canExecute == null || _canExecute.Value;
         }
 
         public void Execute(object parameter)
         {
             _execute(parameter);
         }
+
+        public void RaiseCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
   
     public class Command<T> : ICommand
     {
         private readonly Action<T> _execute;
-        private readonly Predicate<T> _canExecute;
-
+        private readonly ObservableProperty<bool> _canExecute;
+                
         /// <summary>
         /// Создано при вызове RaiseCanExecuteChanged.
         /// </summary>
@@ -56,10 +64,17 @@ namespace GostDOC
         /// </summary>
         /// <param name="execute">Логика выполнения.</param>
         /// <param name="canExecute">Логика состояния выполнения.</param>
-        public Command(Action<T> execute, Predicate<T> canExecute)
+        public Command(Action<T> execute, ObservableProperty<bool> canExecute)
         {
             _execute =  execute ?? throw new ArgumentNullException("execute");
             _canExecute = canExecute;
+
+            if (_canExecute != null)
+            {
+                _canExecute.PropertyChanged += (o, i) => {
+                    RaiseCanExecuteChanged();
+                };
+            }
         }
 
         /// <summary>
@@ -71,7 +86,7 @@ namespace GostDOC
         /// <returns>true, если команда может быть выполнена; в противном случае - false.</returns>
         public bool CanExecute(object parameter)
         {
-            return _canExecute == null || _canExecute((T)parameter);
+            return _canExecute == null || _canExecute.Value;
         }
 
         /// <summary>

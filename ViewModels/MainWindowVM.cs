@@ -38,8 +38,8 @@ namespace GostDOC.ViewModels
 
         private DocManager _docManager = DocManager.Instance;
 
-        private DocumentTypes _docTypes = new DocumentTypes();
-        private MaterialTypes _materials = new MaterialTypes();
+        private DocumentTypes _docTypes = DocManager.Instance.DocumentTypes;
+        private MaterialTypes _materials = DocManager.Instance.MaterialTypes;
 
         private ProjectWrapper _project = new ProjectWrapper();
         private List<MoveInfo> _moveInfo = new List<MoveInfo>();
@@ -78,14 +78,14 @@ namespace GostDOC.ViewModels
         public DragDropFile DragDropFile { get; } = new DragDropFile();
 
         #region Commands
-        public ICommand UndoCmd => new Command<MenuNode>(Undo);
-        public ICommand RedoCmd => new Command<MenuNode>(Redo);
+        public ICommand UndoCmd => new Command<MenuNode>(Undo, IsUndoEnabled);
+        public ICommand RedoCmd => new Command<MenuNode>(Redo, IsRedoEnabled);
         public ICommand NewFileCmd => new Command(NewFile);
         public ICommand OpenFileSpCmd => new Command(OpenFileSp);
         public ICommand OpenFileBCmd => new Command(OpenFileB);
         public ICommand OpenFileD27Cmd => new Command(OpenFileD27);
         public ICommand OpenFileElCmd => new Command(OpenFileEl);
-        public ICommand SaveFileCmd => new Command(SaveFile);
+        public ICommand SaveFileCmd => new Command(SaveFile, IsSaveEnabled);
         public ICommand SaveFileAsCmd => new Command(SaveFileAs);
         public ICommand ClosingCmd => new Command<System.ComponentModel.CancelEventArgs>(Closing);
         public ICommand AddComponentCmd => new Command(AddComponent);
@@ -102,8 +102,11 @@ namespace GostDOC.ViewModels
         public ICommand ClickMenuCmd => new Command<MenuNode>(ClickMenu);
         public ICommand EditNameValueCmd => new Command<System.Windows.Controls.DataGrid>(EditNameValue);
         public ICommand EditComponentsCmd => new Command<System.Windows.Controls.DataGrid>(EditComponents);
-        public ICommand ExportPDFCmd => new Command(ExportPDF);
-        public ICommand ExportExcelCmd => new Command(ExportExcel);
+        public ICommand ExportPDFCmd => new Command(ExportPDF, IsSaveEnabled);
+        public ICommand ExportExcelCmd => new Command(ExportExcel, IsSaveEnabled);
+        public ICommand ImportMaterialsCmd => new Command(ImportMaterials);
+        public ICommand SaveMaterialsCmd => new Command(SaveMaterials);
+        public ICommand UpdateMaterialsCmd => new Command(UpdateMaterials);
 
         public string WindowTitle
         {
@@ -166,13 +169,10 @@ namespace GostDOC.ViewModels
         #endregion Commands
 
         public MainWindowVM()
-        {            
+        {
+            _docManager.Load();
             // Subscribe to drag and drop events
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
-            // Load document types
-            _docTypes.Load();
-            // Load material types
-            _materials.Load();
             // Update title
             UpdateTitle();
         }
@@ -190,7 +190,7 @@ namespace GostDOC.ViewModels
                 Components.SetMementos(_undoRedoComponents.Undo());
                 UpdateUndoRedoMenu(_undoRedoComponents);
             }
-        }
+        }  
 
         private void Redo(MenuNode obj)
         {
@@ -568,22 +568,6 @@ namespace GostDOC.ViewModels
                         }
                     }
                 }
-                else if (obj.Name == Constants.NewMaterialGroupMenuItem)
-                {
-                    // Add group
-                    var group = CommonDialogs.GetGroupName();
-                    if (_materials.AddGroup(group))
-                    {
-                        // Create new group node
-                        var node = new MenuNode() { Name = group, Nodes = new ObservableCollection<MenuNode>() };
-                        // Add default node 
-                        node.Nodes.Add(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = node });
-                        // Add new group to collection
-                        TableContextMenu.InsertSorted(node);
-                        // Save file
-                        _materials.Save();
-                    }
-                }
                 else
                 {
                     // Find material
@@ -613,6 +597,25 @@ namespace GostDOC.ViewModels
                     _excelManager.Export(_docType, path);
                 }
             }
+        }
+
+        private void ImportMaterials(object obj)
+        {
+        }
+
+        private void SaveMaterials(object obj)
+        {
+            var path = CommonDialogs.SaveFileAs("Material Files *.xml | *.xml", "Сохранить файл материалов");
+            if (!string.IsNullOrEmpty(path))
+            {
+                _materials.Save(path);
+            }
+        }
+
+        private void UpdateMaterials(object obj)
+        {
+            CommonDialogs.CreateEditMaterials();
+            UpdateTableContextMenu();
         }
 
         #endregion Commands impl
@@ -885,7 +888,6 @@ namespace GostDOC.ViewModels
                     node.Nodes.Add(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = node });
                     TableContextMenu.Add(node);
                 }
-                TableContextMenu.Add(new MenuNode() { Name = Constants.NewMaterialGroupMenuItem });
                 TableContextMenuEnabled.Value = true;
             }
         }
