@@ -43,7 +43,28 @@ namespace GostDOC.Models
     {
         public List<Component> Sort(List<Component> aItems)
         {
-            return aItems.OrderBy(x => x.Count).ThenBy(x => x.GetProperty(Constants.ComponentDesignatiorID)).ToList();
+            aItems.Sort((x, y) =>
+            {
+                string dX = x.GetProperty(Constants.ComponentDesignatiorID);
+                string dY = y.GetProperty(Constants.ComponentDesignatiorID);
+
+                if (string.IsNullOrEmpty(dX))
+                    return -1;
+
+                if (string.IsNullOrEmpty(dY))
+                    return 1;
+
+                int result = dX.Length.CompareTo(dY.Length);
+
+                // Compare length
+                if (result == 0)
+                {
+                    // Compare strings
+                    result = dX.CompareTo(dY);
+                }
+                return result;
+            });
+            return aItems;
         }
     }    
 

@@ -21,7 +21,7 @@
         <TextBox x:Name="GroupName" Margin="5" Grid.Column="1" Height="25" Text="Новая группа"></TextBox>
 
         <DockPanel Grid.Row="1" Grid.Column="1" LastChildFill="False">
-            <Button Margin="5" DockPanel.Dock="Right" Content="Создать" Width="100" Height="25" IsDefault="True" Click="OkButton_Click" />
+            <Button Margin="5" DockPanel.Dock="Right" Content="Применить" Width="100" Height="25" IsDefault="True" Click="OkButton_Click" />
         </DockPanel>
 
     </Grid>
