@@ -66,7 +66,7 @@ namespace GostDOC.PDF
             aInDoc.Add(mainTable);
             
             // добавить таблицу с основной надписью для первой старницы
-            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs, Pages = 0}));
+            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 0}));
 
             // добавить таблицу с верхней дополнительной графой
             aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
@@ -89,7 +89,7 @@ namespace GostDOC.PDF
             aInDoc.Add(mainTable);
             
             // добавить таблицу с основной надписью 
-            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs}));
+            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs}));
 
             // добавить таблицу с нижней дополнительной графой
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));

@@ -91,7 +91,7 @@ internal class PdfElementListCreator : PdfCreator {
         aInDoc.Add(CreateDataTable(aData, true, 0, out lastProcessedRow));
 
         // добавить таблицу с основной надписью для первой старницы
-        aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs, Pages = 0, AppendGraphs = true}));
+        aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 0, AppendGraphs = true}));
 
         // добавить таблицу с верхней дополнительной графой
         aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
@@ -144,11 +144,11 @@ internal class PdfElementListCreator : PdfCreator {
         // добавить таблицу с данными
         int lastNextProcessedRow;
         var dataTable = CreateDataTable(aData, false, aStartRow, out lastNextProcessedRow);
-        dataTable.SetFixedPosition(19.3f * PdfDefines.mmAXw, BOTTOM_MARGIN + 16 * PdfDefines.mmAXw,
+        dataTable.SetFixedPosition(19.3f * PdfDefines.mmAXw, BOTTOM_MARGIN + 16 * PdfDefines.mmAXw, TITLE_BLOCK_WIDTH + 2f);
         aInPdfDoc.Add(dataTable);
 
         // добавить таблицу с основной надписью для последуюших старницы
-        aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs}));
+        aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber }));
 
         // добавить таблицу с нижней дополнительной графой
         aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));

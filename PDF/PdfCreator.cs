@@ -181,7 +181,7 @@ namespace GostDOC.PDF
             aInPdfDoc.Add(CreateRegisterTable());
 
             // добавить таблицу с основной надписью для последуюших старницы
-            aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs}));
+            aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs}));
 
             // добавить таблицу с нижней дополнительной графой
             aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
@@ -581,7 +581,8 @@ namespace GostDOC.PDF
         /// <returns></returns>
         protected Table CreateNextTitleBlock(TitleBlockStruct titleBlockStruct) {
             var aGraphs = titleBlockStruct.Graphs;
-            var aPageSize = titleBlockStruct.PageSize;        
+            var aPageSize = titleBlockStruct.PageSize;   
+            var pageNumber = titleBlockStruct.Pages;
 
             float[] columnSizes = {
                 7 * mmW(), 
@@ -635,7 +636,7 @@ namespace GostDOC.PDF
                     SetBorderRight(Border.NO_BORDER).
                     SetBorderBottom(Border.NO_BORDER).
                     SetPadding(0).
-                    Add(CreateParagraph(aPageNumber.ToString()).SetPaddingTop(5).SetPaddingLeft(7))); 
+                    Add(CreateParagraph(pageNumber.ToString()).SetPaddingTop(5).SetPaddingLeft(7))); 
 
             rightestCell.Add(rightestCellTable);
             tbl.AddCell(rightestCell);
@@ -721,24 +722,24 @@ namespace GostDOC.PDF
         /// создать таблицу для нижней дополнительной графы
         /// </summary>
         /// <returns></returns>
-        protected Table CreateBottomAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs) 
-        float[] columnSizes = {5 * mmW(), 7 * mmW()};
+        protected Table CreateBottomAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs) { 
+            float[] columnSizes = {5 * mmW(), 7 * mmW()};
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
-        tbl.AddCell(CreateAppendGraphCell(35 * mmW(), "Подп. и дата"));
-        tbl.AddCell(CreateAppendGraphCell(35 * mmW()));
+            tbl.AddCell(CreateAppendGraphCell(35 * mmW(), "Подп. и дата"));
+            tbl.AddCell(CreateAppendGraphCell(35 * mmW()));
 
-        tbl.AddCell(CreateAppendGraphCell(25 * mmW(), "Инв. № дубл."));
-        tbl.AddCell(CreateAppendGraphCell(25 * mmW()));
+            tbl.AddCell(CreateAppendGraphCell(25 * mmW(), "Инв. № дубл."));
+            tbl.AddCell(CreateAppendGraphCell(25 * mmW()));
 
-        tbl.AddCell(CreateAppendGraphCell(25 * mmW(), "Взам. инв. №"));
-        tbl.AddCell(CreateAppendGraphCell(25 * mmW()));
+            tbl.AddCell(CreateAppendGraphCell(25 * mmW(), "Взам. инв. №"));
+            tbl.AddCell(CreateAppendGraphCell(25 * mmW()));
 
-        tbl.AddCell(CreateAppendGraphCell(35 * mmW(), "Подп. и дата").SetHeight(35 * mmW()));
-        tbl.AddCell(CreateAppendGraphCell(35 * mmW()));
+            tbl.AddCell(CreateAppendGraphCell(35 * mmW(), "Подп. и дата").SetHeight(35 * mmW()));
+            tbl.AddCell(CreateAppendGraphCell(35 * mmW()));
 
-        tbl.AddCell(CreateAppendGraphCell(25 * mmW(), "Инв № подл."));
-        tbl.AddCell(CreateAppendGraphCell(25 * mmW() + 2f));
+            tbl.AddCell(CreateAppendGraphCell(25 * mmW(), "Инв № подл."));
+            tbl.AddCell(CreateAppendGraphCell(25 * mmW() + 2f));
        
             tbl.SetFixedPosition(APPEND_GRAPHS_LEFT, BOTTOM_MARGIN, APPEND_GRAPHS_WIDTH);
 
@@ -756,11 +757,11 @@ namespace GostDOC.PDF
             float bottom = 65f;
             if (_pageSize.Contains(PageSize.A3))
             {
-                left = (7 + 10 + 23 + 15 + 10 + 110) * PdfDefines.mmA4 + 20 + 50;
+                left = (7 + 10 + 23 + 15 + 10 + 110) * mmW() + 20 + 50;
             }
             else
             {
-                left = (7 + 10 + 23 + 15 + 10 + 110) * PdfDefines.mmA4 + 55;                
+                left = (7 + 10 + 23 + 15 + 10 + 110) * mmW() + 55;                
             }
 
             aDoc.ShowTextAligned(new Paragraph(aPageCount.ToString()).
