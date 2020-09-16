@@ -33,8 +33,6 @@ internal class PdfElementListCreator : PdfCreator {
 
     private const string FileName = @"Перечень элементов.pdf";
 
-    private int _currentPageNumber = 0;
-
     public PdfElementListCreator() : base(DocType.ItemsList) 
     {
     }
@@ -64,23 +62,26 @@ internal class PdfElementListCreator : PdfCreator {
         MainStream = new MemoryStream();
         pdfWriter = new PdfWriter(MainStream);
         pdfDoc = new PdfDocument(pdfWriter);
-        pdfDoc.SetDefaultPageSize(PageSize);
-        doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), true);
+        pdfDoc.SetDefaultPageSize(_pageSize);
+        doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), false);
 
         int lastProcessedRow = AddFirstPage(doc, graphs, dataTable);
-
+        
         _currentPageNumber = 1;
         while (lastProcessedRow > 0) {
             _currentPageNumber++;
-            lastProcessedRow = AddNextPage(doc, graphs, dataTable, lastProcessedRow);
+            lastProcessedRow = AddNextPage(doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
         }
-                
+        
         if (pdfDoc.GetNumberOfPages() > MAX_PAGES_WITHOUT_CHANGELIST) {
-            AddRegisterList(doc, graphs);
+            _currentPageNumber++;
+            AddRegisterList(doc, graphs, _currentPageNumber);
         }
 
+        AddPageCountOnFirstPage(doc, _currentPageNumber);
+
         doc.Close();
-    }
+     }
 
     /// <summary>
     /// создать страница регистрации изменений
@@ -110,13 +111,13 @@ internal class PdfElementListCreator : PdfCreator {
 
 
         // добавить таблицу с основной надписью для первой старницы
-        aInDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
+        aInDoc.Add(CreateFirstTitleBlock(_pageSize, aGraphs, 0));
 
         // добавить таблицу с верхней дополнительной графой
-        aInDoc.Add(CreateTopAppendGraph(PageSize, aGraphs));
+        aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
 
         // добавить таблицу с нижней дополнительной графой
-        aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+        aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
 
         var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
@@ -139,7 +140,9 @@ internal class PdfElementListCreator : PdfCreator {
     /// </summary>
     /// <param name="aInPdfDoc">a in PDF document.</param>
     /// <returns></returns>
-    internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aStartRow) {
+    internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow) {
+            
+        //pdfDoc.AddNewPage(_pageSize);
         aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
         SetPageMargins(aInPdfDoc);
@@ -153,10 +156,10 @@ internal class PdfElementListCreator : PdfCreator {
 
 
         // добавить таблицу с основной надписью для последуюших старницы
-        aInPdfDoc.Add(CreateNextTitleBlock(PageSize, aGraphs));
+        aInPdfDoc.Add(CreateNextTitleBlock(_pageSize, aGraphs, aPageNumber));
 
         // добавить таблицу с нижней дополнительной графой
-        aInPdfDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+        aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
         return lastNextProcessedRow;
     }

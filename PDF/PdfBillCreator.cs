@@ -45,11 +45,13 @@ namespace GostDOC.PDF
             MainStream = new MemoryStream();
             pdfWriter = new PdfWriter(MainStream);
             pdfDoc = new PdfDocument(pdfWriter);
-            pdfDoc.SetDefaultPageSize(PageSize);
+            pdfDoc.SetDefaultPageSize(_pageSize);
             doc = new Document(pdfDoc, pdfDoc.GetDefaultPageSize().Rotate(), true);
             
             AddFirstPage(doc, graphs, dataTable);
-            AddNextPage(doc, graphs, dataTable, 0);
+            _currentPageNumber = 1;
+            _currentPageNumber++;
+            AddNextPage(doc, graphs, dataTable, _currentPageNumber, 0);
 
             doc.Close();            
         }
@@ -59,10 +61,10 @@ namespace GostDOC.PDF
             SetPageMargins(aInDoc);
 
             // добавить таблицу с нижней дополнительной графой
-            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+            aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
             // добавить таблицу с основной надписью для первой старницы
-            aInDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
+            aInDoc.Add(CreateFirstTitleBlock(_pageSize, aGraphs, 0));
 
 
             Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
@@ -74,7 +76,7 @@ namespace GostDOC.PDF
             return 0;
         }
 
-        internal override int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow) {
+        internal override int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNamuber, int aLastProcessedRow) {
             return 0;
         }
     }

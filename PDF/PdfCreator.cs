@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using iText.Kernel.Font;
+using iText.Kernel.Utils;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Xobject;
 using iText.Layout;
 using iText.Layout.Borders;
 using iText.Layout.Element;
@@ -31,8 +33,8 @@ namespace GostDOC.PDF
         public readonly DocType Type;
 
         internal static PdfFont f1;
-
-        internal readonly PageSize PageSize;
+        
+        internal readonly PageSize _pageSize;
 
         /// <summary>
         /// допустимое количество страниц для документа без добавления листа регистрации изменений
@@ -84,6 +86,11 @@ namespace GostDOC.PDF
         /// </summary>
         protected PdfWriter pdfWriter;
 
+        /// <summary>
+        /// текущий номер страницы
+        /// </summary>
+        protected int _currentPageNumber = 0;
+
 
 
         public PdfCreator(DocType aType)
@@ -93,34 +100,34 @@ namespace GostDOC.PDF
             {
                 case DocType.Bill:
                     {
-                        PageSize = new PageSize(PageSize.A3);
+                        _pageSize = new PageSize(PageSize.A3);
                         RowNumberOnFirstPage = 24;
                         RowNumberOnNextPage = 29;
                     }
                     break;
                 case DocType.D27:
                     {
-                        PageSize = new PageSize(PageSize.A3);
+                        _pageSize = new PageSize(PageSize.A3);
                         RowNumberOnFirstPage = 24;
                         RowNumberOnNextPage = 29;
                     }
                     break;
                 case DocType.Specification: {
-                        PageSize = new PageSize(PageSize.A4);
+                        _pageSize = new PageSize(PageSize.A4);
                         RowNumberOnFirstPage = 24;
                         RowNumberOnNextPage = 29;
                     }
                     break;
                 case DocType.ItemsList:
                     {
-                        PageSize = new PageSize(PageSize.A4);
+                        _pageSize = new PageSize(PageSize.A4);
                         RowNumberOnFirstPage = 24;
                         RowNumberOnNextPage = 31;
                     }
                     break;                
                 default:
                     {
-                        PageSize = new PageSize(PageSize.A4);
+                        _pageSize = new PageSize(PageSize.A4);
                         RowNumberOnFirstPage = 26;
                         RowNumberOnNextPage = 33;
                     }
@@ -150,7 +157,7 @@ namespace GostDOC.PDF
         /// добавить к документу лист регистрации изменений
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
-        internal void AddRegisterList(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs)
+        internal void AddRegisterList(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, int aPageNumber)
         {
             aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
@@ -159,10 +166,10 @@ namespace GostDOC.PDF
             aInPdfDoc.Add(CreateRegisterTable());
 
             // добавить таблицу с основной надписью для последуюших старницы
-            aInPdfDoc.Add(CreateNextTitleBlock(PageSize, aGraphs));
+            aInPdfDoc.Add(CreateNextTitleBlock(_pageSize, aGraphs, aPageNumber));
 
             // добавить таблицу с нижней дополнительной графой
-            aInPdfDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+            aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
         }
 
         Table CreateRegisterTable() {
@@ -230,7 +237,7 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal abstract int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow);
+        internal abstract int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aLastProcessedRow);
 
 
         public static double DegreesToRadians(double degrees)
@@ -491,18 +498,18 @@ namespace GostDOC.PDF
 
             tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true));
             tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true)
-                .Add(new Paragraph(GetGraph(Constants.GRAPH_4))));
+                .Add(CreateTableGraph478Paragraph(GetGraph(Constants.GRAPH_4))));
             tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true));
             tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true)
-                .Add(new Paragraph(GetGraph(Constants.GRAPH_7))));
+                .Add(CreateTableGraph478Paragraph("1")));                
             tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true)
-                .Add(new Paragraph(GetGraph(Constants.GRAPH_8))));
+                .Add(CreateTableGraph478Paragraph(GetGraph(Constants.GRAPH_8))));
 
             tableGraph4789.AddCell(
                 new Cell(1, 5).SetHeight(15 * PdfDefines.mmA4h - 2).SetPaddings(0, 0, 0, 0)
                     .SetBorderLeft(CreateThickBorder()).SetBorderRight(CreateThickBorder())
                     .SetBorderTop(CreateThickBorder()).SetBorderBottom(CreateThickBorder())
-                    .Add(new Paragraph(GetGraph(Constants.GRAPH_9))));
+                    .Add(CreateTableGraph478Paragraph(GetGraph(Constants.GRAPH_9))));
 
             innerRightBottomTable.AddCell(new Cell().Add(tableGraph4789).SetBorder(Border.NO_BORDER)
                 .SetPaddings(-1, -1, 0, 0));
@@ -538,7 +545,7 @@ namespace GostDOC.PDF
         /// создать таблицу основной надписи на последующих страницах
         /// </summary>
         /// <returns></returns>
-        protected Table CreateNextTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs)
+        protected Table CreateNextTitleBlock(PageSize aPageSize, IDictionary<string, string> aGraphs, int aPageNumber)
         {
             float[] columnSizes = {
                 7 * PdfDefines.mmA4, 
@@ -591,12 +598,11 @@ namespace GostDOC.PDF
                     SetBorderLeft(Border.NO_BORDER).
                     SetBorderRight(Border.NO_BORDER).
                     SetBorderBottom(Border.NO_BORDER).
-                    SetPadding(0));
+                    SetPadding(0).
+                    Add(CreateParagraph(aPageNumber.ToString()).SetPaddingTop(5).SetPaddingLeft(7))); 
 
             rightestCell.Add(rightestCellTable);
             tbl.AddCell(rightestCell);
-
-
 
             void AddGraphCell(string text, bool bottomBorder=false) {
                 var c = CreateCell().Add(CreateParagraph(text));
@@ -613,8 +619,8 @@ namespace GostDOC.PDF
             AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_18));
 
             AddGraphCell( "Изм.", bottomBorder:true);
-            AddGraphCell("Лист", bottomBorder:true);
-            AddGraphCell("№ докум.", bottomBorder:true);
+            AddGraphCell( "Лист", bottomBorder:true);
+            AddGraphCell( "№ докум.", bottomBorder:true);
             AddGraphCell( "Подп.", bottomBorder:true);
             AddGraphCell( "Дата", bottomBorder:true);
 
@@ -624,77 +630,104 @@ namespace GostDOC.PDF
         }
  
         protected static Cell CreateAppendGraphCell(float height, string text = null) {
-        var c = new Cell();
-        if (text != null) {
-            c.Add(
-                new Paragraph(text)
-                    .SetFont(f1)
-                    .SetFontSize(12)
-                    .SetRotationAngle(DegreesToRadians(90))
-                    .SetFixedLeading(10)
-                    .SetPadding(0)
-                    .SetPaddingRight(-10)
-                    .SetPaddingLeft(-10)
-                    .SetMargin(0)
-                    .SetItalic()
-                    .SetWidth(height)
-                    .SetTextAlignment(TextAlignment.CENTER));
+            var c = new Cell();
+            if (text != null) {
+                c.Add(
+                    new Paragraph(text)
+                        .SetFont(f1)
+                        .SetFontSize(12)
+                        .SetRotationAngle(DegreesToRadians(90))
+                        .SetFixedLeading(10)
+                        .SetPadding(0)
+                        .SetPaddingRight(-10)
+                        .SetPaddingLeft(-10)
+                        .SetMargin(0)
+                        .SetItalic()
+                        .SetWidth(height)
+                        .SetTextAlignment(TextAlignment.CENTER));
+            }
+
+            c.SetHorizontalAlignment(HorizontalAlignment.CENTER).SetVerticalAlignment(VerticalAlignment.MIDDLE).SetMargin(0)
+                .SetPadding(0).SetHeight(height).SetBorder(new SolidBorder(2));
+
+            return c;
         }
 
-        c.SetHorizontalAlignment(HorizontalAlignment.CENTER).SetVerticalAlignment(VerticalAlignment.MIDDLE).SetMargin(0)
-            .SetPadding(0).SetHeight(height).SetBorder(new SolidBorder(2));
 
-        return c;
-    }
+        /// <summary>
+        /// создать таблицу для верхней дополнительной графы
+        /// </summary>
+        /// <returns></returns>
+        protected Table CreateTopAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs) {
+            float[] columnSizes = {5 * PdfDefines.mmA4, 7 * PdfDefines.mmA4};
+            Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
+            tbl.AddCell(CreateAppendGraphCell(60 * PdfDefines.mmA4, "Перв. примен."));
+            tbl.AddCell(CreateAppendGraphCell(60 * PdfDefines.mmA4));
 
-    /// <summary>
-    /// создать таблицу для верхней дополнительной графы
-    /// </summary>
-    /// <returns></returns>
-    protected Table CreateTopAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs) {
-        float[] columnSizes = {5 * PdfDefines.mmA4, 7 * PdfDefines.mmA4};
-        Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
+            tbl.AddCell(CreateAppendGraphCell(60 * PdfDefines.mmA4, "Справ. №"));
+            tbl.AddCell(CreateAppendGraphCell(60 * PdfDefines.mmA4));
 
-        tbl.AddCell(CreateAppendGraphCell(60 * PdfDefines.mmA4, "Перв. примен."));
-        tbl.AddCell(CreateAppendGraphCell(60 * PdfDefines.mmA4));
+            tbl.SetFixedPosition(APPEND_GRAPHS_LEFT, TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE, APPEND_GRAPHS_WIDTH);
 
-        tbl.AddCell(CreateAppendGraphCell(60 * PdfDefines.mmA4, "Справ. №"));
-        tbl.AddCell(CreateAppendGraphCell(60 * PdfDefines.mmA4));
+            return tbl;
+        }
 
-        tbl.SetFixedPosition(APPEND_GRAPHS_LEFT, TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE, APPEND_GRAPHS_WIDTH);
+        /// <summary>
+        /// создать таблицу для нижней дополнительной графы
+        /// </summary>
+        /// <returns></returns>
+        protected Table CreateBottomAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs) 
+        {
+            float[] columnSizes = {5 * PdfDefines.mmA4, 7 * PdfDefines.mmA4};
+            Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
-        return tbl;
-    }
+            tbl.AddCell(CreateAppendGraphCell(35 * PdfDefines.mmA4, "Подп. и дата"));
+            tbl.AddCell(CreateAppendGraphCell(35 * PdfDefines.mmA4));
 
-    /// <summary>
-    /// создать таблицу для нижней дополнительной графы
-    /// </summary>
-    /// <returns></returns>
-    protected Table CreateBottomAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs) {
-        float[] columnSizes = {5 * PdfDefines.mmA4, 7 * PdfDefines.mmA4};
-        Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
+            tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4, "Инв. № дубл."));
+            tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4));
 
-        tbl.AddCell(CreateAppendGraphCell(35 * PdfDefines.mmA4, "Подп. и дата"));
-        tbl.AddCell(CreateAppendGraphCell(35 * PdfDefines.mmA4));
+            tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4, "Взам. инв. №"));
+            tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4));
 
-        tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4, "Инв. № дубл."));
-        tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4));
+            tbl.AddCell(CreateAppendGraphCell(35 * PdfDefines.mmA4, "Подп. и дата").SetHeight(35 * PdfDefines.mmA4));
+            tbl.AddCell(CreateAppendGraphCell(35 * PdfDefines.mmA4));
 
-        tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4, "Взам. инв. №"));
-        tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4));
-
-        tbl.AddCell(CreateAppendGraphCell(35 * PdfDefines.mmA4, "Подп. и дата").SetHeight(35 * PdfDefines.mmA4));
-        tbl.AddCell(CreateAppendGraphCell(35 * PdfDefines.mmA4));
-
-        tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4, "Инв № подл."));
-        tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4 + 2f));
+            tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4, "Инв № подл."));
+            tbl.AddCell(CreateAppendGraphCell(25 * PdfDefines.mmA4 + 2f));
        
-        tbl.SetFixedPosition(APPEND_GRAPHS_LEFT, BOTTOM_MARGIN, APPEND_GRAPHS_WIDTH);
+            tbl.SetFixedPosition(APPEND_GRAPHS_LEFT, BOTTOM_MARGIN, APPEND_GRAPHS_WIDTH);
 
-        return tbl;
-    }
+            return tbl;
+        }
 
+        /// <summary>
+        /// добавить количество страниц на первую страницу документа
+        /// </summary>
+        /// <param name="aInPdfDoc">PDF документ</param>
+        /// <param name="aPageCount">общее количество страние</param>
+        internal void AddPageCountOnFirstPage(iText.Layout.Document aDoc, int aPageCount)
+        {   
+            float left = 0f;
+            float bottom = 65f;
+            if (_pageSize.Contains(PageSize.A3))
+            {
+                left = (7 + 10 + 23 + 15 + 10 + 110) * PdfDefines.mmA4 + 20 + 50;
+            }
+            else
+            {
+                left = (7 + 10 + 23 + 15 + 10 + 110) * PdfDefines.mmA4 + 55;                
+            }
+
+            aDoc.ShowTextAligned(new Paragraph(aPageCount.ToString()).
+                                SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFontSize(12).SetFont(f1),
+                                left, bottom,
+                                1, 
+                                TextAlignment.CENTER, VerticalAlignment.MIDDLE, 
+                                0);
+        
+        }
 
     }
 }
