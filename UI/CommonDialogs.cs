@@ -22,6 +22,21 @@ namespace GostDOC.UI
             return null;
         }
 
+        public static string EditGroupName(string aSource)
+        {
+            NewGroup newGroupDlg = new NewGroup();
+            
+            newGroupDlg.Title = "Изменить группу";
+            newGroupDlg.GroupName.Text = aSource;
+
+            var result = newGroupDlg.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                return newGroupDlg.GroupName.Text;
+            }
+            return null;
+        }
+
         public static string GetMainFileName(string[] aFileNames)
         {
             SelectMainFile mainFileDlg = new SelectMainFile();
@@ -57,6 +72,15 @@ namespace GostDOC.UI
             return false;
         }
 
+        public static void CreateEditMaterials()
+        {
+            EditMaterials dlg = new EditMaterials();
+            var result = dlg.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+            }
+        }
+
         public static string SaveFileAs(string aFilter, string aTitle)
         {
             SaveFileDialog save = new SaveFileDialog();
@@ -85,6 +109,26 @@ namespace GostDOC.UI
         public static Material AddMaterial()
         {
             NewMaterial newMaterialDlg = new NewMaterial();
+            var result = newMaterialDlg.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                return new Material()
+                {
+                    Name = newMaterialDlg.MaterialName.Text,
+                    Note = newMaterialDlg.MaterialNote.Text
+                };
+            }
+            return null;
+        }
+
+        public static Material UpdateMaterial(Material aSource)
+        {
+            NewMaterial newMaterialDlg = new NewMaterial();
+
+            newMaterialDlg.Title = "Изменить материал";
+            newMaterialDlg.MaterialName.Text = aSource.Name;
+            newMaterialDlg.MaterialNote.Text = aSource.Note;
+
             var result = newMaterialDlg.ShowDialog();
             if (result.HasValue && result.Value)
             {

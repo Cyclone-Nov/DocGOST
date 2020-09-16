@@ -24,7 +24,19 @@ namespace GostDOC.Models
 
         public Project Project { get; private set; } = new Project();
 
+        public MaterialTypes MaterialTypes { get; } = new MaterialTypes();
+
+        public DocumentTypes DocumentTypes { get; } = new DocumentTypes();
+
         #region Public
+
+        public void Load()
+        {
+            // Load material types
+            MaterialTypes.Load();
+            // Load document types
+            DocumentTypes.Load();
+        }
 
         public bool LoadData(string aFilePath, DocType aDocType)
         {

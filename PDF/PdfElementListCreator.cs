@@ -29,8 +29,6 @@ internal class PdfElementListCreator : PdfCreator {
 
     private const string FileName = @"Перечень элементов.pdf";
 
-    private int _currentPageNumber = 0;
-
     public PdfElementListCreator() : base(DocType.ItemsList) 
     {
     }
@@ -60,23 +58,26 @@ internal class PdfElementListCreator : PdfCreator {
         MainStream = new MemoryStream();
         pdfWriter = new PdfWriter(MainStream);
         pdfDoc = new PdfDocument(pdfWriter);
-        pdfDoc.SetDefaultPageSize(PageSize);
-        doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), true);
+        pdfDoc.SetDefaultPageSize(_pageSize);
+        doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), false);
 
         int lastProcessedRow = AddFirstPage(doc, graphs, dataTable);
-
+        
         _currentPageNumber = 1;
         while (lastProcessedRow > 0) {
             _currentPageNumber++;
-            lastProcessedRow = AddNextPage(doc, graphs, dataTable, lastProcessedRow);
+            lastProcessedRow = AddNextPage(doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
         }
-                
+        
         if (pdfDoc.GetNumberOfPages() > MAX_PAGES_WITHOUT_CHANGELIST) {
-            AddRegisterList(doc, graphs);
+            _currentPageNumber++;
+            AddRegisterList(doc, graphs, _currentPageNumber);
         }
 
+        AddPageCountOnFirstPage(doc, _currentPageNumber);
+
         doc.Close();
-    }
+     }
 
     /// <summary>
     /// добавить к документу первую страницу
@@ -90,13 +91,13 @@ internal class PdfElementListCreator : PdfCreator {
         aInDoc.Add(CreateDataTable(aData, true, 0, out lastProcessedRow));
 
         // добавить таблицу с основной надписью для первой старницы
-        aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs, Pages = 0, AppendGraphs = true}));
+        aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 0, AppendGraphs = true}));
 
         // добавить таблицу с верхней дополнительной графой
-        aInDoc.Add(CreateTopAppendGraph(PageSize, aGraphs));
+        aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
 
         // добавить таблицу с нижней дополнительной графой
-        aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+        aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
         
         DrawLinesFirstPage();
         AddSecondaryElements(aInDoc, aGraphs);
@@ -135,7 +136,7 @@ internal class PdfElementListCreator : PdfCreator {
     /// </summary>
     /// <param name="aInPdfDoc">a in PDF document.</param>
     /// <returns></returns>
-    internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aStartRow) {
+    internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow) {
         aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
         SetPageMargins(aInPdfDoc);
@@ -143,15 +144,14 @@ internal class PdfElementListCreator : PdfCreator {
         // добавить таблицу с данными
         int lastNextProcessedRow;
         var dataTable = CreateDataTable(aData, false, aStartRow, out lastNextProcessedRow);
-        dataTable.SetFixedPosition(19.3f * PdfDefines.mmAXw, BOTTOM_MARGIN + 16 * PdfDefines.mmAXw,
-            TITLE_BLOCK_WIDTH + 2f);
+        dataTable.SetFixedPosition(19.3f * PdfDefines.mmAXw, BOTTOM_MARGIN + 16 * PdfDefines.mmAXw, TITLE_BLOCK_WIDTH + 2f);
         aInPdfDoc.Add(dataTable);
 
         // добавить таблицу с основной надписью для последуюших старницы
-        aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs}));
+        aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber }));
 
         // добавить таблицу с нижней дополнительной графой
-        aInPdfDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+        aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
         return lastNextProcessedRow;
     }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GostDOC.Models
 {
-    class MenuNode : IComparable<MenuNode>
+    public class MenuNode : IComparable<MenuNode>
     {
         public string Name { get; set; }
         public MenuNode Parent { get; set; }

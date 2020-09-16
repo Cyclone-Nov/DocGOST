@@ -10,24 +10,33 @@ namespace GostDOC.ExcelExport
 {
     class ExcelManager
     {
+        public bool CanExport(DocType aDocType)
+        {
+            return aDocType == DocType.D27;
+        }
+
         public void Export(DocType aDocType, string aFilePath)
         {
-            // Open excel application
-            var app = new Excel.Application();
-            // Set app visible
-            // app.Visible = true;
-            // Skip dialog messages
-            app.DisplayAlerts = false;
-            // Create workbook
-            var wb = app.Workbooks.Add();
             // Get exporter
             var export = ExcelExportFactory.GetExporter(aDocType);
-            // Export
-            export?.Export(app, aFilePath);
-            // Save
-            wb.SaveAs(aFilePath);
-            // App quit
-            app.Quit();
+
+            if (export != null)
+            {
+                // Open excel application
+                var app = new Excel.Application();
+                // Set app visible
+                // app.Visible = true;
+                // Skip dialog messages
+                app.DisplayAlerts = false;
+                // Create workbook
+                var wb = app.Workbooks.Add();
+                // Export
+                export.Export(app, aFilePath);
+                // Save
+                wb.SaveAs(aFilePath);
+                // App quit
+                app.Quit();
+            }
         } 
     }
 }

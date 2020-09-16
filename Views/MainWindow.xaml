@@ -30,16 +30,11 @@
     </Window.Resources>
 
     <Window.InputBindings>
-        <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewFileCmd}"/>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveFileCmd}"/>
-        <KeyBinding Key="A" Modifiers="Control" Command="{Binding SaveFileAsCmd}"/>
         <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCmd}"/>
         <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCmd}"/>
-        <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewFileCmd}"/>
-        <KeyBinding Key="I" Modifiers="Control" Command="{Binding OpenFileSpCmd}"/>
-        <KeyBinding Key="B" Modifiers="Control" Command="{Binding OpenFileBCmd}"/>
-        <KeyBinding Key="D" Modifiers="Control" Command="{Binding OpenFileD27Cmd}"/>
-        <KeyBinding Key="E" Modifiers="Control" Command="{Binding OpenFileElCmd}"/>
+        <KeyBinding Key="F5" Command="{Binding ExportPDFCmd}"/>
+        <KeyBinding Key="F6" Command="{Binding ExportExcelCmd}"/>
     </Window.InputBindings>
 
     <Grid Margin="0,0,0,5">
@@ -59,17 +54,22 @@
         <Menu Height="20" VerticalAlignment="Top" Grid.ColumnSpan="10">
             <MenuItem Header="Файл">
                 <MenuItem Header="Сохранить" InputGestureText="Ctrl+S" Command="{Binding SaveFileCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
-                <MenuItem Header="Сохранить как..." InputGestureText="Ctrl+A" Command="{Binding SaveFileAsCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
+                <MenuItem Header="Сохранить как..." Command="{Binding SaveFileAsCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
                 <Separator />
-                <MenuItem Header="Экспорт в PDF" Command="{Binding ExportPDFCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
-                <MenuItem Header="Экспорт в XLSX" Command="{Binding ExportExcelCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
+                <MenuItem Header="Экспорт в PDF" InputGestureText="F5" Command="{Binding ExportPDFCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
+                <MenuItem Header="Экспорт в XLSX" InputGestureText="F6" Command="{Binding ExportExcelCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
             </MenuItem>
             <MenuItem Header="Документы">
-                <MenuItem Header="Новая спецификация" InputGestureText="Ctrl+N" Command="{Binding NewFileCmd}"/>
-                <MenuItem Header="Импорт спецификации" InputGestureText="Ctrl+I" Command="{Binding OpenFileSpCmd}"/>
-                <MenuItem Header="Импорт ведомости покупных изделий" InputGestureText="Ctrl+B" Command="{Binding OpenFileBCmd}"/>
-                <MenuItem Header="Импорт ведомости комплектации" InputGestureText="Ctrl+D" Command="{Binding OpenFileD27Cmd}"/>
-                <MenuItem Header="Импорт перечня элементов" InputGestureText="Ctrl+E" Command="{Binding OpenFileElCmd}"/>
+                <MenuItem Header="Новая спецификация" Command="{Binding NewFileCmd}"/>
+                <MenuItem Header="Импорт спецификации" Command="{Binding OpenFileSpCmd}"/>
+                <MenuItem Header="Импорт ведомости покупных изделий" Command="{Binding OpenFileBCmd}"/>
+                <MenuItem Header="Импорт ведомости комплектации" Command="{Binding OpenFileD27Cmd}"/>
+                <MenuItem Header="Импорт перечня элементов" Command="{Binding OpenFileElCmd}"/>
+            </MenuItem>
+            <MenuItem Header="Материалы">
+                <MenuItem Header="Импорт материалов" Command="{Binding ImportMaterialsCmd}"/>
+                <MenuItem Header="Сохранить как..." Command="{Binding SaveMaterialsCmd}"/>
+                <MenuItem Header="Редактировать" Command="{Binding UpdateMaterialsCmd}"/>
             </MenuItem>
             <MenuItem Header="Правка">
                 <MenuItem Header="Отменить" InputGestureText="Ctrl+Z" Command="{Binding UndoCmd}" IsEnabled="{Binding IsUndoEnabled.Value}" />

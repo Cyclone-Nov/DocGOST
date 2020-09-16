@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -173,6 +174,7 @@
     <Compile Include="Models\DocumentTypes.cs" />
     <Compile Include="ExcelExport\ExcelManager.cs" />
     <Compile Include="Models\GroupData.cs" />
+    <Compile Include="Models\MaterialNode.cs" />
     <Compile Include="Models\MenuNode.cs" />
     <Compile Include="Models\MoveInfo.cs" />
     <Compile Include="Models\ProjectWrapper.cs" />
@@ -189,7 +191,11 @@
     <Compile Include="UserControls\NameValueControl.xaml.cs">
       <DependentUpon>NameValueControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\MaterialsVM.cs" />
     <Compile Include="ViewModels\NewFileVM.cs" />
+    <Compile Include="Views\EditMaterials.xaml.cs">
+      <DependentUpon>EditMaterials.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\NewFile.xaml.cs">
       <DependentUpon>NewFile.xaml</DependentUpon>
     </Compile>
@@ -234,6 +240,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\NameValueControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditMaterials.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

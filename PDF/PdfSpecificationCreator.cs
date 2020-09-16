@@ -43,13 +43,16 @@ namespace GostDOC.PDF
             MainStream = new MemoryStream();
             pdfWriter = new PdfWriter(MainStream);
             pdfDoc = new PdfDocument(pdfWriter);
-            pdfDoc.SetDefaultPageSize(PageSize);
+            pdfDoc.SetDefaultPageSize(_pageSize);
             doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), true);
             
             var dataTable = aData;
 
+            
             AddFirstPage(doc, aMainGraphs, dataTable);
-            AddNextPage(doc, aMainGraphs, dataTable, 0);
+            _currentPageNumber = 1;
+            _currentPageNumber++;
+            AddNextPage(doc, aMainGraphs, dataTable, _currentPageNumber, 0);
 
             doc.Close();            
         }
@@ -63,20 +66,20 @@ namespace GostDOC.PDF
             aInDoc.Add(mainTable);
             
             // добавить таблицу с основной надписью для первой старницы
-            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs, Pages = 0}));
+            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 0}));
 
             // добавить таблицу с верхней дополнительной графой
-            aInDoc.Add(CreateTopAppendGraph(PageSize, aGraphs));
+            aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
 
             // добавить таблицу с нижней дополнительной графой
-            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+            aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
             DrawMissingLinesFirstPage();
 
             return 0;
         }
 
-        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow) {
+        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNamuber, int aLastProcessedRow) {
             aInDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
             SetPageMargins(aInDoc);
@@ -86,10 +89,10 @@ namespace GostDOC.PDF
             aInDoc.Add(mainTable);
             
             // добавить таблицу с основной надписью 
-            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs}));
+            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs}));
 
             // добавить таблицу с нижней дополнительной графой
-            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+            aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
             DrawMissingLinesNextPage(2);
 
