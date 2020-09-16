@@ -58,32 +58,50 @@ namespace GostDOC.PDF
             MainStream = new MemoryStream();
             pdfWriter = new PdfWriter(MainStream);
             pdfDoc = new PdfDocument(pdfWriter);
-            pdfDoc.SetDefaultPageSize(PageSize);
+            pdfDoc.SetDefaultPageSize(_pageSize);
             doc = new Document(pdfDoc, pdfDoc.GetDefaultPageSize().Rotate(), true);
             
-            AddFirstPage(doc, graphs, dataTable);
-            AddNextPage(doc, graphs, dataTable, 0);
+           int lastProcessedRow = AddFirstPage(doc, graphs, dataTable);
+        
+            _currentPageNumber = 1;
+            while (lastProcessedRow > 0) {
+                _currentPageNumber++;
+                lastProcessedRow = AddNextPage(doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
+            }
+        
+            if (pdfDoc.GetNumberOfPages() > MAX_PAGES_WITHOUT_CHANGELIST) {
+                _currentPageNumber++;
+                AddRegisterList(doc, graphs, _currentPageNumber);
+            }
+
+            AddPageCountOnFirstPage(doc, _currentPageNumber);
 
             doc.Close();            
         }
 
         internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData) {
             SetPageMargins(aInDoc);
-            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
-            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs, Pages = 0}));
+            aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
+            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 0}));
             aInDoc.Add(CreateTable(null, true, 0, out var lpr));
             DrawLines(pdfDoc.GetFirstPage());
-            return 0;
+            return lpr;
         }
 
 
-        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aLastProcessedRow) {
+        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow) {
             aInDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
             SetPageMargins(aInDoc);
-            aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
-            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs}));
+
+            int lastNextProcessedRow;
+            var dataTable = CreateTable(aData, false, aStartRow, out lastNextProcessedRow);
+            dataTable.SetFixedPosition(19.3f * mmH(), BOTTOM_MARGIN + 16 * mmH(), TITLE_BLOCK_WIDTH + 2f);
+            aInDoc.Add(dataTable);
+
+            aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
+            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber }));
             DrawLines(pdfDoc.GetPage(2));
-            return 0;
+            return lastNextProcessedRow;
         }
 
         Table CreateTable(DataTable aData, bool firstPage, int aStartRow, out int outLastProcessedRow) {
