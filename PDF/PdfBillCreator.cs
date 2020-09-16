@@ -21,10 +21,19 @@ namespace GostDOC.PDF
 {
     class PdfBillCreator : PdfCreator
     {
-        protected new readonly float LEFT_MARGIN = 5 * PdfDefines.mmA3;
-        protected new readonly float RIGHT_MARGIN = 5 * PdfDefines.mmA3;
+        protected new readonly float LEFT_MARGIN = 5 * mmW();
+        protected new readonly float RIGHT_MARGIN = 5 * mmH();
 
         public PdfBillCreator() : base(DocType.Bill) {
+        }
+
+        protected new static float mmH() {
+            // this document is landscape orientation
+            return PdfDefines.mmAXw;
+        }
+        protected new static float mmW() {
+            // this document is landscape orientation
+            return PdfDefines.mmAXh;
         }
 
         public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs) 
@@ -73,7 +82,7 @@ namespace GostDOC.PDF
         internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData) {
             SetPageMargins(aInDoc);
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
-            aInDoc.Add(CreateFirstTitleBlock(_pageSize, aGraphs, 0));
+            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = PageSize, Graphs = aGraphs, Pages = 0}));
             aInDoc.Add(CreateTable(null, true, 0, out var lpr));
             DrawLines(pdfDoc.GetFirstPage());
             return lpr;
@@ -97,23 +106,26 @@ namespace GostDOC.PDF
 
         Table CreateTable(DataTable aData, bool firstPage, int aStartRow, out int outLastProcessedRow) {
             float[] columnSizes = {
-                60 * PdfDefines.mmA3h, 
-                45 * PdfDefines.mmA3h, 
-                70 * PdfDefines.mmA3h, 
-                55 * PdfDefines.mmA3h,
-                70 * PdfDefines.mmA3h,
-                16 * PdfDefines.mmA3h,
-                16 * PdfDefines.mmA3h,
-                16 * PdfDefines.mmA3h,
-                16 * PdfDefines.mmA3h,
-                24 * PdfDefines.mmA3h,
+                60 * mmW(), 
+                45 * mmW(), 
+                70 * mmW(), 
+                55 * mmW(),
+                70 * mmW(),
+                16 * mmW(),
+                16 * mmW(),
+                16 * mmW(),
+                16 * mmW(),
+                24 * mmW(),
             };
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
             tbl.SetMargin(0).SetPadding(0).SetFont(f1).SetFontSize(12).SetItalic().SetTextAlignment(TextAlignment.CENTER);
 
             Cell CreateCell(int rowspan=1, int colspan=1) => new Cell(rowspan, colspan).SetPadding(0).SetMargin(0).SetBorderLeft(CreateThickBorder()).SetBorderRight(CreateThickBorder());
 
-            void AddMainHeaderCell(string text) => tbl.AddCell(CreateCell(2,1).SetBorder(CreateThickBorder()).Add(new Paragraph("Наименование")));
+            void AddMainHeaderCell(string text) => 
+                tbl.AddCell(CreateCell(2,1)
+                    .SetVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .SetBorder(CreateThickBorder()).Add(new Paragraph(text)));
 
             AddMainHeaderCell("Наименование");
             AddMainHeaderCell("Код продукции");
@@ -121,25 +133,32 @@ namespace GostDOC.PDF
             AddMainHeaderCell("Поставщик");
             AddMainHeaderCell("Куда входит (обозначение)");
 
-            tbl.AddCell(CreateCell(1, 4).SetBorder(CreateThickBorder()).SetHeight(9*PdfDefines.mmA3).Add(new Paragraph("Количество")));
+            tbl.AddCell(
+                CreateCell(1, 4)
+                    .SetBorder(CreateThickBorder())
+                    .SetVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .SetHeight(9*mmH()).Add(new Paragraph("Количество")));
             AddMainHeaderCell("Примечание");
             
-            void AddSecondaryHeaderCell(string text) => tbl.AddCell(CreateCell().SetBorder(CreateThickBorder()).SetHeight(18*PdfDefines.mmA3).Add(new Paragraph(text)));
+            void AddSecondaryHeaderCell(string text) => tbl.AddCell(CreateCell().SetBorder(CreateThickBorder()).SetHeight(18*mmH()).Add(new Paragraph(text)));
 
-            AddSecondaryHeaderCell("на изделие");
-            AddSecondaryHeaderCell("в комплекте");
-            AddSecondaryHeaderCell("на регулир");
+            AddSecondaryHeaderCell("на из-\nделие");
+            AddSecondaryHeaderCell("в ком-\nплекте");
+            AddSecondaryHeaderCell("на ре-\nгулир");
             AddSecondaryHeaderCell("всего");
 
 
             var rowNumber = firstPage ? RowNumberOnFirstPage : RowNumberOnNextPage;
-            for (int i = 0; i < rowNumber*10; ++i) {
-                tbl.AddCell(CreateCell().SetHeight(5*PdfDefines.mmA3));
+            for (int i = 0; i < (rowNumber-1)*10; ++i) {
+                tbl.AddCell(CreateCell().SetHeight(8*mmH()));
+            }
+            for (int i = 0; i < 10; ++i) {
+                tbl.AddCell(CreateCell().SetBorderBottom(CreateThickBorder()).SetHeight(8*mmH()));
             }
 
-
-            //tbl.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, 78 * PdfDefines.mmA3, (60+45+70+55+70+16*4+24)*PdfDefines.mmA3 ) ;
-            tbl.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, 78 * PdfDefines.mmA3, 280*PdfDefines.mmA3h-0.5f) ;
+            var ass  = columnSizes.Sum();
+            var bottom = firstPage ? BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_FULL_HEIGHT_MM * mmH() -3f : 0;
+            tbl.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, bottom, columnSizes.Sum()-0.5f) ;
 
             outLastProcessedRow = 0;
             return tbl;
@@ -152,7 +171,7 @@ namespace GostDOC.PDF
             Canvas canvas = new Canvas(new PdfCanvas(aPage),
                 new Rectangle(APPEND_GRAPHS_LEFT, BOTTOM_MARGIN, PdfDefines.A3Width, 2));
             canvas.Add(
-                new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((228) * PdfDefines.mmA3));
+                new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((228) * mmW()));
 
             var leftVertLineHeight = PdfDefines.A3Width - BOTTOM_MARGIN * 2;
             var x = APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f;
@@ -160,7 +179,7 @@ namespace GostDOC.PDF
             canvas = new Canvas(new PdfCanvas(aPage), new Rectangle(x, y, 2, leftVertLineHeight));
             canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(leftVertLineHeight).SetRotationAngle(DegreesToRadians(90)));
 
-            var upperHorizLineWidth = pageWidth - (x+RIGHT_MARGIN) + 4;
+            var upperHorizLineWidth = pageWidth - (x+RIGHT_MARGIN);
             y = BOTTOM_MARGIN + leftVertLineHeight;
             canvas = new Canvas(new PdfCanvas(aPage), new Rectangle(x, y, upperHorizLineWidth, 2));
             canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(upperHorizLineWidth));
