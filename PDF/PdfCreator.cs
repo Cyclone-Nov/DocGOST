@@ -517,7 +517,9 @@ namespace GostDOC.PDF
             #endregion
 
             // switch A3/A4
-            if (Math.Abs(aPageSize.GetWidth() - PageSize.A3.GetWidth()) < 0.1) {
+            if (Math.Abs(aPageSize.GetWidth() - PageSize.A3.GetWidth()) < 0.1) { 
+                // A3
+
                 mainTable.SetFixedPosition(415 * PdfDefines.mmA4-TITLE_BLOCK_WIDTH, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
                 
                 Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
@@ -525,11 +527,13 @@ namespace GostDOC.PDF
                 canvas.Add(
                     new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((53 * 2 + 14 - 50) * PdfDefines.mmA4));
 
-            } else {
-                mainTable.SetFixedPosition(20 * PdfDefines.mmA4, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            } else { 
+                // A4
+                var left = 20 * PdfDefines.mmA4 - 2f;
+                mainTable.SetFixedPosition(left, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
 
                 Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
-                    new Rectangle((20 + 7 + 10 + 23 + 15 + 10) * PdfDefines.mmA4, BOTTOM_MARGIN, PdfDefines.A4Width, 2));
+                    new Rectangle(left + (7 + 10 + 23 + 15 + 10) * PdfDefines.mmA4, BOTTOM_MARGIN, PdfDefines.A4Width, 2));
                 canvas.Add(
                     new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((53 * 2 + 14 - 50) * PdfDefines.mmA4));
             }

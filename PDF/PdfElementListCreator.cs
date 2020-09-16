@@ -101,14 +101,6 @@ internal class PdfElementListCreator : PdfCreator {
         // добавить таблицу с данными
         aInDoc.Add(CreateDataTable(aData, true, 0, out lastProcessedRow));
 
-        // нарисовать недостающую линию
-        var fromLeft = 19.3f * PdfDefines.mmA4 + TITLE_BLOCK_WIDTH;
-        Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
-            new Rectangle(fromLeft, BOTTOM_MARGIN + (15 + 5 + 5 + 15 + 8 + 14) * PdfDefines.mmA4 + 2f, 2, 30));
-        canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(15)
-            .SetRotationAngle(DegreesToRadians(90)));
-
-
         // добавить таблицу с основной надписью для первой старницы
         aInDoc.Add(CreateFirstTitleBlock(PageSize, aGraphs, 0));
 
@@ -117,8 +109,14 @@ internal class PdfElementListCreator : PdfCreator {
 
         // добавить таблицу с нижней дополнительной графой
         aInDoc.Add(CreateBottomAppendGraph(PageSize, aGraphs));
+        
+        DrawLinesFirstPage();
+        AddSecondaryElements(aInDoc, aGraphs);
 
+        return lastProcessedRow;
+    }
 
+    void AddSecondaryElements(iText.Layout.Document aInDoc, IDictionary<string, string> aGraphs) {
         var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
         var p = new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT)).SetRotationAngle(DegreesToRadians(90))
             .AddStyle(style).SetFixedPosition(10 * PdfDefines.mmA4 + 2,
@@ -131,8 +129,18 @@ internal class PdfElementListCreator : PdfCreator {
             .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 70) * PdfDefines.mmA4 + 20, 0, 100);
         aInDoc.Add(p);
 
-        return lastProcessedRow;
     }
+
+    void DrawLinesFirstPage() {
+        // нарисовать недостающую линию
+        var fromLeft = 19.3f * PdfDefines.mmA4 + TITLE_BLOCK_WIDTH-2f;
+        Canvas canvas = new Canvas(
+            new PdfCanvas(pdfDoc.GetFirstPage()), 
+            new Rectangle(fromLeft, BOTTOM_MARGIN + (15 + 5 + 5 + 15 + 8 + 14) * PdfDefines.mmA4 + 2f, 2, 30));
+        canvas.Add(new LineSeparator(
+            new SolidLine(THICK_LINE_WIDTH)).SetWidth(15).SetRotationAngle(DegreesToRadians(90)));
+    }
+
 
     /// <summary>
     /// добавить к документу последующие страницы
@@ -277,7 +285,7 @@ internal class PdfElementListCreator : PdfCreator {
         if (outLastProcessedRow == aData.Rows.Count)
             outLastProcessedRow = 0;
 
-        tbl.SetFixedPosition(19.3f * PdfDefines.mmA4, 78 * PdfDefines.mmA4 + 0.5f, TITLE_BLOCK_WIDTH + 2f);
+        tbl.SetFixedPosition(19.3f * PdfDefines.mmA4, 78 * PdfDefines.mmA4 + 0.5f, TITLE_BLOCK_WIDTH);
 
         return tbl;
     }
