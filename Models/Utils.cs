@@ -99,6 +99,28 @@ namespace GostDOC.Models
             return -1;
         }
 
+        public static void InsertSorted<T>(this ObservableCollection<T> collection, T item) where T : IComparable<T> 
+        {
+            if (collection.Count == 0)
+                collection.Add(item);
+            else
+            {
+                bool last = true;
+                for (int i = 0; i < collection.Count; i++)
+                {
+                    int result = collection[i].CompareTo(item);
+                    if (result >= 1)
+                    {
+                        collection.Insert(i, item);
+                        last = false;
+                        break;
+                    }
+                }
+                if (last)
+                    collection.Add(item);
+            }
+        }
+
         public static SortType GetSortType(DocType aDocType, string aGroupName)
         {
             SortType sortType = SortType.None;

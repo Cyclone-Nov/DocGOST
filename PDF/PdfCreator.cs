@@ -8,7 +8,6 @@ using iText.Kernel.Font;
 using iText.Kernel.Utils;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
-using iText.Kernel.Pdf.Xobject;
 using iText.Layout;
 using iText.Layout.Borders;
 using iText.Layout.Element;
@@ -41,9 +40,13 @@ namespace GostDOC.PDF
         /// </summary>
         protected const int MAX_PAGES_WITHOUT_CHANGELIST = 3;
 
+        protected readonly float BOTTOM_MARGIN = 5 * PdfDefines.mmA4;
+        protected readonly float LEFT_MARGIN = 8 * PdfDefines.mmA4;
+        protected readonly float TOP_MARGIN = 5 * PdfDefines.mmA4;
+        protected readonly float RIGHT_MARGIN = 5 * PdfDefines.mmA4;
+
         protected const float THICK_LINE_WIDTH = 2f;         
         protected readonly float TITLE_BLOCK_WIDTH = 185 * PdfDefines.mmA4;
-        protected readonly float BOTTOM_MARGIN = 5 * PdfDefines.mmA4;
         protected readonly float DEFAULT_TITLE_BLOCK_CELL_HEIGHT = 5 * PdfDefines.mmA4h;
         protected readonly float TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE = (5 + 287 - 60 * 2) * PdfDefines.mmA4;
         protected readonly float APPEND_GRAPHS_LEFT = (20 - 5 - 7) * PdfDefines.mmA4;
@@ -101,7 +104,7 @@ namespace GostDOC.PDF
                 case DocType.Bill:
                     {
                         _pageSize = new PageSize(PageSize.A3);
-                        RowNumberOnFirstPage = 24;
+                        RowNumberOnFirstPage = 10;
                         RowNumberOnNextPage = 29;
                     }
                     break;
@@ -147,10 +150,10 @@ namespace GostDOC.PDF
                 
 
         protected void SetPageMargins(iText.Layout.Document aDoc) {
-            aDoc.SetLeftMargin(8 * PdfDefines.mmA4);
-            aDoc.SetRightMargin(5 * PdfDefines.mmA4);
-            aDoc.SetTopMargin(5 * PdfDefines.mmA4);
-            aDoc.SetBottomMargin(5 * PdfDefines.mmA4);
+            aDoc.SetLeftMargin(LEFT_MARGIN);
+            aDoc.SetRightMargin(RIGHT_MARGIN);
+            aDoc.SetTopMargin(TOP_MARGIN);
+            aDoc.SetBottomMargin(BOTTOM_MARGIN);
         }
 
         /// <summary>
@@ -520,7 +523,9 @@ namespace GostDOC.PDF
             #endregion
 
             // switch A3/A4
-            if (Math.Abs(aPageSize.GetWidth() - PageSize.A3.GetWidth()) < 0.1) {
+            if (Math.Abs(aPageSize.GetWidth() - PageSize.A3.GetWidth()) < 0.1) { 
+                // A3
+
                 mainTable.SetFixedPosition(415 * PdfDefines.mmA4-TITLE_BLOCK_WIDTH, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
                 
                 Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
@@ -528,11 +533,13 @@ namespace GostDOC.PDF
                 canvas.Add(
                     new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((53 * 2 + 14 - 50) * PdfDefines.mmA4));
 
-            } else {
-                mainTable.SetFixedPosition(20 * PdfDefines.mmA4, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            } else { 
+                // A4
+                var left = 20 * PdfDefines.mmA4 - 2f;
+                mainTable.SetFixedPosition(left, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
 
                 Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
-                    new Rectangle((20 + 7 + 10 + 23 + 15 + 10) * PdfDefines.mmA4, BOTTOM_MARGIN, PdfDefines.A4Width, 2));
+                    new Rectangle(left + (7 + 10 + 23 + 15 + 10) * PdfDefines.mmA4, BOTTOM_MARGIN, PdfDefines.A4Width, 2));
                 canvas.Add(
                     new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((53 * 2 + 14 - 50) * PdfDefines.mmA4));
             }
@@ -624,7 +631,15 @@ namespace GostDOC.PDF
             AddGraphCell( "Подп.", bottomBorder:true);
             AddGraphCell( "Дата", bottomBorder:true);
 
-            tbl.SetFixedPosition(20 * PdfDefines.mmA4, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+
+
+            // switch A3/A4
+            if (Math.Abs(aPageSize.GetWidth() - PageSize.A3.GetWidth()) < 0.1) {
+                tbl.SetFixedPosition(PdfDefines.A3Height - TITLE_BLOCK_WIDTH - RIGHT_MARGIN, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            } else {
+                tbl.SetFixedPosition(20 * PdfDefines.mmA4, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            }
+
 
             return tbl;
         }

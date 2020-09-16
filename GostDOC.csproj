@@ -195,6 +195,9 @@
       <DependentUpon>NewFile.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\MaterialTypes.cs" />
+    <Compile Include="Views\NewMaterial.xaml.cs">
+      <DependentUpon>NewMaterial.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XML\XUtils.cs" />
     <Compile Include="Models\Converter.cs" />
     <Compile Include="Models\DataStructures.cs" />
@@ -263,6 +266,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\NewGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\NewMaterial.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
