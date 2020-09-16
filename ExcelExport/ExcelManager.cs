@@ -17,26 +17,29 @@ namespace GostDOC.ExcelExport
 
         public void Export(DocType aDocType, string aFilePath)
         {
-            // Get exporter
-            var export = ExcelExportFactory.GetExporter(aDocType);
-
-            if (export != null)
+            Task.Run(() =>
             {
-                // Open excel application
-                var app = new Excel.Application();
-                // Set app visible
-                // app.Visible = true;
-                // Skip dialog messages
-                app.DisplayAlerts = false;
-                // Create workbook
-                var wb = app.Workbooks.Add();
-                // Export
-                export.Export(app, aFilePath);
-                // Save
-                wb.SaveAs(aFilePath);
-                // App quit
-                app.Quit();
-            }
+                // Get exporter
+                var export = ExcelExportFactory.GetExporter(aDocType);
+
+                if (export != null)
+                {
+                    // Open excel application
+                    var app = new Excel.Application();
+                    // Set app visible
+                    // app.Visible = true;
+                    // Skip dialog messages
+                    app.DisplayAlerts = false;
+                    // Create workbook
+                    var wb = app.Workbooks.Add();
+                    // Export
+                    export.Export(app, aFilePath);
+                    // Save
+                    wb.SaveAs(aFilePath);
+                    // App quit
+                    app.Quit();
+                }
+            });
         } 
     }
 }

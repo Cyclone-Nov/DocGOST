@@ -67,9 +67,10 @@
                 <MenuItem Header="Импорт перечня элементов" Command="{Binding OpenFileElCmd}"/>
             </MenuItem>
             <MenuItem Header="Материалы">
-                <MenuItem Header="Импорт материалов" Command="{Binding ImportMaterialsCmd}"/>
-                <MenuItem Header="Сохранить как..." Command="{Binding SaveMaterialsCmd}"/>
                 <MenuItem Header="Редактировать" Command="{Binding UpdateMaterialsCmd}"/>
+                <Separator />
+                <MenuItem Header="Экспорт в файл" Command="{Binding SaveMaterialsCmd}"/>
+                <MenuItem Header="Импорт из файла" Command="{Binding ImportMaterialsCmd}"/>
             </MenuItem>
             <MenuItem Header="Правка">
                 <MenuItem Header="Отменить" InputGestureText="Ctrl+Z" Command="{Binding UndoCmd}" IsEnabled="{Binding IsUndoEnabled.Value}" />

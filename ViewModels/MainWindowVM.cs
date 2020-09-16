@@ -875,9 +875,9 @@ namespace GostDOC.ViewModels
                     MenuNode node = new MenuNode() { Name = kvp.Key, Nodes = new ObservableCollection<MenuNode>() };
                     foreach (var doc in kvp.Value)
                     {
-                        node.Nodes.Add(new MenuNode() { Name = doc.Key, Parent = node });
+                        node.Nodes.InsertSorted(new MenuNode() { Name = doc.Key, Parent = node });
                     }
-                    TableContextMenu.Add(node);
+                    TableContextMenu.InsertSorted(node);
                 }
                 TableContextMenuEnabled.Value = true;
             }
@@ -888,10 +888,10 @@ namespace GostDOC.ViewModels
                     MenuNode node = new MenuNode() { Name = kvp.Key, Nodes = new ObservableCollection<MenuNode>() };
                     foreach (var doc in kvp.Value)
                     {
-                        node.Nodes.Add(new MenuNode() { Name = doc.Key, Parent = node });
+                        node.Nodes.InsertSorted(new MenuNode() { Name = doc.Key, Parent = node });
                     }
-                    node.Nodes.Add(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = node });
-                    TableContextMenu.Add(node);
+                    node.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = node });
+                    TableContextMenu.InsertSorted(node);
                 }
                 TableContextMenuEnabled.Value = true;
             }
