@@ -25,7 +25,7 @@
                   AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="Auto" CanUserSortColumns="False" CanUserDeleteRows="False" CanUserReorderColumns="False"
                   SelectedItem="{Binding ComponentsSelectedItem.Value}"
                   ItemsSource="{Binding Components}" ContextMenuService.IsEnabled="{Binding TableContextMenuEnabled.Value}">
-            
+
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="CellEditEnding">
                     <i:InvokeCommandAction Command="{Binding EditComponentsCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}}"  />
@@ -47,7 +47,7 @@
                     </Setter>
                 </Style>
             </DataGrid.ColumnHeaderStyle>             
-            |
+
             <DataGrid.ContextMenu>
                 <ContextMenu ItemsSource="{Binding TableContextMenu}">
                     <ContextMenu.ItemTemplate>

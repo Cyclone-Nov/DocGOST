@@ -174,7 +174,13 @@ namespace GostDOC.ViewModels
             // Subscribe to drag and drop events
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
             // Update title
-            UpdateTitle();            
+            UpdateTitle();
+
+            Components.CollectionChanged += Components_CollectionChanged;
+        }
+
+        private void Components_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
         }
 
         #region Commands impl
