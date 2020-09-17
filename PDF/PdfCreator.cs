@@ -627,6 +627,7 @@ namespace GostDOC.PDF
                     SetBorderLeft(Border.NO_BORDER).
                     SetBorderRight(Border.NO_BORDER).
                     SetBorderTop(Border.NO_BORDER).
+                    SetBorderBottom(CreateThickBorder()).
                     SetPadding(0).
                     Add(CreateParagraph("Лист").SetPaddingTop(5)));
             rightestCellTable.AddCell(

@@ -272,7 +272,7 @@ internal class PdfElementListCreator : PdfCreator {
         if (outLastProcessedRow == aData.Rows.Count)
             outLastProcessedRow = 0;
 
-        tbl.SetFixedPosition(19.3f * PdfDefines.mmAXw, 78 * PdfDefines.mmAXw + 0.5f, TITLE_BLOCK_WIDTH);
+        tbl.SetFixedPosition(19.3f * PdfDefines.mmAXw, 78 * PdfDefines.mmAXw + 1.5f, TITLE_BLOCK_WIDTH);
 
         return tbl;
     }

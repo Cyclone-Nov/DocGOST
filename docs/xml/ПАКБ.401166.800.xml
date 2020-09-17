@@ -1,0 +1,746 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Версия XML 1.0-->
+<!--Раздел документации // Вид документа#Код документа#Обозначение#Формат#Примечание-->
+<!--BOARD_OUTLINE       // SEGMENT;X;Y#-->
+<!--BOARD_CUTOUT        // SEGMENT;X;Y#-->
+<!--DRILLED_HOLES       // HOLE_NUMBER;HOLE_D;HOLE_X;HOLE_Y;HOLE_STYLE#-->
+<!--STYLE_HOLE          // PTH=1, NPTH=0-->
+<!--LAYER_COMPONENT     // TOP=1, BOTTOM=0-->
+<xml>
+<transaction	Type="AltiumDesigner"	version="1.0"	Date="28.07.2020"	Time="16:09:29">
+<project	Project_Path="D:\Altium\Project 2\PCB_Project\PCB_Project.PrjPcb"	Project_Name="PCB_Project.PrjPcb">
+<configurations>
+<!-- -00 из 2 -->
+	<configuration	name="-00">
+	<graphs>
+		<graph name="Шифр PCB"	value="ERKK"/>
+		<graph name="Характер работы"	value=""/>
+		<graph name="Формат PCB"	value=""/>
+		<graph name="Утвердил"	value="Гульцов"/>
+		<graph name="Указания изменение"	value=""/>
+		<graph name="Разработал схемотехник"	value="Струнков"/>
+		<graph name="Разработал конструктор"	value="Ражева"/>
+		<graph name="Раздел"	value="Документация"/>
+		<graph name="Проект"	value="САВиП"/>
+		<graph name="Проверил схемотехник"	value="Васильев"/>
+		<graph name="Проверил конструктор"	value="Десинов"/>
+		<graph name="Примечание"	value=""/>
+		<graph name="Порядковый номер изменения"	value=""/>
+		<graph name="Первичная применяемость"	value="ПАКБ.436734.802"/>
+		<graph name="Обозначение PCB"	value="ПАКБ.636734.802"/>
+		<graph name="Обозначение"	value="ПАКБ.401166.800"/>
+		<graph name="Нормоконтроль"	value="Корнева"/>
+		<graph name="Номер документа изменение"	value=""/>
+		<graph name="Наименование PCB"	value="Плата печатная"/>
+		<graph name="Наименование"	value="Модуль питания (МП)"/>
+		<graph name="Литера3"	value=""/>
+		<graph name="Литера2"	value=""/>
+		<graph name="Литера"	value=""/>
+		<graph name="Код документа"	value="Т6М"/>
+		<graph name="Дополнительная графа"	value=""/>
+		<graph name="Дата изменения"	value=""/>
+		<graph name="Вид документа"	value="Файл проекта печатной платы"/>
+	</graphs>
+	<documents>
+		<document>
+			<properties>
+				<property name="Раздел СП"	value="Документация"/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Наименование"	value="Инструкция по настройке"/>
+				<property name="Обозначение"	value="ПАКБ.436734.802И2"/>
+				<property name="Код документа"	value="И2"/>
+				<property name="Формат"	value="А4"/>
+				<property name="Примечание"	value=""/>
+			</properties>
+		</document>
+		<document>
+			<properties>
+				<property name="Раздел СП"	value="Документация"/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Наименование"	value="Технические условия Лист утверждения"/>
+				<property name="Обозначение"	value="ПАКБ.436734.802ТУ-ЛУ"/>
+				<property name="Код документа"	value="ТУ-ЛУ"/>
+				<property name="Формат"	value="А4"/>
+				<property name="Примечание"	value="Размножать по указанию"/>
+			</properties>
+		</document>
+		<document>
+			<properties>
+				<property name="Раздел СП"	value="Документация"/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Наименование"	value="Технические условия"/>
+				<property name="Обозначение"	value="ПАКБ.436734.802ТУ"/>
+				<property name="Код документа"	value="ТУ"/>
+				<property name="Формат"	value="А4"/>
+				<property name="Примечание"	value=""/>
+			</properties>
+		</document>
+		<document>
+			<properties>
+				<property name="Раздел СП"	value="Документация"/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Наименование"	value="Перечень элементов"/>
+				<property name="Обозначение"	value="ПАКБ.436734.802ПЭ3"/>
+				<property name="Код документа"	value="ПЭ3"/>
+				<property name="Формат"	value="А4"/>
+				<property name="Примечание"	value=""/>
+			</properties>
+		</document>
+		<document>
+			<properties>
+				<property name="Раздел СП"	value="Документация"/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Наименование"	value="Схема электрическая принципиальная"/>
+				<property name="Обозначение"	value="ПАКБ.436734.802Э3"/>
+				<property name="Код документа"	value="Э3"/>
+				<property name="Формат"	value="А3"/>
+				<property name="Примечание"	value=""/>
+			</properties>
+		</document>
+		<document>
+			<properties>
+				<property name="Раздел СП"	value="Документация"/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Наименование"	value="Габаритный чертеж"/>
+				<property name="Обозначение"	value="ПАКБ.436734.802ГЧ"/>
+				<property name="Код документа"	value="ГЧ"/>
+				<property name="Формат"	value="А3"/>
+				<property name="Примечание"	value=""/>
+			</properties>
+		</document>
+	</documents>
+	<componentsPCB>
+		<component_pcb>
+			<properties>
+				<property name="Раздел СП"	value="Детали"/>
+				<property name="Примечание"	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Куда входит"	value=""/>
+				<property name="Наименование"	value="Плата печатная"/>
+				<property name="Обозначение"	value="ПАКБ.123456.000"/>
+				<property name="Первичная применяемость"	value="ПАКБ.436734.802"/>
+				<property name="Формат"	value="A4"/>
+				<property name="Board_filename"	value="PCB1.PcbDoc"/>
+				<property name="Board_Code"	value=""/>
+				<property name="Кол-во слоев"	value="2"/>
+				<property name="Толщина, мм"	value="0,39"/>
+				<attribute name="BOARD_OUTLINE"	value="
+25,4;25,4;177,8;25,4#
+177,8;25,4;177,8;127#
+177,8;127;25,4;127#
+25,4;127;25,4;25,4#
+				"/>
+				<attribute name="BOARD_CUTOUT"	value="
+				"/>
+				<attribute name="DRILLED_HOLES"	value="
+				"/>
+			</properties>
+		</component_pcb>
+	</componentsPCB>
+	<components>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C1"/>
+				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="235,2"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C2"/>
+				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="224,54"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C3"/>
+				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="218,19"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C4"/>
+				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="207,39"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C5"/>
+				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="192,4"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C6"/>
+				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="186,06"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R1"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+				<property name="Footprint"	value="RESC0603X55N"/>
+				<property name="X"	value="229,87"/>
+				<property name="Y"	value="29,84"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R2"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -2 Ом ±5 % -Т -А -М"/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+				<property name="Footprint"	value="RESC0603X55N"/>
+				<property name="X"	value="212,85"/>
+				<property name="Y"	value="29,84"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R3"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+				<property name="Footprint"	value="RESC0603X55N"/>
+				<property name="X"	value="202,06"/>
+				<property name="Y"	value="29,84"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R4"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+				<property name="Footprint"	value="RESC0603X55N"/>
+				<property name="X"	value="197,74"/>
+				<property name="Y"	value="29,84"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R5"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000"/>
+				<property name="Footprint"	value="RESC0603X55N"/>
+				<property name="X"	value="180,72"/>
+				<property name="Y"	value="29,84"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+	</components>
+	</configuration>
+<!-- -01 из 2 -->
+	<configuration	name="-01">
+	<components>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C1"/>
+				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000-01"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="235,2"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C2"/>
+				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000-01"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="224,54"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C3"/>
+				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000-01"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="218,19"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C4"/>
+				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000-01"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="207,39"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C5"/>
+				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000-01"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="192,4"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="C6"/>
+				<property name="Наименование"	value="К10-79-10 В-2 мкФ +80/-20 % Н90"/>
+				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
+				<property name="Код продукции"	value="27.90.52.000"/>
+				<property name="Поставщик"	value="ООО  «КУЛОН»"/>
+				<property name="Тип"	value="К10-79"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000-01"/>
+				<property name="Footprint"	value="CAPC3326X180N"/>
+				<property name="X"	value="186,06"/>
+				<property name="Y"	value="28,96"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R1"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000-01"/>
+				<property name="Footprint"	value="RESC0603X55N"/>
+				<property name="X"	value="229,87"/>
+				<property name="Y"	value="29,84"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R2"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -2 Ом ±5 % -Т -А -М"/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000-01"/>
+				<property name="Footprint"	value="RESC0603X55N"/>
+				<property name="X"	value="212,85"/>
+				<property name="Y"	value="29,84"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R3"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000-01"/>
+				<property name="Footprint"	value="RESC0603X55N"/>
+				<property name="X"	value="202,06"/>
+				<property name="Y"	value="29,84"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R4"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000-01"/>
+				<property name="Footprint"	value="RESC0603X55N"/>
+				<property name="X"	value="197,74"/>
+				<property name="Y"	value="29,84"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+		<component>
+			<properties>
+				<property name="Раздел СП"	value="Прочие изделия"/>
+				<property name="Раздел ВП"	value=""/>
+				<property name="Подраздел СП"	value=""/>
+				<property name="Подраздел ВП"	value=""/>
+				<property name="Примечание"	value=""/>
+				<property name="Количество на изд."	value=""	value2=""	value3=""/>
+				<property name="Количество в комп."	value=""/>
+				<property name="Количество на рег."	value=""/>
+				<property name="Наличие комонента"	value="1"/>
+				<property name="Позиционное обозначение"	value="R5"/>
+				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
+				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
+				<property name="Код продукции"	value="27.90.60.000"/>
+				<property name="Поставщик"	value="АО «НПО «ЭРКОН»"/>
+				<property name="Тип"	value="Р1-8В"/>
+				<property name="Куда входит"	value="ПАКБ.123456.000-01"/>
+				<property name="Footprint"	value="RESC0603X55N"/>
+				<property name="X"	value="180,72"/>
+				<property name="Y"	value="29,84"/>
+				<property name="Z"	value="0,39"/>
+				<property name="Layer"	value="1"/>
+				<property name="Rotation"	value="0"/>
+				<property name="StandOff"	value="0"/>
+			</properties>
+		</component>
+	</components>
+	</configuration>
+</configurations>
+</project>
+</transaction>
+</xml>
