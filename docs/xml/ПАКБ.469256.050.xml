@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xml>
+<transaction   Type="SOLIDWORKS"   version="1.0"   Date="05.08.2020"   Time="15:49:41">
+<project   Project_Path="D:\PDM\Проект\САВиП\КШУ\ПАКБ.469256.048 Камера широкоугольная (КШУ).SldAsm"   Project_Name="ПАКБ.469256.048 Камера широкоугольная (КШУ).SldAsm">
+<configurations>
+   <configuration  name="-00">
+   <graphs>
+       <graph name="Шифр PCB"  value=""/>
+       <graph name="Характер работы"   value=""/>
+       <graph name="Формат PCB"    value=""/>
+       <graph name="Утвердил"  value="Гульцов"/>
+       <graph name="Указания изменение"    value=""/>
+       <graph name="Разработал схемотехник"    value=""/>
+       <graph name="Разработал конструктор"    value="Илалов"/>
+       <graph name="Раздел"    value="Документация"/>
+       <graph name="Проект"    value="САВиП"/>
+       <graph name="Проверил схемотехник"  value=""/>
+       <graph name="Проверил конструктор"  value="Десинов"/>
+       <graph name="Примечание"    value=""/>
+       <graph name="Порядковый номер изменения"    value=""/>
+       <graph name="Первичная применяемость"   value="ПАКБ.463265.123"/>
+       <graph name="Обозначение PCB"   value=""/>
+       <graph name="Обозначение"   value="ПАКБ.469256.049"/>
+       <graph name="Нормоконтроль" value="Корнева"/>
+       <graph name="Номер документа изменение" value=""/>
+       <graph name="Наименование PCB"  value=""/>
+       <graph name="Наименование"  value="Камера широкоугольная (КШУ)"/>
+       <graph name="Литера3"   value=""/>
+       <graph name="Литера2"   value=""/>
+       <graph name="Литера"    value=""/>
+       <graph name="Код документа" value=""/>
+       <graph name="Дополнительная графа"  value=""/>
+       <graph name="Дата изменения"    value=""/>
+       <graph name="Вид документа" value="Электронная модель сборочной единицы"/>
+   </graphs>
+   <components>
+		<component>
+            <properties>
+                <property name="Раздел СП"  value="Сборочные единицы"/>
+                <property name="Раздел ВП"  value=""/>
+                <property name="Подраздел СП"   value=""/>
+                <property name="Подраздел ВП"   value=""/>
+                <property name="Примечание" value=""/>
+                <property name="Количество на изд." value=""/>
+                <property name="Количество в комп." value=""/>
+                <property name="Количество на рег." value=""/>
+                <property name="Наличие комонента"  value="1"/>
+                <property name="Позиционное обозначение"    value=""/>
+                <property name="Наименование"   value="Модуль оптический"/>
+                <property name="Обозначение"   value="ПАКБ.203129.802"/>
+                <property name="Формат" value="А4"/>
+                <property name="Документ на поставку"   value=""/>
+                <property name="Код продукции"  value=""/>
+                <property name="Поставщик"  value=""/>
+                <property name="Тип"    value=""/>
+                <property name="Куда входит"    value="ПАКБ.203129.802"/>
+                <property name="Footprint"  value=""/>
+                <property name="X"  value="0"/>
+                <property name="Y"  value="0"/>
+                <property name="Z"  value="0"/>
+                <property name="Layer"  value="1"/>
+                <property name="Rotation"   value="0"/>
+                <property name="StandOff"   value="0"/>
+            </properties>
+        </component>
+		<component>
+            <properties>
+                <property name="Раздел СП"  value="Сборочные единицы"/>
+                <property name="Раздел ВП"  value=""/>
+                <property name="Подраздел СП"   value=""/>
+                <property name="Подраздел ВП"   value=""/>
+                <property name="Примечание" value=""/>
+                <property name="Количество на изд." value=""/>
+                <property name="Количество в комп." value=""/>
+                <property name="Количество на рег." value=""/>
+                <property name="Наличие комонента"  value="1"/>
+                <property name="Позиционное обозначение"    value=""/>
+                <property name="Наименование"   value="Крышка"/>
+                <property name="Обозначение"   value="ПАКБ.301265.801"/>
+                <property name="Формат" value="А4"/>
+                <property name="Документ на поставку"   value=""/>
+                <property name="Код продукции"  value=""/>
+                <property name="Поставщик"  value=""/>
+                <property name="Тип"    value=""/>
+                <property name="Куда входит"    value="ПАКБ.301265.801"/>
+                <property name="Footprint"  value=""/>
+                <property name="X"  value="0"/>
+                <property name="Y"  value="0"/>
+                <property name="Z"  value="0"/>
+                <property name="Layer"  value="1"/>
+                <property name="Rotation"   value="0"/>
+                <property name="StandOff"   value="0"/>
+            </properties>
+        </component>
+		<component>
+            <properties>
+                <property name="Раздел СП"  value="Сборочные единицы"/>
+                <property name="Раздел ВП"  value=""/>
+                <property name="Подраздел СП"   value=""/>
+                <property name="Подраздел ВП"   value=""/>
+                <property name="Примечание" value=""/>
+                <property name="Количество на изд." value=""/>
+                <property name="Количество в комп." value=""/>
+                <property name="Количество на рег." value=""/>
+                <property name="Наличие комонента"  value="1"/>
+                <property name="Позиционное обозначение"    value=""/>
+                <property name="Наименование"   value="Дальномер"/>
+                <property name="Обозначение"   value="ПАКБ.401166.800"/>
+                <property name="Формат" value="А4"/>
+                <property name="Документ на поставку"   value=""/>
+                <property name="Код продукции"  value=""/>
+                <property name="Поставщик"  value=""/>
+                <property name="Тип"    value=""/>
+                <property name="Куда входит"    value="ПАКБ.401166.800"/>
+                <property name="Footprint"  value=""/>
+                <property name="X"  value="0"/>
+                <property name="Y"  value="0"/>
+                <property name="Z"  value="0"/>
+                <property name="Layer"  value="1"/>
+                <property name="Rotation"   value="0"/>
+                <property name="StandOff"   value="0"/>
+            </properties>
+        </component>
+		<component>
+            <properties>
+                <property name="Раздел СП"  value="Сборочные единицы"/>
+                <property name="Раздел ВП"  value=""/>
+                <property name="Подраздел СП"   value=""/>
+                <property name="Подраздел ВП"   value=""/>
+                <property name="Примечание" value=""/>
+                <property name="Количество на изд." value=""/>
+                <property name="Количество в комп." value=""/>
+                <property name="Количество на рег." value=""/>
+                <property name="Наличие комонента"  value="1"/>
+                <property name="Позиционное обозначение"    value=""/>
+                <property name="Наименование"   value="Колодка клеммная"/>
+                <property name="Обозначение"   value="ПАКБ.685112.800"/>
+                <property name="Формат" value="А4"/>
+                <property name="Документ на поставку"   value=""/>
+                <property name="Код продукции"  value=""/>
+                <property name="Поставщик"  value=""/>
+                <property name="Тип"    value=""/>
+                <property name="Куда входит"    value="ПАКБ.685112.800"/>
+                <property name="Footprint"  value=""/>
+                <property name="X"  value="0"/>
+                <property name="Y"  value="0"/>
+                <property name="Z"  value="0"/>
+                <property name="Layer"  value="1"/>
+                <property name="Rotation"   value="0"/>
+                <property name="StandOff"   value="0"/>
+            </properties>
+        </component>
+		<component>
+            <properties>
+                <property name="Раздел СП"  value="Сборочные единицы"/>
+                <property name="Раздел ВП"  value=""/>
+                <property name="Подраздел СП"   value=""/>
+                <property name="Подраздел ВП"   value=""/>
+                <property name="Примечание" value=""/>
+                <property name="Количество на изд." value=""/>
+                <property name="Количество в комп." value=""/>
+                <property name="Количество на рег." value=""/>
+                <property name="Наличие комонента"  value="1"/>
+                <property name="Позиционное обозначение"    value=""/>
+                <property name="Наименование"   value="Жгут 2"/>
+                <property name="Обозначение"   value="ПАКБ.685621.815"/>
+                <property name="Формат" value="А4"/>
+                <property name="Документ на поставку"   value=""/>
+                <property name="Код продукции"  value=""/>
+                <property name="Поставщик"  value=""/>
+                <property name="Тип"    value=""/>
+                <property name="Куда входит"    value="ПАКБ.685621.815"/>
+                <property name="Footprint"  value=""/>
+                <property name="X"  value="0"/>
+                <property name="Y"  value="0"/>
+                <property name="Z"  value="0"/>
+                <property name="Layer"  value="1"/>
+                <property name="Rotation"   value="0"/>
+                <property name="StandOff"   value="0"/>
+            </properties>
+        </component>
+		<component>
+            <properties>
+                <property name="Раздел СП"  value="Сборочные единицы"/>
+                <property name="Раздел ВП"  value=""/>
+                <property name="Подраздел СП"   value=""/>
+                <property name="Подраздел ВП"   value=""/>
+                <property name="Примечание" value=""/>
+                <property name="Количество на изд." value=""/>
+                <property name="Количество в комп." value=""/>
+                <property name="Количество на рег." value=""/>
+                <property name="Наличие комонента"  value="1"/>
+                <property name="Позиционное обозначение"    value=""/>
+                <property name="Наименование"   value="Перемычка металлизации"/>
+                <property name="Обозначение"   value="ПАКБ.685621.816"/>
+                <property name="Формат" value="А4"/>
+                <property name="Документ на поставку"   value=""/>
+                <property name="Код продукции"  value=""/>
+                <property name="Поставщик"  value=""/>
+                <property name="Тип"    value=""/>
+                <property name="Куда входит"    value="ПАКБ.685621.816"/>
+                <property name="Footprint"  value=""/>
+                <property name="X"  value="0"/>
+                <property name="Y"  value="0"/>
+                <property name="Z"  value="0"/>
+                <property name="Layer"  value="1"/>
+                <property name="Rotation"   value="0"/>
+                <property name="StandOff"   value="0"/>
+            </properties>
+        </component>
+		<component>
+            <properties>
+                <property name="Раздел СП"  value="Сборочные единицы"/>
+                <property name="Раздел ВП"  value=""/>
+                <property name="Подраздел СП"   value=""/>
+                <property name="Подраздел ВП"   value=""/>
+                <property name="Примечание" value=""/>
+                <property name="Количество на изд." value=""/>
+                <property name="Количество в комп." value=""/>
+                <property name="Количество на рег." value=""/>
+                <property name="Наличие комонента"  value="1"/>
+                <property name="Позиционное обозначение"    value=""/>
+                <property name="Наименование"   value="Жгут 1"/>
+                <property name="Обозначение"   value="ПАКБ.685623.800"/>
+                <property name="Формат" value="А4"/>
+                <property name="Документ на поставку"   value=""/>
+                <property name="Код продукции"  value=""/>
+                <property name="Поставщик"  value=""/>
+                <property name="Тип"    value=""/>
+                <property name="Куда входит"    value="ПАКБ.685623.800"/>
+                <property name="Footprint"  value=""/>
+                <property name="X"  value="0"/>
+                <property name="Y"  value="0"/>
+                <property name="Z"  value="0"/>
+                <property name="Layer"  value="1"/>
+                <property name="Rotation"   value="0"/>
+                <property name="StandOff"   value="0"/>
+            </properties>
+        </component>
+		</components>
+    </configuration>
+</configurations>
+</project>
+</transaction>
+</xml>

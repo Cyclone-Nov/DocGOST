@@ -157,7 +157,7 @@ namespace GostDOC.Models
         
         public static string[] ReadCfgFileLines(string aFileName)
         {
-            string filePath = Path.Combine(Environment.CurrentDirectory, $"{aFileName}.cfg");
+            string filePath = Path.Combine(Environment.CurrentDirectory, Constants.Settings, $"{aFileName}.cfg");
             if (File.Exists(filePath))
             {
                 return File.ReadAllLines(filePath);
