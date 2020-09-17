@@ -305,16 +305,16 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="PhysicalDesignators.cfg">
+    <Content Include="Settings\PhysicalDesignators.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="DefaultGraphNames.cfg">
+    <Content Include="Settings\DefaultGraphNames.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Standards.cfg">
+    <Content Include="Settings\Standards.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Units.cfg">
+    <Content Include="Settings\Units.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -324,7 +324,7 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Documents.cfg">
+    <Content Include="Settings\Documents.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Font\GOST_BU.TTF">
@@ -352,4 +352,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /E /Y "$(ProjectDir)Settings" "$(TargetDir)Settings"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -37,7 +37,7 @@ namespace GostDOC.Models
 
     class MaterialTypes
     {        
-        private string _filePath = Path.Combine(Environment.CurrentDirectory, "Materials.xml");
+        private string _filePath = Path.Combine(Environment.CurrentDirectory, Constants.Settings, "Materials.xml");
 
         public IDictionary<string, IDictionary<string, Material>> Materials { get; } = new Dictionary<string, IDictionary<string, Material>>();
 

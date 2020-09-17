@@ -174,35 +174,41 @@ namespace GostDOC.ViewModels
             // Subscribe to drag and drop events
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
             // Update title
-            UpdateTitle();
+            UpdateTitle();            
         }
 
         #region Commands impl
         private void Undo(MenuNode obj)
         {
-            if (_selectedItem.NodeType == NodeType.Root)
+            if (_selectedItem != null)
             {
-                GeneralGraphValues.SetMementos(_undoRedoGraphs.Undo());
-                UpdateUndoRedoMenu(_undoRedoGraphs);
-            }
-            else if (!string.IsNullOrEmpty(GroupName))
-            {
-                Components.SetMementos(_undoRedoComponents.Undo());
-                UpdateUndoRedoMenu(_undoRedoComponents);
+                if (_selectedItem.NodeType == NodeType.Root)
+                {
+                    GeneralGraphValues.SetMementos(_undoRedoGraphs.Undo());
+                    UpdateUndoRedoMenu(_undoRedoGraphs);
+                }
+                else if (!string.IsNullOrEmpty(GroupName))
+                {
+                    Components.SetMementos(_undoRedoComponents.Undo());
+                    UpdateUndoRedoMenu(_undoRedoComponents);
+                }
             }
         }  
 
         private void Redo(MenuNode obj)
         {
-            if (_selectedItem.NodeType == NodeType.Root)
+            if (_selectedItem != null)
             {
-                GeneralGraphValues.SetMementos(_undoRedoGraphs.Redo());
-                UpdateUndoRedoMenu(_undoRedoGraphs);
-            }
-            else if (!string.IsNullOrEmpty(GroupName))
-            {
-                Components.SetMementos(_undoRedoComponents.Redo());
-                UpdateUndoRedoMenu(_undoRedoComponents);
+                if (_selectedItem.NodeType == NodeType.Root)
+                {
+                    GeneralGraphValues.SetMementos(_undoRedoGraphs.Redo());
+                    UpdateUndoRedoMenu(_undoRedoGraphs);
+                }
+                else if (!string.IsNullOrEmpty(GroupName))
+                {
+                    Components.SetMementos(_undoRedoComponents.Redo());
+                    UpdateUndoRedoMenu(_undoRedoComponents);
+                }
             }
         }
 
@@ -913,12 +919,14 @@ namespace GostDOC.ViewModels
         {
             // Update undo / redo stack
             _undoRedoComponents.Add(Components.GetMementos());
+            UpdateUndoRedoMenu(_undoRedoComponents);
         }
 
         private void UpdateUndoRedoGraph()
         {
             // Update undo / redo stack
             _undoRedoGraphs.Add(GeneralGraphValues.GetMementos());
+            UpdateUndoRedoMenu(_undoRedoGraphs);
         }
     }
 }
