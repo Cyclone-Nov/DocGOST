@@ -181,7 +181,7 @@ internal class PdfElementListCreator : PdfCreator {
         Cell headerCell = CreateEmptyCell(1, 1).SetMargin(0).SetPaddings(-2, -2, -2, -2)
             .SetHeight(15 * PdfDefines.mmAXh).SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1)
             .SetFontSize(16);
-        tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Поз. обозна-\nчение").SetFixedLeading(11.0f)));
+        tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Поз. обозна-\nчение").SetFixedLeading(11.5f)));
         tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Наименование")));
         tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Кол.")));
         tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Примечание")));
@@ -272,7 +272,7 @@ internal class PdfElementListCreator : PdfCreator {
         if (outLastProcessedRow == aData.Rows.Count)
             outLastProcessedRow = 0;
 
-        tbl.SetFixedPosition(19.3f * PdfDefines.mmAXw, 78 * PdfDefines.mmAXw + 0.5f, TITLE_BLOCK_WIDTH);
+        tbl.SetFixedPosition(19.3f * PdfDefines.mmAXw, 78 * PdfDefines.mmAXw + 1.5f, TITLE_BLOCK_WIDTH);
 
         return tbl;
     }

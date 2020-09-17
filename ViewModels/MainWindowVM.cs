@@ -589,7 +589,7 @@ namespace GostDOC.ViewModels
 
         private void ExportExcel(object obj)
         {
-            if (_docType != DocType.None)
+            if (_excelManager.CanExport(_docType))
             {
                 var path = CommonDialogs.SaveFileAs("Excel Files *.xlsx | *.xlsx", "Сохранить файл");
                 if (!string.IsNullOrEmpty(path))
@@ -601,6 +601,11 @@ namespace GostDOC.ViewModels
 
         private void ImportMaterials(object obj)
         {
+            var path = CommonDialogs.OpenFile("Material Files *.xml | *.xml", "Открыть файл материалов");
+            if (!string.IsNullOrEmpty(path))
+            {
+                _materials.Import(path);
+            }
         }
 
         private void SaveMaterials(object obj)
@@ -870,9 +875,9 @@ namespace GostDOC.ViewModels
                     MenuNode node = new MenuNode() { Name = kvp.Key, Nodes = new ObservableCollection<MenuNode>() };
                     foreach (var doc in kvp.Value)
                     {
-                        node.Nodes.Add(new MenuNode() { Name = doc.Key, Parent = node });
+                        node.Nodes.InsertSorted(new MenuNode() { Name = doc.Key, Parent = node });
                     }
-                    TableContextMenu.Add(node);
+                    TableContextMenu.InsertSorted(node);
                 }
                 TableContextMenuEnabled.Value = true;
             }
@@ -883,10 +888,10 @@ namespace GostDOC.ViewModels
                     MenuNode node = new MenuNode() { Name = kvp.Key, Nodes = new ObservableCollection<MenuNode>() };
                     foreach (var doc in kvp.Value)
                     {
-                        node.Nodes.Add(new MenuNode() { Name = doc.Key, Parent = node });
+                        node.Nodes.InsertSorted(new MenuNode() { Name = doc.Key, Parent = node });
                     }
-                    node.Nodes.Add(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = node });
-                    TableContextMenu.Add(node);
+                    node.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = node });
+                    TableContextMenu.InsertSorted(node);
                 }
                 TableContextMenuEnabled.Value = true;
             }
