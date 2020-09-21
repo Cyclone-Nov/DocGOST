@@ -244,6 +244,8 @@ namespace GostDOC.Common
         /// </summary>
         public static readonly string GroupKits = "Комплекты";
 
+        public static readonly string Settings = "Settings";
+
 
         public static readonly string GroupNameSp = "Раздел СП";
         public static readonly string SubGroupNameSp = "Подраздел СП";

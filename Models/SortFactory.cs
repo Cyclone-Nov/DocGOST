@@ -134,6 +134,9 @@ namespace GostDOC.Models
                 string nameX = x.GetProperty(Constants.ComponentName);
                 string nameY = y.GetProperty(Constants.ComponentName);
 
+                if (string.IsNullOrEmpty(nameX) && string.IsNullOrEmpty(nameY))
+                    return 0;
+
                 if (string.IsNullOrEmpty(nameX))
                     return -1;
 
