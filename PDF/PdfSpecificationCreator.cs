@@ -54,6 +54,8 @@ namespace GostDOC.PDF
             _currentPageNumber++;
             AddNextPage(doc, aMainGraphs, dataTable, _currentPageNumber, 0);
 
+            AddPageCountOnFirstPage(doc, _currentPageNumber);
+
             doc.Close();            
         }
 

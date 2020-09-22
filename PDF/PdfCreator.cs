@@ -47,17 +47,18 @@ namespace GostDOC.PDF
         /// </summary>
         protected const int MAX_PAGES_WITHOUT_CHANGELIST = 3;
 
-        protected readonly float BOTTOM_MARGIN = 5 * mmW();
-        protected readonly float LEFT_MARGIN = 8 * mmW();
-        protected readonly float TOP_MARGIN = 5 * mmW();
-        protected readonly float RIGHT_MARGIN = 5 * mmW();
+        protected static readonly float BOTTOM_MARGIN = 5 * mmW();
+        protected static readonly float LEFT_MARGIN = 8 * mmW();
+        protected static readonly float TOP_MARGIN = 5 * mmW();
+        protected static readonly float RIGHT_MARGIN = 5 * mmW();
 
         protected const float THICK_LINE_WIDTH = 2f; 
         
-        protected readonly float TITLE_BLOCK_WIDTH = 185 * mmW();
-        protected readonly float DEFAULT_TITLE_BLOCK_CELL_HEIGHT = 5 * mmH();
-        protected readonly float TITLE_BLOCK_FIRST_PAGE_FULL_HEIGHT_MM = (15 + 5 + 5 + 15 + 8 + 14);
-        protected readonly float TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM = (15 + 5 + 5 + 15);
+        protected static readonly float TITLE_BLOCK_WIDTH_MM = 185;
+        protected static readonly float TITLE_BLOCK_WIDTH = TITLE_BLOCK_WIDTH_MM * mmW();
+        protected static readonly float DEFAULT_TITLE_BLOCK_CELL_HEIGHT = 5 * mmH();
+        protected static readonly float TITLE_BLOCK_FIRST_PAGE_FULL_HEIGHT_MM = (15 + 5 + 5 + 15 + 8 + 14);
+        protected static readonly float TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM = (15 + 5 + 5 + 15);
 
 
         protected readonly float TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE = (5 + 287 - 60 * 2) * mmW();
@@ -550,11 +551,11 @@ namespace GostDOC.PDF
 
             #endregion
 
-            // switch A3/A4
-            if (Math.Abs(aPageSize.GetWidth() - PageSize.A3.GetWidth()) < 0.1) { 
-                // A3
 
-                mainTable.SetFixedPosition(415 * mmW()-TITLE_BLOCK_WIDTH, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+
+            if (aPageSize.Contains(PageSize.A3)) {
+                // A3
+                mainTable.SetFixedPosition(415 * mmW()-TITLE_BLOCK_WIDTH+2f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
                 
                 Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
                     new Rectangle((295)* mmW(), BOTTOM_MARGIN, PdfDefines.A4Width, 2));
@@ -665,7 +666,7 @@ namespace GostDOC.PDF
 
 
             // switch A3/A4
-            if (Math.Abs(aPageSize.GetWidth() - PageSize.A3.GetWidth()) < 0.1) {
+            if (aPageSize.Contains(PageSize.A3)) {
                 tbl.SetFixedPosition(PdfDefines.A3Height - TITLE_BLOCK_WIDTH - RIGHT_MARGIN, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
             } else {
                 tbl.SetFixedPosition(20 * mmW(), BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
@@ -752,18 +753,11 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">PDF документ</param>
         /// <param name="aPageCount">общее количество страние</param>
-        internal void AddPageCountOnFirstPage(iText.Layout.Document aDoc, int aPageCount)
+        protected void AddPageCountOnFirstPage(iText.Layout.Document aDoc, int aPageCount)
         {   
             float left = 0f;
             float bottom = 65f;
-            if (_pageSize.Contains(PageSize.A3))
-            {
-                left = (7 + 10 + 23 + 15 + 10 + 110) * mmW() + 20 + 50;
-            }
-            else
-            {
-                left = (7 + 10 + 23 + 15 + 10 + 110) * mmW() + 55;                
-            }
+            left = (7 + 10 + 23 + 15 + 10 + 110) * mmW() + 55;                
 
             aDoc.ShowTextAligned(new Paragraph(aPageCount.ToString()).
                                 SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFontSize(12).SetFont(f1),
