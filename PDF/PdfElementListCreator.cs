@@ -108,21 +108,21 @@ internal class PdfElementListCreator : PdfCreator {
     void AddSecondaryElements(iText.Layout.Document aInDoc, IDictionary<string, string> aGraphs) {
         var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
         var p = new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT)).SetRotationAngle(DegreesToRadians(90))
-            .AddStyle(style).SetFixedPosition(10 * PdfDefines.mmAXw + 2,
-                TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * PdfDefines.mmAXw, 100);
+            .AddStyle(style).SetFixedPosition(10 * mmW() + 2,
+                TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * mmW(), 100);
         aInDoc.Add(p);
         p = new Paragraph("Копировал").AddStyle(style)
-            .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 14) * PdfDefines.mmAXw, 0, 100);
+            .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 14) * mmW(), 0, 100);
         aInDoc.Add(p);
         p = new Paragraph("Формат А4").AddStyle(style)
-            .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 70) * PdfDefines.mmAXw + 20, 0, 100);
+            .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 70) * mmW() + 20, 0, 100);
         aInDoc.Add(p);
 
     }
 
     void DrawLinesFirstPage() {
         // нарисовать недостающую линию
-        var fromLeft = 19.3f * PdfDefines.mmAXw + TITLE_BLOCK_WIDTH-2f;
+        var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH-2f;
         Canvas canvas = new Canvas(
             new PdfCanvas(pdfDoc.GetFirstPage()), 
             new Rectangle(fromLeft, BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM * mmH() + 2f, 2, 100));
@@ -144,11 +144,11 @@ internal class PdfElementListCreator : PdfCreator {
         // добавить таблицу с данными
         int lastNextProcessedRow;
         var dataTable = CreateDataTable(aData, false, aStartRow, out lastNextProcessedRow);
-        dataTable.SetFixedPosition(19.3f * PdfDefines.mmAXw, BOTTOM_MARGIN + 16 * PdfDefines.mmAXw, TITLE_BLOCK_WIDTH + 2f);
+        dataTable.SetFixedPosition(19.3f * mmW(), BOTTOM_MARGIN + 16 * mmW()+2.5f, TITLE_BLOCK_WIDTH + 2f);
         aInPdfDoc.Add(dataTable);
 
         // добавить таблицу с основной надписью для последуюших старницы
-        aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber }));
+        aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber }));
 
         // добавить таблицу с нижней дополнительной графой
         aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
@@ -157,10 +157,10 @@ internal class PdfElementListCreator : PdfCreator {
     }
 
     private new void SetPageMargins(iText.Layout.Document aDoc) {
-        aDoc.SetLeftMargin(8 * PdfDefines.mmAXw);
-        aDoc.SetRightMargin(5 * PdfDefines.mmAXw);
-        aDoc.SetTopMargin(5 * PdfDefines.mmAXw);
-        aDoc.SetBottomMargin(5 * PdfDefines.mmAXw);
+        aDoc.SetLeftMargin(8 * mmW());
+        aDoc.SetRightMargin(5 * mmW());
+        aDoc.SetTopMargin(5 * mmW());
+        aDoc.SetBottomMargin(5 * mmW());
     }
 
   
@@ -173,7 +173,7 @@ internal class PdfElementListCreator : PdfCreator {
     /// <param name="outLastProcessedRow">последняя обработанная строка таблицы данных</param>
     /// <returns></returns>
     private Table CreateDataTable(DataTable aData, bool firstPage, int aStartRow, out int outLastProcessedRow) {
-        float[] columnSizes = {20 * PdfDefines.mmAXw, 110 * PdfDefines.mmAXw, 10 * PdfDefines.mmAXw, 45 * PdfDefines.mmAXw};
+        float[] columnSizes = {20 * mmW(), 110 * mmW(), 10 * mmW(), 45 * mmW()};
         Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
         tbl.SetMargin(0).SetPadding(0);
 
@@ -239,7 +239,7 @@ internal class PdfElementListCreator : PdfCreator {
             }
             else {
                 // разобьем наименование на несколько строк исходя из длины текста
-                string[] namestrings = SplitNameByWidth(110 * PdfDefines.mmAXw, fontSize, font, name).ToArray();
+                string[] namestrings = SplitNameByWidth(110 * mmW(), fontSize, font, name).ToArray();
                 if (namestrings.Length <= remainingPdfTabeRows) {
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
                     tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(namestrings[0])));
@@ -272,7 +272,7 @@ internal class PdfElementListCreator : PdfCreator {
         if (outLastProcessedRow == aData.Rows.Count)
             outLastProcessedRow = 0;
 
-        tbl.SetFixedPosition(19.3f * PdfDefines.mmAXw, 78 * PdfDefines.mmAXw + 1.5f, TITLE_BLOCK_WIDTH);
+        tbl.SetFixedPosition(19.3f * mmW(), 78 * mmW()+0.48f, TITLE_BLOCK_WIDTH);
 
         return tbl;
     }

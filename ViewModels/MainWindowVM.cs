@@ -174,7 +174,7 @@ namespace GostDOC.ViewModels
             // Subscribe to drag and drop events
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
             // Update title
-            UpdateTitle();            
+            UpdateTitle();
         }
 
         #region Commands impl
@@ -289,6 +289,7 @@ namespace GostDOC.ViewModels
                 _filePath = string.Empty;
                 UpdateTitle();
                 UpdateData();
+                HideTables();
             }
         }
 
@@ -653,6 +654,7 @@ namespace GostDOC.ViewModels
                 DocNodes.Add(aNode);
                 _docType = aDocType;
                 OpenFile(path);
+                HideTables();
             }            
         }
         private void OpenFile(string aFilePath)
@@ -927,6 +929,13 @@ namespace GostDOC.ViewModels
             // Update undo / redo stack
             _undoRedoGraphs.Add(GeneralGraphValues.GetMementos());
             UpdateUndoRedoMenu(_undoRedoGraphs);
+        }
+
+        private void HideTables()
+        {
+            IsSpecificationTableVisible.Value = false;
+            IsBillTableVisible.Value = false;
+            IsGeneralGraphValuesVisible.Value = false;
         }
     }
 }

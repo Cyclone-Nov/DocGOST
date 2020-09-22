@@ -327,6 +327,9 @@
     <Content Include="Settings\Documents.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="ExcelExport\Templates\elements_list.xlsx" />
+    <None Include="ExcelExport\Templates\purchased_items_list.xlsx" />
+    <None Include="ExcelExport\Templates\specification.xlsx" />
     <None Include="Font\GOST_BU.TTF">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

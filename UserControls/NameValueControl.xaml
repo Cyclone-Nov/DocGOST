@@ -10,7 +10,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <DataGrid Margin="5" SelectionMode="Single"  SelectionUnit="FullRow" 
-                  AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="True"
+                  AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False"
                   ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType={x:Type local:NameValueControl}}}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="CellEditEnding">

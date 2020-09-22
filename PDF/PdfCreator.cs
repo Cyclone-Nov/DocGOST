@@ -277,6 +277,7 @@ namespace GostDOC.PDF
             public PageSize PageSize;
             public IDictionary<string, string> Graphs;
             public int Pages;
+            public int CurrentPage;
             public bool AppendGraphs;
 
         }
@@ -533,7 +534,7 @@ namespace GostDOC.PDF
             tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true)
                 .Add(CreateTableGraph478Paragraph("1")));                
             tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true)
-                .Add(CreateTableGraph478Paragraph(GetGraph(Constants.GRAPH_8))));
+                .Add(CreateTableGraph478Paragraph(""/*titleBlockStruct.Pages.ToString()*/)));
 
             tableGraph4789.AddCell(
                 new Cell(1, 5).SetHeight(15 * mmH() - 2).SetPaddings(0, 0, 0, 0)
@@ -582,7 +583,6 @@ namespace GostDOC.PDF
         protected Table CreateNextTitleBlock(TitleBlockStruct titleBlockStruct) {
             var aGraphs = titleBlockStruct.Graphs;
             var aPageSize = titleBlockStruct.PageSize;   
-            var pageNumber = titleBlockStruct.Pages;
 
             float[] columnSizes = {
                 7 * mmW(), 
@@ -599,7 +599,7 @@ namespace GostDOC.PDF
                 return new Cell().SetHeight(DEFAULT_TITLE_BLOCK_CELL_HEIGHT).SetPadding(0).SetBorderRight(CreateThickBorder());
             }
             Paragraph CreateParagraph(string text) {
-                return new Paragraph(text).SetItalic().SetPaddingTop(-2).SetFontSize(12).SetFont(f1);
+                return new Paragraph(text).SetItalic().SetPaddingTop(-2).SetFontSize(12).SetFont(f1).SetVerticalAlignment(VerticalAlignment.MIDDLE);
             }
 
             for (int i = 0; i < 5; ++i) {
@@ -629,7 +629,7 @@ namespace GostDOC.PDF
                     SetBorderTop(Border.NO_BORDER).
                     SetBorderBottom(CreateThickBorder()).
                     SetPadding(0).
-                    Add(CreateParagraph("Лист").SetPaddingTop(5)));
+                    Add(CreateParagraph("Лист").SetPaddingTop(2).SetPaddingLeft(2)));
             rightestCellTable.AddCell(
                 new Cell().
                     SetHeight(8*mmH()).
@@ -637,7 +637,7 @@ namespace GostDOC.PDF
                     SetBorderRight(Border.NO_BORDER).
                     SetBorderBottom(Border.NO_BORDER).
                     SetPadding(0).
-                    Add(CreateParagraph(pageNumber.ToString()).SetPaddingTop(5).SetPaddingLeft(7))); 
+                    Add(CreateParagraph(titleBlockStruct.CurrentPage.ToString()).SetPaddingTop(2).SetPaddingLeft(7))); 
 
             rightestCell.Add(rightestCellTable);
             tbl.AddCell(rightestCell);
