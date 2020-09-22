@@ -46,8 +46,8 @@
                         </Setter.Value>
                     </Setter>
                 </Style>
-            </DataGrid.ColumnHeaderStyle>             
-            |
+            </DataGrid.ColumnHeaderStyle>
+
             <DataGrid.ContextMenu>
                 <ContextMenu ItemsSource="{Binding TableContextMenu}">
                     <ContextMenu.ItemTemplate>
