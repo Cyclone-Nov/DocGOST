@@ -62,11 +62,11 @@ namespace GostDOC.PDF
             SetPageMargins(aInDoc);
 
             var mainTable = CreateMainTable(aGraphs, aData, true);
-            mainTable.SetFixedPosition(19.3f * PdfDefines.mmAXw, 79 * PdfDefines.mmAXw+5f, TITLE_BLOCK_WIDTH+2f);
+            mainTable.SetFixedPosition(19.3f * mmW(), 79 * mmH()+5.02f, TITLE_BLOCK_WIDTH-0.02f);
             aInDoc.Add(mainTable);
             
             // добавить таблицу с основной надписью для первой старницы
-            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 0}));
+            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 2}));
 
             // добавить таблицу с верхней дополнительной графой
             aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
@@ -85,11 +85,11 @@ namespace GostDOC.PDF
             SetPageMargins(aInDoc);
 
             var mainTable = CreateMainTable(aGraphs, aData, false);
-            mainTable.SetFixedPosition(19.3f * PdfDefines.mmAXw, 37 * PdfDefines.mmAXw+5f, TITLE_BLOCK_WIDTH+2f);
+            mainTable.SetFixedPosition(19.3f * mmW(), 37 * mmW()+5f, TITLE_BLOCK_WIDTH+2f);
             aInDoc.Add(mainTable);
             
             // добавить таблицу с основной надписью 
-            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs}));
+            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = 2}));
 
             // добавить таблицу с нижней дополнительной графой
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
@@ -101,21 +101,21 @@ namespace GostDOC.PDF
 
         Table CreateMainTable(IDictionary<string, string> aGraphs, DataTable aData, bool firstPage) {
             float[] columnSizes = { 
-                6  * PdfDefines.mmAXw, 
-                6  * PdfDefines.mmAXw, 
-                8  * PdfDefines.mmAXw, 
-                70 * PdfDefines.mmAXw, 
-                63 * PdfDefines.mmAXw, 
-                10 * PdfDefines.mmAXw, 
-                22 * PdfDefines.mmAXw};
+                6  * mmW(), 
+                6  * mmW(), 
+                8  * mmW(), 
+                70 * mmW(), 
+                63 * mmW(), 
+                10 * mmW(), 
+                22 * mmW()};
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
             tbl.SetMargin(0).SetPadding(0);
 
             Cell CreateCell() => new Cell().SetPadding(0).SetVerticalAlignment(VerticalAlignment.MIDDLE);
             Paragraph CreateParagraph(string text) => new Paragraph(text).SetFont(f1).SetItalic().SetTextAlignment(TextAlignment.CENTER);
 
-            Table AddHeaderCell90(string text) => tbl.AddCell(CreateCell().SetBorder(CreateThickBorder()).SetHeight(15*PdfDefines.mmAXh).Add(CreateParagraph(text).SetRotationAngle(DegreesToRadians(90))));
-            Table AddHeaderCell(string text) => tbl.AddCell(CreateCell().SetBorder(CreateThickBorder()).SetHeight(15*PdfDefines.mmAXh).Add(CreateParagraph(text).SetFixedLeading(11)));
+            Table AddHeaderCell90(string text) => tbl.AddCell(CreateCell().SetBorder(CreateThickBorder()).SetHeight(15*mmH()).Add(CreateParagraph(text).SetRotationAngle(DegreesToRadians(90))));
+            Table AddHeaderCell(string text) => tbl.AddCell(CreateCell().SetBorder(CreateThickBorder()).SetHeight(15*mmH()).Add(CreateParagraph(text).SetFixedLeading(11)));
 
             AddHeaderCell90("Формат");
             AddHeaderCell90("Зона");
@@ -127,11 +127,11 @@ namespace GostDOC.PDF
 
             var rowsNumber = firstPage ? RowNumberOnFirstPage : RowNumberOnNextPage;
             for (int i = 0; i < (rowsNumber-1) * 7; ++i) {
-                tbl.AddCell(new Cell().SetHeight(8*PdfDefines.mmAXh).SetPadding(0).SetBorderLeft(CreateThickBorder())).SetBorderRight(CreateThickBorder());
+                tbl.AddCell(new Cell().SetHeight(8*mmH()).SetPadding(0).SetBorderLeft(CreateThickBorder())).SetBorderRight(CreateThickBorder());
             }
             for (int i = 0; i < 7; ++i) {
                 tbl.AddCell(new Cell().
-                        SetHeight(8 * PdfDefines.mmAXh).
+                        SetHeight(8 * mmH()).
                         SetPadding(0).
                         SetBorderLeft(CreateThickBorder()).
                         SetBorderRight(CreateThickBorder()).
@@ -142,29 +142,27 @@ namespace GostDOC.PDF
             return tbl;
         }
 
-        private void SetPageMargins(iText.Layout.Document aDoc)
-        {
-            aDoc.SetLeftMargin(8 * PdfDefines.mmAXw);
-            aDoc.SetRightMargin(5 * PdfDefines.mmAXw);
-            aDoc.SetTopMargin(5 * PdfDefines.mmAXw);
-            aDoc.SetBottomMargin(5 * PdfDefines.mmAXw);
+        private void SetPageMargins(iText.Layout.Document aDoc) {
+            aDoc.SetLeftMargin(8 * mmW());
+            aDoc.SetRightMargin(5 * mmW());
+            aDoc.SetTopMargin(5 * mmW());
+            aDoc.SetBottomMargin(5 * mmW());
         }
 
         private void DrawMissingLinesFirstPage() {
-
             // нарисовать недостающую линию
-            var fromLeft = 19.3f * PdfDefines.mmAXw + TITLE_BLOCK_WIDTH;
+            var fromLeft = 19 * mmW() -1.17f /*+1.65f*/ + TITLE_BLOCK_WIDTH;
             Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
-                new Rectangle(fromLeft, BOTTOM_MARGIN + (15 + 5 + 5 + 15 + 8 + 14) * PdfDefines.mmAXw + 10f, 2, 30));
-            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(20)
+                new Rectangle(fromLeft, BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM * mmH() -2f, 2, 120));
+            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(120)
                 .SetRotationAngle(DegreesToRadians(90)));
 
         }
         private void DrawMissingLinesNextPage(int pageNumber) {
             // нарисовать недостающую линию
-            var fromLeft = 19.3f * PdfDefines.mmAXw + TITLE_BLOCK_WIDTH;
+            var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH;
             Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetPage(pageNumber)),
-                new Rectangle(fromLeft, BOTTOM_MARGIN + (8+7) * PdfDefines.mmAXw-6f, 2, 60));
+                new Rectangle(fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 60));
             canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(50)
                 .SetRotationAngle(DegreesToRadians(90)));
 
