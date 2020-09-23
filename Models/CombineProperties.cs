@@ -16,7 +16,7 @@ namespace GostDOC.Models
             {
                 return false;
             }
-            return other.Name.Equals(Name) && other.Included.Equals(Included);
+            return string.Equals(other.Name, Name) && string.Equals(other.Included, Included);
         }
         public override bool Equals(object other)
         {
@@ -24,8 +24,7 @@ namespace GostDOC.Models
         }
         public override int GetHashCode()
         {
-            return Name.GetHashCode() ^ Included.GetHashCode();
+            return (Name?.GetHashCode() ?? 0) ^ (Included?.GetHashCode() ?? 0);
         }
-
     }
 }
