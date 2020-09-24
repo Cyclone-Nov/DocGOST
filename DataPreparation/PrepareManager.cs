@@ -50,8 +50,8 @@ namespace GostDOC.Models
         {       
             ElementListDataPreparer = new ElementListDataPreparer();
             BillDataPreparer = new BillDataPreparer();
-            SpecificationDataPreparer = new ElementListDataPreparer();
-            EquipmentBillDataPreparer = new ElementListDataPreparer();
+            SpecificationDataPreparer = new SpecificationDataPreparer();
+            EquipmentBillDataPreparer = new EquipmentBillDataPreparer();
         }
         
 
