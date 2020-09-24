@@ -61,6 +61,8 @@ namespace GostDOC.Models
 
         public bool Import(string aFilePath)
         {
+            Materials.Clear();
+
             MaterialsXml materials = null;
             if (XmlSerializeHelper.LoadXmlStructFile(ref materials, aFilePath))
             {

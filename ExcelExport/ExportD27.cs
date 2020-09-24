@@ -43,17 +43,12 @@ namespace GostDOC.ExcelExport
                 ws.Cells[1, 1] = "Наименование";
                 ws.MergeRange(1, 1, maxLevelHeight, 1, 2);
 
-                ws.Cells[maxLevelHeight + 1, 1] = "Сборочные единицы";
-                ws.Cells[maxLevelHeight + 1, 1].Interior.ColorIndex = _nextColor;
-                ws.Cells[maxLevelHeight + 1, 1].Font.Bold = true;
-                ws.Cells[maxLevelHeight + 1, 1].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
-
                 ws.Cells[maxLevelHeight, 2] = "Ед. измерения";
                 ws.Cells[maxLevelHeight, 2].Orientation = 90;
                 ws.MergeRange(1, 2, maxLevelHeight, 2, _nextColor);                
 
                 // Process main group
-                ProcessGroup(ws, 1, 3, maxLevelHeight + 2, cfg.Value.D27);
+                ProcessGroup(ws, 1, 3, maxLevelHeight + 1, cfg.Value.D27);
 
                 ws.Columns.AutoFit();
                 ws.Rows.AutoFit();

@@ -145,6 +145,14 @@ namespace GostDOC.Models
                 || aGroupInfo.GroupName == Constants.GroupMaterials;
         }
 
+        private bool IsD27Component(SubGroupInfo aGroupInfo)
+        {
+            return aGroupInfo.GroupName == Constants.GroupOthers
+                || aGroupInfo.GroupName == Constants.GroupDetails
+                || aGroupInfo.GroupName == Constants.GroupStandard
+                || aGroupInfo.GroupName == Constants.GroupMaterials;
+        }
+
         private bool IsComplexComponent(SubGroupInfo aGroupInfo)
         {
             return aGroupInfo.GroupName == Constants.GroupAssemblyUnits
@@ -249,6 +257,10 @@ namespace GostDOC.Models
                     {
                         // Add to Bill
                         AddComponent(aNewCfg.Bill, component, groups[1]);
+                    }
+
+                    if (IsD27Component(groups[0]))
+                    {
                         // Add to D27
                         groupD27.Components.Add(component);
                     }

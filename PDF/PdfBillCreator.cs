@@ -157,8 +157,8 @@ namespace GostDOC.PDF
             }
 
             var ass  = columnSizes.Sum();
-            var bottom = firstPage ? BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_FULL_HEIGHT_MM * mmH() -3f : 0;
-            tbl.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, bottom, columnSizes.Sum()-0.5f) ;
+            var bottom = firstPage ? BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_FULL_HEIGHT_MM * mmH() : 0;
+            tbl.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, bottom, columnSizes.Sum() + 8*mmW() +0.5f);
 
             outLastProcessedRow = 0;
             return tbl;
@@ -189,6 +189,18 @@ namespace GostDOC.PDF
             y = BOTTOM_MARGIN+2f;
             canvas = new Canvas(new PdfCanvas(aPage), new Rectangle(x, y, 2, rightVertLineHeight));
             canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(rightVertLineHeight).SetRotationAngle(DegreesToRadians(90)));
+        }
+
+        protected new void AddPageCountOnFirstPage(iText.Layout.Document aDoc, int aPageCount) {
+            float bottom = 65f;
+            float left = PdfDefines.A3Height - TITLE_BLOCK_WIDTH_MM * mmW() + (7 + 10 + 23 + 15 + 10 + 14 + 53+5+5+5+15) * mmW()+ 20;
+            //left = 300;
+            aDoc.ShowTextAligned(new Paragraph(aPageCount.ToString()).
+                                SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFontSize(12).SetFont(f1),
+                                left, bottom,
+                                1, 
+                                TextAlignment.CENTER, VerticalAlignment.MIDDLE, 
+                                0);
         }
     }
 }

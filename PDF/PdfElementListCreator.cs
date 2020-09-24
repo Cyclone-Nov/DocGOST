@@ -86,9 +86,8 @@ internal class PdfElementListCreator : PdfCreator {
     internal override int AddFirstPage(iText.Layout.Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData) {
         SetPageMargins(aInDoc);
 
-        int lastProcessedRow = 0;
         // добавить таблицу с данными
-        aInDoc.Add(CreateDataTable(aData, true, 0, out lastProcessedRow));
+        aInDoc.Add(CreateDataTable(new DataTableStruct {Data = aData, FirstPage = true, StartRow = 0}, out var lastProcessedRow));
 
         // добавить таблицу с основной надписью для первой старницы
         aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 0, AppendGraphs = true}));
@@ -142,8 +141,7 @@ internal class PdfElementListCreator : PdfCreator {
         SetPageMargins(aInPdfDoc);
 
         // добавить таблицу с данными
-        int lastNextProcessedRow;
-        var dataTable = CreateDataTable(aData, false, aStartRow, out lastNextProcessedRow);
+        var dataTable = CreateDataTable(new DataTableStruct{Data = aData, FirstPage =false, StartRow = aStartRow}, out var lastProcessedRow);
         dataTable.SetFixedPosition(19.3f * mmW(), BOTTOM_MARGIN + 16 * mmW()+2.5f, TITLE_BLOCK_WIDTH + 2f);
         aInPdfDoc.Add(dataTable);
 
@@ -153,7 +151,7 @@ internal class PdfElementListCreator : PdfCreator {
         // добавить таблицу с нижней дополнительной графой
         aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
-        return lastNextProcessedRow;
+        return lastProcessedRow;
     }
 
     private new void SetPageMargins(iText.Layout.Document aDoc) {
@@ -163,16 +161,19 @@ internal class PdfElementListCreator : PdfCreator {
         aDoc.SetBottomMargin(5 * mmW());
     }
 
-  
+
     /// <summary>
     /// создание таблицы данных
     /// </summary>
-    /// <param name="aData">таблица данных</param>
-    /// <param name="firstPage">признак первой или последующих страниц</param>
-    /// <param name="aStartRow">строка таблицы данных с которой надо начинать запись в PDF страницу</param>
+    /// <param name="aDataTableStruct">данные для создания таблицы</param>
     /// <param name="outLastProcessedRow">последняя обработанная строка таблицы данных</param>
     /// <returns></returns>
-    private Table CreateDataTable(DataTable aData, bool firstPage, int aStartRow, out int outLastProcessedRow) {
+    private Table CreateDataTable(DataTableStruct aDataTableStruct, out int outLastProcessedRow) {
+        var aData = aDataTableStruct.Data;
+        var aGraphs = aDataTableStruct.Graphs;
+        var aFirstPage = aDataTableStruct.FirstPage;
+        var aStartRow = aDataTableStruct.StartRow;
+        
         float[] columnSizes = {20 * mmW(), 110 * mmW(), 10 * mmW(), 45 * mmW()};
         Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
         tbl.SetMargin(0).SetPadding(0);
@@ -193,14 +194,11 @@ internal class PdfElementListCreator : PdfCreator {
         Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2)
             .SetHeight(8 * PdfDefines.mmAXh).SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFont(f1)
             .SetFontSize(14);
-        //UnitValue uFontSize = mainCell.GetProperty<UnitValue>(24); // 24 - index for FontSize property
-        //float fontSize = uFontSize.GetValue();
         float fontSize = 14;
         PdfFont font = leftPaddCell.GetProperty<PdfFont>(20); // 20 - index for Font property
 
-        int remainingPdfTabeRows = (firstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
+        int remainingPdfTabeRows = (aFirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
         outLastProcessedRow = aStartRow;
-
 
         var Rows = aData.Rows.Cast<DataRow>().ToArray();
         DataRow row;
@@ -225,21 +223,21 @@ internal class PdfElementListCreator : PdfCreator {
             }
             else if (string.IsNullOrEmpty(position)) {
                 // это наименование группы
-                if (remainingPdfTabeRows > 4
-                ) // если есть место для записи более 4 строк то записываем группу, иначе выходим
-                {
+                if (remainingPdfTabeRows > 4) {
+                    // если есть место для записи более 4 строк то записываем группу, иначе выходим
                     tbl.AddCell(centrAlignCell.Clone(false));
                     tbl.AddCell(centrAlignCell.Clone(true).Add(new Paragraph(name)));
                     tbl.AddCell(centrAlignCell.Clone(false));
                     tbl.AddCell(leftPaddCell.Clone(false));
                     remainingPdfTabeRows--;
                 }
-                else
+                else {
                     break;
+                }
             }
             else {
                 // разобьем наименование на несколько строк исходя из длины текста
-                string[] namestrings = SplitNameByWidth(110 * mmW(), fontSize, font, name).ToArray();
+                string[] namestrings = SplitStringByWidth(110 * mmW(), fontSize, font, name).ToArray();
                 if (namestrings.Length <= remainingPdfTabeRows) {
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
                     tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(namestrings[0])));
@@ -256,112 +254,27 @@ internal class PdfElementListCreator : PdfCreator {
                             remainingPdfTabeRows--;
                         }
                     }
-                }
-                else
+                } else {
                     break;
+                }
             }
 
             outLastProcessedRow++;
         }
 
         // дополним таблицу пустыми строками если она не полностью заполнена
-        if (remainingPdfTabeRows > 0)
+        if (remainingPdfTabeRows > 0) {
             AddEmptyRowToPdfTable(tbl, remainingPdfTabeRows, 4, centrAlignCell, true);
-
+        }
         // если записали всю табица с данными, то обнуляем количество оставшихся строк
-        if (outLastProcessedRow == aData.Rows.Count)
+        if (outLastProcessedRow == aData.Rows.Count) {
             outLastProcessedRow = 0;
+        }
 
         tbl.SetFixedPosition(19.3f * mmW(), 78 * mmW()+0.48f, TITLE_BLOCK_WIDTH);
 
         return tbl;
     }
 
-    /// <summary>
-    /// добавить пустые строки в таблицу PDF
-    /// </summary>
-    /// <param name="aTable">таблица PDF</param>
-    /// <param name="aRows">количество пустых строк которые надо добавить</param>
-    /// <param name="aColumns">количество столбцов в таблице</param>
-    /// <param name="aTemplateCell">шаблон ячейки</param>
-    /// <param name="aLastRowIsFinal">признак, что последняя строка - это последняя строка таблицы</param>
-    private void AddEmptyRowToPdfTable(Table aTable, int aRows, int aColumns, Cell aTemplateCell,
-        bool aLastRowIsFinal = false) {
-        int bodyRowsCnt = aRows - 1;
-        for (int i = 0; i < bodyRowsCnt * aColumns; i++) {
-            aTable.AddCell(aTemplateCell.Clone(false));
-        }
-
-        int borderWidth = (aLastRowIsFinal) ? 2 : 1;
-        for (int i = 0; i < aColumns; i++)
-            aTable.AddCell(aTemplateCell.Clone(false).SetBorderBottom(new SolidBorder(borderWidth)));
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="aRowspan"></param>
-    /// <param name="aColspan"></param>
-    /// <param name="aLeftBorder"></param>
-    /// <param name="aRightBorder"></param>
-    /// <param name="aTopBorder"></param>
-    /// <param name="aBottomBorder"></param>
-    /// <returns></returns>
-    private Cell CreateEmptyCell(int aRowspan, int aColspan, int aLeftBorder = 2, int aRightBorder = 2,
-        int aTopBorder = 2, int aBottomBorder = 2) {
-        Cell cell = new Cell(aRowspan, aColspan);
-        cell.SetVerticalAlignment(VerticalAlignment.MIDDLE).SetHorizontalAlignment(HorizontalAlignment.CENTER);
-
-        cell.SetBorderBottom(aBottomBorder == 0 ? Border.NO_BORDER : new SolidBorder(aBottomBorder));
-        cell.SetBorderTop(aTopBorder == 0 ? Border.NO_BORDER : new SolidBorder(aTopBorder));
-        cell.SetBorderLeft(aLeftBorder == 0 ? Border.NO_BORDER : new SolidBorder(aLeftBorder));
-        cell.SetBorderRight(aRightBorder == 0 ? Border.NO_BORDER : new SolidBorder(aRightBorder));
-
-        return cell;
-    }
-
-    /// <summary>
-    /// Разбить строку на несколько строк исходя из длины текста
-    /// </summary>
-    /// <param name="aLength">максимальная длина в мм</param>
-    /// <param name="aFontSize">размер шрифта</param>
-    /// <param name="aFont">шрифт</param>
-    /// <param name="aString">строка для разбивки</param>
-    /// <returns></returns>
-    private List<string> SplitNameByWidth(float aLength, float aFontSize, PdfFont aFont, string aString) 
-    {
-        List<string> name_strings = new List<string>();
-        int default_padding = 4;
-        float maxLength = aLength - default_padding;
-        float currLength = aFont.GetWidth(aString, aFontSize);
-
-        GetLimitSubstring(name_strings, maxLength, currLength, aString);
-
-        return name_strings;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="name_strings"></param>
-    /// <param name="maxLength"></param>
-    /// <param name="currLength"></param>
-    /// <param name="aFullName"></param>
-    private void GetLimitSubstring(List<string> name_strings, float maxLength, float currLength, string aFullName) 
-    {
-        if (currLength < maxLength) {
-            name_strings.Add(aFullName);
-        }
-        else {
-            string fullName = aFullName;
-            int symbOnMaxLength = (int) ((fullName.Length / currLength) * maxLength);
-            string partName = fullName.Substring(0, symbOnMaxLength);
-            int index = partName.LastIndexOfAny(new char[] {' ', '-', '.'});
-            name_strings.Add(fullName.Substring(0, index));
-            fullName = fullName.Substring(index + 1);
-            currLength = fullName.Length;
-            GetLimitSubstring(name_strings, maxLength, currLength, fullName);
-        }
-    }
 }
 }
