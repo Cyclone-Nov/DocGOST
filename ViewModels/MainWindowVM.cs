@@ -583,7 +583,7 @@ namespace GostDOC.ViewModels
                     {
                         ComponentVM cmp = new ComponentVM();
                         cmp.Name.Value = material.Name;
-                        cmp.Note.Value = material.Note;
+                        cmp.NoteSP.Value = material.Note;
                         Components.Add(cmp);
                     }
                 }
