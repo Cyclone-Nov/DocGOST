@@ -267,10 +267,34 @@ namespace GostDOC.Common
         public static readonly string ComponentWhereIncluded = "Куда входит";
         public static readonly string ComponentDesignatiorID = "Позиционное обозначение";
 
+        /// <summary>
+        /// Формат
+        /// </summary>
+        public static readonly string ColumnFormat = "Format";
+        /// <summary>
+        /// Позиция
+        /// </summary>
         public static readonly string ColumnPosition = "Position";
+        /// <summary>
+        /// Наименование
+        /// </summary>
         public static readonly string ColumnName = "Name";
+        /// <summary>
+        /// Кол.
+        /// </summary>
         public static readonly string ColumnQuantity = "Quantity";
+        /// <summary>
+        /// Примечание
+        /// </summary>
         public static readonly string ColumnFootnote = "Footnote";
+        /// <summary>
+        /// Обозначение
+        /// </summary>
+        public static readonly string ColumnDesignation = "Designation";
+        /// <summary>
+        /// Зона
+        /// </summary>
+        public static readonly string ColumnZone = "Zone";
 
         public static readonly string GraphCommentsSp = "Комментарии СП";
         public static readonly string GraphCommentsB = "Комментарии ВП";

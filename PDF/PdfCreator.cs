@@ -47,17 +47,18 @@ namespace GostDOC.PDF
         /// </summary>
         protected const int MAX_PAGES_WITHOUT_CHANGELIST = 3;
 
-        protected readonly float BOTTOM_MARGIN = 5 * mmW();
-        protected readonly float LEFT_MARGIN = 8 * mmW();
-        protected readonly float TOP_MARGIN = 5 * mmW();
-        protected readonly float RIGHT_MARGIN = 5 * mmW();
+        protected static readonly float BOTTOM_MARGIN = 5 * mmH();
+        protected static readonly float LEFT_MARGIN = 8 * mmW();
+        protected static readonly float TOP_MARGIN = 5 * mmH();
+        protected static readonly float RIGHT_MARGIN = 5 * mmW();
 
         protected const float THICK_LINE_WIDTH = 2f; 
         
-        protected readonly float TITLE_BLOCK_WIDTH = 185 * mmW();
-        protected readonly float DEFAULT_TITLE_BLOCK_CELL_HEIGHT = 5 * mmH();
-        protected readonly float TITLE_BLOCK_FIRST_PAGE_FULL_HEIGHT_MM = (15 + 5 + 5 + 15 + 8 + 14);
-        protected readonly float TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM = (15 + 5 + 5 + 15);
+        protected static readonly float TITLE_BLOCK_WIDTH_MM = 185;
+        protected static readonly float TITLE_BLOCK_WIDTH = TITLE_BLOCK_WIDTH_MM * mmW();
+        protected static readonly float DEFAULT_TITLE_BLOCK_CELL_HEIGHT = 5 * mmH();
+        protected static readonly float TITLE_BLOCK_FIRST_PAGE_FULL_HEIGHT_MM = (15 + 5 + 5 + 15 + 8 + 14);
+        protected static readonly float TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM = (15 + 5 + 5 + 15);
 
 
         protected readonly float TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE = (5 + 287 - 60 * 2) * mmW();
@@ -280,6 +281,13 @@ namespace GostDOC.PDF
             public int CurrentPage;
             public bool AppendGraphs;
 
+        }
+
+        protected struct DataTableStruct {
+            public DataTable Data;
+            public bool FirstPage;
+            public IDictionary<string, string> Graphs;
+            public int StartRow;
         }
 
         /// <summary>
@@ -550,11 +558,11 @@ namespace GostDOC.PDF
 
             #endregion
 
-            // switch A3/A4
-            if (Math.Abs(aPageSize.GetWidth() - PageSize.A3.GetWidth()) < 0.1) { 
-                // A3
 
-                mainTable.SetFixedPosition(415 * mmW()-TITLE_BLOCK_WIDTH, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+
+            if (aPageSize.Contains(PageSize.A3)) {
+                // A3
+                mainTable.SetFixedPosition(415 * mmW()-TITLE_BLOCK_WIDTH+2f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
                 
                 Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
                     new Rectangle((295)* mmW(), BOTTOM_MARGIN, PdfDefines.A4Width, 2));
@@ -665,7 +673,7 @@ namespace GostDOC.PDF
 
 
             // switch A3/A4
-            if (Math.Abs(aPageSize.GetWidth() - PageSize.A3.GetWidth()) < 0.1) {
+            if (aPageSize.Contains(PageSize.A3)) {
                 tbl.SetFixedPosition(PdfDefines.A3Height - TITLE_BLOCK_WIDTH - RIGHT_MARGIN, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
             } else {
                 tbl.SetFixedPosition(20 * mmW(), BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
@@ -752,18 +760,11 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">PDF документ</param>
         /// <param name="aPageCount">общее количество страние</param>
-        internal void AddPageCountOnFirstPage(iText.Layout.Document aDoc, int aPageCount)
+        protected void AddPageCountOnFirstPage(iText.Layout.Document aDoc, int aPageCount)
         {   
             float left = 0f;
             float bottom = 65f;
-            if (_pageSize.Contains(PageSize.A3))
-            {
-                left = (7 + 10 + 23 + 15 + 10 + 110) * mmW() + 20 + 50;
-            }
-            else
-            {
-                left = (7 + 10 + 23 + 15 + 10 + 110) * mmW() + 55;                
-            }
+            left = (7 + 10 + 23 + 15 + 10 + 110) * mmW() + 55;                
 
             aDoc.ShowTextAligned(new Paragraph(aPageCount.ToString()).
                                 SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFontSize(12).SetFont(f1),
@@ -774,5 +775,97 @@ namespace GostDOC.PDF
         
         }
 
+
+        /// <summary>
+        /// добавить пустые строки в таблицу PDF
+        /// </summary>
+        /// <param name="aTable">таблица PDF</param>
+        /// <param name="aRows">количество пустых строк которые надо добавить</param>
+        /// <param name="aColumns">количество столбцов в таблице</param>
+        /// <param name="aTemplateCell">шаблон ячейки</param>
+        /// <param name="aLastRowIsFinal">признак, что последняя строка - это последняя строка таблицы</param>
+        protected void AddEmptyRowToPdfTable(Table aTable, int aRows, int aColumns, Cell aTemplateCell,
+            bool aLastRowIsFinal = false) {
+            int bodyRowsCnt = aRows - 1;
+            for (int i = 0; i < bodyRowsCnt * aColumns; i++) {
+                aTable.AddCell(aTemplateCell.Clone(false));
+            }
+
+            int borderWidth = (aLastRowIsFinal) ? 2 : 1;
+            for (int i = 0; i < aColumns; i++)
+                aTable.AddCell(aTemplateCell.Clone(false).SetBorderBottom(new SolidBorder(borderWidth)));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="aRowspan"></param>
+        /// <param name="aColspan"></param>
+        /// <param name="aLeftBorder"></param>
+        /// <param name="aRightBorder"></param>
+        /// <param name="aTopBorder"></param>
+        /// <param name="aBottomBorder"></param>
+        /// <returns></returns>
+        protected Cell CreateEmptyCell(
+                int aRowspan, int aColspan,
+                int aLeftBorder = (int) THICK_LINE_WIDTH,
+                int aRightBorder = (int) THICK_LINE_WIDTH,
+                int aTopBorder = (int) THICK_LINE_WIDTH,
+                int aBottomBorder = (int) THICK_LINE_WIDTH) {
+
+            Cell cell = new Cell(aRowspan, aColspan);
+            cell.SetVerticalAlignment(VerticalAlignment.MIDDLE).SetHorizontalAlignment(HorizontalAlignment.CENTER);
+
+            cell.SetBorderBottom(aBottomBorder == 0 ? Border.NO_BORDER : new SolidBorder(aBottomBorder));
+            cell.SetBorderTop(aTopBorder == 0 ? Border.NO_BORDER : new SolidBorder(aTopBorder));
+            cell.SetBorderLeft(aLeftBorder == 0 ? Border.NO_BORDER : new SolidBorder(aLeftBorder));
+            cell.SetBorderRight(aRightBorder == 0 ? Border.NO_BORDER : new SolidBorder(aRightBorder));
+
+            return cell;
+        }
+
+
+        /// <summary>
+        /// Разбить строку на несколько строк исходя из длины текста
+        /// </summary>
+        /// <param name="aLength">максимальная длина в мм</param>
+        /// <param name="aFontSize">размер шрифта</param>
+        /// <param name="aFont">шрифт</param>
+        /// <param name="aString">строка для разбивки</param>
+        /// <returns></returns>
+        protected List<string> SplitStringByWidth(float aLength, float aFontSize, PdfFont aFont, string aString) {
+            List<string> name_strings = new List<string>();
+            int default_padding = 4;
+            float maxLength = aLength - default_padding;
+            float currLength = aFont.GetWidth(aString, aFontSize);
+
+            GetLimitSubstring(name_strings, maxLength, currLength, aString);
+
+            return name_strings;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name_strings"></param>
+        /// <param name="maxLength"></param>
+        /// <param name="currLength"></param>
+        /// <param name="aFullName"></param>
+        protected void GetLimitSubstring(List<string> name_strings, float maxLength, float currLength,
+            string aFullName) {
+            if (currLength < maxLength) {
+                name_strings.Add(aFullName);
+            }
+            else {
+                string fullName = aFullName;
+                int symbOnMaxLength = (int) ((fullName.Length / currLength) * maxLength);
+                string partName = fullName.Substring(0, symbOnMaxLength);
+                int index = partName.LastIndexOfAny(new char[] {' ', '-', '.'});
+                name_strings.Add(fullName.Substring(0, index));
+                fullName = fullName.Substring(index + 1);
+                currLength = fullName.Length;
+                GetLimitSubstring(name_strings, maxLength, currLength, fullName);
+            }
+        }
     }
 }
