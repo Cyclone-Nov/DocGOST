@@ -30,7 +30,7 @@ namespace GostDOC.Models
         public string Name { get; set; }
         public bool AutoSort { get; set; } = true;
         public List<Component> Components { get; set; } = new List<Component>();
-        public IDictionary<string, Group> SubGroups { get; set; } 
+        public IDictionary<string, Group> SubGroups { get; set; }
     }
 
     public class Configuration

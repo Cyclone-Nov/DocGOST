@@ -27,5 +27,13 @@ namespace GostDOC.ExcelExport
             range.Group();
             return range;
         }
+
+        public static void SetBoldAlignedText(this Excel._Worksheet ws, int r1, int c1, string txt)
+        {
+            ws.Cells[r1, c1] = txt;
+            ws.Cells[r1, c1].Font.Bold = true;
+            ws.Cells[r1, c1].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            ws.Cells[r1, c1].VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
+        }
     }
 }
