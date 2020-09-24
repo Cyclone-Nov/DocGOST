@@ -164,6 +164,7 @@
     <Compile Include="DataPreparation\EquipmentBillDataPreparer.cs" />
     <Compile Include="DataPreparation\SpecificationDataPreparer.cs" />
     <Compile Include="Events\TEventArgs.cs" />
+    <Compile Include="ExcelExport\ExcelStructuresD27.cs" />
     <Compile Include="ExcelExport\ExcelExportFactory.cs" />
     <Compile Include="ExcelExport\ExcelExtensions.cs" />
     <Compile Include="ExcelExport\ExportD27.cs" />
