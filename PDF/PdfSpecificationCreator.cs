@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Common;
+using GostDOC.DataPreparation;
 using GostDOC.Models;
 using iText.Kernel.Font;
 using iText.Kernel.Geom;
@@ -173,45 +174,35 @@ namespace GostDOC.PDF
             DataRow row;
             for (int ind = aStartRow; ind < Rows.Length; ind++) {
                 row = Rows[ind];
-                string position = (row[Constants.ColumnPosition] == System.DBNull.Value)
-                    ? string.Empty
-                    : (string) row[Constants.ColumnPosition];
-                string name = (row[Constants.ColumnName] == System.DBNull.Value)
-                    ? string.Empty
-                    : (string) row[Constants.ColumnName];
+
+                string GetCellString(string columnName) =>
+                    (row[columnName] == System.DBNull.Value)
+                        ? string.Empty
+                        : ((BasePreparer.FormattedString) row[columnName]).Value;
+
+                string format = GetCellString(Constants.ColumnFormat);
+                string zone = GetCellString(Constants.ColumnZone);
+                string position = GetCellString(Constants.ColumnPosition);
+                string designation = GetCellString(Constants.ColumnDesignation);
+                string name = GetCellString(Constants.ColumnName);
+                string note = GetCellString(Constants.ColumnFootnote);
+
                 int quantity = (row[Constants.ColumnQuantity] == System.DBNull.Value)
                     ? 0
                     : (int) row[Constants.ColumnQuantity];
-                string note = (row[Constants.ColumnFootnote] == System.DBNull.Value)
-                    ? string.Empty
-                    : (string) row[Constants.ColumnFootnote];
 
                 if (string.IsNullOrEmpty(name)) {
                     AddEmptyRowToPdfTable(tbl, 1, 7, leftPaddCell);
                     remainingPdfTabeRows--;
                 }
-//                else if (string.IsNullOrEmpty(position)) {
-//                    // это наименование группы
-//                    if (remainingPdfTabeRows > 4
-//                    ) // если есть место для записи более 4 строк то записываем группу, иначе выходим
-//                    {
-//                        tbl.AddCell(centrAlignCell.Clone(false));
-//                        tbl.AddCell(centrAlignCell.Clone(true).Add(new Paragraph(name)));
-//                        tbl.AddCell(centrAlignCell.Clone(false));
-//                        tbl.AddCell(leftPaddCell.Clone(false));
-//                        remainingPdfTabeRows--;
-//                    }
-//                    else
-//                        break;
-//                }
                 else {
                     // разобьем наименование на несколько строк исходя из длины текста
                     string[] namestrings = SplitStringByWidth(110 * mmW(), fontSize, font, name).ToArray();
                     if (namestrings.Length <= remainingPdfTabeRows) { 
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph("A4"))); // формат
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(""))); // зона
+                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(format))); // формат
+                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(zone))); // зона
                         tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(""))); // обозначение
+                        tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(designation))); // обозначение
                         tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(namestrings[0]))); // наименование
                         tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity.ToString())));
                         tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));

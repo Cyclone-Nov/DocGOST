@@ -32,30 +32,117 @@ namespace GostDOC.DataPreparation
 
             // работаем по основной конфигурации
             // нужны только компоненты из раздела "Прочие изделия"
-            Group others;
-            if (data.TryGetValue(Constants.GroupOthers, out others))
+            Group documents;
+            if (data.TryGetValue(Constants.GroupDoc, out documents))
             {
-                DataTable table = CreateTable("ElementListData");
-                if (others.Components.Count() > 0 || others.SubGroups.Count() > 0)
-                {
-                    // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
-                    var mainсomponents = others.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
-
-                    AddEmptyRow(table);
-                    //FillDataTable(table, "", mainсomponents, otherConfigsElements, schemaDesignation);
-
-                    foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key))
-                    {
-                        // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
-                        var сomponents = subgroup.Value.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
-                        //FillDataTable(table, subgroup.Value.Name, сomponents, otherConfigsElements, schemaDesignation);
-                    }
-                }
+                DataTable table = CreateTable("SpecificationData");
+                FillDataTable(table, "Документы", documents.Components, otherConfigsElements, schemaDesignation);
+//                if (documents.Components.Any() || documents.SubGroups.Any())
+//                {
+//                    foreach (var d in documents.Components)
+//                    {
+//                        var row = table.NewRow();
+//                        row[Constants.ColumnFormat] = new FormattedString{Value = d.GetProperty(Constants.ComponentFormat)};
+//                        row[Constants.ColumnZone] = new FormattedString{Value =d.GetProperty(Constants.ComponentZone)};
+//                        row[Constants.ColumnPosition] = new FormattedString{Value="0"};
+//                        row[Constants.ColumnDesignation] = new FormattedString{Value =d.GetProperty(Constants.ComponentSign)};
+//                        row[Constants.ColumnName] = new FormattedString{Value =d.GetProperty(Constants.ComponentName)};//(haveToChangeName) ? change_name : component_name;
+//                        row[Constants.ColumnQuantity] = 0;//component_count;
+//                        row[Constants.ColumnFootnote] = new FormattedString{Value =d.GetProperty(Constants.ComponentNote)};
+//                        table.Rows.Add(row);
+//                    }
+//                }
 
                 return table;
             }
             return null;
         }
+
+
+        /// <summary>
+        /// добавить имя группы в таблицу
+        /// </summary>
+        /// <param name="aTable"></param>
+        /// <param name="aGroupName"></param>
+        private void AddGroupName(DataTable aTable, string aGroupName) 
+        {
+            if (string.IsNullOrEmpty(aGroupName)) return;
+            DataRow row = aTable.NewRow();
+            row[Constants.ColumnName] = new FormattedString {Value = aGroupName, IsUnderlined = true};
+            aTable.Rows.Add(row);
+        }
+
+        void FillDataTable(DataTable aTable, string aGroupName, IEnumerable<Models.Component> aComponents, IEnumerable<Dictionary<string, Component>> aOtherComponents, string aSchemaDesignation) {
+            if (!aComponents.Any()) return;
+
+            // Cортировка компонентов по значению свойства "Позиционное обозначение"
+            Models.Component[] sortComponents = SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();
+            // для признаков составления наименования для данного компонента
+            int[] HasStandardDoc;
+
+            string change_name = $"см. табл. {aSchemaDesignation}";
+
+            // ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем номера компонентов с совпадающим значением                
+            Dictionary<string /* GOST/TY string*/, List<int> /* array indexes */> StandardDic = FindComponentsWithStandardDoc(sortComponents, out HasStandardDoc);
+
+            // записываем наименование группы, если есть
+            AddGroupName(aTable, aGroupName);
+
+            // записываем строки с гост/ту в начале таблицы, если они есть для нескольких компонентов
+            // if (!AddStandardDocsToTable(aGroupName, sortComponents, aTable, StandardDic)) {
+            //     AddEmptyRow(aTable);
+            // }
+
+            //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
+            DataRow row;
+            for (int i = 0; i < sortComponents.Length;)
+            {
+                var component = sortComponents[i];
+                string component_name = GetComponentName(HasStandardDoc[i] == 2, component);
+                int component_count = 1; // always only one! GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
+                bool haveToChangeName = string.Equals(component.GetProperty(Constants.ComponentPresence),"0") || HaveToChangeComponentName(component, aOtherComponents);                
+                List<string> component_designators = new List<string>{ component.GetProperty(Constants.ComponentDesignatiorID) };
+
+                bool same;
+                int j = i + 1;
+                if (j < sortComponents.Length && !haveToChangeName) 
+                {
+                    do 
+                    {
+                        var componentNext = sortComponents[j];
+                        string componentNext_name = GetComponentName(HasStandardDoc[j] == 2, componentNext);
+
+                        if (string.Equals(component_name, componentNext_name))
+                        {
+                            same = true;
+                            component_count++;
+                            j++;
+                            component_designators.Add(componentNext.GetProperty(Constants.ComponentDesignatiorID));
+                        }
+                        else
+                            same = false;
+                    } while (same && j < sortComponents.Length);
+                }
+
+                i = j;
+
+
+                row = aTable.NewRow();
+                row[Constants.ColumnFormat] = new FormattedString{Value = component.GetProperty(Constants.ComponentFormat)};
+                row[Constants.ColumnZone] = new FormattedString{Value = component.GetProperty(Constants.ComponentZone)};
+                row[Constants.ColumnPosition] = new FormattedString{Value="X"};
+                row[Constants.ColumnDesignation] = new FormattedString{Value = component.GetProperty(Constants.ComponentSign)};
+                row[Constants.ColumnName] = new FormattedString{Value= (haveToChangeName) ? change_name : component_name};
+                row[Constants.ColumnQuantity] = component_count;
+                row[Constants.ColumnFootnote]= new FormattedString{Value =  component.GetProperty(Constants.ComponentNote)};
+                aTable.Rows.Add(row);
+            }
+
+            AddEmptyRow(aTable);
+            aTable.AcceptChanges();
+
+        }
+
 
         /// <summary>
         /// создание таблицы данных для документа Спецификация
@@ -72,27 +159,27 @@ namespace GostDOC.DataPreparation
             table.Columns.Add(column);
             table.PrimaryKey = new DataColumn[] { column };
 
-            void AddStringColumn(string aColumnName, string aCaption) => AddStringColumnToTable(table, aColumnName, aCaption);
+            void AddColumn(string aColumnName, string aCaption, Type aType) => this.AddColumn(table,aColumnName,aCaption,aType);
 
-            AddStringColumn(Constants.ColumnFormat, "Формат");
-            AddStringColumn(Constants.ColumnZone, "Зона");
-            AddStringColumn(Constants.ColumnPosition, "Поз.");
-            AddStringColumn(Constants.ColumnDesignation, "Обозначение");
-            AddStringColumn(Constants.ColumnName, "Наименование");
-            AddStringColumn(Constants.ColumnQuantity, "Кол.");
-            AddStringColumn(Constants.ColumnFootnote, "Примечание");
+            AddColumn(Constants.ColumnFormat, "Формат", typeof(FormattedString));
+            AddColumn(Constants.ColumnZone, "Зона", typeof(FormattedString) );
+            AddColumn(Constants.ColumnPosition, "Поз.", typeof(FormattedString));
+            AddColumn(Constants.ColumnDesignation, "Обозначение", typeof(FormattedString));
+            AddColumn(Constants.ColumnName, "Наименование", typeof(FormattedString));
+            AddColumn(Constants.ColumnQuantity, "Кол.", typeof(Int32));
+            AddColumn(Constants.ColumnFootnote, "Примечание", typeof(FormattedString));
 
             return table;
         }
 
-        /// <summary>
-        /// добавить пустую строку в таблицу данных
-        /// </summary>
-        /// <param name="aTable"></param>
-        private void AddEmptyRow(DataTable aTable) 
+        private new void AddEmptyRow(DataTable aTable) 
         {
             DataRow row = aTable.NewRow();
-            
+            // TODO
+//            row[Constants.ColumnName] = string.Empty;
+//            row[Constants.ColumnPosition] = string.Empty;
+//            row[Constants.ColumnQuantity] = 0;
+//            row[Constants.ColumnFootnote] = string.Empty;
             aTable.Rows.Add(row);
         }
 
