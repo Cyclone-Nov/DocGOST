@@ -153,11 +153,6 @@ namespace GostDOC.Models
 
         public Material GetMaterial(string aGroup, string aName)
         {
-            if (string.IsNullOrEmpty(aName))
-            {
-                return null;
-            }
-
             IDictionary<string, Material> materials;
             if (Materials.TryGetValue(aGroup, out materials))
             {
