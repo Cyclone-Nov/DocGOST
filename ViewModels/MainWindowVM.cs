@@ -16,7 +16,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace GostDOC.ViewModels
@@ -100,13 +99,15 @@ namespace GostDOC.ViewModels
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
         public ICommand UpdatePdfCmd => new Command(UpdatePdf);
         public ICommand ClickMenuCmd => new Command<MenuNode>(ClickMenu);
-        public ICommand EditNameValueCmd => new Command<System.Windows.Controls.DataGrid>(EditNameValue);
-        public ICommand EditComponentsCmd => new Command<System.Windows.Controls.DataGrid>(EditComponents);
+        public ICommand EditNameValueCmd => new Command<DataGrid>(EditNameValue);
+        public ICommand EditComponentsCmd => new Command<DataGrid>(EditComponents);
         public ICommand ExportPDFCmd => new Command(ExportPDF, IsSaveEnabled);
         public ICommand ExportExcelCmd => new Command(ExportExcel, IsSaveEnabled);
         public ICommand ImportMaterialsCmd => new Command(ImportMaterials);
         public ICommand SaveMaterialsCmd => new Command(SaveMaterials);
         public ICommand UpdateMaterialsCmd => new Command(UpdateMaterials);
+        public ICommand CopyCellCmd => new Command<DataGridCellInfo>(CopyCell);
+        public ICommand PasteCellCmd => new Command<DataGridCellInfo>(PasteCell);
 
         public string WindowTitle
         {
@@ -178,6 +179,25 @@ namespace GostDOC.ViewModels
         }
 
         #region Commands impl
+
+        private void CopyCell(DataGridCellInfo cellInfo)
+        {
+            var txt = (cellInfo.Column?.GetCellContent(cellInfo.Item) as TextBlock)?.Text;
+            if (txt != null)
+            {
+                Clipboard.SetText(txt);
+            }
+        }
+
+        private void PasteCell(DataGridCellInfo cellInfo)
+        {
+            var txtBlock = (cellInfo.Column?.GetCellContent(cellInfo.Item) as TextBlock);
+            if (txtBlock != null)
+            {
+                txtBlock.Text = Clipboard.GetText();
+            }
+        }
+
         private void Undo(MenuNode obj)
         {
             if (_selectedItem != null)
