@@ -45,15 +45,25 @@ namespace GostDOC.DataPreparation
                     var docсomponents = docs.Components.Where(val => !string.Equals(val.GetProperty(Constants.ComponentName.ToLower()), Constants.DOC_SCHEMA.ToLower()));
                     if(docсomponents.Count() > 0)
                     {
-                       if(docсomponents.Count() > 1)
-                       {
-                            // TODO: чего делать если несколько схем на документ?
-                            throw new Exception("В файле спецификации указано несколько схем для перечня элементов...не смог выбрать (((");
-                       }
-                       else
-                       {
+                        // если заканчивается на c3 или э3, то берем ее.                        
+                        var shemas = docсomponents.Where(val => (
+                                string.Equals(val.GetProperty(Constants.ComponentDocCode), "С3", StringComparison.InvariantCultureIgnoreCase) ||
+                                string.Equals(val.GetProperty(Constants.ComponentDocCode), "Э3", StringComparison.InvariantCultureIgnoreCase))
+                            );
+
+                        // в любом случа берем первую
+                        if(shemas.Count() > 0)
+                        {
+                            designation = shemas.First().GetProperty(Constants.ComponentSign);
+                        }
+                        else
+                        {
                             designation = docсomponents.First().GetProperty(Constants.ComponentSign);
-                       }
+                        }                       
+                    }
+                    else
+                    {
+                        // log: в исходном xml файле документов не найдено (раздел Документация пуст)
                     }
                 }
                 else

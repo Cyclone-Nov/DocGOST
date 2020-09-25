@@ -357,6 +357,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /E /Y "$(ProjectDir)Settings" "$(TargetDir)Settings"</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Release (powershell Compress-Archive -Path '$(TargetDir)*' -DestinationPath '$(SolutionDir)\gostdoc.zip' -Force)
+xcopy /E /Y "$(ProjectDir)Settings" "$(TargetDir)Settings"
+
+</PostBuildEvent>
   </PropertyGroup>
 </Project>
