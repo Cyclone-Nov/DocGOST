@@ -12,10 +12,25 @@ namespace GostDOC.ExcelExport
 {
     class ExportD27 : IExcelExport
     {
+        private const int FirstColor = 15;
 
         private DocManager _docManager = DocManager.Instance;
+
         private int _nextColor;
-        private const int FirstColor = 15;
+        private List<ComponentGroupD27> _components = new List<ComponentGroupD27>();
+
+        private int _complexColumn = 0;
+        private int _complexRow = 0;
+
+        private ComplexD27 _main;
+
+        public ExportD27()
+        {
+            _components.Add(new ComponentGroupD27(Constants.GroupDetails));
+            _components.Add(new ComponentGroupD27(Constants.GroupStandard));
+            _components.Add(new ComponentGroupD27(Constants.GroupOthers));
+            _components.Add(new ComponentGroupD27(Constants.GroupMaterials));
+        }
 
         public void Export(Excel.Application aApp, string aFilePath)
         {
@@ -25,8 +40,6 @@ namespace GostDOC.ExcelExport
             bool first = true;
             foreach (var cfg in _docManager.Project.Configurations)
             {
-                _nextColor = FirstColor;
-
                 if (first)
                 {
                     first = false;
@@ -37,19 +50,13 @@ namespace GostDOC.ExcelExport
                 }
                 // Set sheet name
                 ws.Name = cfg.Key;
-                // Get max level
-                int maxLevelHeight = GetMaxLevelHeight(cfg.Value.D27, 1);
                 // Set common fields
                 ws.Cells[1, 1] = "Наименование";
-                ws.MergeRange(1, 1, maxLevelHeight, 1, 2);
-
-                ws.Cells[maxLevelHeight, 2] = "Ед. измерения";
-                ws.Cells[maxLevelHeight, 2].Orientation = 90;
-                ws.MergeRange(1, 2, maxLevelHeight, 2, _nextColor);                
-
-                // Process main group
-                ProcessGroup(ws, 1, 3, maxLevelHeight + 1, cfg.Value.D27);
-
+                // Reset sheet counters
+                Reset();
+                // Process D27
+                Process(ws, cfg.Value.D27);
+                // Auto fit sheet
                 ws.Columns.AutoFit();
                 ws.Rows.AutoFit();
             }
@@ -57,61 +64,140 @@ namespace GostDOC.ExcelExport
             firstSheet.Select();
         }
 
-        private int ProcessGroup(Excel._Worksheet aWs, int aHeaderRow, int aHeaderColumn, int aDataRow, Group aGroup)
+        private void Reset()
+        {
+            _nextColor = FirstColor;
+            _complexColumn = 2;
+            _complexRow = 1;
+
+            foreach (var gp in _components)
+            {
+                gp.Components.Clear();
+            }
+        }
+
+        private void Process(Excel._Worksheet aWs, Group aGroup)
+        {
+            ComplexD27 complex = new ComplexD27();
+            // Prepare print structure
+            ProcessGroup(complex, aGroup);
+            // Print headers
+            Print(aWs, complex);
+
+            // Sum
+            int lastCol = complex.Size.Width + 2;
+            aWs.Cells[1, lastCol] = "Итого";
+            var range = aWs.MergeRange(1, lastCol, complex.Size.Height, lastCol, 2);
+            range.Orientation = 90;
+
+            // Print components
+            int row = complex.Size.Height;
+            foreach (var gp in _components)
+            {
+                if (gp.Components.Count == 0)
+                {
+                    continue;
+                }
+
+                aWs.SetBoldAlignedText(++row, 1, gp.Name);
+                foreach (var component in gp.Components.OrderBy(x => x.Name))
+                {
+                    aWs.Cells[++row, 1] = component.Name;
+                    aWs.Cells[row, component.Column] = component.Count;
+                    aWs.Cells[row, lastCol] = $"=SUM(R{row}C{2}:R{row}C{lastCol - 1})";
+                }
+            }
+            // Merge general name cells
+            aWs.MergeRange(1, 1, complex.Size.Height, 1, 2);
+        }
+
+        private void Print(Excel._Worksheet aWs, ComplexD27 aSrc)
         {
             _nextColor++;
-
-            int dataRow = aDataRow;
-            foreach (var cmp in aGroup.Components)
-            {
-                aWs.Cells[dataRow, 1] = cmp.GetProperty(Constants.ComponentName);
-                aWs.Cells[dataRow, aHeaderColumn] = cmp.Count;
-                dataRow++;
-            }
-
-            int maxLevelHeight = GetMaxLevelHeight(aGroup, 1);
-            if (aGroup.SubGroups != null)
+            if (aSrc.SubComplex != null)
             {
                 // Set name
-                aWs.Cells[aHeaderRow, aHeaderColumn] = aGroup.Name;
+                aWs.Cells[aSrc.Row, aSrc.Column] = aSrc.Name;
                 // horizontal
-                aWs.MergeRange(aHeaderRow, aHeaderColumn, aHeaderRow, aHeaderColumn + aGroup.SubGroups.Count, _nextColor);
-                aWs.GroupRange(aHeaderRow, aHeaderColumn + 1, aHeaderRow, aHeaderColumn + aGroup.SubGroups.Count);
+                aWs.MergeRange(aSrc.Row, aSrc.Column, aSrc.Row, aSrc.Column + aSrc.Size.Width - 1, _nextColor);
+                aWs.GroupRange(aSrc.Row, aSrc.Column + 1, aSrc.Row, aSrc.Column + aSrc.Size.Width - 1);
                 // vertical
-                aWs.MergeRange(aHeaderRow + 1, aHeaderColumn, aHeaderRow + maxLevelHeight - 1, aHeaderColumn, _nextColor);
+                aWs.MergeRange(aSrc.Row + 1, aSrc.Column, aSrc.Row + aSrc.Size.Height - 1, aSrc.Column, _nextColor);
 
-                int row = aHeaderRow + 1;
-                int col = aHeaderColumn + 1;
-                foreach (var kvp in aGroup.SubGroups)
+                foreach (var complex in aSrc.SubComplex)
                 {
-                    // Recursevly process subgroups
-                    dataRow = ProcessGroup(aWs, row, col, dataRow, kvp.Value);
-                    col++;
+                    Print(aWs, complex);
                 }
             }
             else
             {
                 // Set name
-                aWs.Cells[aHeaderRow + maxLevelHeight - 1, aHeaderColumn] = aGroup.Name;
+                aWs.Cells[aSrc.Row, aSrc.Column] = aSrc.Name;
                 // vertical only
-                var range = aWs.MergeRange(aHeaderRow, aHeaderColumn, aHeaderRow + maxLevelHeight - 1, aHeaderColumn, _nextColor);
+                var range = aWs.MergeRange(aSrc.Row, aSrc.Column, aSrc.Row + aSrc.Size.Height - 1, aSrc.Column, _nextColor);
                 range.Orientation = 90;
-            }
-            return dataRow;
+            }            
         }
 
-        private int GetMaxLevelHeight(Group aGroup, int aLevel)
+        private HeaderSize ProcessGroup(ComplexD27 aDst, Group aSrc)
         {
-            int max = aLevel;
-            if (aGroup.SubGroups != null)
+            aDst.Name = aSrc.Name;
+            aDst.Column = _complexColumn;
+            aDst.Row = _complexRow;
+
+            foreach (var cmp in aSrc.Components)
             {
-                max++;
-                foreach (var gp in aGroup.SubGroups)
+                ComponentD27 component = new ComponentD27()
                 {
-                    max = Math.Max(GetMaxLevelHeight(gp.Value, max), max);
+                    Name = cmp.GetProperty(Constants.ComponentName),
+                    Count = cmp.Count,
+                    Column = _complexColumn
+                };
+
+                AddComponent(cmp.GetProperty(Constants.GroupNameSp), component);
+            }
+
+            _complexColumn++;
+       
+            if (aSrc.SubGroups != null) 
+            {
+                // Increment level
+                _complexRow++;
+                // Create sub complex list
+                aDst.SubComplex = new List<ComplexD27>();
+
+                int height = 1;
+                foreach (var gp in aSrc.SubGroups)
+                {
+                    ComplexD27 newComplex = new ComplexD27();
+                    var size = ProcessGroup(newComplex, gp.Value);
+                    height = Math.Max(height, size.Height);
+                    aDst.Size.Width += size.Width;
+                    aDst.SubComplex.Add(newComplex);
+                }
+                // Decrement level
+                _complexRow--;
+
+                aDst.Size.Height += height;
+            }
+
+            return aDst.Size;
+        }
+
+        private void AddComponent(string aGroupName, ComponentD27 aComponent)
+        {
+            if (!string.IsNullOrEmpty(aGroupName))
+            {
+                foreach (var gp in _components)
+                {
+                    if (gp.Name == aGroupName)
+                    {
+                        // add component
+                        gp.Components.Add(aComponent);
+                        break;
+                    }
                 }
             }
-            return max;
         }
     }
 }
