@@ -256,6 +256,7 @@ namespace GostDOC.Common
         public static readonly string ComponentProductCode = "Код продукции";
         public static readonly string ComponentFormat = "Формат";
         public static readonly string ComponentDoc = "Документ на поставку";
+        public static readonly string ComponentDocCode = "Код документа";
         public static readonly string ComponentType = "Тип";
         public static readonly string ComponentSupplier = "Поставщик";
         public static readonly string ComponentCountDev = "Количество на изд.";
