@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Common;
 using GostDOC.Models;
+using iText.Layout.Properties;
 
 namespace GostDOC.DataPreparation {
 /// <summary>
@@ -220,6 +221,7 @@ public abstract class BasePreparer {
         public string Value;
         public bool IsUnderlined;
         public bool IsBold;
+        public TextAlignment TextAlignment;
     }
 }
 }

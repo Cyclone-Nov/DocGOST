@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using GostDOC.Common;
 using GostDOC.Models;
+using iText.Layout.Properties;
 
 namespace GostDOC.DataPreparation
 {
@@ -30,32 +31,45 @@ namespace GostDOC.DataPreparation
             // из остальных конфигураций получаем список словарей с соответсвующими компонентами
             var otherConfigsElements = MakeComponentDesignatorsDictionaryOtherConfigs(aConfigs);
 
-            // работаем по основной конфигурации
-            // нужны только компоненты из раздела "Прочие изделия"
-            Group documents;
-            if (data.TryGetValue(Constants.GroupDoc, out documents))
-            {
-                DataTable table = CreateTable("SpecificationData");
-                FillDataTable(table, "Документы", documents.Components, otherConfigsElements, schemaDesignation);
-//                if (documents.Components.Any() || documents.SubGroups.Any())
-//                {
-//                    foreach (var d in documents.Components)
-//                    {
-//                        var row = table.NewRow();
-//                        row[Constants.ColumnFormat] = new FormattedString{Value = d.GetProperty(Constants.ComponentFormat)};
-//                        row[Constants.ColumnZone] = new FormattedString{Value =d.GetProperty(Constants.ComponentZone)};
-//                        row[Constants.ColumnPosition] = new FormattedString{Value="0"};
-//                        row[Constants.ColumnDesignation] = new FormattedString{Value =d.GetProperty(Constants.ComponentSign)};
-//                        row[Constants.ColumnName] = new FormattedString{Value =d.GetProperty(Constants.ComponentName)};//(haveToChangeName) ? change_name : component_name;
-//                        row[Constants.ColumnQuantity] = 0;//component_count;
-//                        row[Constants.ColumnFootnote] = new FormattedString{Value =d.GetProperty(Constants.ComponentNote)};
-//                        table.Rows.Add(row);
-//                    }
-//                }
+            DataTable table = CreateTable("SpecificationData");
 
-                return table;
+            if (data.TryGetValue(Constants.GroupDoc, out var documents))
+            {
+                FillDataTable(table, "", documents.Components, otherConfigsElements, schemaDesignation);
             }
-            return null;
+            if (data.TryGetValue(Constants.GroupComplex, out var complex))
+            {
+                FillDataTable(table, "Комплексы", complex.Components, otherConfigsElements, schemaDesignation);
+            }
+            if (data.TryGetValue(Constants.GroupAssemblyUnits, out var assemblyUnits))
+            {
+                FillDataTable(table, "Сборочные единицы", assemblyUnits.Components, otherConfigsElements, schemaDesignation);
+            }
+            if (data.TryGetValue(Constants.GroupDetails, out var details))
+            {
+                FillDataTable(table, "Детали", details.Components, otherConfigsElements, schemaDesignation);
+            }
+            if (data.TryGetValue(Constants.GroupStandard, out var standard))
+            {
+                FillDataTable(table, "Стандартные изделия", standard.Components, otherConfigsElements, schemaDesignation);
+            }
+            if (data.TryGetValue(Constants.GroupOthers, out var others))
+            {
+                FillDataTable(table, "Прочие изделия", others.Components, otherConfigsElements, schemaDesignation);
+            }
+            if (data.TryGetValue(Constants.GroupMaterials, out var materials))
+            {
+                FillDataTable(table, "Материалы", materials.Components, otherConfigsElements, schemaDesignation);
+            }
+            if (data.TryGetValue(Constants.GroupKits, out var kits))
+            {
+                FillDataTable(table, "Комплекты", kits.Components, otherConfigsElements, schemaDesignation);
+            }
+
+
+            return table;
+
+            //return null;
         }
 
 
@@ -68,7 +82,7 @@ namespace GostDOC.DataPreparation
         {
             if (string.IsNullOrEmpty(aGroupName)) return;
             DataRow row = aTable.NewRow();
-            row[Constants.ColumnName] = new FormattedString {Value = aGroupName, IsUnderlined = true};
+            row[Constants.ColumnName] = new FormattedString {Value = aGroupName, IsUnderlined = true, TextAlignment = TextAlignment.CENTER};
             aTable.Rows.Add(row);
         }
 
@@ -130,7 +144,7 @@ namespace GostDOC.DataPreparation
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString{Value = component.GetProperty(Constants.ComponentFormat)};
                 row[Constants.ColumnZone] = new FormattedString{Value = component.GetProperty(Constants.ComponentZone)};
-                row[Constants.ColumnPosition] = new FormattedString{Value="X"};
+                row[Constants.ColumnPosition] = new FormattedString{Value=String.Empty};
                 row[Constants.ColumnDesignation] = new FormattedString{Value = component.GetProperty(Constants.ComponentSign)};
                 row[Constants.ColumnName] = new FormattedString{Value= (haveToChangeName) ? change_name : component_name};
                 row[Constants.ColumnQuantity] = component_count;

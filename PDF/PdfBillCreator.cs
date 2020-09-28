@@ -41,42 +41,42 @@ namespace GostDOC.PDF
             var dataTable = aData;
             var graphs = aMainGraphs;
 
-            if (pdfWriter != null)
+            if (_pdfWriter != null)
             {
-                doc.Close();
-                doc = null;
-                pdfDoc.Close();
-                pdfDoc = null;
-                pdfWriter.Close();
-                pdfWriter.Dispose();
-                pdfWriter = null;
+                _doc.Close();
+                _doc = null;
+                _pdfDoc.Close();
+                _pdfDoc = null;
+                _pdfWriter.Close();
+                _pdfWriter.Dispose();
+                _pdfWriter = null;
                 MainStream.Dispose();
                 MainStream = null;                
             }
 
             f1 = PdfFontFactory.CreateFont(@"Font\\GOST_TYPE_A.ttf", "cp1251", true);
             MainStream = new MemoryStream();
-            pdfWriter = new PdfWriter(MainStream);
-            pdfDoc = new PdfDocument(pdfWriter);
-            pdfDoc.SetDefaultPageSize(_pageSize);
-            doc = new Document(pdfDoc, pdfDoc.GetDefaultPageSize().Rotate(), true);
+            _pdfWriter = new PdfWriter(MainStream);
+            _pdfDoc = new PdfDocument(_pdfWriter);
+            _pdfDoc.SetDefaultPageSize(_pageSize);
+            _doc = new Document(_pdfDoc, _pdfDoc.GetDefaultPageSize().Rotate(), true);
             
-           int lastProcessedRow = AddFirstPage(doc, graphs, dataTable);
+           int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable);
         
             _currentPageNumber = 1;
             while (lastProcessedRow > 0) {
                 _currentPageNumber++;
-                lastProcessedRow = AddNextPage(doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
+                lastProcessedRow = AddNextPage(_doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
             }
         
-            if (pdfDoc.GetNumberOfPages() > MAX_PAGES_WITHOUT_CHANGELIST) {
+            if (_pdfDoc.GetNumberOfPages() > MAX_PAGES_WITHOUT_CHANGELIST) {
                 _currentPageNumber++;
-                AddRegisterList(doc, graphs, _currentPageNumber);
+                AddRegisterList(_doc, graphs, _currentPageNumber);
             }
 
-            AddPageCountOnFirstPage(doc, _currentPageNumber);
+            AddPageCountOnFirstPage(_doc, _currentPageNumber);
 
-            doc.Close();            
+            _doc.Close();            
         }
 
         internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData) {
@@ -84,7 +84,7 @@ namespace GostDOC.PDF
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
             aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 0}));
             aInDoc.Add(CreateTable(null, true, 0, out var lpr));
-            DrawLines(pdfDoc.GetFirstPage());
+            DrawLines(_pdfDoc.GetFirstPage());
             return lpr;
         }
 
@@ -100,7 +100,7 @@ namespace GostDOC.PDF
 
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
             aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber }));
-            DrawLines(pdfDoc.GetPage(2));
+            DrawLines(_pdfDoc.GetPage(2));
             return lastNextProcessedRow;
         }
 
