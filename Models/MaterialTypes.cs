@@ -56,6 +56,8 @@ namespace GostDOC.Models
                 Materials.Add("Лаки, краски, нефтепродукты и химикаты", new Dictionary<string, Material>());
                 Materials.Add("Металлические, неметаллические порошки", new Dictionary<string, Material>());
                 Materials.Add("Прочие материалы", new Dictionary<string, Material>());
+
+                Save();
             }
         }
 
