@@ -42,41 +42,41 @@ internal class PdfElementListCreator : PdfCreator {
         var dataTable = aData;
         var graphs = aMainGraphs;
 
-        if (pdfWriter != null) {
-            doc.Close();
-            doc = null;
-            pdfDoc.Close();
-            pdfDoc = null;
-            pdfWriter.Close();
-            pdfWriter.Dispose();
-            pdfWriter = null;
+        if (_pdfWriter != null) {
+            _doc.Close();
+            _doc = null;
+            _pdfDoc.Close();
+            _pdfDoc = null;
+            _pdfWriter.Close();
+            _pdfWriter.Dispose();
+            _pdfWriter = null;
             MainStream.Dispose();
             MainStream = null;
         }
 
         f1 = PdfFontFactory.CreateFont(@"Font\\GOST_TYPE_A.ttf", "cp1251", true);
         MainStream = new MemoryStream();
-        pdfWriter = new PdfWriter(MainStream);
-        pdfDoc = new PdfDocument(pdfWriter);
-        pdfDoc.SetDefaultPageSize(_pageSize);
-        doc = new iText.Layout.Document(pdfDoc, pdfDoc.GetDefaultPageSize(), false);
+        _pdfWriter = new PdfWriter(MainStream);
+        _pdfDoc = new PdfDocument(_pdfWriter);
+        _pdfDoc.SetDefaultPageSize(_pageSize);
+        _doc = new iText.Layout.Document(_pdfDoc, _pdfDoc.GetDefaultPageSize(), false);
 
-        int lastProcessedRow = AddFirstPage(doc, graphs, dataTable);
+        int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable);
         
         _currentPageNumber = 1;
         while (lastProcessedRow > 0) {
             _currentPageNumber++;
-            lastProcessedRow = AddNextPage(doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
+            lastProcessedRow = AddNextPage(_doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
         }
         
-        if (pdfDoc.GetNumberOfPages() > MAX_PAGES_WITHOUT_CHANGELIST) {
+        if (_pdfDoc.GetNumberOfPages() > MAX_PAGES_WITHOUT_CHANGELIST) {
             _currentPageNumber++;
-            AddRegisterList(doc, graphs, _currentPageNumber);
+            AddRegisterList(_doc, graphs, _currentPageNumber);
         }
 
-        AddPageCountOnFirstPage(doc, _currentPageNumber);
+        AddPageCountOnFirstPage(_doc, _currentPageNumber);
 
-        doc.Close();
+        _doc.Close();
      }
 
     /// <summary>
@@ -123,7 +123,7 @@ internal class PdfElementListCreator : PdfCreator {
         // нарисовать недостающую линию
         var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH-2f;
         Canvas canvas = new Canvas(
-            new PdfCanvas(pdfDoc.GetFirstPage()), 
+            new PdfCanvas(_pdfDoc.GetFirstPage()), 
             new Rectangle(fromLeft, BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM * mmH() + 2f, 2, 100));
         canvas.Add(new LineSeparator(
             new SolidLine(THICK_LINE_WIDTH)).SetWidth(100).SetRotationAngle(DegreesToRadians(90)));
