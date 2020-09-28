@@ -63,8 +63,6 @@ namespace GostDOC.Models
 
         public bool Import(string aFilePath)
         {
-            Materials.Clear();
-
             MaterialsXml materials = null;
             if (XmlSerializeHelper.LoadXmlStructFile(ref materials, aFilePath))
             {
@@ -79,7 +77,10 @@ namespace GostDOC.Models
 
                     foreach (var material in group.Materials)
                     {
-                        dic.Add(material.Name, material);
+                        if (!dic.ContainsKey(material.Name))
+                        {
+                            dic.Add(material.Name, material);
+                        }
                     }
                 }
                 return true;

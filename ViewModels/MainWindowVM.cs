@@ -669,15 +669,24 @@ namespace GostDOC.ViewModels
             string path = CommonDialogs.OpenFile("xml Files *.xml | *.xml", "Выбрать файл...");
             if (!string.IsNullOrEmpty(path))
             {
-                IsSaveEnabled.Value = true;
-                DocNodes.Clear();
-                DocNodes.Add(aNode);
                 _docType = aDocType;
-                OpenFile(path);
+
+                if (OpenFile(path))
+                {
+                    DocNodes.Clear();
+                    DocNodes.Add(aNode);
+                    IsSaveEnabled.Value = true;
+                }
+                else
+                {
+                    _docType = DocType.None;
+                    IsSaveEnabled.Value = false;
+                }
+
                 HideTables();
             }            
         }
-        private void OpenFile(string aFilePath)
+        private bool OpenFile(string aFilePath)
         {
             // Save current file name only if one file was selected
             _filePath = aFilePath;
@@ -692,11 +701,14 @@ namespace GostDOC.ViewModels
 
                 // Update visual data
                 UpdateData();
+
+                return true;
             }
             else
             {
                 System.Windows.MessageBox.Show("Некорректный Формат файла!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            return false;
         }
 
         private bool Save()
