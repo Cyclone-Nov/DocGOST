@@ -217,7 +217,7 @@ public abstract class BasePreparer {
         }
 
 
-    public struct FormattedString {
+    public class FormattedString {
         public string Value;
         public bool IsUnderlined;
         public bool IsBold;

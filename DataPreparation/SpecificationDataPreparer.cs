@@ -144,7 +144,7 @@ namespace GostDOC.DataPreparation
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString{Value = component.GetProperty(Constants.ComponentFormat)};
                 row[Constants.ColumnZone] = new FormattedString{Value = component.GetProperty(Constants.ComponentZone)};
-                row[Constants.ColumnPosition] = new FormattedString{Value=String.Empty};
+                row[Constants.ColumnPosition] = null;
                 row[Constants.ColumnDesignation] = new FormattedString{Value = component.GetProperty(Constants.ComponentSign)};
                 row[Constants.ColumnName] = new FormattedString{Value= (haveToChangeName) ? change_name : component_name};
                 row[Constants.ColumnQuantity] = component_count;
