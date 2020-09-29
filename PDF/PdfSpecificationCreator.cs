@@ -231,7 +231,7 @@ namespace GostDOC.PDF
                         } else if (name.TextAlignment == TextAlignment.LEFT) {
                             nameCell = (leftPaddCell.Clone(false).Add(new Paragraph(namestrings[0]))); // наименование
                         }
-                        if (name.IsUnderlined) nameCell.SetUnderline(1.0f, 0);
+                        if (name.IsUnderlined) nameCell.SetUnderline(0.5f, -1);
                         tbl.AddCell(nameCell);
 
                         tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity == 0 ? "" : quantity.ToString())));
@@ -268,7 +268,7 @@ namespace GostDOC.PDF
             return tbl;
         }
 
-        private void SetPageMargins(iText.Layout.Document aDoc) {
+        private new void SetPageMargins(iText.Layout.Document aDoc) {
             aDoc.SetLeftMargin(8 * mmW());
             aDoc.SetRightMargin(5 * mmW());
             aDoc.SetTopMargin(5 * mmW());
