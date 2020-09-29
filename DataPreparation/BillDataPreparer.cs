@@ -42,22 +42,20 @@ namespace GostDOC.DataPreparation
                     var mainсomponents = others.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
 
                     AddEmptyRow(table);
-                    FillDataTable(table, "", mainсomponents, otherConfigsElements, schemaDesignation);
+                    //FillDataTable(table, "", mainсomponents, otherConfigsElements, schemaDesignation);
 
                     foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key))
                     {
                         // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
                         var сomponents = subgroup.Value.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
-                        FillDataTable(table, subgroup.Value.Name, сomponents, otherConfigsElements, schemaDesignation);
+                        //FillDataTable(table, subgroup.Value.Name, сomponents, otherConfigsElements, schemaDesignation);
                     }
                 }
 
                 return table;
             }
         
-            return null;
-
-            return null;
+            return null;           
         }
 
         /// <summary>

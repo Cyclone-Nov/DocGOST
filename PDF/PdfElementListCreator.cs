@@ -60,8 +60,8 @@ internal class PdfElementListCreator : PdfCreator {
         _pdfDoc = new PdfDocument(_pdfWriter);
         _pdfDoc.SetDefaultPageSize(_pageSize);
         _doc = new iText.Layout.Document(_pdfDoc, _pdfDoc.GetDefaultPageSize(), false);
-
-        int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable);
+        int countPages = PdfUtils.GetCountPage(Type, dataTable.Rows.Count);
+        int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable, countPages);
         
         _currentPageNumber = 1;
         while (lastProcessedRow > 0) {
@@ -69,12 +69,12 @@ internal class PdfElementListCreator : PdfCreator {
             lastProcessedRow = AddNextPage(_doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
         }
         
-        if (_pdfDoc.GetNumberOfPages() > MAX_PAGES_WITHOUT_CHANGELIST) {
+        if (_pdfDoc.GetNumberOfPages() > PdfDefines.MAX_PAGES_WITHOUT_CHANGELIST) {
             _currentPageNumber++;
             AddRegisterList(_doc, graphs, _currentPageNumber);
         }
 
-        AddPageCountOnFirstPage(_doc, _currentPageNumber);
+        //AddPageCountOnFirstPage(_doc, _currentPageNumber);
 
         _doc.Close();
      }
@@ -83,14 +83,14 @@ internal class PdfElementListCreator : PdfCreator {
     /// добавить к документу первую страницу
     /// </summary>
     /// <returns>номер последней записанной строки. Если 0 - то достигнут конец таблицы данных</returns>
-    internal override int AddFirstPage(iText.Layout.Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData) {
+    internal override int AddFirstPage(iText.Layout.Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages) {
         SetPageMargins(aInDoc);
 
         // добавить таблицу с данными
         aInDoc.Add(CreateDataTable(new DataTableStruct {Data = aData, FirstPage = true, StartRow = 0}, out var lastProcessedRow));
 
         // добавить таблицу с основной надписью для первой старницы
-        aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 0, AppendGraphs = true}));
+        aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, AppendGraphs = true}));
 
         // добавить таблицу с верхней дополнительной графой
         aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
@@ -170,7 +170,7 @@ internal class PdfElementListCreator : PdfCreator {
     /// <returns></returns>
     private Table CreateDataTable(DataTableStruct aDataTableStruct, out int outLastProcessedRow) {
         var aData = aDataTableStruct.Data;
-        var aGraphs = aDataTableStruct.Graphs;
+        //var aGraphs = aDataTableStruct.Graphs;
         var aFirstPage = aDataTableStruct.FirstPage;
         var aStartRow = aDataTableStruct.StartRow;
         
@@ -194,8 +194,8 @@ internal class PdfElementListCreator : PdfCreator {
         Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2)
             .SetHeight(8 * PdfDefines.mmAXh).SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFont(f1)
             .SetFontSize(14);
-        float fontSize = 14;
-        PdfFont font = leftPaddCell.GetProperty<PdfFont>(20); // 20 - index for Font property
+        //float fontSize = 14;
+        //PdfFont font = leftPaddCell.GetProperty<PdfFont>(20); // 20 - index for Font property
 
         int remainingPdfTabeRows = (aFirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
         outLastProcessedRow = aStartRow;
@@ -217,13 +217,16 @@ internal class PdfElementListCreator : PdfCreator {
                 ? string.Empty
                 : (string) row[Constants.ColumnFootnote];
 
-            if (string.IsNullOrEmpty(name)) {
+            if (string.IsNullOrEmpty(name)) 
+            {
                 AddEmptyRowToPdfTable(tbl, 1, 4, leftPaddCell);
                 remainingPdfTabeRows--;
             }
-            else if (string.IsNullOrEmpty(position)) {
-                // это наименование группы
-                if (remainingPdfTabeRows > 4) {
+            else if (string.IsNullOrEmpty(position)) 
+            {
+                // это наименование группы или перенос предыдущей строки?
+                if (remainingPdfTabeRows > 4) 
+                {
                     // если есть место для записи более 4 строк то записываем группу, иначе выходим
                     tbl.AddCell(centrAlignCell.Clone(false));
                     tbl.AddCell(centrAlignCell.Clone(true).Add(new Paragraph(name)));
@@ -231,34 +234,18 @@ internal class PdfElementListCreator : PdfCreator {
                     tbl.AddCell(leftPaddCell.Clone(false));
                     remainingPdfTabeRows--;
                 }
-                else {
-                    break;
-                }
+                else                 
+                    break;                
             }
-            else {
-                // разобьем наименование на несколько строк исходя из длины текста
-                string[] namestrings = SplitStringByWidth(110 * mmW(), fontSize, font, name).ToArray();
-                if (namestrings.Length <= remainingPdfTabeRows) {
-                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(namestrings[0])));
-                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity.ToString())));
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));
-                    remainingPdfTabeRows--;
-
-                    if (namestrings.Length > 1) {
-                        for (int i = 1; i < namestrings.Length; i++) {
-                            tbl.AddCell(centrAlignCell.Clone(false));
-                            tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(namestrings[i])));
-                            tbl.AddCell(centrAlignCell.Clone(false));
-                            tbl.AddCell(leftPaddCell.Clone(false));
-                            remainingPdfTabeRows--;
-                        }
-                    }
-                } else {
-                    break;
-                }
+            else 
+            {
+                // просто запишем строку
+                tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
+                tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(name)));
+                tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity.ToString())));
+                tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));
+                remainingPdfTabeRows--; 
             }
-
             outLastProcessedRow++;
         }
 

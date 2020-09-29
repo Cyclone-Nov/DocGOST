@@ -54,14 +54,14 @@ namespace GostDOC.PDF
                 MainStream = null;                
             }
 
-            f1 = PdfFontFactory.CreateFont(@"Font\\GOST_TYPE_A.ttf", "cp1251", true);
             MainStream = new MemoryStream();
             _pdfWriter = new PdfWriter(MainStream);
             _pdfDoc = new PdfDocument(_pdfWriter);
             _pdfDoc.SetDefaultPageSize(_pageSize);
             _doc = new Document(_pdfDoc, _pdfDoc.GetDefaultPageSize().Rotate(), true);
             
-           int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable);
+            int countPages = PdfUtils.GetCountPage(Type, dataTable.Rows.Count);
+            int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable, countPages);
         
             _currentPageNumber = 1;
             while (lastProcessedRow > 0) {
@@ -69,7 +69,7 @@ namespace GostDOC.PDF
                 lastProcessedRow = AddNextPage(_doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
             }
         
-            if (_pdfDoc.GetNumberOfPages() > MAX_PAGES_WITHOUT_CHANGELIST) {
+            if (_pdfDoc.GetNumberOfPages() > PdfDefines.MAX_PAGES_WITHOUT_CHANGELIST) {
                 _currentPageNumber++;
                 AddRegisterList(_doc, graphs, _currentPageNumber);
             }
@@ -79,10 +79,10 @@ namespace GostDOC.PDF
             _doc.Close();            
         }
 
-        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData) {
+        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages) {
             SetPageMargins(aInDoc);
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
-            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 0}));
+            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages}));
             aInDoc.Add(CreateTable(null, true, 0, out var lpr));
             DrawLines(_pdfDoc.GetFirstPage());
             return lpr;

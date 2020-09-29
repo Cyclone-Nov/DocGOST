@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GostDOC.Common;
 using GostDOC.Models;
 using iText.Layout.Properties;
+using GostDOC.PDF;
 
 namespace GostDOC.DataPreparation
 {
@@ -101,12 +102,7 @@ namespace GostDOC.DataPreparation
 
             // записываем наименование группы, если есть
             AddGroupName(aTable, aGroupName);
-
-            // записываем строки с гост/ту в начале таблицы, если они есть для нескольких компонентов
-            // if (!AddStandardDocsToTable(aGroupName, sortComponents, aTable, StandardDic)) {
-            //     AddEmptyRow(aTable);
-            // }
-
+            
             //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
             DataRow row;
             for (int i = 0; i < sortComponents.Length;)
@@ -141,15 +137,35 @@ namespace GostDOC.DataPreparation
                 i = j;
 
 
+                var name = (haveToChangeName) ? change_name : component_name;
+                string[] namearr = PdfUtils.SplitStringByWidth(110, name).ToArray();       
+                var note = component.GetProperty(Constants.ComponentNote);
+                string[] notearr = PdfUtils.SplitStringByWidth(45, note).ToArray();
+
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString{Value = component.GetProperty(Constants.ComponentFormat)};
                 row[Constants.ColumnZone] = new FormattedString{Value = component.GetProperty(Constants.ComponentZone)};
                 row[Constants.ColumnPosition] = new FormattedString{Value=String.Empty};
                 row[Constants.ColumnDesignation] = new FormattedString{Value = component.GetProperty(Constants.ComponentSign)};
-                row[Constants.ColumnName] = new FormattedString{Value= (haveToChangeName) ? change_name : component_name};
+                row[Constants.ColumnName] = new FormattedString{Value = namearr.First()};
                 row[Constants.ColumnQuantity] = component_count;
-                row[Constants.ColumnFootnote]= new FormattedString{Value =  component.GetProperty(Constants.ComponentNote)};
+                row[Constants.ColumnFootnote]= new FormattedString{Value = notearr.First()};
                 aTable.Rows.Add(row);
+
+                int max = Math.Max(namearr.Length, notearr.Length);
+                if (max > 1)
+                {
+                    int ln_name = namearr.Length;
+                    int ln_note = notearr.Length;
+
+                    for (int ln = 1; ln< max; ln++)
+                    {
+                        row = aTable.NewRow();
+                        row[Constants.ColumnName] = (ln_name > ln) ? namearr[ln] : string.Empty;
+                        row[Constants.ColumnFootnote] = (ln_note > ln) ? notearr[ln] : string.Empty;
+                        aTable.Rows.Add(row);
+                    }
+                }                
             }
 
             AddEmptyRow(aTable);

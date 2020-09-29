@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using iText.Kernel.Geom;
-
+using iText.Kernel.Font;
 
 namespace GostDOC.PDF
 {
     public static class PdfDefines
     {
-
         public static float A4Width = PageSize.A4.GetWidth();
         public static float A4Height = PageSize.A4.GetHeight();
         public static float A3Width = PageSize.A3.GetWidth();
@@ -21,5 +20,14 @@ namespace GostDOC.PDF
 //      public static readonly float mmA3h = PageSize.A3.GetHeight() / 420;
         public static readonly float ROW_HEIGHT = 6 * mmAXw;
         public static readonly float INNER_TABLE_ROW_HEIGHT = ROW_HEIGHT * 0.6f;
+
+        public static PdfFont MainFont = PdfFontFactory.CreateFont(@"Font\\GOST_TYPE_A.ttf", "cp1251", true);
+
+        public const float DefaultFontSize = 14f;
+
+        /// <summary>
+        /// допустимое количество страниц для документа без добавления листа регистрации изменений
+        /// </summary>
+        public const int MAX_PAGES_WITHOUT_CHANGELIST = 3;
     }
 }

@@ -188,6 +188,7 @@
     <Compile Include="PDF\PdfDefines.cs" />
     <Compile Include="PDF\PdfManager.cs" />
     <Compile Include="PDF\PdfSpecificationCreator.cs" />
+    <Compile Include="PDF\PdfUtils.cs" />
     <Compile Include="UI\DragDropFile.cs" />
     <Compile Include="UserControls\NameValueControl.xaml.cs">
       <DependentUpon>NameValueControl.xaml</DependentUpon>

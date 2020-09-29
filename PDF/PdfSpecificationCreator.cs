@@ -53,8 +53,8 @@ namespace GostDOC.PDF
             _doc = new iText.Layout.Document(_pdfDoc, _pdfDoc.GetDefaultPageSize(), true);
             
             var dataTable = aData;
-           
-            int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable);
+            int countPages = PdfUtils.GetCountPage(Type, dataTable.Rows.Count);
+            int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable, countPages);
             
             _currentPageNumber = 1;
             while (lastProcessedRow > 0) {
@@ -62,12 +62,12 @@ namespace GostDOC.PDF
                 lastProcessedRow = AddNextPage(_doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
             }
             
-            if (_pdfDoc.GetNumberOfPages() > MAX_PAGES_WITHOUT_CHANGELIST) {
+            if (_pdfDoc.GetNumberOfPages() > PdfDefines.MAX_PAGES_WITHOUT_CHANGELIST) {
                 _currentPageNumber++;
                 AddRegisterList(_doc, graphs, _currentPageNumber);
             }
             
-            AddPageCountOnFirstPage(_doc, _currentPageNumber);
+            //AddPageCountOnFirstPage(_doc, _currentPageNumber);
 
             _doc.Close();            
         }
@@ -78,7 +78,7 @@ namespace GostDOC.PDF
             return tableHeight;
         }
 
-        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData) {
+        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages) {
 
             SetPageMargins(aInDoc);
 
@@ -91,7 +91,7 @@ namespace GostDOC.PDF
             aInDoc.Add(dataTable);
             
             // добавить таблицу с основной надписью для первой старницы
-            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = 2}));
+            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages }));
 
             // добавить таблицу с верхней дополнительной графой
             aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
@@ -216,42 +216,25 @@ namespace GostDOC.PDF
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS, leftPaddCell);
                     remainingPdfTabeRows--;
                 }
-                else {
-                    // разобьем наименование на несколько строк исходя из длины текста
-                    string[] namestrings = SplitStringByWidth(110 * mmW(), fontSize, font, name.Value).ToArray();
-                    if (namestrings.Length <= remainingPdfTabeRows) { 
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(format))); // формат
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(zone))); // зона
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
-                        tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(designation))); // обозначение
+                else 
+                {                    
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(format))); // формат
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(zone))); // зона
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(designation))); // обозначение
 
-                        Cell nameCell = leftPaddCell.Clone(false);
-                        if (name.TextAlignment == TextAlignment.CENTER) {
-                            nameCell = (centrAlignCell.Clone(false).Add(new Paragraph(namestrings[0]))); // наименование
-                        } else if (name.TextAlignment == TextAlignment.LEFT) {
-                            nameCell = (leftPaddCell.Clone(false).Add(new Paragraph(namestrings[0]))); // наименование
-                        }
-                        if (name.IsUnderlined) nameCell.SetUnderline(1.0f, 0);
-                        tbl.AddCell(nameCell);
-
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity == 0 ? "" : quantity.ToString())));
-                        tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));
-                        remainingPdfTabeRows--;
-
-                        if (namestrings.Length > 1) {
-                            for (int i = 1; i < namestrings.Length; i++) {
-                                for (int x = 0; x < 4; ++x) {
-                                    tbl.AddCell(centrAlignCell.Clone(false));
-                                }
-                                tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(namestrings[i])));
-                                tbl.AddCell(centrAlignCell.Clone(false));
-                                tbl.AddCell(leftPaddCell.Clone(false));
-                                remainingPdfTabeRows--;
-                            }
-                        }
+                    Cell nameCell = leftPaddCell.Clone(false);
+                    if (name.TextAlignment == TextAlignment.CENTER) {
+                        nameCell = (centrAlignCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
+                    } else if (name.TextAlignment == TextAlignment.LEFT) {
+                        nameCell = (leftPaddCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
                     }
-                    else
-                        break;
+                    if (name.IsUnderlined) nameCell.SetUnderline(1.0f, 0);
+                    tbl.AddCell(nameCell);
+
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity == 0 ? "" : quantity.ToString())));
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));
+                    remainingPdfTabeRows--;
                 }
 
                 outLastProcessedRow++;
