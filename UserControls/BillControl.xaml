@@ -21,7 +21,7 @@
         </Grid.RowDefinitions>
 
         <DataGrid x:Name="billDataGrid" Margin="5" SelectionMode="Extended" SelectionUnit="FullRow" 
-                  AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="Auto"
+                  AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="Auto" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False"
                   SelectedItem="{Binding ComponentsSelectedItem.Value}"
                   ItemsSource="{Binding Components}">
 
@@ -30,7 +30,12 @@
                     <i:InvokeCommandAction Command="{Binding EditComponentsCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}}"  />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-            
+
+            <DataGrid.InputBindings>
+                <KeyBinding Key="C" Modifiers="Ctrl" Command="{Binding CopyCellCmd}" CommandParameter="{Binding CurrentCell, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                <KeyBinding Key="V" Modifiers="Ctrl" Command="{Binding PasteCellCmd}" CommandParameter="{Binding CurrentCell, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+            </DataGrid.InputBindings>
+
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="ContentTemplate">

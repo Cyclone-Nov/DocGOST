@@ -22,8 +22,6 @@ namespace GostDOC.ExcelExport
         private int _complexColumn = 0;
         private int _complexRow = 0;
 
-        private ComplexD27 _main;
-
         public ExportD27()
         {
             _components.Add(new ComponentGroupD27(Constants.GroupDetails));

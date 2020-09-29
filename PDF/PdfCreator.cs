@@ -47,10 +47,15 @@ namespace GostDOC.PDF
         /// </summary>
         protected const int MAX_PAGES_WITHOUT_CHANGELIST = 3;
 
-        protected static readonly float BOTTOM_MARGIN = 5 * mmH();
-        protected static readonly float LEFT_MARGIN = 8 * mmW();
-        protected static readonly float TOP_MARGIN = 5 * mmH();
-        protected static readonly float RIGHT_MARGIN = 5 * mmW();
+        protected static readonly float TOP_MARGIN_MM = 5;
+        protected static readonly float BOTTOM_MARGIN_MM = 5;
+        protected static readonly float LEFT_MARGIN_MM = 8;
+        protected static readonly float RIGHT_MARGIN_MM = 5;
+
+        protected static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH();
+        protected static readonly float LEFT_MARGIN = LEFT_MARGIN_MM * mmW();
+        protected static readonly float TOP_MARGIN = TOP_MARGIN_MM * mmH();
+        protected static readonly float RIGHT_MARGIN = RIGHT_MARGIN_MM * mmW();
 
         protected const float THICK_LINE_WIDTH = 2f; 
         
@@ -90,17 +95,17 @@ namespace GostDOC.PDF
         /// <summary>
         /// The PDF document
         /// </summary>
-        protected PdfDocument pdfDoc;
+        protected PdfDocument _pdfDoc;
 
         /// <summary>
         /// The document
         /// </summary>
-        protected iText.Layout.Document doc;
+        protected iText.Layout.Document _doc;
 
         /// <summary>
         /// The PDF writer
         /// </summary>
-        protected PdfWriter pdfWriter;
+        protected PdfWriter _pdfWriter;
 
         /// <summary>
         /// текущий номер страницы
@@ -156,8 +161,8 @@ namespace GostDOC.PDF
 
         public byte[] GetData()
         {
-            doc.Flush();
-            pdfWriter.Flush();
+            _doc.Flush();
+            _pdfWriter.Flush();
             return MainStream.ToArray();
         }
                 
@@ -564,7 +569,7 @@ namespace GostDOC.PDF
                 // A3
                 mainTable.SetFixedPosition(415 * mmW()-TITLE_BLOCK_WIDTH+2f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
                 
-                Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
+                Canvas canvas = new Canvas(new PdfCanvas(_pdfDoc.GetFirstPage()),
                     new Rectangle((295)* mmW(), BOTTOM_MARGIN, PdfDefines.A4Width, 2));
                 canvas.Add(
                     new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((53 * 2 + 14 - 50) * mmW()));
@@ -574,7 +579,7 @@ namespace GostDOC.PDF
                 var left = 20 * mmW() - 2f;
                 mainTable.SetFixedPosition(left, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
 
-                Canvas canvas = new Canvas(new PdfCanvas(pdfDoc.GetFirstPage()),
+                Canvas canvas = new Canvas(new PdfCanvas(_pdfDoc.GetFirstPage()),
                     new Rectangle(left + (7 + 10 + 23 + 15 + 10) * mmW(), BOTTOM_MARGIN, PdfDefines.A4Width, 2));
                 canvas.Add(
                     new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((53 * 2 + 14 - 50) * mmW()));

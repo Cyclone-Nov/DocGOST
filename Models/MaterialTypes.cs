@@ -56,13 +56,13 @@ namespace GostDOC.Models
                 Materials.Add("Лаки, краски, нефтепродукты и химикаты", new Dictionary<string, Material>());
                 Materials.Add("Металлические, неметаллические порошки", new Dictionary<string, Material>());
                 Materials.Add("Прочие материалы", new Dictionary<string, Material>());
+
+                Save();
             }
         }
 
         public bool Import(string aFilePath)
         {
-            Materials.Clear();
-
             MaterialsXml materials = null;
             if (XmlSerializeHelper.LoadXmlStructFile(ref materials, aFilePath))
             {
@@ -77,7 +77,10 @@ namespace GostDOC.Models
 
                     foreach (var material in group.Materials)
                     {
-                        dic.Add(material.Name, material);
+                        if (!dic.ContainsKey(material.Name))
+                        {
+                            dic.Add(material.Name, material);
+                        }
                     }
                 }
                 return true;
@@ -153,11 +156,6 @@ namespace GostDOC.Models
 
         public Material GetMaterial(string aGroup, string aName)
         {
-            if (string.IsNullOrEmpty(aName))
-            {
-                return null;
-            }
-
             IDictionary<string, Material> materials;
             if (Materials.TryGetValue(aGroup, out materials))
             {
