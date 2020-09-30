@@ -54,6 +54,7 @@ namespace GostDOC.PDF
                 MainStream = null;                
             }
 
+            f1 = PdfFontFactory.CreateFont(@"Font\\GOST_TYPE_A.ttf", "cp1251", true);
             MainStream = new MemoryStream();
             _pdfWriter = new PdfWriter(MainStream);
             _pdfDoc = new PdfDocument(_pdfWriter);
