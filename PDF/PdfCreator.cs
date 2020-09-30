@@ -792,9 +792,10 @@ namespace GostDOC.PDF
                 aTable.AddCell(aTemplateCell.Clone(false));
             }
 
-            int borderWidth = (aLastRowIsFinal) ? 2 : 1;
-            for (int i = 0; i < aColumns; i++)
+            float borderWidth = (aLastRowIsFinal) ? THICK_LINE_WIDTH : 1;
+            for (int i = 0; i < aColumns; i++) {
                 aTable.AddCell(aTemplateCell.Clone(false).SetBorderBottom(new SolidBorder(borderWidth)));
+            }
         }
 
         /// <summary>

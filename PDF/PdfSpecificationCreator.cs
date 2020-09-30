@@ -187,6 +187,11 @@ namespace GostDOC.PDF
             var Rows = aData.Rows.Cast<DataRow>().ToArray();
             DataRow row;
             for (int ind = aStartRow; ind < Rows.Length; ind++) {
+
+                if (remainingPdfTabeRows <= 0) {
+                    break;
+                }
+
                 row = Rows[ind];
 
                 string GetCellString(string columnName) =>
@@ -217,7 +222,11 @@ namespace GostDOC.PDF
                     remainingPdfTabeRows--;
                 }
                 else 
-                {                    
+                {
+                    if (remainingPdfTabeRows == 1) {
+                        centrAlignCell.SetBorderBottom(CreateThickBorder());
+                        leftPaddCell.SetBorderBottom(CreateThickBorder());
+                    }
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(format))); // формат
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(zone))); // зона
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
