@@ -59,7 +59,7 @@ internal class PdfElementListCreator : PdfCreator {
         _pdfWriter = new PdfWriter(MainStream);
         _pdfDoc = new PdfDocument(_pdfWriter);
         _pdfDoc.SetDefaultPageSize(_pageSize);
-        _doc = new iText.Layout.Document(_pdfDoc, _pdfDoc.GetDefaultPageSize(), false);
+        _doc = new iText.Layout.Document(_pdfDoc, _pdfDoc.GetDefaultPageSize(), true);
         int countPages = PdfUtils.GetCountPage(Type, dataTable.Rows.Count);
         int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable, countPages);
         
