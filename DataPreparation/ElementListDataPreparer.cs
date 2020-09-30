@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using GostDOC.Common;
 using GostDOC.Models;
+using GostDOC.PDF;
 
 namespace GostDOC.DataPreparation
 {
@@ -128,12 +129,35 @@ internal class ElementListDataPreparer : BasePreparer {
 
                 string component_designator = MakeComponentDesignatorsString(component_designators);
 
+                // вчисляем длины полей и переносим на следующуй строку при необходимости 
+                // разобьем наименование на несколько строк исходя из длины текста
+                var name = (haveToChangeName) ? change_name : component_name;
+                string[] namearr = PdfUtils.SplitStringByWidth(110, name).ToArray();       
+                var note = component.GetProperty(Constants.ComponentNote);
+                string[] notearr = PdfUtils.SplitStringByWidth(45, note).ToArray();
+
                 row = aTable.NewRow();
                 row[Constants.ColumnPosition] = component_designator;
-                row[Constants.ColumnName] = (haveToChangeName) ? change_name : component_name;
+                row[Constants.ColumnName] = namearr.First();
                 row[Constants.ColumnQuantity] = component_count;
-                row[Constants.ColumnFootnote] = component.GetProperty(Constants.ComponentNote);
+                row[Constants.ColumnFootnote] = notearr.First();
                 aTable.Rows.Add(row);
+
+                int max = Math.Max(namearr.Length, notearr.Length);
+                if (max > 1)
+                {
+                    int ln_name = namearr.Length;
+                    int ln_note = notearr.Length;
+
+                    for (int ln = 1; ln< max; ln++)
+                    {
+                        row = aTable.NewRow();
+                        row[Constants.ColumnName] = (ln_name > ln) ? namearr[ln] : string.Empty;
+                        row[Constants.ColumnFootnote] = (ln_note > ln) ? notearr[ln] : string.Empty;
+                        aTable.Rows.Add(row);
+                    }
+                }
+
             }
 
             AddEmptyRow(aTable);

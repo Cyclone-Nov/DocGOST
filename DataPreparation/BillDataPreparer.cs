@@ -20,7 +20,42 @@ namespace GostDOC.DataPreparation
         public override DataTable CreateDataTable(IDictionary<string, Configuration> aConfigs)
         {
             
-            return null;
+             // выбираем основную конфигурацию
+            Configuration mainConfig = null;
+            if (!aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out mainConfig))
+                return null;        
+            var data = mainConfig.Specification;
+            string schemaDesignation = GetSchemaDesignation(mainConfig);
+
+            // из остальных конфигураций получаем список словарей с соответсвующими компонентами
+            var otherConfigsElements = MakeComponentDesignatorsDictionaryOtherConfigs(aConfigs);
+
+            // работаем по основной конфигурации
+            // нужны только компоненты из раздела "Прочие изделия"
+            Group others;
+            if (data.TryGetValue(Constants.GroupOthers, out others))
+            {
+                DataTable table = CreateTable("ElementListData");
+                if (others.Components.Count() > 0 || others.SubGroups.Count() > 0)
+                {
+                    // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
+                    var mainсomponents = others.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
+
+                    AddEmptyRow(table);
+                    //FillDataTable(table, "", mainсomponents, otherConfigsElements, schemaDesignation);
+
+                    foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key))
+                    {
+                        // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
+                        var сomponents = subgroup.Value.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
+                        //FillDataTable(table, subgroup.Value.Name, сomponents, otherConfigsElements, schemaDesignation);
+                    }
+                }
+
+                return table;
+            }
+        
+            return null;           
         }
 
         /// <summary>

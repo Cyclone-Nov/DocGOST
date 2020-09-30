@@ -24,14 +24,15 @@ namespace GostDOC.PDF
 {
     public abstract class PdfCreator
     {
+
+        protected static PdfFont f1 = PdfDefines.MainFont;
+
         /// <summary>
         /// The save path
         /// </summary>
         public readonly string SavePath;
 
         public readonly DocType Type;
-
-        internal static PdfFont f1;
         
         internal readonly PageSize _pageSize;
 
@@ -41,11 +42,6 @@ namespace GostDOC.PDF
         protected static float mmW() {
             return PdfDefines.mmAXw;
         }
-
-        /// <summary>
-        /// допустимое количество страниц для документа без добавления листа регистрации изменений
-        /// </summary>
-        protected const int MAX_PAGES_WITHOUT_CHANGELIST = 3;
 
         protected static readonly float TOP_MARGIN_MM = 5;
         protected static readonly float BOTTOM_MARGIN_MM = 5;
@@ -251,7 +247,7 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal abstract int AddFirstPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData);
+        internal abstract int AddFirstPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData,int aCountPages);
 
         /// <summary>
         /// добавить к документу последующие страницы
@@ -827,50 +823,6 @@ namespace GostDOC.PDF
             cell.SetBorderRight(aRightBorder == 0 ? Border.NO_BORDER : new SolidBorder(aRightBorder));
 
             return cell;
-        }
-
-
-        /// <summary>
-        /// Разбить строку на несколько строк исходя из длины текста
-        /// </summary>
-        /// <param name="aLength">максимальная длина в мм</param>
-        /// <param name="aFontSize">размер шрифта</param>
-        /// <param name="aFont">шрифт</param>
-        /// <param name="aString">строка для разбивки</param>
-        /// <returns></returns>
-        protected List<string> SplitStringByWidth(float aLength, float aFontSize, PdfFont aFont, string aString) {
-            List<string> name_strings = new List<string>();
-            int default_padding = 4;
-            float maxLength = aLength - default_padding;
-            float currLength = aFont.GetWidth(aString, aFontSize);
-
-            GetLimitSubstring(name_strings, maxLength, currLength, aString);
-
-            return name_strings;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name_strings"></param>
-        /// <param name="maxLength"></param>
-        /// <param name="currLength"></param>
-        /// <param name="aFullName"></param>
-        protected void GetLimitSubstring(List<string> name_strings, float maxLength, float currLength,
-            string aFullName) {
-            if (currLength < maxLength) {
-                name_strings.Add(aFullName);
-            }
-            else {
-                string fullName = aFullName;
-                int symbOnMaxLength = (int) ((fullName.Length / currLength) * maxLength);
-                string partName = fullName.Substring(0, symbOnMaxLength);
-                int index = partName.LastIndexOfAny(new char[] {' ', '-', '.'});
-                name_strings.Add(fullName.Substring(0, index));
-                fullName = fullName.Substring(index + 1);
-                currLength = fullName.Length;
-                GetLimitSubstring(name_strings, maxLength, currLength, fullName);
-            }
-        }
+        }        
     }
 }
