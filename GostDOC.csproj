@@ -168,6 +168,7 @@
     <Compile Include="ExcelExport\ExcelExportFactory.cs" />
     <Compile Include="ExcelExport\ExcelExtensions.cs" />
     <Compile Include="ExcelExport\ExportD27.cs" />
+    <Compile Include="ExcelExport\ExportSp.cs" />
     <Compile Include="Interfaces\IExcelExport.cs" />
     <Compile Include="Interfaces\IMemento.cs" />
     <Compile Include="Models\CombineProperties.cs" />
@@ -359,6 +360,7 @@
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (powershell Compress-Archive -Path '$(TargetDir)*' -DestinationPath '$(SolutionDir)\gostdoc.zip' -Force)
 xcopy /E /Y "$(ProjectDir)Settings" "$(TargetDir)Settings"
+xcopy /E /Y "$(ProjectDir)ExcelExport\Templates\*" "$(TargetDir)Templates\"
 
 </PostBuildEvent>
   </PropertyGroup>

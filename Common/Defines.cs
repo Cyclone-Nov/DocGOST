@@ -309,5 +309,8 @@ namespace GostDOC.Common
         public static readonly string GostDocTypeB = "GostDocB";
 
         public static readonly string NewMaterialMenuItem = "<Добавить материал>";
+
+        public static readonly string TemplatesFolder = "Templates";
+        public static readonly string SpecificationTemplateName = "specification";
     }
 }

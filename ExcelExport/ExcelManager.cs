@@ -12,7 +12,7 @@ namespace GostDOC.ExcelExport
     {
         public bool CanExport(DocType aDocType)
         {
-            return aDocType == DocType.D27;
+            return aDocType == DocType.D27 || aDocType == DocType.Specification;
         }
 
         public void Export(DocType aDocType, string aFilePath)
@@ -27,15 +27,11 @@ namespace GostDOC.ExcelExport
                     // Open excel application
                     var app = new Excel.Application();
                     // Set app visible
-                    //app.Visible = true;
+                    app.Visible = true;
                     // Skip dialog messages
                     app.DisplayAlerts = false;
-                    // Create workbook
-                    var wb = app.Workbooks.Add();
                     // Export
                     export.Export(app, aFilePath);
-                    // Save
-                    wb.SaveAs(aFilePath);
                     // App quit
                     app.Quit();
                 }

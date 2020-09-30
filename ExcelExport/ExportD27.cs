@@ -32,6 +32,9 @@ namespace GostDOC.ExcelExport
 
         public void Export(Excel.Application aApp, string aFilePath)
         {
+            // Create workbook
+            var wb = aApp.Workbooks.Add();
+
             Excel._Worksheet ws = aApp.ActiveSheet;
             Excel._Worksheet firstSheet = aApp.ActiveSheet;
                         
@@ -60,6 +63,9 @@ namespace GostDOC.ExcelExport
             }
 
             firstSheet.Select();
+
+            // Save
+            wb.SaveAs(aFilePath);
         }
 
         private void Reset()

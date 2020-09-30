@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using GostDOC.DataPreparation;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace GostDOC.ExcelExport
@@ -34,6 +35,26 @@ namespace GostDOC.ExcelExport
             ws.Cells[r1, c1].Font.Bold = true;
             ws.Cells[r1, c1].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
             ws.Cells[r1, c1].VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
+        }
+
+        public static T GetTableValue<T>(this DataTable tbl, int row, int col)
+        {
+            var val = tbl.Rows[row].ItemArray[col];
+            if (val != System.DBNull.Value)
+            {
+                return (T)val;
+            }
+            return default(T);
+        }
+
+        public static string GetTableValue(this DataTable tbl, int row, int col)
+        {
+            var val = tbl.Rows[row].ItemArray[col];
+            if (val != System.DBNull.Value)
+            {
+                return ((BasePreparer.FormattedString)val).Value;
+            }
+            return string.Empty;
         }
     }
 }

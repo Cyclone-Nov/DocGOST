@@ -164,6 +164,11 @@ namespace GostDOC.Models
             }
             return new string[] { };
         }
+
+        public static string GetTemplatePath(string aTemplateName)
+        {
+            return Path.Combine(Environment.CurrentDirectory, Constants.TemplatesFolder, aTemplateName);
+        }
     }
 
     static class Extensions
