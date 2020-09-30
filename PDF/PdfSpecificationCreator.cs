@@ -203,7 +203,7 @@ namespace GostDOC.PDF
                 string format = GetCellString(Constants.ColumnFormat);
                 string zone = GetCellString(Constants.ColumnZone);
                 string position = GetCellString(Constants.ColumnPosition);
-                string designation = GetCellString(Constants.ColumnDesignation);
+                string designation = GetCellString(Constants.ColumnSign);
                 string note = GetCellString(Constants.ColumnFootnote);
 
                 var name = GetCellStringFormatted(Constants.ColumnName);
@@ -229,7 +229,7 @@ namespace GostDOC.PDF
                     } else if (name.TextAlignment == TextAlignment.LEFT) {
                         nameCell = (leftPaddCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
                     }
-                        if (name.IsUnderlined) nameCell.SetUnderline(0.5f, -1);
+                    if (name.IsUnderlined) nameCell.SetUnderline(0.5f, -1);
                     tbl.AddCell(nameCell);
 
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity == 0 ? "" : quantity.ToString())));

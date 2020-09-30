@@ -100,6 +100,9 @@ namespace GostDOC.Common
     }
 
     public static class Constants {
+
+        #region Графы
+
         /// <summary>
         /// Название проекта
         /// </summary>
@@ -206,6 +209,10 @@ namespace GostDOC.Common
         public static readonly string GRAPH_29 = "";
         public static readonly string GRAPH_30 = "";
 
+        #endregion
+
+
+        #region Группы
 
         /// <summary>
         /// компоненты, не вошедшие ни в одной группу
@@ -244,13 +251,17 @@ namespace GostDOC.Common
         /// </summary>
         public static readonly string GroupKits = "Комплекты";
 
-        public static readonly string Settings = "Settings";
+        #endregion
 
+
+        public static readonly string Settings = "Settings";
 
         public static readonly string GroupNameSp = "Раздел СП";
         public static readonly string SubGroupNameSp = "Подраздел СП";
         public static readonly string GroupNameB = "Раздел ВП";
         public static readonly string SubGroupNameB = "Подраздел ВП";
+
+        #region Компоненты
 
         public static readonly string ComponentName = "Наименование";
         public static readonly string ComponentProductCode = "Код продукции";
@@ -268,6 +279,11 @@ namespace GostDOC.Common
         public static readonly string ComponentSign = "Обозначение";
         public static readonly string ComponentWhereIncluded = "Куда входит";
         public static readonly string ComponentDesignatiorID = "Позиционное обозначение";
+        
+        #endregion
+
+
+        #region Столбцы
 
         /// <summary>
         /// Формат
@@ -292,16 +308,24 @@ namespace GostDOC.Common
         /// <summary>
         /// Обозначение
         /// </summary>
-        public static readonly string ColumnDesignation = "Designation";
+        public static readonly string ColumnSign = "Sign";
         /// <summary>
         /// Зона
         /// </summary>
         public static readonly string ColumnZone = "Zone";
 
+        #endregion
+
+
+        #region Графы Дракулы
+
         public static readonly string GraphCommentsSp = "Комментарии СП";
         public static readonly string GraphCommentsB = "Комментарии ВП";
         public static readonly string GraphSign = "Обозначение";
         public static readonly string GraphName = "Наименование";
+
+        #endregion
+
 
         public static readonly string DOC_SCHEMA = "Схема";
 

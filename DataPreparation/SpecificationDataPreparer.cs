@@ -15,6 +15,14 @@ namespace GostDOC.DataPreparation
     internal class SpecificationDataPreparer : BasePreparer
     {
 
+        class DataToFillTable {
+            public DataTable Table;
+            public string GroupName;
+            public IEnumerable<Models.Component> Components;
+            public IEnumerable<Dictionary<string, Component>> OtherComponents;
+            public string SchemaDesignation;
+        }
+
         /// <summary>
         /// формирование таблицы данных
         /// </summary>
@@ -33,43 +41,32 @@ namespace GostDOC.DataPreparation
             var otherConfigsElements = MakeComponentDesignatorsDictionaryOtherConfigs(aConfigs);
 
             DataTable table = CreateTable("SpecificationData");
+            
+//            if (data.TryGetValue(Constants.GroupDoc, out var documents)) {
+//                dtf.GroupName = "";
+//                dtf.Components = documents.Components;
+//                FillDataTable(dtf);
+//            }
 
-            if (data.TryGetValue(Constants.GroupDoc, out var documents))
-            {
-                FillDataTable(table, "", documents.Components, otherConfigsElements, schemaDesignation);
-            }
-            if (data.TryGetValue(Constants.GroupComplex, out var complex))
-            {
-                FillDataTable(table, "Комплексы", complex.Components, otherConfigsElements, schemaDesignation);
-            }
-            if (data.TryGetValue(Constants.GroupAssemblyUnits, out var assemblyUnits))
-            {
-                FillDataTable(table, "Сборочные единицы", assemblyUnits.Components, otherConfigsElements, schemaDesignation);
-            }
-            if (data.TryGetValue(Constants.GroupDetails, out var details))
-            {
-                FillDataTable(table, "Детали", details.Components, otherConfigsElements, schemaDesignation);
-            }
-            if (data.TryGetValue(Constants.GroupStandard, out var standard))
-            {
-                FillDataTable(table, "Стандартные изделия", standard.Components, otherConfigsElements, schemaDesignation);
-            }
-            if (data.TryGetValue(Constants.GroupOthers, out var others))
-            {
-                FillDataTable(table, "Прочие изделия", others.Components, otherConfigsElements, schemaDesignation);
-            }
-            if (data.TryGetValue(Constants.GroupMaterials, out var materials))
-            {
-                FillDataTable(table, "Материалы", materials.Components, otherConfigsElements, schemaDesignation);
-            }
-            if (data.TryGetValue(Constants.GroupKits, out var kits))
-            {
-                FillDataTable(table, "Комплекты", kits.Components, otherConfigsElements, schemaDesignation);
+            DataToFillTable dtf = new DataToFillTable{Table = table, OtherComponents = otherConfigsElements, SchemaDesignation = schemaDesignation};
+            void Fill(string groupName) {
+                if (data.TryGetValue(groupName, out var someGroup)) {
+                    dtf.Components = someGroup.Components;
+                    dtf.GroupName = groupName;
+                    FillDataTable(dtf);
+                }
             }
 
+            Fill(Constants.GroupDoc);
+            Fill(Constants.GroupComplex);
+            Fill(Constants.GroupAssemblyUnits);
+            Fill(Constants.GroupDetails);
+            Fill(Constants.GroupStandard);
+            Fill(Constants.GroupOthers);
+            Fill(Constants.GroupMaterials);
+            Fill(Constants.GroupKits);
 
             return table;
-
             //return null;
         }
 
@@ -87,11 +84,28 @@ namespace GostDOC.DataPreparation
             aTable.Rows.Add(row);
         }
 
-        void FillDataTable(DataTable aTable, string aGroupName, IEnumerable<Models.Component> aComponents, IEnumerable<Dictionary<string, Component>> aOtherComponents, string aSchemaDesignation) {
+        void FillDataTable(DataToFillTable dataToFill) {
+            var aComponents = dataToFill.Components;
+            var aSchemaDesignation = dataToFill.SchemaDesignation;
+            var aOtherComponents = dataToFill.OtherComponents;
             if (!aComponents.Any()) return;
 
-            // Cортировка компонентов по значению свойства "Позиционное обозначение"
-            Models.Component[] sortComponents = SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();
+            var sortType = SortType.None;
+
+            if (dataToFill.GroupName == Constants.GroupDoc) {
+                sortType = SortType.None;
+            } else if (dataToFill.GroupName == Constants.GroupComplex || dataToFill.GroupName == Constants.GroupAssemblyUnits || dataToFill.GroupName == Constants.GroupDetails) {
+                sortType = SortType.SpComplex;
+            } else if (dataToFill.GroupName == Constants.GroupStandard) {
+                sortType = SortType.SpStandard;
+            } else if (dataToFill.GroupName == Constants.GroupOthers) {
+                sortType = SortType.SpOthers;
+            } else if (dataToFill.GroupName == Constants.GroupKits) {
+                sortType = SortType.SpKits;
+            }
+
+            var sort = SortFactory.GetSort(sortType);
+            Models.Component[] sortComponents = sort.Sort(aComponents.ToList()).ToArray();
             // для признаков составления наименования для данного компонента
             int[] HasStandardDoc;
 
@@ -100,8 +114,10 @@ namespace GostDOC.DataPreparation
             // ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем номера компонентов с совпадающим значением                
             Dictionary<string /* GOST/TY string*/, List<int> /* array indexes */> StandardDic = FindComponentsWithStandardDoc(sortComponents, out HasStandardDoc);
 
-            // записываем наименование группы, если есть
-            AddGroupName(aTable, aGroupName);
+            if (dataToFill.GroupName != Constants.GroupDoc) {
+                // записываем наименование группы
+                AddGroupName(dataToFill.Table, dataToFill.GroupName);
+            }
             
             //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
             DataRow row;
@@ -142,15 +158,21 @@ namespace GostDOC.DataPreparation
                 var note = component.GetProperty(Constants.ComponentNote);
                 string[] notearr = PdfUtils.SplitStringByWidth(45, note).ToArray();
 
-                row = aTable.NewRow();
+                row = dataToFill.Table.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString{Value = component.GetProperty(Constants.ComponentFormat)};
                 row[Constants.ColumnZone] = new FormattedString{Value = component.GetProperty(Constants.ComponentZone)};
                 row[Constants.ColumnPosition] = null;
-                row[Constants.ColumnDesignation] = new FormattedString{Value = component.GetProperty(Constants.ComponentSign)};
+
+                string designation = component.GetProperty(Constants.ComponentSign);
+                if (dataToFill.GroupName == Constants.GroupDoc) {
+                    designation += component.GetProperty(Constants.ComponentDocCode);
+                }
+                row[Constants.ColumnSign] = new FormattedString{Value = designation};
+
                 row[Constants.ColumnName] = new FormattedString{Value = namearr.First()};
                 row[Constants.ColumnQuantity] = component_count;
                 row[Constants.ColumnFootnote]= new FormattedString{Value = notearr.First()};
-                aTable.Rows.Add(row);
+                dataToFill.Table.Rows.Add(row);
 
                 int max = Math.Max(namearr.Length, notearr.Length);
                 if (max > 1)
@@ -160,16 +182,16 @@ namespace GostDOC.DataPreparation
 
                     for (int ln = 1; ln< max; ln++)
                     {
-                        row = aTable.NewRow();
+                        row = dataToFill.Table.NewRow();
                         row[Constants.ColumnName] = (ln_name > ln) ? namearr[ln] : string.Empty;
                         row[Constants.ColumnFootnote] = (ln_note > ln) ? notearr[ln] : string.Empty;
-                        aTable.Rows.Add(row);
+                        dataToFill.Table.Rows.Add(row);
                     }
                 }                
             }
 
-            AddEmptyRow(aTable);
-            aTable.AcceptChanges();
+            AddEmptyRow(dataToFill.Table);
+            dataToFill.Table.AcceptChanges();
 
         }
 
@@ -194,7 +216,7 @@ namespace GostDOC.DataPreparation
             AddColumn(Constants.ColumnFormat, "Формат", typeof(FormattedString));
             AddColumn(Constants.ColumnZone, "Зона", typeof(FormattedString) );
             AddColumn(Constants.ColumnPosition, "Поз.", typeof(FormattedString));
-            AddColumn(Constants.ColumnDesignation, "Обозначение", typeof(FormattedString));
+            AddColumn(Constants.ColumnSign, "Обозначение", typeof(FormattedString));
             AddColumn(Constants.ColumnName, "Наименование", typeof(FormattedString));
             AddColumn(Constants.ColumnQuantity, "Кол.", typeof(Int32));
             AddColumn(Constants.ColumnFootnote, "Примечание", typeof(FormattedString));
