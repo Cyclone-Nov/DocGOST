@@ -60,7 +60,7 @@ namespace GostDOC.Models
                 if (result == 0)
                 {
                     // Compare strings
-                    result = dX.CompareTo(dY);
+                    result = string.Compare(dX, dY);
                 }
                 return result;
             });
