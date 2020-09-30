@@ -543,7 +543,7 @@ namespace GostDOC.PDF
             tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true)
                 .Add(CreateTableGraph478Paragraph("1")));                
             tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true)
-                .Add(CreateTableGraph478Paragraph(""/*titleBlockStruct.Pages.ToString()*/)));
+                .Add(CreateTableGraph478Paragraph(titleBlockStruct.Pages.ToString())));
 
             tableGraph4789.AddCell(
                 new Cell(1, 5).SetHeight(15 * mmH() - 2).SetPaddings(0, 0, 0, 0)
@@ -792,9 +792,10 @@ namespace GostDOC.PDF
                 aTable.AddCell(aTemplateCell.Clone(false));
             }
 
-            int borderWidth = (aLastRowIsFinal) ? 2 : 1;
-            for (int i = 0; i < aColumns; i++)
+            float borderWidth = (aLastRowIsFinal) ? THICK_LINE_WIDTH : 1;
+            for (int i = 0; i < aColumns; i++) {
                 aTable.AddCell(aTemplateCell.Clone(false).SetBorderBottom(new SolidBorder(borderWidth)));
+            }
         }
 
         /// <summary>

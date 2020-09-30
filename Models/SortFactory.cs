@@ -15,6 +15,13 @@ namespace GostDOC.Models
         List<T> Sort(List<T> aItems); 
     }
 
+    class NoSort : ISort<Component>
+    {
+        public List<Component> Sort(List<Component> aItems) {
+            return aItems.ToList();
+        }
+    }
+
     class NameSort : ISort<Component>
     {
         public List<Component> Sort(List<Component> aItems)
@@ -230,6 +237,8 @@ namespace GostDOC.Models
                     return new NameSort();
                 case SortType.DesignatorID:
                     return new DesignatorIDSort();
+                case SortType.None:
+                    return new NoSort();
             }
             return null;
         }
