@@ -114,9 +114,11 @@ namespace GostDOC.DataPreparation
             // ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем номера компонентов с совпадающим значением                
             Dictionary<string /* GOST/TY string*/, List<int> /* array indexes */> StandardDic = FindComponentsWithStandardDoc(sortComponents, out HasStandardDoc);
 
+            // записываем наименование группы
             if (dataToFill.GroupName != Constants.GroupDoc) {
-                // записываем наименование группы
+                AddEmptyRow(dataToFill.Table);
                 AddGroupName(dataToFill.Table, dataToFill.GroupName);
+                AddEmptyRow(dataToFill.Table);
             }
             
             //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
@@ -190,7 +192,7 @@ namespace GostDOC.DataPreparation
                 }                
             }
 
-            AddEmptyRow(dataToFill.Table);
+            //AddEmptyRow(dataToFill.Table);
             dataToFill.Table.AcceptChanges();
 
         }
