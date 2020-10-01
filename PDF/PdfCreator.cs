@@ -275,12 +275,12 @@ namespace GostDOC.PDF
             return s;
         }
 
-        protected struct TitleBlockStruct {
+        protected class TitleBlockStruct {
             public PageSize PageSize;
             public IDictionary<string, string> Graphs;
             public int Pages;
             public int CurrentPage;
-            public bool AppendGraphs;
+            public bool AppendGraphs = true;
 
         }
 
