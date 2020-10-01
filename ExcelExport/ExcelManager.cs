@@ -12,28 +12,35 @@ namespace GostDOC.ExcelExport
     {
         public bool CanExport(DocType aDocType)
         {
-            return aDocType == DocType.D27 || aDocType == DocType.Specification;
+            return aDocType == DocType.D27 || aDocType == DocType.Specification || aDocType == DocType.Bill;
         }
 
         public void Export(DocType aDocType, string aFilePath)
         {
             Task.Run(() =>
             {
-                // Get exporter
-                var export = ExcelExportFactory.GetExporter(aDocType);
-
-                if (export != null)
+                // Open excel application
+                Excel.Application app = null;
+                try
                 {
-                    // Open excel application
-                    var app = new Excel.Application();
-                    // Set app visible
-                    //app.Visible = true;
-                    // Skip dialog messages
-                    app.DisplayAlerts = false;
-                    // Export
-                    export.Export(app, aFilePath);
+                    // Get exporter
+                    var export = ExcelExportFactory.GetExporter(aDocType);
+
+                    if (export != null)
+                    {
+                        app = new Excel.Application();
+                        // Set app visible
+                        //app.Visible = true;
+                        // Skip dialog messages
+                        app.DisplayAlerts = false;
+                        // Export
+                        export.Export(app, aFilePath);
+                    }
+                }
+                finally
+                {
                     // App quit
-                    app.Quit();
+                    app?.Quit();
                 }
             });
         } 

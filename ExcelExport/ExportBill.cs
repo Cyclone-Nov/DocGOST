@@ -4,25 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Common;
-using GostDOC.DataPreparation;
 using GostDOC.Interfaces;
 using GostDOC.Models;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace GostDOC.ExcelExport
 {
-    class ExportSp : IExcelExport
+    class ExportBill : IExcelExport
     {
-        private const int MinRowIndex = 2;
-        private const int MaxRowIndexFirst = 27;
-        private const int MaxRowIndexSecond = 34;
+        private const int MinRowIndex = 3;
+        private const int MaxRowIndexFirst = 26;
+        private const int MaxRowIndexSecond = 32;
 
         private const int RowCountFirst = MaxRowIndexFirst - MinRowIndex + 1;
         private const int RowCountSecond = MaxRowIndexSecond - MinRowIndex + 1;
 
         private PrepareManager _prepareManager = PrepareManager.Instance;
         private DocManager _docManager = DocManager.Instance;
-        private int _tableRow = 0;           
+        private int _tableRow = 0;
         private System.Data.DataTable _tbl;
         private IDictionary<string, string> _graphs;
 
@@ -44,9 +43,10 @@ namespace GostDOC.ExcelExport
 
         public void Export(Excel.Application aApp, string aFilePath)
         {
-            _tbl = DataTableExtensions.GetDataTable(DocType.Specification);
+            _tbl = DataTableExtensions.GetDataTable(DocType.Bill);
 
-            var wb = aApp.Workbooks.Open(Utils.GetTemplatePath(Constants.SpecificationTemplateName));
+            // Open template file
+            var wb = aApp.Workbooks.Open(Utils.GetTemplatePath(Constants.BillTemplateName));
 
             _graphs = ExcelUtils.GetGraphs();
 
@@ -80,7 +80,6 @@ namespace GostDOC.ExcelExport
             aApp.Sheets["1"].Select();
             // Save
             wb.SaveAs(aFilePath);
-
         }
 
         public void FillFirstSheet(Excel.Application aApp)
@@ -90,19 +89,19 @@ namespace GostDOC.ExcelExport
             if (_graphs != null)
             {
                 // Fill main title
-                sheet.Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1);
-                sheet.Cells[32, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
-                sheet.Cells[36, 16] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4);
-                sheet.Cells[36, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a);
-                sheet.Cells[36, 18] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b);
+                sheet.Cells[34, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1);
+                sheet.Cells[31, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+                sheet.Cells[35, 24] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4);
+                sheet.Cells[35, 25] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a);
+                sheet.Cells[35, 26] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b);
 
-                sheet.Cells[35, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_dev);
-                sheet.Cells[36, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_chk);
-                sheet.Cells[38, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11norm);
-                sheet.Cells[39, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
+                sheet.Cells[34, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11bl_dev);
+                sheet.Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11bl_chk);
+                sheet.Cells[37, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11norm);
+                sheet.Cells[38, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
             }
             // Set pages count
-            sheet.Cells[36, 22] = Pages;
+            sheet.Cells[35, 29] = Pages;
             // Fill data
             FillRows(sheet, MaxRowIndexFirst);
         }
@@ -110,11 +109,12 @@ namespace GostDOC.ExcelExport
         public void FillSheet(Excel._Worksheet sheet)
         {
             // Set page number
-            sheet.Cells[37, 22] = sheet.Name;
+            sheet.Cells[37, 30] = sheet.Name;
+            
             if (_graphs != null)
             {
                 // Set title
-                sheet.Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+                sheet.Cells[35, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
             }
             // Fill data
             FillRows(sheet, MaxRowIndexSecond);
@@ -122,9 +122,11 @@ namespace GostDOC.ExcelExport
 
         private void FillRows(Excel._Worksheet sheet, int maxRows)
         {
-            int row = MinRowIndex;
+            int row = 3;
             while (row <= maxRows && _tableRow < _tbl.Rows.Count)
-            { 
+            {
+                // TODO: Fill table items
+                /*
                 sheet.Cells[row, 4] = _tbl.GetTableValue(_tableRow, 1);
                 sheet.Cells[row, 6] = _tbl.GetTableValue(_tableRow, 2);
                 sheet.Cells[row, 7] = _tbl.GetTableValue(_tableRow, 3);
@@ -134,8 +136,9 @@ namespace GostDOC.ExcelExport
                 int count = _tbl.GetTableValue<int>(_tableRow, 6);
                 if (count > 0)
                     sheet.Cells[row, 20] = count;
-               
+
                 sheet.Cells[row, 22] = _tbl.GetTableValue(_tableRow, 7);
+                */
 
                 row++;
                 _tableRow++;

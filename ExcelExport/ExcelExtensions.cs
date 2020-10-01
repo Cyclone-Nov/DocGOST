@@ -4,7 +4,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GostDOC.Common;
 using GostDOC.DataPreparation;
+using GostDOC.Models;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace GostDOC.ExcelExport
@@ -36,7 +38,10 @@ namespace GostDOC.ExcelExport
             ws.Cells[r1, c1].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
             ws.Cells[r1, c1].VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
         }
+    }
 
+    static class DataTableExtensions
+    {
         public static T GetTableValue<T>(this DataTable tbl, int row, int col)
         {
             var val = tbl.Rows[row].ItemArray[col];
@@ -55,6 +60,30 @@ namespace GostDOC.ExcelExport
                 return ((BasePreparer.FormattedString)val).Value;
             }
             return string.Empty;
+        }
+
+        public static DataTable GetDataTable(DocType aDocType)
+        {
+            if (PrepareManager.Instance.PrepareDataTable(aDocType, DocManager.Instance.Project.Configurations))
+            {
+                return PrepareManager.Instance.GetDataTable(aDocType);
+            }
+            return null;
+        }
+    }
+
+    static class ExcelUtils
+    {
+        public static IDictionary<string, string> GetGraphs()
+        {
+            foreach (var cfg in DocManager.Instance.Project.Configurations)
+            {
+                if (cfg.Value.Graphs.Count > 0)
+                {
+                    return cfg.Value.Graphs;                    
+                }
+            }
+            return null;
         }
     }
 }

@@ -336,5 +336,6 @@ namespace GostDOC.Common
 
         public static readonly string TemplatesFolder = "Templates";
         public static readonly string SpecificationTemplateName = "specification";
+        public static readonly string BillTemplateName = "purchased_items_list";
     }
 }

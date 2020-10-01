@@ -169,6 +169,13 @@ namespace GostDOC.Models
         {
             return Path.Combine(Environment.CurrentDirectory, Constants.TemplatesFolder, aTemplateName);
         }
+
+        public static string GetGraphValue(IDictionary<string, string> graphs, string name)
+        {
+            string result;
+            graphs.TryGetValue(name, out result);
+            return result;
+        }
     }
 
     static class Extensions

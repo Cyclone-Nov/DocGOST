@@ -168,6 +168,7 @@
     <Compile Include="ExcelExport\ExcelExportFactory.cs" />
     <Compile Include="ExcelExport\ExcelExtensions.cs" />
     <Compile Include="ExcelExport\ExportD27.cs" />
+    <Compile Include="ExcelExport\ExportBill.cs" />
     <Compile Include="ExcelExport\ExportSp.cs" />
     <Compile Include="Interfaces\IExcelExport.cs" />
     <Compile Include="Interfaces\IMemento.cs" />
@@ -330,7 +331,6 @@
     <Content Include="Settings\Documents.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="ExcelExport\Templates\elements_list.xlsx" />
     <None Include="ExcelExport\Templates\purchased_items_list.xlsx" />
     <None Include="ExcelExport\Templates\specification.xlsx" />
     <None Include="Font\GOST_BU.TTF">

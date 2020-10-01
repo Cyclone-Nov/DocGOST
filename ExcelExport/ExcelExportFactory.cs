@@ -17,10 +17,9 @@ namespace GostDOC.ExcelExport
                 case DocType.D27:
                     return new ExportD27();
                 case DocType.Bill:
+                    return new ExportBill();
                 case DocType.Specification:
                     return new ExportSp();
-                case DocType.ItemsList:
-                    break;
             }
             return null;
         }
