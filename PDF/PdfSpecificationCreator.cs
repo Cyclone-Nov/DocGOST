@@ -145,11 +145,11 @@ namespace GostDOC.PDF
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
             tbl.SetMargin(0).SetPadding(0);
 
-            Cell CreateCell() => new Cell().SetPadding(0).SetVerticalAlignment(VerticalAlignment.MIDDLE);
-            Paragraph CreateParagraph(string text) => new Paragraph(text).SetFont(f1).SetItalic().SetTextAlignment(TextAlignment.CENTER);
+            Cell headerCell = new Cell().SetPadding(0).SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorder(CreateThickBorder()).SetHeight(15*mmH());
+            Paragraph CreateParagraph(string text) => new Paragraph(text).SetFont(f1).SetItalic().SetTextAlignment(TextAlignment.CENTER).SetFontSize(14);
 
-            Table AddHeaderCell90(string text) => tbl.AddCell(CreateCell().SetBorder(CreateThickBorder()).SetHeight(15*mmH()).Add(CreateParagraph(text).SetRotationAngle(DegreesToRadians(90))));
-            Table AddHeaderCell(string text) => tbl.AddCell(CreateCell().SetBorder(CreateThickBorder()).SetHeight(15*mmH()).Add(CreateParagraph(text).SetFixedLeading(11)));
+            Table AddHeaderCell90(string text) => tbl.AddCell(headerCell.Clone(false).Add(CreateParagraph(text).SetRotationAngle(DegreesToRadians(90))));
+            Table AddHeaderCell(string text) => tbl.AddCell(headerCell.Clone(false).Add(CreateParagraph(text).SetFixedLeading(11)));
 
             AddHeaderCell90("Формат");
             AddHeaderCell90("Зона");
