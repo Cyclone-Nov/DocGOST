@@ -197,7 +197,7 @@ internal class PdfElementListCreator : PdfCreator {
         //float fontSize = 14;
         //PdfFont font = leftPaddCell.GetProperty<PdfFont>(20); // 20 - index for Font property
 
-        int remainingPdfTabeRows = (aFirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
+        int remainingPdfTableRows = (aFirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
         outLastProcessedRow = aStartRow;
 
         var Rows = aData.Rows.Cast<DataRow>().ToArray();
@@ -220,19 +220,19 @@ internal class PdfElementListCreator : PdfCreator {
             if (string.IsNullOrEmpty(name)) 
             {
                 AddEmptyRowToPdfTable(tbl, 1, 4, leftPaddCell);
-                remainingPdfTabeRows--;
+                remainingPdfTableRows--;
             }
             else if (string.IsNullOrEmpty(position)) 
             {
                 // это наименование группы или перенос предыдущей строки?
-                if (remainingPdfTabeRows > 4) 
+                if (remainingPdfTableRows > 4) 
                 {
                     // если есть место для записи более 4 строк то записываем группу, иначе выходим
                     tbl.AddCell(centrAlignCell.Clone(false));
                     tbl.AddCell(centrAlignCell.Clone(true).Add(new Paragraph(name)));
                     tbl.AddCell(centrAlignCell.Clone(false));
                     tbl.AddCell(leftPaddCell.Clone(false));
-                    remainingPdfTabeRows--;
+                    remainingPdfTableRows--;
                 }
                 else                 
                     break;                
@@ -244,14 +244,14 @@ internal class PdfElementListCreator : PdfCreator {
                 tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(name)));
                 tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity.ToString())));
                 tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));
-                remainingPdfTabeRows--; 
+                remainingPdfTableRows--; 
             }
             outLastProcessedRow++;
         }
 
         // дополним таблицу пустыми строками если она не полностью заполнена
-        if (remainingPdfTabeRows > 0) {
-            AddEmptyRowToPdfTable(tbl, remainingPdfTabeRows, 4, centrAlignCell, true);
+        if (remainingPdfTableRows > 0) {
+            AddEmptyRowToPdfTable(tbl, remainingPdfTableRows, 4, centrAlignCell, true);
         }
         // если записали всю табица с данными, то обнуляем количество оставшихся строк
         if (outLastProcessedRow == aData.Rows.Count) {
