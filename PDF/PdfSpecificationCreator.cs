@@ -181,14 +181,14 @@ namespace GostDOC.PDF
             float fontSize = 14;
             PdfFont font = leftPaddCell.GetProperty<PdfFont>(20); // 20 - index for Font property
 
-            int remainingPdfTabeRows = (aFirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
+            int remainingPdfTableRows = (aFirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
             outLastProcessedRow = aStartRow;
 
             var Rows = aData.Rows.Cast<DataRow>().ToArray();
             DataRow row;
             for (int ind = aStartRow; ind < Rows.Length; ind++) {
 
-                if (remainingPdfTabeRows <= 0) {
+                if (remainingPdfTableRows <= 0) {
                     break;
                 }
 
@@ -201,57 +201,74 @@ namespace GostDOC.PDF
 
                 BasePreparer.FormattedString GetCellStringFormatted(string columnName) =>
                     (row[columnName] == System.DBNull.Value)
-                        ? new BasePreparer.FormattedString { Value=String.Empty}
+                        ? null 
                         : ((BasePreparer.FormattedString) row[columnName]);
 
 
                 string format = GetCellString(Constants.ColumnFormat);
                 string zone = GetCellString(Constants.ColumnZone);
                 string position = GetCellString(Constants.ColumnPosition);
-                string designation = GetCellString(Constants.ColumnSign);
+                string sign = GetCellString(Constants.ColumnSign);
                 string note = GetCellString(Constants.ColumnFootnote);
 
                 var name = GetCellStringFormatted(Constants.ColumnName);
+
+                void AddCellFormatted(BasePreparer.FormattedString fs) {
+                    Cell c = new Cell();
+                    if (fs.TextAlignment == TextAlignment.CENTER) {
+                        c = (centrAlignCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
+                    } else if (name.TextAlignment == TextAlignment.LEFT) {
+                        c = (leftPaddCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
+                    }
+                    if (fs.IsUnderlined) c.SetUnderline(0.5f, -1);
+                    tbl.AddCell(c);
+                }
 
                 int quantity = (row[Constants.ColumnQuantity] == System.DBNull.Value)
                     ? 0
                     : (int) row[Constants.ColumnQuantity];
 
-                if (string.IsNullOrEmpty(name.Value)) {
+                if (name == null) {
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS, leftPaddCell);
-                    remainingPdfTabeRows--;
-                }
-                else 
-                {
-                    if (remainingPdfTabeRows == 1) {
+                    remainingPdfTableRows--;
+                } else if (string.IsNullOrEmpty(sign))  {
+                    // это наименование группы или перенос предыдущей строки?
+                    if (remainingPdfTableRows > 4)  {
+                        // если есть место для записи более 4 строк то записываем группу, иначе выходим
+                        tbl.AddCell(centrAlignCell.Clone(false)); // формат
+                        tbl.AddCell(centrAlignCell.Clone(false)); // зона
+                        tbl.AddCell(centrAlignCell.Clone(false)); // поз
+                        tbl.AddCell(centrAlignCell.Clone(false)); // обозначение
+                        AddCellFormatted(name);
+                        tbl.AddCell(centrAlignCell.Clone(false)); // кол
+                        tbl.AddCell(centrAlignCell.Clone(false)); // примеч.
+
+                        remainingPdfTableRows--;
+                    }
+                    else {
+                        break;
+                    }
+                } else  {
+                    if (remainingPdfTableRows == 1) {
                         centrAlignCell.SetBorderBottom(CreateThickBorder());
                         leftPaddCell.SetBorderBottom(CreateThickBorder());
                     }
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(format))); // формат
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(zone))); // зона
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(designation))); // обозначение
-
-                    Cell nameCell = leftPaddCell.Clone(false);
-                    if (name.TextAlignment == TextAlignment.CENTER) {
-                        nameCell = (centrAlignCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
-                    } else if (name.TextAlignment == TextAlignment.LEFT) {
-                        nameCell = (leftPaddCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
-                    }
-                    if (name.IsUnderlined) nameCell.SetUnderline(0.5f, -1);
-                    tbl.AddCell(nameCell);
-
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(sign))); // обозначение
+                    AddCellFormatted(name);
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity == 0 ? "" : quantity.ToString())));
                     tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));
-                    remainingPdfTabeRows--;
+                    remainingPdfTableRows--;
                 }
 
                 outLastProcessedRow++;
             }
 
             // дополним таблицу пустыми строками если она не полностью заполнена
-            if (remainingPdfTabeRows > 0) {
-                AddEmptyRowToPdfTable(tbl, remainingPdfTabeRows, COLUMNS, centrAlignCell, true);
+            if (remainingPdfTableRows > 0) {
+                AddEmptyRowToPdfTable(tbl, remainingPdfTableRows, COLUMNS, centrAlignCell, true);
             }
             if (outLastProcessedRow == aData.Rows.Count) {
                 outLastProcessedRow = 0;
