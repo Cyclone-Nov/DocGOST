@@ -83,7 +83,7 @@ namespace GostDOC.PDF
         internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages) {
             SetPageMargins(aInDoc);
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
-            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages}));
+            aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, DocType = DocType.Bill}));
             aInDoc.Add(CreateTable(null, true, 0, out var lpr));
             DrawLines(_pdfDoc.GetFirstPage());
             return lpr;
@@ -100,7 +100,7 @@ namespace GostDOC.PDF
             aInDoc.Add(dataTable);
 
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
-            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber }));
+            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber, DocType = DocType.Bill}));
             DrawLines(_pdfDoc.GetPage(2));
             return lastNextProcessedRow;
         }

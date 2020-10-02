@@ -1,24 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data;
 using System.IO;
+using System.Linq;
+using GostDOC.Common;
 using iText.Kernel.Font;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas;
+using iText.Kernel.Pdf.Canvas.Draw;
 using iText.Layout;
-using iText.Layout.Borders;
 using iText.Layout.Element;
 using iText.Layout.Properties;
-using Org.BouncyCastle.Asn1.Crmf;
-using GostDOC.Common;
-using iText.Kernel.Pdf.Canvas;
-using GostDOC.Models;
-using System.Data;
-using System.Runtime;
-using iText.Kernel.Pdf.Canvas.Draw;
-
 
 namespace GostDOC.PDF {
 /// <summary>
@@ -59,7 +52,7 @@ internal class PdfElementListCreator : PdfCreator {
         _pdfWriter = new PdfWriter(MainStream);
         _pdfDoc = new PdfDocument(_pdfWriter);
         _pdfDoc.SetDefaultPageSize(_pageSize);
-        _doc = new iText.Layout.Document(_pdfDoc, _pdfDoc.GetDefaultPageSize(), true);
+        _doc = new Document(_pdfDoc, _pdfDoc.GetDefaultPageSize(), true);
         int countPages = PdfUtils.GetCountPage(Type, dataTable.Rows.Count);
         int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable, countPages);
         
@@ -83,14 +76,16 @@ internal class PdfElementListCreator : PdfCreator {
     /// добавить к документу первую страницу
     /// </summary>
     /// <returns>номер последней записанной строки. Если 0 - то достигнут конец таблицы данных</returns>
-    internal override int AddFirstPage(iText.Layout.Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages) {
+    internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages) {
         SetPageMargins(aInDoc);
 
         // добавить таблицу с данными
-        aInDoc.Add(CreateDataTable(new DataTableStruct {Data = aData, FirstPage = true, StartRow = 0}, out var lastProcessedRow));
+        var dataTable = CreateDataTable(new DataTableStruct {Data = aData, FirstPage = true, StartRow = 0}, out var lastProcessedRow);
+        dataTable.SetFixedPosition(19.3f * mmW(), 78 * mmW()+0.48f, TITLE_BLOCK_WIDTH);
+        aInDoc.Add(dataTable);
 
         // добавить таблицу с основной надписью для первой старницы
-        aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, AppendGraphs = true}));
+        aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, AppendGraphs = true, DocType = DocType.ItemsList}));
 
         // добавить таблицу с верхней дополнительной графой
         aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
@@ -104,7 +99,7 @@ internal class PdfElementListCreator : PdfCreator {
         return lastProcessedRow;
     }
 
-    void AddSecondaryElements(iText.Layout.Document aInDoc, IDictionary<string, string> aGraphs) {
+    void AddSecondaryElements(Document aInDoc, IDictionary<string, string> aGraphs) {
         var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
         var p = new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT)).SetRotationAngle(DegreesToRadians(90))
             .AddStyle(style).SetFixedPosition(10 * mmW() + 2,
@@ -129,32 +124,48 @@ internal class PdfElementListCreator : PdfCreator {
             new SolidLine(THICK_LINE_WIDTH)).SetWidth(100).SetRotationAngle(DegreesToRadians(90)));
     }
 
+    void DrawLines(int aPageNumber) {
+        // нарисовать недостающую линию
+        var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH-2f;
+        Canvas canvas = new Canvas(
+            new PdfCanvas(_pdfDoc.GetPage(aPageNumber)), 
+            new Rectangle(fromLeft, BOTTOM_MARGIN + 2f, 2, 100));
+        canvas.Add(new LineSeparator(
+            new SolidLine(THICK_LINE_WIDTH)).SetWidth(100).SetRotationAngle(DegreesToRadians(90)));
+    }
+
 
     /// <summary>
     /// добавить к документу последующие страницы
     /// </summary>
     /// <param name="aInPdfDoc">a in PDF document.</param>
     /// <returns></returns>
-    internal override int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow) {
+    internal override int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow) {
         aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
         SetPageMargins(aInPdfDoc);
 
         // добавить таблицу с данными
         var dataTable = CreateDataTable(new DataTableStruct{Data = aData, FirstPage =false, StartRow = aStartRow}, out var lastProcessedRow);
-        dataTable.SetFixedPosition(19.3f * mmW(), BOTTOM_MARGIN + 16 * mmW()+2.5f, TITLE_BLOCK_WIDTH + 2f);
+        dataTable.SetFixedPosition(
+            19.3f * mmW(),
+            //BOTTOM_MARGIN + 16 * mmW()+2.5f, 
+            PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN_MM * mmH()) + 5.51f,
+            TITLE_BLOCK_WIDTH);
         aInPdfDoc.Add(dataTable);
 
         // добавить таблицу с основной надписью для последуюших старницы
-        aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber }));
+        aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList}));
 
         // добавить таблицу с нижней дополнительной графой
         aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
+        DrawLines(aPageNumber);
+
         return lastProcessedRow;
     }
 
-    private new void SetPageMargins(iText.Layout.Document aDoc) {
+    private new void SetPageMargins(Document aDoc) {
         aDoc.SetLeftMargin(8 * mmW());
         aDoc.SetRightMargin(5 * mmW());
         aDoc.SetTopMargin(5 * mmW());
@@ -194,8 +205,6 @@ internal class PdfElementListCreator : PdfCreator {
         Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2)
             .SetHeight(8 * PdfDefines.mmAXh).SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFont(f1)
             .SetFontSize(14);
-        //float fontSize = 14;
-        //PdfFont font = leftPaddCell.GetProperty<PdfFont>(20); // 20 - index for Font property
 
         int remainingPdfTableRows = (aFirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
         outLastProcessedRow = aStartRow;
@@ -203,26 +212,30 @@ internal class PdfElementListCreator : PdfCreator {
         var Rows = aData.Rows.Cast<DataRow>().ToArray();
         DataRow row;
         for (int ind = aStartRow; ind < Rows.Length; ind++) {
+
+            if (remainingPdfTableRows <= 0) {
+                break;
+            }
+
             row = Rows[ind];
-            string position = (row[Constants.ColumnPosition] == System.DBNull.Value)
+
+            string GetCellString(string columnName) =>(row[columnName] == DBNull.Value)
                 ? string.Empty
-                : (string) row[Constants.ColumnPosition];
-            string name = (row[Constants.ColumnName] == System.DBNull.Value)
-                ? string.Empty
-                : (string) row[Constants.ColumnName];
-            int quantity = (row[Constants.ColumnQuantity] == System.DBNull.Value)
+                : (string) row[columnName];
+
+            string position = GetCellString(Constants.ColumnPosition);
+            string name = GetCellString(Constants.ColumnName);
+            string note = GetCellString(Constants.ColumnFootnote);
+            int quantity = (row[Constants.ColumnQuantity] == DBNull.Value)
                 ? 0
                 : (int) row[Constants.ColumnQuantity];
-            string note = (row[Constants.ColumnFootnote] == System.DBNull.Value)
-                ? string.Empty
-                : (string) row[Constants.ColumnFootnote];
 
             if (string.IsNullOrEmpty(name)) 
             {
                 AddEmptyRowToPdfTable(tbl, 1, 4, leftPaddCell);
                 remainingPdfTableRows--;
             }
-            else if (string.IsNullOrEmpty(position)) 
+            else if (string.IsNullOrEmpty(position) && quantity == 0) 
             {
                 // это наименование группы или перенос предыдущей строки?
                 if (remainingPdfTableRows > 4) 
@@ -258,7 +271,6 @@ internal class PdfElementListCreator : PdfCreator {
             outLastProcessedRow = 0;
         }
 
-        tbl.SetFixedPosition(19.3f * mmW(), 78 * mmW()+0.48f, TITLE_BLOCK_WIDTH);
 
         return tbl;
     }

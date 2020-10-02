@@ -19,6 +19,7 @@ using GostDOC.Models;
 using System.IO;
 using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Pdf.Canvas.Draw;
+using iText.Layout.Layout;
 
 namespace GostDOC.PDF
 {
@@ -139,7 +140,7 @@ namespace GostDOC.PDF
                     {
                         _pageSize = new PageSize(PageSize.A4);
                         RowNumberOnFirstPage = 24;
-                        RowNumberOnNextPage = 31;
+                        RowNumberOnNextPage = 29;
                     }
                     break;                
                 default:
@@ -162,6 +163,12 @@ namespace GostDOC.PDF
             return MainStream.ToArray();
         }
                 
+
+        protected float GetTableHeight(Table table, int pageNumber) {
+            var result = table.CreateRendererSubTree().SetParent(_doc.GetRenderer()).Layout(new LayoutContext(new LayoutArea(pageNumber, new Rectangle(0, 0, PageSize.A4.GetWidth(), PageSize.A4.GetHeight()))));
+            float tableHeight = result.GetOccupiedArea().GetBBox().GetHeight();
+            return tableHeight;
+        }
 
         protected void SetPageMargins(iText.Layout.Document aDoc) {
             aDoc.SetLeftMargin(LEFT_MARGIN);
@@ -281,7 +288,7 @@ namespace GostDOC.PDF
             public int Pages;
             public int CurrentPage;
             public bool AppendGraphs = true;
-
+            public DocType DocType;
         }
 
         protected struct DataTableStruct {
@@ -310,6 +317,7 @@ namespace GostDOC.PDF
             string GetGraph(string graph) {
                 return GetGraphByName(aGraphs, graph);
             }
+
 
             #region Пустая ячейка слева
 
@@ -473,12 +481,21 @@ namespace GostDOC.PDF
             #region Правая нижняя таблица
 
             var rightBottomTable = new Table(UnitValue.CreatePercentArray(new[] {1f})).UseAllAvailableWidth();
+            var graph2 = GetGraph(Constants.GRAPH_2);
+            switch (titleBlockStruct.DocType) {
+                case DocType.Bill:
+                    graph2 += "ВП";
+                    break;
+                case DocType.ItemsList:
+                    graph2 += "ПЭ3";
+                    break;
+            }
             rightBottomTable.AddCell(
                 new Cell().Add(
-                        new Paragraph(GetGraph(Constants.GRAPH_2)).AddStyle(
-                            new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFont(f1).SetMarginLeft(20)
+                        new Paragraph(graph2).AddStyle(
+                            new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFont(f1).SetTextAlignment(TextAlignment.CENTER)
                                 .SetFontSize(20))).SetHeight(15 * mmH()).SetPaddings(0, 0, 1, 0)
-                    .SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorderLeft(Border.NO_BORDER)
+                    .SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorderLeft(Border.NO_BORDER).SetHorizontalAlignment(HorizontalAlignment.CENTER)
                     .SetBorderBottom(Border.NO_BORDER).SetBorderTop(CreateThickBorder())
                     .SetBorderRight(CreateThickBorder()));
 
@@ -558,7 +575,6 @@ namespace GostDOC.PDF
             mainTable.AddCell(CreateMainTableCell().Add(rightBottomTable));
 
             #endregion
-
 
 
             if (aPageSize.Contains(PageSize.A3)) {
@@ -646,13 +662,13 @@ namespace GostDOC.PDF
                     SetBorderRight(Border.NO_BORDER).
                     SetBorderBottom(Border.NO_BORDER).
                     SetPadding(0).
-                    Add(CreateParagraph(titleBlockStruct.CurrentPage.ToString()).SetPaddingTop(2).SetPaddingLeft(7))); 
+                    Add(CreateParagraph(titleBlockStruct.CurrentPage.ToString()).SetPaddingTop(2).SetTextAlignment(TextAlignment.CENTER)/*.SetPaddingLeft(7)*/)); 
 
             rightestCell.Add(rightestCellTable);
             tbl.AddCell(rightestCell);
 
             void AddGraphCell(string text, bool bottomBorder=false) {
-                var c = CreateCell().Add(CreateParagraph(text));
+                var c = CreateCell().Add(CreateParagraph(text).SetTextAlignment(TextAlignment.CENTER));
                 if (bottomBorder) {
                     c.SetBorderBottom(CreateThickBorder());
                 }
@@ -677,7 +693,7 @@ namespace GostDOC.PDF
             if (aPageSize.Contains(PageSize.A3)) {
                 tbl.SetFixedPosition(PdfDefines.A3Height - TITLE_BLOCK_WIDTH - RIGHT_MARGIN, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
             } else {
-                tbl.SetFixedPosition(20 * mmW(), BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+                tbl.SetFixedPosition(20 * mmW(), BOTTOM_MARGIN, TITLE_BLOCK_WIDTH-2f);
             }
 
 
