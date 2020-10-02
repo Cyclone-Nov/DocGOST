@@ -19,6 +19,7 @@ using GostDOC.Models;
 using System.IO;
 using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Pdf.Canvas.Draw;
+using iText.Layout.Layout;
 
 namespace GostDOC.PDF
 {
@@ -139,7 +140,7 @@ namespace GostDOC.PDF
                     {
                         _pageSize = new PageSize(PageSize.A4);
                         RowNumberOnFirstPage = 24;
-                        RowNumberOnNextPage = 31;
+                        RowNumberOnNextPage = 29;
                     }
                     break;                
                 default:
@@ -162,6 +163,12 @@ namespace GostDOC.PDF
             return MainStream.ToArray();
         }
                 
+
+        protected float GetTableHeight(Table table, int pageNumber) {
+            var result = table.CreateRendererSubTree().SetParent(_doc.GetRenderer()).Layout(new LayoutContext(new LayoutArea(pageNumber, new Rectangle(0, 0, PageSize.A4.GetWidth(), PageSize.A4.GetHeight()))));
+            float tableHeight = result.GetOccupiedArea().GetBBox().GetHeight();
+            return tableHeight;
+        }
 
         protected void SetPageMargins(iText.Layout.Document aDoc) {
             aDoc.SetLeftMargin(LEFT_MARGIN);
@@ -677,7 +684,7 @@ namespace GostDOC.PDF
             if (aPageSize.Contains(PageSize.A3)) {
                 tbl.SetFixedPosition(PdfDefines.A3Height - TITLE_BLOCK_WIDTH - RIGHT_MARGIN, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
             } else {
-                tbl.SetFixedPosition(20 * mmW(), BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+                tbl.SetFixedPosition(20 * mmW(), BOTTOM_MARGIN, TITLE_BLOCK_WIDTH-2f);
             }
 
 

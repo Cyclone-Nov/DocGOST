@@ -72,11 +72,6 @@ namespace GostDOC.PDF
             _doc.Close();            
         }
 
-        float GetTableHeight(/*int pageNumber,*/ Table table) {
-            var result = table.CreateRendererSubTree().SetParent(_doc.GetRenderer()).Layout(new LayoutContext(new LayoutArea(1, new Rectangle(0, 0, PageSize.A4.GetWidth(), PageSize.A4.GetHeight()))));
-            float tableHeight = result.GetOccupiedArea().GetBBox().GetHeight();
-            return tableHeight;
-        }
 
         internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages) {
 
@@ -85,7 +80,7 @@ namespace GostDOC.PDF
             var dataTable = CreateDataTable(new DataTableStruct{Data=aData, FirstPage = true, StartRow = 0}, out var lastProcessedRow);
             dataTable.SetFixedPosition(
                 19.3f * mmW(),
-                PdfDefines.A4Height - (GetTableHeight(dataTable) + TOP_MARGIN_MM * mmH()) + 5.51f,
+                PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN_MM * mmH()) + 5.51f,
                 TITLE_BLOCK_WIDTH - 0.02f);
 
             aInDoc.Add(dataTable);
@@ -111,7 +106,7 @@ namespace GostDOC.PDF
             var dataTable = CreateDataTable(new DataTableStruct{Graphs = aGraphs, Data = aData, FirstPage = false, StartRow = aStartRow}, out var lastProcessedRow);
             dataTable.SetFixedPosition(
                 19.3f * mmW(), 
-                PdfDefines.A4Height - (GetTableHeight(dataTable) + TOP_MARGIN_MM * mmH()) + 5.51f,
+                PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNamuber) + TOP_MARGIN_MM * mmH()) + 5.51f,
                 TITLE_BLOCK_WIDTH+2f);
             aInDoc.Add(dataTable);
             
@@ -126,11 +121,25 @@ namespace GostDOC.PDF
             return lastProcessedRow;
         }
 
+        void AddDataTableHeader(Table aTable) {
+
+            Cell headerCell = new Cell().SetPadding(0).SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorder(CreateThickBorder()).SetHeight(15*mmH());
+            Paragraph CreateParagraph(string text) => new Paragraph(text).SetFont(f1).SetItalic().SetTextAlignment(TextAlignment.CENTER).SetFontSize(14);
+
+            Table AddHeaderCell90(string text) => aTable.AddCell(headerCell.Clone(false).Add(CreateParagraph(text).SetRotationAngle(DegreesToRadians(90))));
+            Table AddHeaderCell(string text) => aTable.AddCell(headerCell.Clone(false).Add(CreateParagraph(text).SetFixedLeading(11)));
+
+            AddHeaderCell90("Формат");
+            AddHeaderCell90("Зона");
+            AddHeaderCell90("Поз.");
+            AddHeaderCell("Обозначение");
+            AddHeaderCell("Наименование");
+            AddHeaderCell90("Кол.");
+            AddHeaderCell("Приме-\nчание");
+        }
+
         Table CreateDataTable(DataTableStruct aDataTableStruct, out int outLastProcessedRow) {
             const int COLUMNS = 7;
-            var aData = aDataTableStruct.Data;
-            var aGraphs = aDataTableStruct.Graphs;
-            var aFirstPage = aDataTableStruct.FirstPage;
             var aStartRow = aDataTableStruct.StartRow;
 
             float[] columnSizes = { 
@@ -144,22 +153,9 @@ namespace GostDOC.PDF
 
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
             tbl.SetMargin(0).SetPadding(0);
+            
+            AddDataTableHeader(tbl);
 
-            Cell headerCell = new Cell().SetPadding(0).SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorder(CreateThickBorder()).SetHeight(15*mmH());
-            Paragraph CreateParagraph(string text) => new Paragraph(text).SetFont(f1).SetItalic().SetTextAlignment(TextAlignment.CENTER).SetFontSize(14);
-
-            Table AddHeaderCell90(string text) => tbl.AddCell(headerCell.Clone(false).Add(CreateParagraph(text).SetRotationAngle(DegreesToRadians(90))));
-            Table AddHeaderCell(string text) => tbl.AddCell(headerCell.Clone(false).Add(CreateParagraph(text).SetFixedLeading(11)));
-
-            AddHeaderCell90("Формат");
-            AddHeaderCell90("Зона");
-            AddHeaderCell90("Поз.");
-            AddHeaderCell("Обозначение");
-            AddHeaderCell("Наименование");
-            AddHeaderCell90("Кол.");
-            AddHeaderCell("Приме-\nчание");
-
-            // fill table
             Cell centrAlignCell = CreateEmptyCell(1, 1, 2, 2, 0, 1)
                 .SetMargin(0)
                 .SetPaddings(0, 0, 0, 0)
@@ -178,13 +174,11 @@ namespace GostDOC.PDF
                 .SetBorderLeft(CreateThickBorder())
                 .SetBorderRight(CreateThickBorder())
                 .SetFontSize(14);
-            float fontSize = 14;
-            PdfFont font = leftPaddCell.GetProperty<PdfFont>(20); // 20 - index for Font property
 
-            int remainingPdfTableRows = (aFirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
+            int remainingPdfTableRows = (aDataTableStruct.FirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
             outLastProcessedRow = aStartRow;
 
-            var Rows = aData.Rows.Cast<DataRow>().ToArray();
+            var Rows = aDataTableStruct.Data.Rows.Cast<DataRow>().ToArray();
             DataRow row;
             for (int ind = aStartRow; ind < Rows.Length; ind++) {
 
@@ -270,7 +264,7 @@ namespace GostDOC.PDF
             if (remainingPdfTableRows > 0) {
                 AddEmptyRowToPdfTable(tbl, remainingPdfTableRows, COLUMNS, centrAlignCell, true);
             }
-            if (outLastProcessedRow == aData.Rows.Count) {
+            if (outLastProcessedRow == aDataTableStruct.Data.Rows.Count) {
                 outLastProcessedRow = 0;
             }
 
