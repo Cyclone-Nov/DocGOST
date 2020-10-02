@@ -72,6 +72,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsUndoEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsRedoEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsSaveEnabled { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<bool> IsExportExcelEnabled { get; } = new ObservableProperty<bool>(false);
 
         // Drag / drop
         public DragDropFile DragDropFile { get; } = new DragDropFile();
@@ -102,7 +103,7 @@ namespace GostDOC.ViewModels
         public ICommand EditNameValueCmd => new Command<DataGrid>(EditNameValue);
         public ICommand EditComponentsCmd => new Command<DataGrid>(EditComponents);
         public ICommand ExportPDFCmd => new Command(ExportPDF, IsSaveEnabled);
-        public ICommand ExportExcelCmd => new Command(ExportExcel, IsSaveEnabled);
+        public ICommand ExportExcelCmd => new Command(ExportExcel, IsExportExcelEnabled);
         public ICommand ImportMaterialsCmd => new Command(ImportMaterials);
         public ICommand SaveMaterialsCmd => new Command(SaveMaterials);
         public ICommand UpdateMaterialsCmd => new Command(UpdateMaterials);
@@ -186,6 +187,7 @@ namespace GostDOC.ViewModels
             if (txt != null)
             {
                 Clipboard.SetText(txt);
+                cellInfo.Column.OnCopyingCellClipboardContent(cellInfo.Item);
             }
         }
 
@@ -195,6 +197,7 @@ namespace GostDOC.ViewModels
             if (txtBlock != null)
             {
                 txtBlock.Text = Clipboard.GetText();
+                cellInfo.Column.OnPastingCellClipboardContent(cellInfo.Item, txtBlock.Text);
             }
         }
 
@@ -304,9 +307,10 @@ namespace GostDOC.ViewModels
 
                 DocNodes.Clear();
                 DocNodes.Add(_specification);
-                _docType = DocType.Specification;
                 
                 _filePath = string.Empty;
+
+                UpdateDocType(DocType.Specification);
                 UpdateTitle();
                 UpdateData();
                 HideTables();
@@ -669,7 +673,7 @@ namespace GostDOC.ViewModels
             string path = CommonDialogs.OpenFile("xml Files *.xml | *.xml", "Выбрать файл...");
             if (!string.IsNullOrEmpty(path))
             {
-                _docType = aDocType;
+                UpdateDocType(aDocType);
 
                 if (OpenFile(path))
                 {
@@ -679,7 +683,7 @@ namespace GostDOC.ViewModels
                 }
                 else
                 {
-                    _docType = DocType.None;
+                    UpdateDocType(DocType.None);
                     IsSaveEnabled.Value = false;
                 }
 
@@ -968,6 +972,12 @@ namespace GostDOC.ViewModels
             IsSpecificationTableVisible.Value = false;
             IsBillTableVisible.Value = false;
             IsGeneralGraphValuesVisible.Value = false;
+        }
+
+        private void UpdateDocType(DocType aType)
+        {
+            _docType = aType;
+            IsExportExcelEnabled.Value = _excelManager.CanExport(_docType);
         }
     }
 }

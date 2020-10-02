@@ -57,7 +57,7 @@
                 <MenuItem Header="Сохранить как..." Command="{Binding SaveFileAsCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
                 <Separator />
                 <MenuItem Header="Экспорт в PDF" InputGestureText="F5" Command="{Binding ExportPDFCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
-                <MenuItem Header="Экспорт в XLSX" InputGestureText="F6" Command="{Binding ExportExcelCmd}" IsEnabled="{Binding IsSaveEnabled.Value}"/>
+                <MenuItem Header="Экспорт в XLSX" InputGestureText="F6" Command="{Binding ExportExcelCmd}" IsEnabled="{Binding IsExportExcelEnabled.Value}"/>
             </MenuItem>
             <MenuItem Header="Документы">
                 <MenuItem Header="Новая спецификация" Command="{Binding NewFileCmd}"/>
