@@ -288,7 +288,7 @@ namespace GostDOC.PDF
             public int Pages;
             public int CurrentPage;
             public bool AppendGraphs = true;
-
+            public DocType DocType;
         }
 
         protected struct DataTableStruct {
@@ -317,6 +317,7 @@ namespace GostDOC.PDF
             string GetGraph(string graph) {
                 return GetGraphByName(aGraphs, graph);
             }
+
 
             #region Пустая ячейка слева
 
@@ -480,12 +481,21 @@ namespace GostDOC.PDF
             #region Правая нижняя таблица
 
             var rightBottomTable = new Table(UnitValue.CreatePercentArray(new[] {1f})).UseAllAvailableWidth();
+            var graph2 = GetGraph(Constants.GRAPH_2);
+            switch (titleBlockStruct.DocType) {
+                case DocType.Bill:
+                    graph2 += "ВП";
+                    break;
+                case DocType.ItemsList:
+                    graph2 += "ПЭ3";
+                    break;
+            }
             rightBottomTable.AddCell(
                 new Cell().Add(
-                        new Paragraph(GetGraph(Constants.GRAPH_2)).AddStyle(
-                            new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFont(f1).SetMarginLeft(20)
+                        new Paragraph(graph2).AddStyle(
+                            new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFont(f1).SetTextAlignment(TextAlignment.CENTER)
                                 .SetFontSize(20))).SetHeight(15 * mmH()).SetPaddings(0, 0, 1, 0)
-                    .SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorderLeft(Border.NO_BORDER)
+                    .SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorderLeft(Border.NO_BORDER).SetHorizontalAlignment(HorizontalAlignment.CENTER)
                     .SetBorderBottom(Border.NO_BORDER).SetBorderTop(CreateThickBorder())
                     .SetBorderRight(CreateThickBorder()));
 
@@ -565,7 +575,6 @@ namespace GostDOC.PDF
             mainTable.AddCell(CreateMainTableCell().Add(rightBottomTable));
 
             #endregion
-
 
 
             if (aPageSize.Contains(PageSize.A3)) {
