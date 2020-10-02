@@ -662,13 +662,13 @@ namespace GostDOC.PDF
                     SetBorderRight(Border.NO_BORDER).
                     SetBorderBottom(Border.NO_BORDER).
                     SetPadding(0).
-                    Add(CreateParagraph(titleBlockStruct.CurrentPage.ToString()).SetPaddingTop(2).SetPaddingLeft(7))); 
+                    Add(CreateParagraph(titleBlockStruct.CurrentPage.ToString()).SetPaddingTop(2).SetTextAlignment(TextAlignment.CENTER)/*.SetPaddingLeft(7)*/)); 
 
             rightestCell.Add(rightestCellTable);
             tbl.AddCell(rightestCell);
 
             void AddGraphCell(string text, bool bottomBorder=false) {
-                var c = CreateCell().Add(CreateParagraph(text));
+                var c = CreateCell().Add(CreateParagraph(text).SetTextAlignment(TextAlignment.CENTER));
                 if (bottomBorder) {
                     c.SetBorderBottom(CreateThickBorder());
                 }
