@@ -107,7 +107,7 @@ namespace GostDOC.PDF
             dataTable.SetFixedPosition(
                 19.3f * mmW(), 
                 PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNamuber) + TOP_MARGIN_MM * mmH()) + 5.51f,
-                TITLE_BLOCK_WIDTH+2f);
+                TITLE_BLOCK_WIDTH);
             aInDoc.Add(dataTable);
             
             // добавить таблицу с основной надписью 
@@ -116,7 +116,7 @@ namespace GostDOC.PDF
             // добавить таблицу с нижней дополнительной графой
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
-            DrawMissingLinesNextPage(_currentPageNumber);
+            DrawLines(_currentPageNumber);
 
             return lastProcessedRow;
         }
@@ -287,9 +287,9 @@ namespace GostDOC.PDF
                 .SetRotationAngle(DegreesToRadians(90)));
 
         }
-        private void DrawMissingLinesNextPage(int pageNumber) {
+        private void DrawLines(int pageNumber) {
             // нарисовать недостающую линию
-            var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH;
+            var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH-2f;
             Canvas canvas = new Canvas(new PdfCanvas(_pdfDoc.GetPage(pageNumber)),
                 new Rectangle(fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 60));
             canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(50)
