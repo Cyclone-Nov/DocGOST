@@ -41,12 +41,6 @@ namespace GostDOC.DataPreparation
             var otherConfigsElements = MakeComponentDesignatorsDictionaryOtherConfigs(aConfigs);
 
             DataTable table = CreateTable("SpecificationData");
-            
-//            if (data.TryGetValue(Constants.GroupDoc, out var documents)) {
-//                dtf.GroupName = "";
-//                dtf.Components = documents.Components;
-//                FillDataTable(dtf);
-//            }
 
             DataToFillTable dtf = new DataToFillTable{Table = table, OtherComponents = otherConfigsElements, SchemaDesignation = schemaDesignation};
             void Fill(string groupName) {
@@ -54,6 +48,20 @@ namespace GostDOC.DataPreparation
                     dtf.Components = someGroup.Components;
                     dtf.GroupName = groupName;
                     FillDataTable(dtf);
+
+                    if (someGroup.SubGroups.Count != 0) {
+                        if (groupName != Constants.GroupDoc) {
+                            AddEmptyRow(table);
+                            AddGroupName(table, groupName);
+                        }
+                    }
+
+                    foreach (KeyValuePair<string, Group> kvp in someGroup.SubGroups) {
+                        dtf.Components = kvp.Value.Components;
+                        dtf.GroupName = kvp.Key;
+                        FillDataTable(dtf);
+                    }
+
                 }
             }
 
@@ -88,7 +96,11 @@ namespace GostDOC.DataPreparation
             var aComponents = dataToFill.Components;
             var aSchemaDesignation = dataToFill.SchemaDesignation;
             var aOtherComponents = dataToFill.OtherComponents;
-            if (!aComponents.Any()) return;
+            if (!aComponents.Any()) {
+
+                return;
+
+            }
 
             var sortType = SortType.None;
 
