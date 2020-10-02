@@ -187,6 +187,7 @@ namespace GostDOC.ViewModels
             if (txt != null)
             {
                 Clipboard.SetText(txt);
+                cellInfo.Column.OnCopyingCellClipboardContent(cellInfo.Item);
             }
         }
 
@@ -196,6 +197,7 @@ namespace GostDOC.ViewModels
             if (txtBlock != null)
             {
                 txtBlock.Text = Clipboard.GetText();
+                cellInfo.Column.OnPastingCellClipboardContent(cellInfo.Item, txtBlock.Text);
             }
         }
 
