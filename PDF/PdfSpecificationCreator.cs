@@ -17,6 +17,7 @@ using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Layout;
 using iText.Layout.Properties;
+using Xceed.Wpf.Toolkit.Core.Converters;
 using Document = iText.Layout.Document;
 
 namespace GostDOC.PDF
@@ -123,11 +124,17 @@ namespace GostDOC.PDF
 
         void AddDataTableHeader(Table aTable) {
 
-            Cell headerCell = new Cell().SetPadding(0).SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorder(CreateThickBorder()).SetHeight(15*mmH());
+            Cell headerCell = new Cell().SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorder(CreateThickBorder()).SetHeight(15*mmH());
             Paragraph CreateParagraph(string text) => new Paragraph(text).SetFont(f1).SetItalic().SetTextAlignment(TextAlignment.CENTER).SetFontSize(14);
 
-            Table AddHeaderCell90(string text) => aTable.AddCell(headerCell.Clone(false).Add(CreateParagraph(text).SetRotationAngle(DegreesToRadians(90))));
-            Table AddHeaderCell(string text) => aTable.AddCell(headerCell.Clone(false).Add(CreateParagraph(text).SetFixedLeading(11)));
+            Table AddHeaderCell90(string text) => 
+                aTable.AddCell(headerCell.Clone(false)
+                    .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                    .SetVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .Add(CreateParagraph(text).SetRotationAngle(DegreesToRadians(90))));
+            Table AddHeaderCell(string text) => 
+                aTable.AddCell(headerCell.Clone(false)
+                    .Add(CreateParagraph(text).SetFixedLeading(11)));
 
             AddHeaderCell90("Формат");
             AddHeaderCell90("Зона");
