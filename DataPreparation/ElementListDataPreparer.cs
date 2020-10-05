@@ -18,7 +18,8 @@ internal class ElementListDataPreparer : BasePreparer {
     /// </summary>
     /// <param name="aConfigs"></param>
     /// <returns></returns>    
-    public override DataTable CreateDataTable(IDictionary<string, Configuration> aConfigs) {
+    public override DataTable CreateDataTable(IDictionary<string, Configuration> aConfigs)
+    {
         // выбираем основную конфигурацию
         Configuration mainConfig = null;
         if (!aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out mainConfig))

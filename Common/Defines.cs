@@ -250,6 +250,10 @@ namespace GostDOC.Common
         /// раздел "Комплекты" для спецификации
         /// </summary>
         public static readonly string GroupKits = "Комплекты";
+        /// <summary>
+        /// группа для компонентов, не вошедших ни в одному группу (ВП)
+        /// </summary>
+        public static readonly string GroupMainCompontns = "";
 
         #endregion
 
@@ -313,6 +317,46 @@ namespace GostDOC.Common
         /// Зона
         /// </summary>
         public static readonly string ColumnZone = "Zone";
+
+        /// <summary>
+        /// Код продукции
+        /// </summary>
+        public static readonly string ColumnProductCode = "ProductCode";
+
+        /// <summary>
+        /// Обозначение документа на поставку
+        /// </summary>
+        public static readonly string ColumnDeliveryDocSign = "DeliveryDocSign";
+
+        /// <summary>
+        /// Поставщик
+        /// </summary>
+        public static readonly string ColumnSupplier = "Supplier";
+
+        /// <summary>
+        /// Куда входит (обозначение)
+        /// </summary>
+        public static readonly string ColumnEntry = "Entry";
+
+        /// <summary>
+        /// Количество на изделие
+        /// </summary>
+        public static readonly string ColumnQuantityDevice = "QuantityDevice";
+
+        /// <summary>
+        /// Количество в комплекты
+        /// </summary>
+        public static readonly string ColumnQuantityComplex = "QuantityComplex";
+
+        /// <summary>
+        /// Количество на регулир.
+        /// </summary>
+        public static readonly string ColumnQuantityRegul = "QuantityRegul";
+
+        /// <summary>
+        /// Количество всего
+        /// </summary>
+        public static readonly string ColumnQuantityTotal = "QuantityTotal";
 
         #endregion
 
