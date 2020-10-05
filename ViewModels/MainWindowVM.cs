@@ -110,7 +110,6 @@ namespace GostDOC.ViewModels
         public ICommand UpdateMaterialsCmd => new Command(UpdateMaterials);
         public ICommand CopyCellCmd => new Command<DataGridCellInfo>(CopyCell);
         public ICommand PasteCellCmd => new Command<DataGridCellInfo>(PasteCell);
-
         public string WindowTitle
         {
             get
