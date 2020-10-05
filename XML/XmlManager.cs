@@ -247,7 +247,7 @@ namespace GostDOC.Models
                     if (IsComplexComponent(groups[0]))
                     {
                         string val;
-                        if (component.Properties.TryGetValue(Constants.ComponentSign, out val))
+                        if (component.Properties.TryGetValue(Constants.ComponentSign, out val) && !string.IsNullOrEmpty(val))
                         {
                             ParseAssemblyUnit(aNewCfg, val);
                         }
