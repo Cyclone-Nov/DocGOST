@@ -18,6 +18,11 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
 
+            <DataGrid.InputBindings>
+                <KeyBinding Key="C" Modifiers="Ctrl" Command="{Binding CopyCellCmd}" CommandParameter="{Binding CurrentCell, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                <KeyBinding Key="V" Modifiers="Ctrl" Command="{Binding PasteCellCmd}" CommandParameter="{Binding CurrentCell, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+            </DataGrid.InputBindings>
+
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="ContentTemplate">

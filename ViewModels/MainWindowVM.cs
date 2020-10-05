@@ -27,7 +27,7 @@ namespace GostDOC.ViewModels
         private Node _elements = new Node() { Name = "Перечень элементов", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
         private Node _specification = new Node() { Name = "Спецификация", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
         private Node _bill = new Node() { Name = "Ведомость покупных изделий", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
-        private Node _bill_D27 = new Node() { Name = "Ведомость Д27", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
+        private Node _bill_D27 = new Node() { Name = "Ведомость комплектации", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
 
         private DocType _docType = DocType.None;
 
@@ -73,6 +73,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsRedoEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsSaveEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsExportExcelEnabled { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<bool> IsExportPdfEnabled { get; } = new ObservableProperty<bool>(false);
 
         // Drag / drop
         public DragDropFile DragDropFile { get; } = new DragDropFile();
@@ -98,18 +99,17 @@ namespace GostDOC.ViewModels
         public ICommand SaveComponentsCmd => new Command(SaveComponents);
         public ICommand UpComponentsCmd => new Command<IList<object>>(UpComponents);
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
-        public ICommand UpdatePdfCmd => new Command(UpdatePdf);
+        public ICommand UpdatePdfCmd => new Command(UpdatePdf, IsExportPdfEnabled);
         public ICommand ClickMenuCmd => new Command<MenuNode>(ClickMenu);
         public ICommand EditNameValueCmd => new Command<DataGrid>(EditNameValue);
         public ICommand EditComponentsCmd => new Command<DataGrid>(EditComponents);
-        public ICommand ExportPDFCmd => new Command(ExportPDF, IsSaveEnabled);
+        public ICommand ExportPDFCmd => new Command(ExportPDF, IsExportPdfEnabled);
         public ICommand ExportExcelCmd => new Command(ExportExcel, IsExportExcelEnabled);
         public ICommand ImportMaterialsCmd => new Command(ImportMaterials);
         public ICommand SaveMaterialsCmd => new Command(SaveMaterials);
         public ICommand UpdateMaterialsCmd => new Command(UpdateMaterials);
         public ICommand CopyCellCmd => new Command<DataGridCellInfo>(CopyCell);
         public ICommand PasteCellCmd => new Command<DataGridCellInfo>(PasteCell);
-
         public string WindowTitle
         {
             get
@@ -978,6 +978,7 @@ namespace GostDOC.ViewModels
         {
             _docType = aType;
             IsExportExcelEnabled.Value = _excelManager.CanExport(_docType);
+            IsExportPdfEnabled.Value = _docType == DocType.Specification || _docType == DocType.Bill || _docType == DocType.ItemsList;
         }
     }
 }
