@@ -507,10 +507,25 @@ namespace GostDOC.PDF
 
             var textStyle = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1);
 
-            innerRightBottomTable.AddCell(
-                new Cell().AddStyle(textStyle).SetBorderLeft(Border.NO_BORDER).SetBorderRight(Border.NO_BORDER)
-                    .SetBorderTop(CreateThickBorder()).SetBorderBottom(Border.NO_BORDER).SetPaddings(-1, 0, 0, 0)
-                    .SetVerticalAlignment(VerticalAlignment.MIDDLE).Add(new Paragraph(GetGraph(Constants.GRAPH_1))));
+            string documentTypeGraph1 = "";
+            switch (titleBlockStruct.DocType) {
+                case DocType.Bill:
+                    documentTypeGraph1 = "Ведомость покупных изделий";
+                    break;
+                case DocType.ItemsList:
+                    documentTypeGraph1 = "Перечень элементов";
+                    break;
+            }
+
+            var graph2Cell = new Cell().AddStyle(textStyle).SetBorderLeft(Border.NO_BORDER)
+                .SetBorderRight(Border.NO_BORDER)
+                .SetBorderTop(CreateThickBorder()).SetBorderBottom(Border.NO_BORDER).SetPaddings(-1, 0, 0, 0)
+                .SetVerticalAlignment(VerticalAlignment.MIDDLE)
+                .Add(new Paragraph(GetGraph(Constants.GRAPH_1)).SetFontSize(20));
+            if (!string.IsNullOrEmpty(documentTypeGraph1)) {
+                graph2Cell.Add(new Paragraph(documentTypeGraph1).SetFontSize(12));
+            }
+            innerRightBottomTable.AddCell(graph2Cell);
 
             var tableGraph4789 =
                 new Table(UnitValue.CreatePointArray(new[] {
