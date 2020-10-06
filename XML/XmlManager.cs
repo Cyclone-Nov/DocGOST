@@ -116,6 +116,9 @@ namespace GostDOC.Models
                 {
                     ComponentXml cmp = new ComponentXml();
                     PropertiesToXml(component.Properties, cmp.Properties);
+
+                    SetProperty(cmp, Constants.ComponentCountDev, "1");
+
                     for (int i = 0; i < component.Count; i++)
                     {
                         switch (component.Type)
