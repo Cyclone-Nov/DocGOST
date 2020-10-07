@@ -116,6 +116,9 @@ namespace GostDOC.Models
                 {
                     ComponentXml cmp = new ComponentXml();
                     PropertiesToXml(component.Properties, cmp.Properties);
+
+                    SetProperty(cmp, Constants.ComponentCountDev, "1");
+
                     for (int i = 0; i < component.Count; i++)
                     {
                         switch (component.Type)
@@ -247,7 +250,7 @@ namespace GostDOC.Models
                     if (IsComplexComponent(groups[0]))
                     {
                         string val;
-                        if (component.Properties.TryGetValue(Constants.ComponentSign, out val))
+                        if (component.Properties.TryGetValue(Constants.ComponentSign, out val) && !string.IsNullOrEmpty(val))
                         {
                             ParseAssemblyUnit(aNewCfg, val);
                         }

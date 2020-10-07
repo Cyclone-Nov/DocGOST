@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Common;
+using GostDOC.DataPreparation;
 using GostDOC.Models;
 using iText.Kernel.Font;
 using iText.Kernel.Geom;
@@ -75,7 +76,7 @@ namespace GostDOC.PDF
                 AddRegisterList(_doc, graphs, _currentPageNumber);
             }
 
-            AddPageCountOnFirstPage(_doc, _currentPageNumber);
+            //AddPageCountOnFirstPage(_doc, _currentPageNumber);
 
             _doc.Close();            
         }
@@ -84,7 +85,7 @@ namespace GostDOC.PDF
             SetPageMargins(aInDoc);
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
             aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, DocType = DocType.Bill}));
-            aInDoc.Add(CreateTable(null, true, 0, out var lpr));
+            aInDoc.Add(CreateTable(aData, true, 0, out var lpr));
             DrawLines(_pdfDoc.GetFirstPage());
             return lpr;
         }
@@ -106,6 +107,8 @@ namespace GostDOC.PDF
         }
 
         Table CreateTable(DataTable aData, bool firstPage, int aStartRow, out int outLastProcessedRow) {
+            
+            const int COLUMNS = 11;
             float[] columnSizes = {
                 60 * mmW(), 
                 45 * mmW(), 
@@ -121,10 +124,143 @@ namespace GostDOC.PDF
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
             tbl.SetMargin(0).SetPadding(0).SetFont(f1).SetFontSize(12).SetItalic().SetTextAlignment(TextAlignment.CENTER);
 
+            Cell centrAlignCell = CreateEmptyCell(1, 1, 2, 2, 0, 1)
+                .SetMargin(0)
+                .SetPaddings(0, 0, 0, 0)
+                .SetHeight(8 * PdfDefines.mmAXh)
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetItalic()
+                .SetFont(f1)
+                .SetBorderLeft(THICK_BORDER)
+                .SetBorderRight(THICK_BORDER)
+                .SetFontSize(14)
+                .SetHeight(8 * mmH());
+            Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2)
+                .SetHeight(8 * PdfDefines.mmAXh)
+                .SetTextAlignment(TextAlignment.LEFT)
+                .SetItalic()
+                .SetFont(f1)
+                .SetBorderLeft(THICK_BORDER)
+                .SetBorderRight(THICK_BORDER)
+                .SetFontSize(14)
+                .SetHeight(8 * mmH());
+
+            AddDataTableHeader(tbl);
+
+            var rowNumber = firstPage ? RowNumberOnFirstPage : RowNumberOnNextPage;
+            outLastProcessedRow = aStartRow;
+
+            var Rows = aData.Rows.Cast<DataRow>().ToArray();
+            DataRow row;
+            int inc = 0;
+            for (int ind = aStartRow; ind < Rows.Length; ind++)
+            {
+                if (rowNumber <= 0) {
+                    break;
+                }
+
+                row = Rows[ind];
+
+                string GetCellString(string columnName) =>(row[columnName] == DBNull.Value)
+                    ? string.Empty
+                    : (string) row[columnName];
+
+                BasePreparer.FormattedString GetCellStringFormatted(string columnName) =>
+                (row[columnName] == System.DBNull.Value)
+                    ? null 
+                    : ((BasePreparer.FormattedString) row[columnName]);
+                                    
+                string name = GetCellString(Constants.ColumnName);
+                string productCode = GetCellString(Constants.ColumnProductCode);
+                string deliveryDocSign = GetCellString(Constants.ColumnDeliveryDocSign);
+                string supplier = GetCellString(Constants.ColumnSupplier);
+                string entry = GetCellString(Constants.ColumnEntry);
+                int quantityDev = (row[Constants.ColumnQuantityDevice] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityDevice];
+                int quantityComplex = (row[Constants.ColumnQuantityComplex] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityComplex];
+                int quantityReg = (row[Constants.ColumnQuantityRegul] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityRegul];
+                int quantityTotal = (row[Constants.ColumnQuantityTotal] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityTotal];
+                string note = GetCellString(Constants.ColumnFootnote);
+
+                inc++;
+                if (string.IsNullOrEmpty(name)) 
+                {
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(inc.ToString())));
+                    AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 1, leftPaddCell);
+                    rowNumber--;
+                }
+                else if (string.IsNullOrEmpty(productCode) && string.IsNullOrEmpty(deliveryDocSign) && string.IsNullOrEmpty(supplier) && string.IsNullOrEmpty(entry)) 
+                {
+                    // это наименование группы
+                    if (rowNumber > 4) 
+                    {
+                        // если есть место для записи более 4 строк то записываем группу, иначе выходим
+                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));                        
+                        tbl.AddCell(leftPaddCell.Clone(true).Add(new Paragraph(name)));
+                        tbl.AddCell(leftPaddCell.Clone(false)); // Код продукции
+                        tbl.AddCell(leftPaddCell.Clone(false)); // Обозначение документа на поставку
+                        tbl.AddCell(leftPaddCell.Clone(false)); // Поставщик
+                        tbl.AddCell(leftPaddCell.Clone(false)); // Куда входит (обозначение)
+                        tbl.AddCell(leftPaddCell.Clone(false)); // Количество на изделие
+                        tbl.AddCell(leftPaddCell.Clone(false)); // Количество в комплекты
+                        tbl.AddCell(leftPaddCell.Clone(false)); // Количество на регулир.
+                        tbl.AddCell(leftPaddCell.Clone(false)); // Количество всего
+                        tbl.AddCell(leftPaddCell.Clone(false)); // Примечание
+                        rowNumber--;
+                    }
+                    else                 
+                        break;                
+                }
+                else 
+                {
+                    // просто запишем строку
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));                        
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(name)));
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(productCode))); // Код продукции
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(deliveryDocSign))); // Обозначение документа на поставку
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(supplier))); // Поставщик
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(entry))); // Куда входит (обозначение)
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(quantityDev.ToString()))); // Количество на изделие
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(quantityComplex.ToString()))); // Количество в комплекты
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(quantityReg.ToString()))); // Количество на регулир.
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(quantityTotal.ToString()))); // Количество всего
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note))); // Примечание
+                    rowNumber--; 
+                }
+                outLastProcessedRow++;
+            }
+
+
+            //for (int i = 0; i < (rowNumber-1)*10; ++i) {
+            //    tbl.AddCell(CreateCell().SetHeight(8*mmH()));
+            //}
+            //for (int i = 0; i < 10; ++i) {
+            //    tbl.AddCell(CreateCell().SetBorderBottom(THICK_BORDER).SetHeight(8*mmH()));
+            //}
+
+            var ass  = columnSizes.Sum();
+            var bottom = firstPage ? BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_FULL_HEIGHT_MM * mmH() : 0;
+            tbl.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, bottom, columnSizes.Sum() + 8*mmW() +0.5f);
+
+             // дополним таблицу пустыми строками если она не полностью заполнена
+            if (rowNumber > 0) {
+                AddEmptyRowToPdfTable(tbl, rowNumber, COLUMNS, centrAlignCell, true);
+            }
+            if (outLastProcessedRow == aData.Rows.Count) {
+                outLastProcessedRow = 0;
+            }
+            return tbl;
+        }
+
+        /// <summary>
+        /// Adds the data table header.
+        /// </summary>
+        /// <param name="aTable">a table.</param>
+        void AddDataTableHeader(Table aTable) {
+
             Cell CreateCell(int rowspan=1, int colspan=1) => new Cell(rowspan, colspan).SetPadding(0).SetMargin(0).SetBorderLeft(THICK_BORDER).SetBorderRight(THICK_BORDER);
 
-            void AddMainHeaderCell(string text) => 
-                tbl.AddCell(CreateCell(2,1)
+            void AddMainHeaderCell(string text) =>
+                aTable.AddCell(CreateCell(2,1)
                     .SetVerticalAlignment(VerticalAlignment.MIDDLE)
                     .SetBorder(THICK_BORDER).Add(new Paragraph(text)));
 
@@ -134,37 +270,20 @@ namespace GostDOC.PDF
             AddMainHeaderCell("Поставщик");
             AddMainHeaderCell("Куда входит (обозначение)");
 
-            tbl.AddCell(
+            aTable.AddCell(
                 CreateCell(1, 4)
                     .SetBorder(THICK_BORDER)
                     .SetVerticalAlignment(VerticalAlignment.MIDDLE)
                     .SetHeight(9*mmH()).Add(new Paragraph("Количество")));
             AddMainHeaderCell("Примечание");
             
-            void AddSecondaryHeaderCell(string text) => tbl.AddCell(CreateCell().SetBorder(THICK_BORDER).SetHeight(18*mmH()).Add(new Paragraph(text)));
+            void AddSecondaryHeaderCell(string text) => aTable.AddCell(CreateCell().SetBorder(THICK_BORDER).SetHeight(18*mmH()).Add(new Paragraph(text)));
 
             AddSecondaryHeaderCell("на из-\nделие");
             AddSecondaryHeaderCell("в ком-\nплекте");
             AddSecondaryHeaderCell("на ре-\nгулир");
             AddSecondaryHeaderCell("всего");
-
-
-            var rowNumber = firstPage ? RowNumberOnFirstPage : RowNumberOnNextPage;
-            for (int i = 0; i < (rowNumber-1)*10; ++i) {
-                tbl.AddCell(CreateCell().SetHeight(8*mmH()));
-            }
-            for (int i = 0; i < 10; ++i) {
-                tbl.AddCell(CreateCell().SetBorderBottom(THICK_BORDER).SetHeight(8*mmH()));
-            }
-
-            var ass  = columnSizes.Sum();
-            var bottom = firstPage ? BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_FULL_HEIGHT_MM * mmH() : 0;
-            tbl.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, bottom, columnSizes.Sum() + 8*mmW() +0.5f);
-
-            outLastProcessedRow = 0;
-            return tbl;
         }
-
 
         void DrawLines(PdfPage aPage) {
             var pageWidth = aPage.GetPageSize().GetWidth();

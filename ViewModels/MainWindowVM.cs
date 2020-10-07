@@ -897,6 +897,9 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentCountSet, aSrc.CountSet.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCountReg, aSrc.CountReg.Value.ToString());
 
+            // добавим кол-во компонентов чтобы при сохранении их сохранялось столько же
+            aDst.Count = aSrc.CountDev.Value;
+
             if (aSrc.NoteSP.Value != aSrc.DesignatorID.Value)
             {
                 aDst.Properties.Add(Constants.ComponentNote, aSrc.NoteSP.Value);
