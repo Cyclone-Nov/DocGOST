@@ -117,23 +117,20 @@ namespace GostDOC.Models
                     ComponentXml cmp = new ComponentXml();
                     PropertiesToXml(component.Properties, cmp.Properties);
 
-                    SetProperty(cmp, Constants.ComponentCountDev, "1");
-
-                    for (int i = 0; i < component.Count; i++)
+                    SetProperty(cmp, Constants.ComponentCount, component.Count.ToString());
+                    
+                    switch (component.Type)
                     {
-                        switch (component.Type)
-                        {
-                            case ComponentType.Document:
-                                cfgXml.Documents.Add(cmp);
-                                break;
-                            case ComponentType.ComponentPCB:
-                                cfgXml.ComponentsPCB.Add(cmp);
-                                break;
-                            default:
-                                cfgXml.Components.Add(cmp);
-                                break;
-                        }
-                    }
+                        case ComponentType.Document:
+                            cfgXml.Documents.Add(cmp);
+                            break;
+                        case ComponentType.ComponentPCB:
+                            cfgXml.ComponentsPCB.Add(cmp);
+                            break;
+                        default:
+                            cfgXml.Components.Add(cmp);
+                            break;
+                    }                    
                 }
 
                 _xml.Transaction.Project.Configurations.Add(cfgXml);
@@ -442,7 +439,7 @@ namespace GostDOC.Models
         {
             uint count = 0;
             // Read count if set
-            uint.TryParse(GetProperty(aComponent, Constants.ComponentCountDev), out count);
+            uint.TryParse(GetProperty(aComponent, Constants.ComponentCount), out count);
             // Return 1 as default or count if set
             return count > 0 ? count : 1;                
         }
