@@ -121,12 +121,12 @@ namespace GostDOC.PDF
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
             tbl.SetMargin(0).SetPadding(0).SetFont(f1).SetFontSize(12).SetItalic().SetTextAlignment(TextAlignment.CENTER);
 
-            Cell CreateCell(int rowspan=1, int colspan=1) => new Cell(rowspan, colspan).SetPadding(0).SetMargin(0).SetBorderLeft(CreateThickBorder()).SetBorderRight(CreateThickBorder());
+            Cell CreateCell(int rowspan=1, int colspan=1) => new Cell(rowspan, colspan).SetPadding(0).SetMargin(0).SetBorderLeft(THICK_BORDER).SetBorderRight(THICK_BORDER);
 
             void AddMainHeaderCell(string text) => 
                 tbl.AddCell(CreateCell(2,1)
                     .SetVerticalAlignment(VerticalAlignment.MIDDLE)
-                    .SetBorder(CreateThickBorder()).Add(new Paragraph(text)));
+                    .SetBorder(THICK_BORDER).Add(new Paragraph(text)));
 
             AddMainHeaderCell("Наименование");
             AddMainHeaderCell("Код продукции");
@@ -136,12 +136,12 @@ namespace GostDOC.PDF
 
             tbl.AddCell(
                 CreateCell(1, 4)
-                    .SetBorder(CreateThickBorder())
+                    .SetBorder(THICK_BORDER)
                     .SetVerticalAlignment(VerticalAlignment.MIDDLE)
                     .SetHeight(9*mmH()).Add(new Paragraph("Количество")));
             AddMainHeaderCell("Примечание");
             
-            void AddSecondaryHeaderCell(string text) => tbl.AddCell(CreateCell().SetBorder(CreateThickBorder()).SetHeight(18*mmH()).Add(new Paragraph(text)));
+            void AddSecondaryHeaderCell(string text) => tbl.AddCell(CreateCell().SetBorder(THICK_BORDER).SetHeight(18*mmH()).Add(new Paragraph(text)));
 
             AddSecondaryHeaderCell("на из-\nделие");
             AddSecondaryHeaderCell("в ком-\nплекте");
@@ -154,7 +154,7 @@ namespace GostDOC.PDF
                 tbl.AddCell(CreateCell().SetHeight(8*mmH()));
             }
             for (int i = 0; i < 10; ++i) {
-                tbl.AddCell(CreateCell().SetBorderBottom(CreateThickBorder()).SetHeight(8*mmH()));
+                tbl.AddCell(CreateCell().SetBorderBottom(THICK_BORDER).SetHeight(8*mmH()));
             }
 
             var ass  = columnSizes.Sum();

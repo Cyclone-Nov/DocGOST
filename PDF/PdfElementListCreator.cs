@@ -21,6 +21,7 @@ namespace GostDOC.PDF {
 internal class PdfElementListCreator : PdfCreator {
 
     private const string FileName = @"Перечень элементов.pdf";
+    private readonly float DATA_TABLE_LEFT = 19.3f * mmW() - TO_LEFT_CORRECTION;
 
     public PdfElementListCreator() : base(DocType.ItemsList) 
     {
@@ -67,8 +68,6 @@ internal class PdfElementListCreator : PdfCreator {
             AddRegisterList(_doc, graphs, _currentPageNumber);
         }
 
-        //AddPageCountOnFirstPage(_doc, _currentPageNumber);
-
         _doc.Close();
      }
 
@@ -81,7 +80,10 @@ internal class PdfElementListCreator : PdfCreator {
 
         // добавить таблицу с данными
         var dataTable = CreateDataTable(new DataTableStruct {Data = aData, FirstPage = true, StartRow = 0}, out var lastProcessedRow);
-        dataTable.SetFixedPosition(19.3f * mmW(), 78 * mmW()+0.48f, TITLE_BLOCK_WIDTH);
+        dataTable.SetFixedPosition(
+            DATA_TABLE_LEFT,
+            PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 5.51f,
+            TITLE_BLOCK_WIDTH);
         aInDoc.Add(dataTable);
 
         // добавить таблицу с основной надписью для первой старницы
@@ -92,8 +94,8 @@ internal class PdfElementListCreator : PdfCreator {
 
         // добавить таблицу с нижней дополнительной графой
         aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
-        
-        DrawLinesFirstPage();
+
+        DrawLines(1);
         AddSecondaryElements(aInDoc, aGraphs);
 
         return lastProcessedRow;
@@ -101,37 +103,33 @@ internal class PdfElementListCreator : PdfCreator {
 
     void AddSecondaryElements(Document aInDoc, IDictionary<string, string> aGraphs) {
         var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
-        var p = new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT)).SetRotationAngle(DegreesToRadians(90))
-            .AddStyle(style).SetFixedPosition(10 * mmW() + 2,
-                TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * mmW(), 100);
+
+        var p = 
+            new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT))
+                .SetRotationAngle(DegreesToRadians(90))
+                .AddStyle(style)
+                .SetFixedPosition(10 * mmW() + 2 - TO_LEFT_CORRECTION, TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * mmW(), 100);
         aInDoc.Add(p);
-        p = new Paragraph("Копировал").AddStyle(style)
-            .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 14) * mmW(), 0, 100);
+
+        float bottom = -2;
+        p = new Paragraph("Копировал")
+            .AddStyle(style)
+            .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 14) * mmW()-TO_LEFT_CORRECTION, bottom, 100);
         aInDoc.Add(p);
         p = new Paragraph("Формат А4").AddStyle(style)
-            .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 70) * mmW() + 20, 0, 100);
+            .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 70) * mmW() + 20 - TO_LEFT_CORRECTION, bottom, 100);
         aInDoc.Add(p);
-
-    }
-
-    void DrawLinesFirstPage() {
-        // нарисовать недостающую линию
-        var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH-2f;
-        Canvas canvas = new Canvas(
-            new PdfCanvas(_pdfDoc.GetFirstPage()), 
-            new Rectangle(fromLeft, BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM * mmH() + 2f, 2, 100));
-        canvas.Add(new LineSeparator(
-            new SolidLine(THICK_LINE_WIDTH)).SetWidth(100).SetRotationAngle(DegreesToRadians(90)));
     }
 
     void DrawLines(int aPageNumber) {
-        // нарисовать недостающую линию
-        var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH-2f;
-        Canvas canvas = new Canvas(
-            new PdfCanvas(_pdfDoc.GetPage(aPageNumber)), 
-            new Rectangle(fromLeft, BOTTOM_MARGIN + 2f, 2, 100));
-        canvas.Add(new LineSeparator(
-            new SolidLine(THICK_LINE_WIDTH)).SetWidth(100).SetRotationAngle(DegreesToRadians(90)));
+        if (aPageNumber == 1) {
+            var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
+            DrawVerticalLine(1, fromLeft, BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM * mmH() + 2f, 2, 120);
+        }
+        else {
+            var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
+            DrawVerticalLine(aPageNumber, fromLeft, BOTTOM_MARGIN + 2f, 2, 100);
+        }
     }
 
 
@@ -148,9 +146,8 @@ internal class PdfElementListCreator : PdfCreator {
         // добавить таблицу с данными
         var dataTable = CreateDataTable(new DataTableStruct{Data = aData, FirstPage =false, StartRow = aStartRow}, out var lastProcessedRow);
         dataTable.SetFixedPosition(
-            19.3f * mmW(),
-            //BOTTOM_MARGIN + 16 * mmW()+2.5f, 
-            PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN_MM * mmH()) + 5.51f,
+            DATA_TABLE_LEFT,
+            PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNumber) + TOP_MARGIN) + 5.51f,
             TITLE_BLOCK_WIDTH);
         aInPdfDoc.Add(dataTable);
 

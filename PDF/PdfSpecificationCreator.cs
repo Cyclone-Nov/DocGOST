@@ -25,6 +25,7 @@ namespace GostDOC.PDF
     class PdfSpecificationCreator : PdfCreator {
 
         private static readonly float DATA_TABLE_CELL_HEIGHT_MM = 8;
+        private readonly float DATA_TABLE_LEFT = 19.3f * mmW() - TO_LEFT_CORRECTION;
 
         public PdfSpecificationCreator() : base(DocType.Specification) {
         }
@@ -74,14 +75,15 @@ namespace GostDOC.PDF
         }
 
 
+
         internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages) {
 
             SetPageMargins(aInDoc);
 
             var dataTable = CreateDataTable(new DataTableStruct{Data=aData, FirstPage = true, StartRow = 0}, out var lastProcessedRow);
             dataTable.SetFixedPosition(
-                19.3f * mmW(),
-                PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN_MM * mmH()) + 5.51f,
+                DATA_TABLE_LEFT,
+                PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 5.51f,
                 TITLE_BLOCK_WIDTH - 0.02f);
 
             aInDoc.Add(dataTable);
@@ -95,7 +97,7 @@ namespace GostDOC.PDF
             // добавить таблицу с нижней дополнительной графой
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
-            DrawMissingLinesFirstPage();
+            DrawLines(1);
 
             return lastProcessedRow;
         }
@@ -106,8 +108,10 @@ namespace GostDOC.PDF
             SetPageMargins(aInDoc);
             var dataTable = CreateDataTable(new DataTableStruct{Graphs = aGraphs, Data = aData, FirstPage = false, StartRow = aStartRow}, out var lastProcessedRow);
             dataTable.SetFixedPosition(
-                19.3f * mmW(), 
-                PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNamuber) + TOP_MARGIN_MM * mmH()) + 5.51f,
+                DATA_TABLE_LEFT,
+                PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 5.51f,
+                //19.3f * mmW(), 
+                //PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNamuber) + TOP_MARGIN_MM * mmH()) + 5.51f,
                 TITLE_BLOCK_WIDTH);
             aInDoc.Add(dataTable);
             
@@ -124,7 +128,7 @@ namespace GostDOC.PDF
 
         void AddDataTableHeader(Table aTable) {
 
-            Cell headerCell = new Cell().SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorder(CreateThickBorder()).SetHeight(15*mmH());
+            Cell headerCell = new Cell().SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorder(THICK_BORDER).SetHeight(15*mmH());
             Paragraph CreateParagraph(string text) => new Paragraph(text).SetFont(f1).SetItalic().SetTextAlignment(TextAlignment.CENTER).SetFontSize(14);
 
             Table AddHeaderCell90(string text) => 
@@ -170,16 +174,16 @@ namespace GostDOC.PDF
                 .SetTextAlignment(TextAlignment.CENTER)
                 .SetItalic()
                 .SetFont(f1)
-                .SetBorderLeft(CreateThickBorder())
-                .SetBorderRight(CreateThickBorder())
+                .SetBorderLeft(THICK_BORDER)
+                .SetBorderRight(THICK_BORDER)
                 .SetFontSize(14);
             Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2)
                 .SetHeight(8 * PdfDefines.mmAXh)
                 .SetTextAlignment(TextAlignment.LEFT)
                 .SetItalic()
                 .SetFont(f1)
-                .SetBorderLeft(CreateThickBorder())
-                .SetBorderRight(CreateThickBorder())
+                .SetBorderLeft(THICK_BORDER)
+                .SetBorderRight(THICK_BORDER)
                 .SetFontSize(14);
 
             int remainingPdfTableRows = (aDataTableStruct.FirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
@@ -251,8 +255,8 @@ namespace GostDOC.PDF
                     }
                 } else  {
                     if (remainingPdfTableRows == 1) {
-                        centrAlignCell.SetBorderBottom(CreateThickBorder());
-                        leftPaddCell.SetBorderBottom(CreateThickBorder());
+                        centrAlignCell.SetBorderBottom(THICK_BORDER);
+                        leftPaddCell.SetBorderBottom(THICK_BORDER);
                     }
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(format))); // формат
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(zone))); // зона
@@ -285,22 +289,21 @@ namespace GostDOC.PDF
             aDoc.SetBottomMargin(5 * mmW());
         }
 
-        private void DrawMissingLinesFirstPage() {
-            // нарисовать недостающую линию
-            var fromLeft = 19 * mmW() -1.17f /*+1.65f*/ + TITLE_BLOCK_WIDTH;
-            Canvas canvas = new Canvas(new PdfCanvas(_pdfDoc.GetFirstPage()),
-                new Rectangle(fromLeft, BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM * mmH() -2f, 2, 120));
-            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(120)
-                .SetRotationAngle(DegreesToRadians(90)));
+//        private void DrawMissingLinesFirstPage() {
+//            // нарисовать недостающую линию
+//            var fromLeft = 19 * mmW() -1.17f /*+1.65f*/ + TITLE_BLOCK_WIDTH;
+//            Canvas canvas = new Canvas(new PdfCanvas(_pdfDoc.GetFirstPage()),
+//                new Rectangle(fromLeft, BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM * mmH() -2f, 2, 120));
+//            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(120)
+//                .SetRotationAngle(DegreesToRadians(90)));
+//
+//        }
 
-        }
         private void DrawLines(int pageNumber) {
             // нарисовать недостающую линию
-            var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH-2f;
-            Canvas canvas = new Canvas(new PdfCanvas(_pdfDoc.GetPage(pageNumber)),
-                new Rectangle(fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 60));
-            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(50)
-                .SetRotationAngle(DegreesToRadians(90)));
+            
+            var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
+            DrawVerticalLine(pageNumber, fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 200);
 
         }
 
