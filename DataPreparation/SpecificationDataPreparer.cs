@@ -43,25 +43,32 @@ namespace GostDOC.DataPreparation
             DataTable table = CreateTable("SpecificationData");
 
             DataToFillTable dtf = new DataToFillTable{Table = table, OtherComponents = otherConfigsElements, SchemaDesignation = schemaDesignation};
+            int position = 0;
             void Fill(string groupName) {
                 if (data.TryGetValue(groupName, out var someGroup)) {
                     dtf.Components = someGroup.Components;
                     dtf.GroupName = groupName;
-                    FillDataTable(dtf);
+                    bool res = FillDataTable(dtf, ref position);
 
                     if (someGroup.SubGroups.Count != 0) {
                         if (groupName != Constants.GroupDoc) {
                             AddEmptyRow(table);
                             AddGroupName(table, groupName);
                         }
+
+                        foreach (KeyValuePair<string, Group> kvp in someGroup.SubGroups) {
+                            dtf.Components = kvp.Value.Components;
+                            dtf.GroupName = kvp.Key;
+                            res = FillDataTable(dtf, ref position);
+                        }
                     }
 
-                    foreach (KeyValuePair<string, Group> kvp in someGroup.SubGroups) {
-                        dtf.Components = kvp.Value.Components;
-                        dtf.GroupName = kvp.Key;
-                        FillDataTable(dtf);
+                    if (res)
+                    { 
+                        AddEmptyRow(table);
+                        AddEmptyRow(table);
+                        position +=2;
                     }
-
                 }
             }
 
@@ -92,14 +99,13 @@ namespace GostDOC.DataPreparation
             aTable.Rows.Add(row);
         }
 
-        void FillDataTable(DataToFillTable dataToFill) {
+        bool FillDataTable(DataToFillTable dataToFill, ref int aPos) {
             var aComponents = dataToFill.Components;
             var aSchemaDesignation = dataToFill.SchemaDesignation;
             var aOtherComponents = dataToFill.OtherComponents;
             if (!aComponents.Any()) {
 
-                return;
-
+                return false;
             }
 
             var sortType = SortType.None;
@@ -118,13 +124,6 @@ namespace GostDOC.DataPreparation
 
             var sort = SortFactory.GetSort(sortType);
             Models.Component[] sortComponents = sort.Sort(aComponents.ToList()).ToArray();
-            // для признаков составления наименования для данного компонента
-            int[] HasStandardDoc;
-
-            string change_name = $"см. табл. {aSchemaDesignation}";
-
-            // ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем номера компонентов с совпадающим значением                
-            Dictionary<string /* GOST/TY string*/, List<int> /* array indexes */> StandardDic = FindComponentsWithStandardDoc(sortComponents, out HasStandardDoc);
 
             // записываем наименование группы
             if (dataToFill.GroupName != Constants.GroupDoc) {
@@ -138,19 +137,19 @@ namespace GostDOC.DataPreparation
             for (int i = 0; i < sortComponents.Length;)
             {
                 var component = sortComponents[i];
-                string component_name = GetComponentName(HasStandardDoc[i] == 2, component);
+                string component_name = component.GetProperty(Constants.ComponentName);
                 int component_count = 1; // always only one! GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
-                bool haveToChangeName = string.Equals(component.GetProperty(Constants.ComponentPresence),"0") || HaveToChangeComponentName(component, aOtherComponents);                
+                
                 List<string> component_designators = new List<string>{ component.GetProperty(Constants.ComponentDesignatiorID) };
 
                 bool same;
                 int j = i + 1;
-                if (j < sortComponents.Length && !haveToChangeName) 
+                if (j < sortComponents.Length) 
                 {
                     do 
                     {
                         var componentNext = sortComponents[j];
-                        string componentNext_name = GetComponentName(HasStandardDoc[j] == 2, componentNext);
+                        string componentNext_name = componentNext.GetProperty(Constants.ComponentName);
 
                         if (string.Equals(component_name, componentNext_name))
                         {
@@ -167,19 +166,23 @@ namespace GostDOC.DataPreparation
                 i = j;
 
 
-                var name = (haveToChangeName) ? change_name : component_name;
-                string[] namearr = PdfUtils.SplitStringByWidth(110, name).ToArray();       
+                var name = component_name;
+                string[] namearr = PdfUtils.SplitStringByWidth(63, name).ToArray();       
                 var note = component.GetProperty(Constants.ComponentNote);
-                string[] notearr = PdfUtils.SplitStringByWidth(45, note).ToArray();
+                string[] notearr = PdfUtils.SplitStringByWidth(22, note).ToArray();
 
                 row = dataToFill.Table.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString{Value = component.GetProperty(Constants.ComponentFormat)};
-                row[Constants.ColumnZone] = new FormattedString{Value = component.GetProperty(Constants.ComponentZone)};
-                row[Constants.ColumnPosition] = null;
+                row[Constants.ColumnZone] = new FormattedString{Value = component.GetProperty(Constants.ComponentZone)};                
+                if (dataToFill.GroupName != Constants.GroupDoc) 
+                { 
+                    ++aPos;
+                    row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString() }; 
+                }
 
                 string designation = component.GetProperty(Constants.ComponentSign);
                 if (dataToFill.GroupName == Constants.GroupDoc) {
-                    designation += component.GetProperty(Constants.ComponentDocCode);
+                    //designation += component.GetProperty(Constants.ComponentDocCode);
                 }
                 row[Constants.ColumnSign] = new FormattedString{Value = designation};
 
@@ -206,7 +209,7 @@ namespace GostDOC.DataPreparation
 
             //AddEmptyRow(dataToFill.Table);
             dataToFill.Table.AcceptChanges();
-
+            return true;
         }
 
 
