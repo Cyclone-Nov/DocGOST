@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -131,8 +131,8 @@ namespace GostDOC.PDF
                 .SetTextAlignment(TextAlignment.CENTER)
                 .SetItalic()
                 .SetFont(f1)
-                .SetBorderLeft(CreateThickBorder())
-                .SetBorderRight(CreateThickBorder())
+                .SetBorderLeft(THICK_BORDER)
+                .SetBorderRight(THICK_BORDER)
                 .SetFontSize(14)
                 .SetHeight(8 * mmH());
             Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2)
@@ -140,8 +140,8 @@ namespace GostDOC.PDF
                 .SetTextAlignment(TextAlignment.LEFT)
                 .SetItalic()
                 .SetFont(f1)
-                .SetBorderLeft(CreateThickBorder())
-                .SetBorderRight(CreateThickBorder())
+                .SetBorderLeft(THICK_BORDER)
+                .SetBorderRight(THICK_BORDER)
                 .SetFontSize(14)
                 .SetHeight(8 * mmH());
 
@@ -234,7 +234,7 @@ namespace GostDOC.PDF
             //    tbl.AddCell(CreateCell().SetHeight(8*mmH()));
             //}
             //for (int i = 0; i < 10; ++i) {
-            //    tbl.AddCell(CreateCell().SetBorderBottom(CreateThickBorder()).SetHeight(8*mmH()));
+            //    tbl.AddCell(CreateCell().SetBorderBottom(THICK_BORDER).SetHeight(8*mmH()));
             //}
 
             var ass  = columnSizes.Sum();
@@ -257,12 +257,12 @@ namespace GostDOC.PDF
         /// <param name="aTable">a table.</param>
         void AddDataTableHeader(Table aTable) {
 
-            Cell CreateCell(int rowspan=1, int colspan=1) => new Cell(rowspan, colspan).SetPadding(0).SetMargin(0).SetBorderLeft(CreateThickBorder()).SetBorderRight(CreateThickBorder());
+            Cell CreateCell(int rowspan=1, int colspan=1) => new Cell(rowspan, colspan).SetPadding(0).SetMargin(0).SetBorderLeft(THICK_BORDER).SetBorderRight(THICK_BORDER);
 
             void AddMainHeaderCell(string text) =>
                 aTable.AddCell(CreateCell(2,1)
                     .SetVerticalAlignment(VerticalAlignment.MIDDLE)
-                    .SetBorder(CreateThickBorder()).Add(new Paragraph(text)));
+                    .SetBorder(THICK_BORDER).Add(new Paragraph(text)));
 
             AddMainHeaderCell("Наименование");
             AddMainHeaderCell("Код продукции");
@@ -272,12 +272,12 @@ namespace GostDOC.PDF
 
             aTable.AddCell(
                 CreateCell(1, 4)
-                    .SetBorder(CreateThickBorder())
+                    .SetBorder(THICK_BORDER)
                     .SetVerticalAlignment(VerticalAlignment.MIDDLE)
                     .SetHeight(9*mmH()).Add(new Paragraph("Количество")));
             AddMainHeaderCell("Примечание");
             
-            void AddSecondaryHeaderCell(string text) => aTable.AddCell(CreateCell().SetBorder(CreateThickBorder()).SetHeight(18*mmH()).Add(new Paragraph(text)));
+            void AddSecondaryHeaderCell(string text) => aTable.AddCell(CreateCell().SetBorder(THICK_BORDER).SetHeight(18*mmH()).Add(new Paragraph(text)));
 
             AddSecondaryHeaderCell("на из-\nделие");
             AddSecondaryHeaderCell("в ком-\nплекте");
