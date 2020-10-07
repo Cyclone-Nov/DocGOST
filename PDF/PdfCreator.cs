@@ -333,100 +333,86 @@ namespace GostDOC.PDF
             return documentTypeGraph1;
         }
 
+
         /// <summary>
         /// создать таблицу основной надписи на первой странице
         /// </summary>
         /// <returns></returns>
         protected Table CreateFirstTitleBlock(TitleBlockStruct titleBlockStruct) {
-            var aGraphs = titleBlockStruct.Graphs;
-            var aPageSize = titleBlockStruct.PageSize;        
-
-            float[] columnSizes = {65 * mmW(), 120 * mmW()};
-            Table mainTable = new Table(UnitValue.CreatePointArray(columnSizes));
-            mainTable.SetFont(f1).SetItalic();
-
-            Cell CreateMainTableCell() {
-                return new Cell().SetBorder(Border.NO_BORDER).SetMargin(0).SetPadding(0);
-            }
-
 
             string GetGraph(string graph) {
-                return GetGraphByName(aGraphs, graph);
+                return GetGraphByName(titleBlockStruct.Graphs, graph);
             }
+            Paragraph CreatePaddingTopParagraph(string text) => new Paragraph(text).SetPaddingTop(-2f);
 
-
-            #region Пустая ячейка слева
-
-            mainTable.AddCell(CreateMainTableCell());
-
-            #endregion
-
-            #region Правая верхняя таблица (доп. графы)
-
-            if (titleBlockStruct.AppendGraphs) {
-                var correction = (TO_LEFT_CORRECTION * 1.69f ) / 3;
-                var rightTopTable = new Table(UnitValue.CreatePointArray(new[] {
-                    14 * mmW() +correction,
-                    53 * mmW() +correction,
-                    53 * mmW()+ correction,
-                }));
-
-                float rightTopTableCellHeight1 = 14 * mmH();
-                float rightTopTableCellHeight2 = 8 * mmH();
-
-                Cell CreateRightTopTableCell(float height, int rowspan = 1, int colspan = 1) {
-                    return new Cell(rowspan, colspan).SetHeight(height).SetBorder(THICK_BORDER);
-                }
-
-                void Add27to29Graph(string graph) {
-                    rightTopTable.AddCell(CreateRightTopTableCell(rightTopTableCellHeight1)
-                        .Add(new Paragraph(GetGraph(graph))));
-                }
-
-                Add27to29Graph(Constants.GRAPH_27);
-                Add27to29Graph(Constants.GRAPH_28);
-                Add27to29Graph(Constants.GRAPH_29);
-
-                rightTopTable.AddCell(CreateRightTopTableCell(rightTopTableCellHeight2, 1, 3)
-                    .Add(new Paragraph(GetGraph(Constants.GRAPH_30))).SetBorderBottom(THICK_BORDER));
-
-                mainTable.AddCell(CreateMainTableCell().Add(rightTopTable).SetPaddings(0,0,-2,-TO_LEFT_CORRECTION*0.515f));
-            } else {
-                mainTable.AddCell(CreateMainTableCell());
-            }
-
-            #endregion
-
-            #region Левая таблица
-
-            var leftTableTextStyle =
-                new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFontSize(12).SetFont(f1);
-            var leftTable = new Table(UnitValue.CreatePointArray(new[] {
-                7 * mmW(),
+            float[] columnSizes = {
+                7 * mmW(), 
                 10 * mmW(),
                 23 * mmW(),
                 15 * mmW(),
-                10 * mmW()
-            })).AddStyle(leftTableTextStyle);
-            float leftTableCellHeight = 5 * mmH();
+                10 * mmW(),
+                14 * mmW(),
+                53 * mmW(),
+                3 * mmW(),
+                5 * mmW(),
+                5 * mmW(),
+                5 * mmW(),
+                15 * mmW(),
+                20 * mmW(),
+            };
+            Table mainTable = new Table(UnitValue.CreatePointArray(columnSizes));
+            mainTable.SetFont(f1).SetItalic();
 
-            Cell CreateLeftTableCell(int rowspan = 1, int colspan = 1) {
-                return new Cell(rowspan, colspan).SetHeight(leftTableCellHeight).SetPadding(0);
-            }
 
+            #region Left Upper (empty)
+
+            mainTable.AddCell(new Cell(2, 5).SetBorder(Border.NO_BORDER));
+
+            #endregion 
+
+
+            #region Right Upper (additional)
+
+            mainTable.AddCell(new Cell(1, 1).SetHeight(14*mmH()).SetBorder(THICK_BORDER));
+            mainTable.AddCell(new Cell(1, 1).SetBorder(THICK_BORDER));
+            mainTable.AddCell(new Cell(1,6).SetBorder(THICK_BORDER));
+
+            mainTable.AddCell(new Cell(1,8).SetHeight(8*mmH()).SetBorder(THICK_BORDER));
+
+            #endregion
+
+            float leftTableCellHeight = 5 * mmH() -0.775f;
+            Cell leftTableCell = new Cell(1, 1)
+                .SetHeight(leftTableCellHeight)
+                .SetPadding(0)
+                .SetFontSize(12)
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetVerticalAlignment(VerticalAlignment.MIDDLE)
+                .SetBorderLeft(THICK_BORDER)
+                .SetBorderRight(THICK_BORDER);
+            
             for (int i = 0; i < 5; ++i) {
-                leftTable.AddCell(CreateLeftTableCell()
-                    .SetBorderLeft(THICK_BORDER)
-                    .SetBorderRight(THICK_BORDER)
-                    .SetBorderTop(THICK_BORDER));
+                mainTable.AddCell(leftTableCell.Clone(false).SetBorderTop(THICK_BORDER));
             }
+
+
+            #region Graph 2
+            
+            var graph2 = GetGraph(Constants.GRAPH_2) + GetAdditionalGraph2(titleBlockStruct.DocType);
+            mainTable.AddCell(new Cell(3, 8)
+                .SetBorder(THICK_BORDER).SetFontSize(20)
+                .SetTextAlignment(TextAlignment.CENTER).SetVerticalAlignment(VerticalAlignment.MIDDLE)
+                .Add(CreatePaddingTopParagraph(graph2)));
+
+            #endregion
+
+
+            #region Graph 14-18
 
             void Add14to18Graph(string graph) {
-                leftTable.AddCell(
-                    CreateLeftTableCell()
-                        .Add(new Paragraph(GetGraph(graph)))
-                        .SetBorderLeft(THICK_BORDER)
-                        .SetBorderRight(THICK_BORDER));
+                mainTable.AddCell(
+                    leftTableCell.Clone(false)
+                        .Add(CreatePaddingTopParagraph(GetGraph(graph))));
             }
 
             Add14to18Graph(Constants.GRAPH_14);
@@ -435,225 +421,144 @@ namespace GostDOC.PDF
             Add14to18Graph(Constants.GRAPH_17);
             Add14to18Graph(Constants.GRAPH_18);
 
-            Paragraph CreateLeftTableTopParagraph(string text) {
-                var style = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFontSize(12).SetFont(f1)
-                    .SetPaddingTop(-2);
-                return new Paragraph(text).AddStyle(style);
-            }
-
-            void AddToTopLeftTable(string text) {
-                leftTable.AddCell(
-                    CreateLeftTableCell()
-                        .SetBorderRight(THICK_BORDER)
-                        .SetBorderLeft(THICK_BORDER)
-                        .Add(CreateLeftTableTopParagraph(text)));
-            }
-
-            AddToTopLeftTable("Изм.");
-            AddToTopLeftTable("Лист");
-            AddToTopLeftTable("№ Докум.");
-            AddToTopLeftTable("Подп.");
-            AddToTopLeftTable("Дата");
-
-            Paragraph CreateLeftTableBottomParagraph(string text) {
-                var style = new Style().SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFontSize(12).SetFont(f1)
-                    .SetPaddingTop(-2);
-                return new Paragraph(text).AddStyle(style);
-            }
-
-            void SetThickBorder(Cell c, bool topBorder, bool bottomBorder) {
-                if (topBorder) {
-                    c.SetBorderTop(THICK_BORDER);
-                }
-
-                if (bottomBorder) {
-                    c.SetBorderBottom(THICK_BORDER);
-                }
-            }
-
-            void AddToBottomLeftTable(string text, string graph, bool topBorder = false, bool bottomBorder = false) {
-                var c = CreateLeftTableCell(1, 2)
-                    .SetBorderLeft(THICK_BORDER)
-                    .SetBorderRight(THICK_BORDER)
-                    .Add(CreateLeftTableBottomParagraph(text));
-                SetThickBorder(c, topBorder, bottomBorder);
-                leftTable.AddCell(c);
-
-                c = CreateLeftTableCell()
-                    .SetBorderRight(THICK_BORDER)
-                    .Add(CreateLeftTableBottomParagraph(GetGraph(graph)));
-                SetThickBorder(c, topBorder, bottomBorder);
-                leftTable.AddCell(c);
-
-                for (int i = 0; i < 2; ++i) {
-                    c = CreateLeftTableCell().SetBorderRight(THICK_BORDER);
-                    SetThickBorder(c, topBorder, bottomBorder);
-                    leftTable.AddCell(c);
-                }
-            }
+            #endregion
 
 
-            AddToBottomLeftTable("Разраб.", Constants.GRAPH_11sp_dev, true);
-            AddToBottomLeftTable("Пров.", Constants.GRAPH_11sp_chk);
+            Table AddLeftUpperCell(string text) => 
+                mainTable.AddCell(leftTableCell.Clone(false)
+                    .SetBorderTop(THICK_BORDER)
+                    .SetBorderBottom(THICK_BORDER)
+                    .Add(CreatePaddingTopParagraph(text)));
+
+            AddLeftUpperCell("Изм.");
+            AddLeftUpperCell("Лист");
+            AddLeftUpperCell("№ Докум");
+            AddLeftUpperCell("Подп.");
+            AddLeftUpperCell("Дата");
 
 
-            leftTable.AddCell(CreateLeftTableCell(1, 2)
+            Cell leftTableCell2Column = new Cell(1, 2)
+                .SetHeight(leftTableCellHeight)
+                .SetPadding(0)
+                .SetFontSize(12)
+                .SetTextAlignment(TextAlignment.LEFT)
                 .SetBorderLeft(THICK_BORDER)
-                .SetBorderRight(THICK_BORDER)
-                .Add(CreateLeftTableBottomParagraph(GetGraph(Constants.GRAPH_10))));
-            leftTable.AddCell(CreateLeftTableCell().SetBorderRight(THICK_BORDER)
-                .Add(CreateLeftTableBottomParagraph(GetGraph(Constants.GRAPH_11))));
-            leftTable.AddCell(CreateLeftTableCell().SetBorderRight(THICK_BORDER)
-                .Add(CreateLeftTableBottomParagraph(GetGraph(Constants.GRAPH_12))));
-            leftTable.AddCell(CreateLeftTableCell().SetBorderRight(THICK_BORDER)
-                .Add(CreateLeftTableBottomParagraph(GetGraph(Constants.GRAPH_13))));
+                .SetBorderRight(THICK_BORDER);
 
-            AddToBottomLeftTable("Н. контр", Constants.GRAPH_11norm);
-            AddToBottomLeftTable("Утв.", Constants.GRAPH_11affirm, false, true);
-
-            mainTable.AddCell(CreateMainTableCell().Add(leftTable));
-
-            #endregion
-
-            #region Правая нижняя таблица
+            Table AddCellWithText(Cell cell, string text) => mainTable.AddCell(cell.Clone(false).Add(CreatePaddingTopParagraph(text)));
 
 
-            var rightBottomTable = new Table(UnitValue.CreatePercentArray(new[] {1f})).UseAllAvailableWidth();
+            #region Разраб.
 
-
-            #region Граф 2
-
-            var graph2 = GetGraph(Constants.GRAPH_2) + GetAdditionalGraph2(titleBlockStruct.DocType);
-            rightBottomTable.AddCell(
-                new Cell()
-                .Add(
-                    new Paragraph(graph2)
-                        .SetTextAlignment(TextAlignment.CENTER)
-                        .SetFontSize(20)
-                        .SetPaddingTop(4)
-                        .SetVerticalAlignment(VerticalAlignment.MIDDLE))
-                .SetHeight(15 * mmH()) 
-                .SetPaddings(-2, 0, 5, 0)
-                .SetVerticalAlignment(VerticalAlignment.MIDDLE)
-                .SetHorizontalAlignment(HorizontalAlignment.CENTER)
-                .SetBorder(Border.NO_BORDER)
-            );
-
+            var graph11Cell = leftTableCell.Clone(false).SetTextAlignment(TextAlignment.LEFT);
+            AddCellWithText(leftTableCell2Column, "Разраб.");
+            mainTable.AddCell(graph11Cell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_11sp_dev))));
+            for (int i = 0; i < 2; ++i) {
+                mainTable.AddCell(leftTableCell.Clone(false));
+            }
+            
             #endregion
 
 
-            var correction2 = (TO_LEFT_CORRECTION * 2.5f ) / 2;
-            var innerRightBottomTable =
-                new Table(UnitValue.CreatePointArray(new[] {
-                    (53 * 2 + 14 - 50) * mmW()+correction2,
-                    50 * mmW()+correction2,
-                }));
 
+            #region Graph 1
 
-            #region Граф 1
-
-            var textStyle = new Style()
-                .SetTextAlignment(TextAlignment.CENTER)
-                .SetVerticalAlignment(VerticalAlignment.MIDDLE);
             string documentTypeGraph1 = GetAdditionalGraph1(titleBlockStruct.DocType);
-            var graph1Cell = new Cell().AddStyle(textStyle).SetBorderLeft(Border.NO_BORDER)
-                .SetBorderRight(Border.NO_BORDER)
-                .SetBorderBottom(Border.NO_BORDER)
-                .SetBorderTop(THICK_BORDER)
-                .SetPaddings(-1, 0, 0, 0)
+            var graph1Cell = new Cell(5, 3)
+                .SetTextAlignment(TextAlignment.CENTER)
                 .SetVerticalAlignment(VerticalAlignment.MIDDLE)
-                .Add(new Paragraph(GetGraph(Constants.GRAPH_1)).SetFontSize(20));
+                .SetBorder(THICK_BORDER).Add(new Paragraph(GetGraph(Constants.GRAPH_1)).SetFontSize(20));
             if (!string.IsNullOrEmpty(documentTypeGraph1)) {
                 graph1Cell.Add(new Paragraph(documentTypeGraph1).SetFontSize(12));
             }
-            innerRightBottomTable.AddCell(graph1Cell);
-            
-            #endregion
-
-
-            var tableGraph4789 =
-                new Table(UnitValue.CreatePointArray(new[] {
-                    5 * mmW(),
-                    5 * mmW(),
-                    5 * mmW(),
-                    15 * mmW(),
-                    20 * mmW(),
-                }));
-
-            Cell CreateTableGraph478Cell(int colspan = 1, int rowspan = 1, bool borderTop = false,
-                bool borderLeft = false, bool borderBottom = false) {
-                var height = 5 * mmH();
-                var c = new Cell(colspan, rowspan).SetHeight(height).SetPadding(0).SetBorderRight(THICK_BORDER);
-                if (borderTop) {
-                    c.SetBorderTop(THICK_BORDER);
-                }
-
-                if (borderLeft) {
-                    c.SetBorderLeft(THICK_BORDER);
-                }
-
-                if (borderBottom) {
-                    c.SetBorderBottom(THICK_BORDER);
-                }
-
-                return c;
-            }
-
-            Paragraph CreateTableGraph478Paragraph(string text) {
-                var style = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFontSize(12).SetFont(f1)
-                    .SetPaddingTop(-2);
-                return new Paragraph(text).AddStyle(style);
-            }
-
-            tableGraph4789.AddCell(CreateTableGraph478Cell(1, 3, borderTop: true, borderLeft: true, borderBottom: true)
-                .Add(CreateTableGraph478Paragraph("Лит.")));
-            tableGraph4789.AddCell(CreateTableGraph478Cell(borderTop: true, borderBottom: true)
-                .Add(CreateTableGraph478Paragraph("Лист")));
-            tableGraph4789.AddCell(CreateTableGraph478Cell(borderTop: true, borderBottom: true)
-                .Add(CreateTableGraph478Paragraph("Листов")));
-
-            tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true));
-            tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true)
-                .Add(CreateTableGraph478Paragraph(GetGraph(Constants.GRAPH_4))));
-            tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true));
-            tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true)
-                .Add(CreateTableGraph478Paragraph("1")));                
-            tableGraph4789.AddCell(CreateTableGraph478Cell(borderLeft: true)
-                .Add(CreateTableGraph478Paragraph(titleBlockStruct.Pages.ToString())));
-
-            tableGraph4789.AddCell(
-                new Cell(1, 5).SetHeight(15 * mmH() - 2).SetPaddings(0, 0, 0, 0)
-                    .SetBorderLeft(THICK_BORDER).SetBorderRight(THICK_BORDER)
-                    .SetBorderTop(THICK_BORDER).SetBorderBottom(THICK_BORDER)
-                    .Add(CreateTableGraph478Paragraph(GetGraph(Constants.GRAPH_9))));
-
-            innerRightBottomTable.AddCell(
-                new Cell()
-                    .Add(tableGraph4789)
-                    .SetBorder(Border.NO_BORDER)
-                    .SetPaddings(-1, 0, 0, 0));
-  
-            rightBottomTable.AddCell(new Cell().SetPaddings(0,0,0,0).SetBorder(Border.NO_BORDER).Add(innerRightBottomTable));
-            mainTable.AddCell(CreateMainTableCell().Add(rightBottomTable));
+            mainTable.AddCell(graph1Cell);
 
             #endregion
 
+             
+            mainTable.AddCell(new Cell(1, 3).SetPadding(0).Add(CreatePaddingTopParagraph("Лит.")).SetTextAlignment(TextAlignment.CENTER).SetBorder(THICK_BORDER));
+            mainTable.AddCell(new Cell(1, 1).SetPadding(0).Add(CreatePaddingTopParagraph("Лист")).SetTextAlignment(TextAlignment.CENTER).SetBorder(THICK_BORDER));
+            mainTable.AddCell(new Cell(1, 1).SetPadding(0).Add(CreatePaddingTopParagraph("Листов")).SetTextAlignment(TextAlignment.CENTER).SetBorder(THICK_BORDER));
+
+
+            #region Пров.
+
+            AddCellWithText(leftTableCell2Column, "Пров.");
+            mainTable.AddCell(graph11Cell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_11sp_chk))));
+            for (int i = 0; i < 2; ++i) {
+                mainTable.AddCell(leftTableCell.Clone(false));
+            }
+           
+            #endregion
+
+
+            #region Graph 4, 7, 8
+
+            var fullyBorderCell = leftTableCell.Clone(false).SetBorder(THICK_BORDER);
+            mainTable.AddCell(fullyBorderCell.Clone(false));
+            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4))));
+            mainTable.AddCell(fullyBorderCell.Clone(false));
+            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(titleBlockStruct.CurrentPage.ToString())));
+            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(titleBlockStruct.Pages.ToString())));
             
-            if (aPageSize.Contains(PageSize.A3)) {
-                // A3
-                mainTable.SetFixedPosition(415 * mmW()-TITLE_BLOCK_WIDTH+2f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
-                DrawLines(1,aPageSize, 0);
-            } else { 
+            #endregion
+           
+
+            // graph 10-13
+            mainTable.AddCell(leftTableCell2Column);
+            for (int i = 0; i < 3; ++i) {
+                mainTable.AddCell(leftTableCell.Clone(false));
+            }
+
+
+            #region Graph 9
+
+            mainTable.AddCell(new Cell(3, 5).SetBorder(THICK_BORDER).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_9))));
+
+            #endregion
+
+
+            #region Н. контр.
+
+            AddCellWithText(leftTableCell2Column,"Н. контр.");
+            mainTable.AddCell(graph11Cell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_11norm))));
+            for (int i = 0; i < 2; ++i) {
+                mainTable.AddCell(leftTableCell.Clone(false));
+            }
+
+            #endregion
+
+
+            #region Утв.
+
+            AddCellWithText(leftTableCell2Column.Clone(false).SetBorderBottom(THICK_BORDER),"Утв.");
+            mainTable.AddCell(graph11Cell.Clone(false).SetBorderBottom(THICK_BORDER).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_11affirm))));
+            for (int i = 0; i < 2; ++i) {
+                mainTable.AddCell(leftTableCell.Clone(false).SetBorderBottom(THICK_BORDER));
+            }
+
+            #endregion
+
+            if (titleBlockStruct.PageSize.Contains(PageSize.A4)) {
                 // A4
                 var left = 20 * mmW() - 2f - TO_LEFT_CORRECTION;
-                mainTable.SetFixedPosition(left, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH+TO_LEFT_CORRECTION);
-                DrawLines(1,aPageSize, left);
+                mainTable.SetFixedPosition(left, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH/*+TO_LEFT_CORRECTION*/);
+                
+//                DrawVerticalLine(
+//                    1,
+//                    left + (7+10+23+15+10)*mmW()-0.45f,
+//                    BOTTOM_MARGIN+(15+5+5+15+8+14)*mmH()+8.64f,
+//                    2,
+//                    10.03f);
+            }
+            else {
+                mainTable.SetFixedPosition(415 * mmW() - TITLE_BLOCK_WIDTH + 2f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
             }
 
             return mainTable;
         }
 
-        void DrawLines(int aPageNumber, PageSize aPageSize, float aLeftTitleBlock, float aBottom=0) {
+        void DrawLines(int aPageNumber, PageSize aPageSize, float aLeftTitleBlock, float aBottom = 0) {
             if (aPageNumber == 1) {
                 if (aPageSize.Contains(PageSize.A4)) {
                     DrawHorizontalLine(1,
@@ -664,22 +569,22 @@ namespace GostDOC.PDF
                     );
                     DrawHorizontalLine(1,
                         aLeftTitleBlock + (7 + 10 + 23 + 15 + 10) * mmW(),
-                        BOTTOM_MARGIN + 25*mmH() + 4,
+                        BOTTOM_MARGIN + 25 * mmH() + 4,
                         2,
-                        10 
+                        10
                     );
                     DrawVerticalLine(
                         1,
-                        aLeftTitleBlock + TITLE_BLOCK_WIDTH -TO_LEFT_CORRECTION*0.2f,
+                        aLeftTitleBlock + TITLE_BLOCK_WIDTH - TO_LEFT_CORRECTION * 0.2f,
                         BOTTOM_MARGIN,
                         2,
                         TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM * mmH() + 10);
                 }
                 else {
-                    DrawHorizontalLine(1, (295) * mmW(), BOTTOM_MARGIN, 2,(53 * 2 + 14 - 50) * mmW());
+                    DrawHorizontalLine(1, (295) * mmW(), BOTTOM_MARGIN, 2, (53 * 2 + 14 - 50) * mmW());
                 }
-            } else {
-
+            }
+            else {
             }
         }
 

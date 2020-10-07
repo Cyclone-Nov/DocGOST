@@ -87,7 +87,14 @@ internal class PdfElementListCreator : PdfCreator {
         aInDoc.Add(dataTable);
 
         // добавить таблицу с основной надписью для первой старницы
-        aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, AppendGraphs = true, DocType = DocType.ItemsList}));
+        aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {
+            PageSize = _pageSize, 
+            Graphs = aGraphs, 
+            Pages = aCountPages, 
+            AppendGraphs = true, 
+            DocType = DocType.ItemsList,
+            CurrentPage = 1,
+        }));
 
         // добавить таблицу с верхней дополнительной графой
         aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
