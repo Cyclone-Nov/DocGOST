@@ -91,12 +91,12 @@ namespace GostDOC.PDF
         }
 
         /// <summary>
-        /// 
+        /// разделить строку на писок строк по максимально допустимой ширине строки
         /// </summary>
-        /// <param name="name_strings"></param>
-        /// <param name="maxLength"></param>
-        /// <param name="currLength"></param>
-        /// <param name="aFullName"></param>
+        /// <param name="name_strings">результат в виде списка строк</param>
+        /// <param name="maxLength">ограничение на ширину строки</param>
+        /// <param name="currLength">текущая ширина фразы</param>
+        /// <param name="aFullName">фраза которую надо разделить</param>
         public static void GetLimitSubstring(List<string> name_strings, float maxLength, float currLength, string aFullName)
         {
             if (currLength < maxLength)
@@ -105,11 +105,22 @@ namespace GostDOC.PDF
             } else
             {
                 string fullName = aFullName;
+                // извлекаем из строки то число символов, которое может поместиться в указанную длину maxLength
                 int symbOnMaxLength = (int)((fullName.Length / currLength) * maxLength);
                 string partName = fullName.Substring(0, symbOnMaxLength);
+                
+                // пробуем найти ближайший символ, по которому можно переносить фразу и извлечем часть для первой строки
                 int index = partName.LastIndexOfAny(new char[] { ' ', '-', '.' });
-                name_strings.Add(fullName.Substring(0, index));
-                fullName = fullName.Substring(index + 1);
+                if (index < 0)
+                {
+                    name_strings.Add(partName);
+                    fullName = fullName.Substring(symbOnMaxLength + 1);
+                }
+                else
+                {
+                    name_strings.Add(fullName.Substring(0, index));
+                    fullName = fullName.Substring(index + 1);
+                }
                 currLength = fullName.Length;
                 GetLimitSubstring(name_strings, maxLength, currLength, fullName);
             }
