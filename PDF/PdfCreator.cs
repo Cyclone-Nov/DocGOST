@@ -194,7 +194,7 @@ namespace GostDOC.PDF
             aInPdfDoc.Add(CreateRegisterTable());
 
             // добавить таблицу с основной надписью для последуюших старницы
-            aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs}));
+            aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber }));
 
             // добавить таблицу с нижней дополнительной графой
             aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
