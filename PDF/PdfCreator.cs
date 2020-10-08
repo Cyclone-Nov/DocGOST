@@ -539,20 +539,14 @@ namespace GostDOC.PDF
 
             #endregion
 
-            if (titleBlockStruct.PageSize.Contains(PageSize.A4)) {
+            if (titleBlockStruct.PageSize.Contains(PageSize.A3)) {
+                // A3
+                mainTable.SetFixedPosition(415 * mmW() - TITLE_BLOCK_WIDTH + 2f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            }
+            else {
                 // A4
                 var left = 20 * mmW() - 2f - TO_LEFT_CORRECTION;
                 mainTable.SetFixedPosition(left, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH/*+TO_LEFT_CORRECTION*/);
-                
-//                DrawVerticalLine(
-//                    1,
-//                    left + (7+10+23+15+10)*mmW()-0.45f,
-//                    BOTTOM_MARGIN+(15+5+5+15+8+14)*mmH()+8.64f,
-//                    2,
-//                    10.03f);
-            }
-            else {
-                mainTable.SetFixedPosition(415 * mmW() - TITLE_BLOCK_WIDTH + 2f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
             }
 
             return mainTable;
@@ -618,6 +612,7 @@ namespace GostDOC.PDF
             };
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
+            var titleBlockHeightCell = new Cell().SetHeight(DEFAULT_TITLE_BLOCK_CELL_HEIGHT).SetPadding(0).SetBorderRight(THICK_BORDER);
             Cell CreateCell() {
                 return new Cell().SetHeight(DEFAULT_TITLE_BLOCK_CELL_HEIGHT).SetPadding(0).SetBorderRight(THICK_BORDER);
             }
@@ -675,17 +670,22 @@ namespace GostDOC.PDF
                 tbl.AddCell(c);
             }
 
+            void AddGraphCell2(Cell cell, string text ) {
+                tbl.AddCell(cell.Clone(false).Add(CreateParagraph(text).SetTextAlignment(TextAlignment.CENTER)));
+            }
+
             AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_14));
             AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_15));
             AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_16));
             AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_17));
             AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_18));
 
-            AddGraphCell( "Изм.", bottomBorder:true);
-            AddGraphCell( "Лист", bottomBorder:true);
-            AddGraphCell( "№ докум.", bottomBorder:true);
-            AddGraphCell( "Подп.", bottomBorder:true);
-            AddGraphCell( "Дата", bottomBorder:true);
+            var topAndBottomBorderCell = titleBlockHeightCell.Clone(false).SetBorderBottom(THICK_BORDER).SetBorderTop(THICK_BORDER);
+            AddGraphCell2(topAndBottomBorderCell, "Изм.");
+            AddGraphCell2(topAndBottomBorderCell, "Лист");
+            AddGraphCell2(topAndBottomBorderCell, "№ докум.");
+            AddGraphCell2(topAndBottomBorderCell, "Подп.");
+            AddGraphCell2(topAndBottomBorderCell, "Дата");
 
 
             // switch A3/A4
