@@ -495,9 +495,9 @@ namespace GostDOC.PDF
             #region Graph 4, 7, 8
 
             var fullyBorderCell = leftTableCell.Clone(false).SetBorder(THICK_BORDER);
-            mainTable.AddCell(fullyBorderCell.Clone(false));
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4))));
-            mainTable.AddCell(fullyBorderCell.Clone(false));
+            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4a))));
+            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4b))));
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(titleBlockStruct.CurrentPage.ToString())));
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(titleBlockStruct.Pages.ToString())));
             
