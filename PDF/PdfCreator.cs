@@ -540,8 +540,6 @@ namespace GostDOC.PDF
             #endregion
 
             if (titleBlockStruct.PageSize.Contains(PageSize.A3)) {
-                // A3
-                mainTable.SetFixedPosition(415 * mmW() - TITLE_BLOCK_WIDTH + 2f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
             }
             else {
                 // A4
@@ -552,40 +550,9 @@ namespace GostDOC.PDF
             return mainTable;
         }
 
-        void DrawLines(int aPageNumber, PageSize aPageSize, float aLeftTitleBlock, float aBottom = 0) {
-            if (aPageNumber == 1) {
-                if (aPageSize.Contains(PageSize.A4)) {
-                    DrawHorizontalLine(1,
-                        aLeftTitleBlock + (7 + 10 + 23 + 15 + 10) * mmW(),
-                        BOTTOM_MARGIN,
-                        2,
-                        (53 * 2 + 14 - 50) * mmW() + 30
-                    );
-                    DrawHorizontalLine(1,
-                        aLeftTitleBlock + (7 + 10 + 23 + 15 + 10) * mmW(),
-                        BOTTOM_MARGIN + 25 * mmH() + 4,
-                        2,
-                        10
-                    );
-                    DrawVerticalLine(
-                        1,
-                        aLeftTitleBlock + TITLE_BLOCK_WIDTH - TO_LEFT_CORRECTION * 0.2f,
-                        BOTTOM_MARGIN,
-                        2,
-                        TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM * mmH() + 10);
-                }
-                else {
-                    DrawHorizontalLine(1, (295) * mmW(), BOTTOM_MARGIN, 2, (53 * 2 + 14 - 50) * mmW());
-                }
-            }
-            else {
-            }
-        }
-
-
         protected void DrawHorizontalLine(int aPageNumber, float x, float y, float aWidth, float aLength) {
             Canvas canvas = new Canvas(new PdfCanvas(_pdfDoc.GetPage(aPageNumber)),new Rectangle(x, y, aLength, aWidth));
-            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth((53 * 2 + 14 - 50) * mmW()+30));
+            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(aLength));
         }
 
         protected void DrawVerticalLine(int aPageNumber, float x, float y, float aWidth, float aLength) {
@@ -774,27 +741,6 @@ namespace GostDOC.PDF
 
             return tbl;
         }
-
-        /// <summary>
-        /// добавить количество страниц на первую страницу документа
-        /// </summary>
-        /// <param name="aInPdfDoc">PDF документ</param>
-        /// <param name="aPageCount">общее количество страние</param>
-        protected void AddPageCountOnFirstPage(iText.Layout.Document aDoc, int aPageCount)
-        {   
-            float left = 0f;
-            float bottom = 65f;
-            left = (7 + 10 + 23 + 15 + 10 + 110) * mmW() + 55;                
-
-            aDoc.ShowTextAligned(new Paragraph(aPageCount.ToString()).
-                                SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFontSize(12).SetFont(f1),
-                                left, bottom,
-                                1, 
-                                TextAlignment.CENTER, VerticalAlignment.MIDDLE, 
-                                0);
-        
-        }
-
 
         /// <summary>
         /// добавить пустые строки в таблицу PDF
