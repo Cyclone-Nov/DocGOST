@@ -104,7 +104,7 @@ namespace GostDOC.PDF
             aInDoc.Add(titleBlock);
 
             var dataTable = CreateTable(aData, true, 0, out var lpr);
-            dataTable.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, PdfDefines.A3Width - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 5.51f, COLUMN_SIZES.Sum() + 8*mmW() +0.5f);
+            dataTable.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, PdfDefines.A3Width - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 15f, COLUMN_SIZES.Sum() + 8*mmW() +0.5f);
             aInDoc.Add(dataTable);
 
             DrawLines(1);
