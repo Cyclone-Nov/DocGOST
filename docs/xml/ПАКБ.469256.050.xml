@@ -44,7 +44,7 @@
                 <property name="Количество на изд." value=""/>
                 <property name="Количество в комп." value=""/>
                 <property name="Количество на рег." value=""/>
-                <property name="Наличие комонента"  value="1"/>
+                <property name="Наличие компонента"  value="1"/>
                 <property name="Позиционное обозначение"    value=""/>
                 <property name="Наименование"   value="Модуль оптический"/>
                 <property name="Обозначение"   value="ПАКБ.203129.802"/>
@@ -73,7 +73,7 @@
                 <property name="Количество на изд." value=""/>
                 <property name="Количество в комп." value=""/>
                 <property name="Количество на рег." value=""/>
-                <property name="Наличие комонента"  value="1"/>
+                <property name="Наличие компонента"  value="1"/>
                 <property name="Позиционное обозначение"    value=""/>
                 <property name="Наименование"   value="Крышка"/>
                 <property name="Обозначение"   value="ПАКБ.301265.801"/>
@@ -102,7 +102,7 @@
                 <property name="Количество на изд." value=""/>
                 <property name="Количество в комп." value=""/>
                 <property name="Количество на рег." value=""/>
-                <property name="Наличие комонента"  value="1"/>
+                <property name="Наличие компонента"  value="1"/>
                 <property name="Позиционное обозначение"    value=""/>
                 <property name="Наименование"   value="Дальномер"/>
                 <property name="Обозначение"   value="ПАКБ.401166.800"/>
@@ -131,7 +131,7 @@
                 <property name="Количество на изд." value=""/>
                 <property name="Количество в комп." value=""/>
                 <property name="Количество на рег." value=""/>
-                <property name="Наличие комонента"  value="1"/>
+                <property name="Наличие компонента"  value="1"/>
                 <property name="Позиционное обозначение"    value=""/>
                 <property name="Наименование"   value="Колодка клеммная"/>
                 <property name="Обозначение"   value="ПАКБ.685112.800"/>
@@ -160,7 +160,7 @@
                 <property name="Количество на изд." value=""/>
                 <property name="Количество в комп." value=""/>
                 <property name="Количество на рег." value=""/>
-                <property name="Наличие комонента"  value="1"/>
+                <property name="Наличие компонента"  value="1"/>
                 <property name="Позиционное обозначение"    value=""/>
                 <property name="Наименование"   value="Жгут 2"/>
                 <property name="Обозначение"   value="ПАКБ.685621.815"/>
@@ -189,7 +189,7 @@
                 <property name="Количество на изд." value=""/>
                 <property name="Количество в комп." value=""/>
                 <property name="Количество на рег." value=""/>
-                <property name="Наличие комонента"  value="1"/>
+                <property name="Наличие компонента"  value="1"/>
                 <property name="Позиционное обозначение"    value=""/>
                 <property name="Наименование"   value="Перемычка металлизации"/>
                 <property name="Обозначение"   value="ПАКБ.685621.816"/>
@@ -218,7 +218,7 @@
                 <property name="Количество на изд." value=""/>
                 <property name="Количество в комп." value=""/>
                 <property name="Количество на рег." value=""/>
-                <property name="Наличие комонента"  value="1"/>
+                <property name="Наличие компонента"  value="1"/>
                 <property name="Позиционное обозначение"    value=""/>
                 <property name="Наименование"   value="Жгут 1"/>
                 <property name="Обозначение"   value="ПАКБ.685623.800"/>

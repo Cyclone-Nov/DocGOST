@@ -37,33 +37,33 @@
 	</graphs>
 	<documents>
 		<document>
-			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие комонента"	value="1"/>				<property name="Наименование"	value="Инструкция по настройке"/>				<property name="Обозначение"	value="ПАКБ.436734.802И2"/>				<property name="Код документа"	value="И2"/>				<property name="Формат"	value="А4"/>				<property name="Примечание"	value=""/>
+			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие компонента"	value="1"/>				<property name="Наименование"	value="Инструкция по настройке"/>				<property name="Обозначение"	value="ПАКБ.436734.802И2"/>				<property name="Код документа"	value="И2"/>				<property name="Формат"	value="А4"/>				<property name="Примечание"	value=""/>
 			</properties>
 		</document>
 		<document>
-			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие комонента"	value="1"/>				<property name="Наименование"	value="Технические условия Лист утверждения"/>				<property name="Обозначение"	value="ПАКБ.436734.802ТУ-ЛУ"/>				<property name="Код документа"	value="ТУ-ЛУ"/>				<property name="Формат"	value="А4"/>				<property name="Примечание"	value="Размножать по указанию"/>
+			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие компонента"	value="1"/>				<property name="Наименование"	value="Технические условия Лист утверждения"/>				<property name="Обозначение"	value="ПАКБ.436734.802ТУ-ЛУ"/>				<property name="Код документа"	value="ТУ-ЛУ"/>				<property name="Формат"	value="А4"/>				<property name="Примечание"	value="Размножать по указанию"/>
 			</properties>
 		</document>
 		<document>
-			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие комонента"	value="1"/>				<property name="Наименование"	value="Технические условия"/>				<property name="Обозначение"	value="ПАКБ.436734.802ТУ"/>				<property name="Код документа"	value="ТУ"/>				<property name="Формат"	value="А4"/>				<property name="Примечание"	value=""/>
+			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие компонента"	value="1"/>				<property name="Наименование"	value="Технические условия"/>				<property name="Обозначение"	value="ПАКБ.436734.802ТУ"/>				<property name="Код документа"	value="ТУ"/>				<property name="Формат"	value="А4"/>				<property name="Примечание"	value=""/>
 			</properties>
 		</document>
 		<document>
-			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие комонента"	value="1"/>				<property name="Наименование"	value="Перечень элементов"/>				<property name="Обозначение"	value="ПАКБ.436734.802ПЭ3"/>				<property name="Код документа"	value="ПЭ3"/>				<property name="Формат"	value="А4"/>				<property name="Примечание"	value=""/>
+			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие компонента"	value="1"/>				<property name="Наименование"	value="Перечень элементов"/>				<property name="Обозначение"	value="ПАКБ.436734.802ПЭ3"/>				<property name="Код документа"	value="ПЭ3"/>				<property name="Формат"	value="А4"/>				<property name="Примечание"	value=""/>
 			</properties>
 		</document>
 		<document>
-			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие комонента"	value="1"/>				<property name="Наименование"	value="Схема электрическая принципиальная"/>				<property name="Обозначение"	value="ПАКБ.436734.802Э3"/>				<property name="Код документа"	value="Э3"/>				<property name="Формат"	value="А3"/>				<property name="Примечание"	value=""/>
+			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие компонента"	value="1"/>				<property name="Наименование"	value="Схема электрическая принципиальная"/>				<property name="Обозначение"	value="ПАКБ.436734.802Э3"/>				<property name="Код документа"	value="Э3"/>				<property name="Формат"	value="А3"/>				<property name="Примечание"	value=""/>
 			</properties>
 		</document>
 		<document>
-			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие комонента"	value="1"/>				<property name="Наименование"	value="Габаритный чертеж"/>				<property name="Обозначение"	value="ПАКБ.436734.802ГЧ"/>				<property name="Код документа"	value="ГЧ"/>				<property name="Формат"	value="А3"/>				<property name="Примечание"	value=""/>
+			<properties>				<property name="Раздел СП"	value="Документация"/>				<property name="Наличие компонента"	value="1"/>				<property name="Наименование"	value="Габаритный чертеж"/>				<property name="Обозначение"	value="ПАКБ.436734.802ГЧ"/>				<property name="Код документа"	value="ГЧ"/>				<property name="Формат"	value="А3"/>				<property name="Примечание"	value=""/>
 			</properties>
 		</document>
 	</documents>
 	<componentsPCB>
 		<component_pcb>
-			<properties>				<property name="Раздел СП"	value="Детали"/>				<property name="Примечание"	value=""/>				<property name="Наличие комонента"	value="1"/>				<property name="Подраздел СП"	value=""/>				<property name="Куда входит"	value=""/>				<property name="Наименование"	value="Плата печатная"/>				<property name="Обозначение"	value="ПАКБ.123456.000"/>				<property name="Первичная применяемость"	value="ПАКБ.436734.802"/>				<property name="Формат"	value="A4"/>				<property name="Board_filename"	value="PCB1.PcbDoc"/>				<property name="Board_Code"	value=""/>				<property name="Кол-во слоев"	value="2"/>				<property name="Толщина, мм"	value="0,39"/>
+			<properties>				<property name="Раздел СП"	value="Детали"/>				<property name="Примечание"	value=""/>				<property name="Наличие компонента"	value="1"/>				<property name="Подраздел СП"	value=""/>				<property name="Куда входит"	value=""/>				<property name="Наименование"	value="Плата печатная"/>				<property name="Обозначение"	value="ПАКБ.123456.000"/>				<property name="Первичная применяемость"	value="ПАКБ.436734.802"/>				<property name="Формат"	value="A4"/>				<property name="Board_filename"	value="PCB1.PcbDoc"/>				<property name="Board_Code"	value=""/>				<property name="Кол-во слоев"	value="2"/>				<property name="Толщина, мм"	value="0,39"/>
 				<attribute name="BOARD_OUTLINE"	value="
 25,4;25,4;177,8;25,4#
 177,8;25,4;177,8;127#
@@ -88,7 +88,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C1"/>
 				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -115,7 +115,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C2"/>
 				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -142,7 +142,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C3"/>
 				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -169,7 +169,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C4"/>
 				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -196,7 +196,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C5"/>
 				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -223,7 +223,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C6"/>
 				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -250,7 +250,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="R1"/>
 				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
 				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
@@ -277,7 +277,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="R2"/>
 				<property name="Наименование"	value="Р1-8В -0.1 -2 Ом ±5 % -Т -А -М"/>
 				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
@@ -304,7 +304,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="R3"/>
 				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
 				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
@@ -331,7 +331,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="R4"/>
 				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
 				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
@@ -358,7 +358,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="R5"/>
 				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
 				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
@@ -390,7 +390,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C1"/>
 				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -417,7 +417,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C2"/>
 				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -444,7 +444,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C3"/>
 				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -471,7 +471,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C4"/>
 				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -498,7 +498,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C5"/>
 				<property name="Наименование"	value="К10-79-10 В-1 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -525,7 +525,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="C6"/>
 				<property name="Наименование"	value="К10-79-10 В-2 мкФ +80/-20 % Н90"/>
 				<property name="Документ на поставку"	value="АЖЯР.673511.004ТУ"/>
@@ -552,7 +552,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="R1"/>
 				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
 				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
@@ -579,7 +579,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="R2"/>
 				<property name="Наименование"	value="Р1-8В -0.1 -2 Ом ±5 % -Т -А -М"/>
 				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
@@ -606,7 +606,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="R3"/>
 				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
 				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
@@ -633,7 +633,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="R4"/>
 				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
 				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
@@ -660,7 +660,7 @@
 				<property name="Количество на изд."	value=""/>
 				<property name="Количество в комп."	value=""/>
 				<property name="Количество на рег."	value=""/>
-				<property name="Наличие комонента"	value="1"/>
+				<property name="Наличие компонента"	value="1"/>
 				<property name="Позиционное обозначение"	value="R5"/>
 				<property name="Наименование"	value="Р1-8В -0.1 -1 Ом ±5 % -Т -А -М"/>
 				<property name="Документ на поставку"	value="ОЖ0.467.164ТУ"/>
