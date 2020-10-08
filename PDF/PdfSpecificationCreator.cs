@@ -25,7 +25,7 @@ namespace GostDOC.PDF
     class PdfSpecificationCreator : PdfCreator {
 
         private static readonly float DATA_TABLE_CELL_HEIGHT_MM = 8;
-        private readonly float DATA_TABLE_LEFT = 19.3f * mmW() - TO_LEFT_CORRECTION;
+        private new readonly float DATA_TABLE_LEFT = 19.3f * mmW() - TO_LEFT_CORRECTION;
 
         public PdfSpecificationCreator() : base(DocType.Specification) {
         }
@@ -110,8 +110,6 @@ namespace GostDOC.PDF
             dataTable.SetFixedPosition(
                 DATA_TABLE_LEFT,
                 PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 5.51f,
-                //19.3f * mmW(), 
-                //PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNamuber) + TOP_MARGIN_MM * mmH()) + 5.51f,
                 TITLE_BLOCK_WIDTH);
             aInDoc.Add(dataTable);
             
@@ -288,22 +286,9 @@ namespace GostDOC.PDF
             aDoc.SetBottomMargin(5 * mmW());
         }
 
-//        private void DrawMissingLinesFirstPage() {
-//            // нарисовать недостающую линию
-//            var fromLeft = 19 * mmW() -1.17f /*+1.65f*/ + TITLE_BLOCK_WIDTH;
-//            Canvas canvas = new Canvas(new PdfCanvas(_pdfDoc.GetFirstPage()),
-//                new Rectangle(fromLeft, BOTTOM_MARGIN + TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM * mmH() -2f, 2, 120));
-//            canvas.Add(new LineSeparator(new SolidLine(THICK_LINE_WIDTH)).SetWidth(120)
-//                .SetRotationAngle(DegreesToRadians(90)));
-//
-//        }
-
         private void DrawLines(int pageNumber) {
-            // нарисовать недостающую линию
-            
             var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
             DrawVerticalLine(pageNumber, fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 200);
-
         }
 
     }

@@ -27,6 +27,7 @@ namespace GostDOC.PDF
     {
 
         protected static PdfFont f1 = PdfDefines.MainFont;
+        protected readonly float DATA_TABLE_LEFT = 19.3f * mmW() - TO_LEFT_CORRECTION;
 
         /// <summary>
         /// The save path
@@ -191,13 +192,22 @@ namespace GostDOC.PDF
 
             SetPageMargins(aInPdfDoc);
 
-            aInPdfDoc.Add(CreateRegisterTable());
+            var regTable = CreateRegisterTable();
+            regTable.SetFixedPosition(
+                DATA_TABLE_LEFT,
+                PdfDefines.A4Height - (GetTableHeight(regTable, 1) + TOP_MARGIN) + 5.51f,
+                TITLE_BLOCK_WIDTH - 0.02f);
+            aInPdfDoc.Add(regTable);
+
 
             // добавить таблицу с основной надписью для последуюших старницы
             aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber }));
 
             // добавить таблицу с нижней дополнительной графой
             aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
+
+            var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
+            DrawVerticalLine(aPageNumber, fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 200);
         }
 
         Table CreateRegisterTable() {
