@@ -63,7 +63,7 @@ namespace GostDOC.DataPreparation
                         }
                     }
 
-                    if (res)
+                    if (res && groupName != Constants.GroupDoc)
                     { 
                         AddEmptyRow(table);
                         AddEmptyRow(table);
@@ -173,7 +173,7 @@ namespace GostDOC.DataPreparation
 
                 row = dataToFill.Table.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString{Value = component.GetProperty(Constants.ComponentFormat)};
-                row[Constants.ColumnZone] = new FormattedString{Value = component.GetProperty(Constants.ComponentZone)};                
+                //row[Constants.ColumnZone] = new FormattedString{Value = component.GetProperty(Constants.ComponentZone)};                
                 if (dataToFill.GroupName != Constants.GroupDoc) 
                 { 
                     ++aPos;
@@ -181,14 +181,13 @@ namespace GostDOC.DataPreparation
                 }
 
                 string designation = component.GetProperty(Constants.ComponentSign);
-                if (dataToFill.GroupName == Constants.GroupDoc) {
+                //if (dataToFill.GroupName == Constants.GroupDoc) {
                     //designation += component.GetProperty(Constants.ComponentDocCode);
-                }
+                //}
                 row[Constants.ColumnSign] = new FormattedString{Value = designation};
-
                 row[Constants.ColumnName] = new FormattedString{Value = namearr.First()};
                 row[Constants.ColumnQuantity] = component_count;
-                row[Constants.ColumnFootnote]= new FormattedString{Value = notearr.First()};
+                row[Constants.ColumnFootnote] = new FormattedString{Value = notearr.First()};
                 dataToFill.Table.Rows.Add(row);
 
                 int max = Math.Max(namearr.Length, notearr.Length);
@@ -197,9 +196,10 @@ namespace GostDOC.DataPreparation
                     int ln_name = namearr.Length;
                     int ln_note = notearr.Length;
 
-                    for (int ln = 1; ln< max; ln++)
+                    for (int ln = 1; ln < max; ln++)
                     {
                         row = dataToFill.Table.NewRow();
+                        row[Constants.ColumnZone] = new FormattedString { Value = "1" }; // используем данную колонку для установки признака переноса строки
                         row[Constants.ColumnName] = (ln_name > ln) ? new FormattedString{Value= namearr[ln]} : null;
                         row[Constants.ColumnFootnote] = (ln_note > ln) ? new FormattedString{Value= notearr[ln]} : null;
                         dataToFill.Table.Rows.Add(row);
