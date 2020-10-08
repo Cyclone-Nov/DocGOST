@@ -115,7 +115,7 @@ namespace GostDOC.ViewModels
             get
             {
                 Version version = Assembly.GetExecutingAssembly().GetName().Version;
-                return "ПО формирования документов на основе перечня элементов изделия " + version;
+                return "ПО формирования документов КД на изделие в соответствие с ГОСТ " + version;
             }
         }
         /// <summary>

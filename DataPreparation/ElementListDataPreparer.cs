@@ -100,7 +100,7 @@ internal class ElementListDataPreparer : BasePreparer {
             {
                 var component = sortComponents[i];
                 string component_name = GetComponentName(HasStandardDoc[i] == 2, component);
-                int component_count = 1; // always only one! GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
+                uint component_count = component.Count; //1; // always only one! GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
                 bool haveToChangeName = string.Equals(component.GetProperty(Constants.ComponentPresence),"0") ||
                                         HaveToChangeComponentName(component, aOtherComponents);                
                 List<string> component_designators = new List<string>{ component.GetProperty(Constants.ComponentDesignatiorID) };
