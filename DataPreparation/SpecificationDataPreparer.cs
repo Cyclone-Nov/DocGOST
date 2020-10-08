@@ -138,7 +138,7 @@ namespace GostDOC.DataPreparation
             {
                 var component = sortComponents[i];
                 string component_name = component.GetProperty(Constants.ComponentName);
-                int component_count = 1; // always only one! GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
+                int component_count = GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
                 
                 List<string> component_designators = new List<string>{ component.GetProperty(Constants.ComponentDesignatiorID) };
 
@@ -239,6 +239,23 @@ namespace GostDOC.DataPreparation
             AddColumn(Constants.ColumnFootnote, "Примечание", typeof(FormattedString));
 
             return table;
+        }
+
+        /// <summary>
+        /// получить количество компонентов
+        /// </summary>
+        /// <param name="aCountStr"></param>
+        /// <returns></returns>
+        private int GetComponentCount(string aCountStr) {
+            int count = 1;
+            if (!string.IsNullOrEmpty(aCountStr)) {
+                if (!Int32.TryParse(aCountStr, out count)) {
+                    count = 1;
+                    //throw new Exception($"Не удалось распарсить значение свойства \"Количество на изд.\" для компонента с именем {component_name}");
+                }
+            }
+
+            return count;
         }
 
         private new void AddEmptyRow(DataTable aTable) 
