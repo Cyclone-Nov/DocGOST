@@ -124,8 +124,8 @@ namespace GostDOC.PDF
                 case DocType.Bill:
                     {
                         _pageSize = new PageSize(PageSize.A3);
-                        RowNumberOnFirstPage = 24;
-                        RowNumberOnNextPage = 29;
+                        RowNumberOnFirstPage = 26;
+                        RowNumberOnNextPage = 32;
                     }
                     break;
                 case DocType.D27:
@@ -667,7 +667,7 @@ namespace GostDOC.PDF
 
             // switch A3/A4
             if (aPageSize.Contains(PageSize.A3)) {
-                tbl.SetFixedPosition(PdfDefines.A3Height - TITLE_BLOCK_WIDTH - RIGHT_MARGIN, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+                //tbl.SetFixedPosition(PdfDefines.A3Height - TITLE_BLOCK_WIDTH - RIGHT_MARGIN, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
             } else {
                 float left = 20 * mmW()-(TO_LEFT_CORRECTION+1f);
                 tbl.SetFixedPosition(left, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH-1f);

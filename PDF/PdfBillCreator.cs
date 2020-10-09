@@ -14,6 +14,7 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Pdf.Canvas.Draw;
 using iText.Layout;
+using iText.Layout.Borders;
 using iText.Layout.Element;
 using iText.Layout.Properties;
 using Document = iText.Layout.Document;
@@ -99,7 +100,7 @@ namespace GostDOC.PDF
             SetPageMargins(aInDoc);
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
-            var titleBlock = CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, DocType = DocType.Bill});
+            var titleBlock = CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, CurrentPage = 1,  DocType = DocType.Bill});
             titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -15f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
             aInDoc.Add(titleBlock);
 
@@ -116,14 +117,17 @@ namespace GostDOC.PDF
         internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow) {
             aInDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
             SetPageMargins(aInDoc);
+            aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
+            var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber, CurrentPage = aPageNumber, DocType = DocType.Bill });
+            titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -15f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            aInDoc.Add(titleBlock);
+            
             int lastNextProcessedRow;
             var dataTable = CreateTable(aData, false, aStartRow, out lastNextProcessedRow);
-            dataTable.SetFixedPosition(19.3f * mmH(), BOTTOM_MARGIN + 16 * mmH(), TITLE_BLOCK_WIDTH + 2f);
+            dataTable.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, PdfDefines.A3Width - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 15f, COLUMN_SIZES.Sum() + 8*mmW() +0.5f);
             aInDoc.Add(dataTable);
 
-            aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
-            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber, DocType = DocType.Bill}));
             DrawLines(aPageNumber);
             return lastNextProcessedRow;
         }
@@ -170,27 +174,35 @@ namespace GostDOC.PDF
                     break;
                 }
 
+                if(rowNumber == 1)
+                {
+                    centrAlignCell = centrAlignCell.SetBorderBottom(THICK_BORDER);
+                    leftPaddCell = leftPaddCell.SetBorderBottom(THICK_BORDER);
+                }
+
                 row = Rows[ind];
 
-                string GetCellString(string columnName) =>(row[columnName] == DBNull.Value)
-                    ? string.Empty
-                    : (string) row[columnName];
+                string GetCellString(string columnName) =>
+                    (row[columnName] == DBNull.Value) ? string.Empty : (string) row[columnName];
 
                 BasePreparer.FormattedString GetCellStringFormatted(string columnName) =>
-                (row[columnName] == System.DBNull.Value)
-                    ? null 
-                    : ((BasePreparer.FormattedString) row[columnName]);
+                    (row[columnName] == System.DBNull.Value) ? null : ((BasePreparer.FormattedString) row[columnName]);
                                     
-                string name = GetCellString(Constants.ColumnName);
-                string productCode = GetCellString(Constants.ColumnProductCode);
-                string deliveryDocSign = GetCellString(Constants.ColumnDeliveryDocSign);
-                string supplier = GetCellString(Constants.ColumnSupplier);
-                string entry = GetCellString(Constants.ColumnEntry);
-                int quantityDev = (row[Constants.ColumnQuantityDevice] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityDevice];
-                int quantityComplex = (row[Constants.ColumnQuantityComplex] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityComplex];
-                int quantityReg = (row[Constants.ColumnQuantityRegul] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityRegul];
-                int quantityTotal = (row[Constants.ColumnQuantityTotal] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityTotal];
-                string note = GetCellString(Constants.ColumnFootnote);
+                string name               = GetCellString(Constants.ColumnName);
+                string productCode        = GetCellString(Constants.ColumnProductCode);
+                string deliveryDocSign    = GetCellString(Constants.ColumnDeliveryDocSign);
+                string supplier           = GetCellString(Constants.ColumnSupplier);
+                string entry              = GetCellString(Constants.ColumnEntry);
+                int    quantityDev        = (row[Constants.ColumnQuantityDevice] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityDevice];
+                string strQuantityDev     = quantityDev == 0 ? "-" : quantityDev.ToString();
+                int    quantityComplex    = (row[Constants.ColumnQuantityComplex] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityComplex];
+                string strQuantityComplex = quantityComplex == 0 ? "-" : quantityComplex.ToString();
+                int    quantityReg        = (row[Constants.ColumnQuantityRegul] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityRegul];
+                string strQuantityReg     = quantityReg == 0 ? "-" : quantityReg.ToString();
+                int    quantityTotal      = (row[Constants.ColumnQuantityTotal] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityTotal];
+                string strQuantityTotal   = quantityTotal == 0 ? "-" : quantityTotal.ToString();
+                string note               = GetCellString(Constants.ColumnFootnote);
+                string textFormat         = GetCellString(Constants.ColumnTextFormat);
 
                 inc++;
                 if (string.IsNullOrEmpty(name)) 
@@ -199,22 +211,22 @@ namespace GostDOC.PDF
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 1, leftPaddCell);
                     rowNumber--;
                 }
-                else if (string.IsNullOrEmpty(productCode) && string.IsNullOrEmpty(deliveryDocSign) && string.IsNullOrEmpty(supplier) && string.IsNullOrEmpty(entry)) 
+                else if (!string.IsNullOrEmpty(textFormat)) 
                 {
                     // это наименование группы
                     if (rowNumber > 4) 
                     {
                         // если есть место для записи более 4 строк то записываем группу, иначе выходим
                         tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));                        
-                        tbl.AddCell(leftPaddCell.Clone(true).Add(new Paragraph(name)));
+                        tbl.AddCell(leftPaddCell.Clone(true).Add(new Paragraph(name)).SetUnderline());
                         tbl.AddCell(leftPaddCell.Clone(false)); // Код продукции
                         tbl.AddCell(leftPaddCell.Clone(false)); // Обозначение документа на поставку
                         tbl.AddCell(leftPaddCell.Clone(false)); // Поставщик
                         tbl.AddCell(leftPaddCell.Clone(false)); // Куда входит (обозначение)
-                        tbl.AddCell(leftPaddCell.Clone(false)); // Количество на изделие
-                        tbl.AddCell(leftPaddCell.Clone(false)); // Количество в комплекты
-                        tbl.AddCell(leftPaddCell.Clone(false)); // Количество на регулир.
-                        tbl.AddCell(leftPaddCell.Clone(false)); // Количество всего
+                        tbl.AddCell(centrAlignCell.Clone(false)); // Количество на изделие
+                        tbl.AddCell(centrAlignCell.Clone(false)); // Количество в комплекты
+                        tbl.AddCell(centrAlignCell.Clone(false)); // Количество на регулир.
+                        tbl.AddCell(centrAlignCell.Clone(false)); // Количество всего
                         tbl.AddCell(leftPaddCell.Clone(false)); // Примечание
                         rowNumber--;
                     }
@@ -230,10 +242,10 @@ namespace GostDOC.PDF
                     tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(deliveryDocSign))); // Обозначение документа на поставку
                     tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(supplier))); // Поставщик
                     tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(entry))); // Куда входит (обозначение)
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(quantityDev.ToString()))); // Количество на изделие
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(quantityComplex.ToString()))); // Количество в комплекты
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(quantityReg.ToString()))); // Количество на регулир.
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(quantityTotal.ToString()))); // Количество всего
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityDev))); // Количество на изделие
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityComplex))); // Количество в комплекты
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityReg))); // Количество на регулир.
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityTotal))); // Количество всего
                     tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note))); // Примечание
                     rowNumber--; 
                 }
@@ -251,7 +263,17 @@ namespace GostDOC.PDF
 
              // дополним таблицу пустыми строками если она не полностью заполнена
             if (rowNumber > 0) {
-                AddEmptyRowToPdfTable(tbl, rowNumber, COLUMNS, centrAlignCell, true);
+                for(int j = 0; j < rowNumber;j++)
+                {
+                    inc++;
+                    var cell = centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString()));
+                    if (j + 1 == rowNumber)
+                        cell.SetBorderBottom(new SolidBorder(THICK_LINE_WIDTH));
+                    tbl.AddCell(cell);  
+                    
+                    
+                    AddEmptyRowToPdfTable(tbl, 1, COLUMNS-1, centrAlignCell, (j+1 == rowNumber) ? true : false);
+                }
             }
             if (outLastProcessedRow == aData.Rows.Count) {
                 outLastProcessedRow = 0;
