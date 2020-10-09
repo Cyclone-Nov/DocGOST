@@ -155,16 +155,71 @@ namespace GostDOC.DataPreparation
 
             //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
             DataRow row;
+            Component prevComponent = null;
+            uint prevCnt = 0;
+            uint compCount = 0;
             for (int i = 0; i < sortComponents.Length; i++)
             {
                 var component = sortComponents[i];
-                               
-                // вчисляем длины полей и переносим на следующуй строку при необходимости 
-                // разобьем наименование на несколько строк исходя из длины текста
+                
                 var name = component.GetProperty(Constants.ComponentName); 
+                // объединим совпадающие компоненты
+                if (i > 0)
+                { 
+                    var prevName = prevComponent.GetProperty(Constants.ComponentName);
+                    var prevProductCode = prevComponent.GetProperty(Constants.ComponentProductCode);
+                    var prevComponentDoc = prevComponent.GetProperty(Constants.ComponentDoc);
+
+                    var productCode = component.GetProperty(Constants.ComponentProductCode);
+                    var componentDoc = component.GetProperty(Constants.ComponentDoc);
+
+                    // если текущий компонент совпадает с предыдущим то в строку запишем только количества
+                    if (string.Equals(prevName, name) && string.Equals(prevProductCode, productCode) && string.Equals(prevComponentDoc, componentDoc))
+                    {
+                        row = aTable.NewRow();
+                        row[Constants.ColumnEntry] = component.GetProperty(Constants.ComponentWhereIncluded);
+                        UInt32.TryParse(component.GetProperty(Constants.ComponentCountDev), out uint cnt_dev_n);
+                        if (cnt_dev_n == 0) cnt_dev_n = component.Count;
+                        row[Constants.ColumnQuantityDevice] = cnt_dev_n;
+                        UInt32.TryParse(component.GetProperty(Constants.ComponentCountSet), out uint cnt_comp_n);
+                        row[Constants.ColumnQuantityComplex] = cnt_comp_n;
+                        UInt32.TryParse(component.GetProperty(Constants.ComponentCountReg), out uint cnt_reg_n);
+                        row[Constants.ColumnQuantityRegul] = cnt_reg_n;
+                        row[Constants.ColumnQuantityTotal] = cnt_dev_n + cnt_comp_n + cnt_reg_n;
+                        aTable.Rows.Add(row);
+
+                        if (prevCnt > 0)
+                        {
+                            compCount = prevCnt;
+                            prevCnt = 0;
+                        }
+
+                        compCount += cnt_dev_n + cnt_comp_n + cnt_reg_n;                        
+
+                        if (i == sortComponents.Length - 1)
+                        {
+                            row = aTable.NewRow();
+                            row[Constants.ColumnQuantityTotal] = compCount;                        
+                            aTable.Rows.Add(row);
+                        }
+                        
+                        continue;
+                    }
+                    else if (compCount > 0)  // запишем сумму по предыдущим одинаковым компонентам и обнулим так как произошел переход
+                    {
+                        row = aTable.NewRow();
+                        row[Constants.ColumnQuantityTotal] = compCount;                        
+                        aTable.Rows.Add(row);
+                        compCount = 0;
+                        continue;
+                    }
+                }
+
+                // вчисляем длины полей и переносим на следующую строку при необходимости 
+                // разобьем наименование на несколько строк исходя из длины текста
                 string[] namearr = PdfUtils.SplitStringByWidth(60, name).ToArray();       
-                var supplier = component.GetProperty(Constants.ComponentSupplier); 
-                string[] supplierarr = PdfUtils.SplitStringByWidth(55, supplier).ToArray();       
+                var supplier = component.GetProperty(Constants.ComponentSupplier);                 
+                string[] supplierarr = PdfUtils.SplitStringByWidth(55, supplier).ToArray();
                 var note = component.GetProperty(Constants.ComponentNote);
                 string[] notearr = PdfUtils.SplitStringByWidth(24, note).ToArray();
 
@@ -182,7 +237,8 @@ namespace GostDOC.DataPreparation
                 row[Constants.ColumnQuantityComplex] = cnt_comp;
                 UInt32.TryParse(component.GetProperty(Constants.ComponentCountReg), out uint cnt_reg);
                 row[Constants.ColumnQuantityRegul] = cnt_reg;
-                row[Constants.ColumnQuantityTotal] = cnt_dev + cnt_comp + cnt_reg;
+                prevCnt = cnt_dev + cnt_comp + cnt_reg;
+                row[Constants.ColumnQuantityTotal] = prevCnt;
                 row[Constants.ColumnFootnote] = notearr.First();            
                 aTable.Rows.Add(row);
 
@@ -203,6 +259,8 @@ namespace GostDOC.DataPreparation
                         aTable.Rows.Add(row);
                     }
                 }
+
+                prevComponent = component;
             }
 
             AddEmptyRow(aTable);

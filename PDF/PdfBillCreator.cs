@@ -205,29 +205,28 @@ namespace GostDOC.PDF
                 string textFormat         = GetCellString(Constants.ColumnTextFormat);
 
                 inc++;
-                if (string.IsNullOrEmpty(name)) 
+                if (string.IsNullOrEmpty(name) && quantityTotal == 0)  // это пустая строка
                 {
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 1, leftPaddCell);
                     rowNumber--;
-                }
-                else if (!string.IsNullOrEmpty(textFormat)) 
+                } 
+                else if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(entry) && quantityTotal > 0)  // это строка с суммой по элементам
                 {
-                    // это наименование группы
-                    if (rowNumber > 4) 
+                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));                        
+                        AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 3, leftPaddCell);                        
+                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityTotal)).SetUnderline(1, 12.0f)); // Количество всего
+                        tbl.AddCell(leftPaddCell.Clone(false)); // Примечание
+                        rowNumber--;
+                }
+                else if (!string.IsNullOrEmpty(textFormat))  // это наименование группы
+                {                    
+                    if (rowNumber > 4) // если осталось мнее 5 строк для записи группы, то переходим на следующий лист
                     {
                         // если есть место для записи более 4 строк то записываем группу, иначе выходим
                         tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));                        
                         tbl.AddCell(leftPaddCell.Clone(true).Add(new Paragraph(name)).SetUnderline());
-                        tbl.AddCell(leftPaddCell.Clone(false)); // Код продукции
-                        tbl.AddCell(leftPaddCell.Clone(false)); // Обозначение документа на поставку
-                        tbl.AddCell(leftPaddCell.Clone(false)); // Поставщик
-                        tbl.AddCell(leftPaddCell.Clone(false)); // Куда входит (обозначение)
-                        tbl.AddCell(centrAlignCell.Clone(false)); // Количество на изделие
-                        tbl.AddCell(centrAlignCell.Clone(false)); // Количество в комплекты
-                        tbl.AddCell(centrAlignCell.Clone(false)); // Количество на регулир.
-                        tbl.AddCell(centrAlignCell.Clone(false)); // Количество всего
-                        tbl.AddCell(leftPaddCell.Clone(false)); // Примечание
+                        AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 2, leftPaddCell);                        
                         rowNumber--;
                     }
                     else                 
