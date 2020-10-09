@@ -207,6 +207,7 @@ namespace GostDOC.Models
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
                 var included = cmp.Properties.Find(x => x.Name == Constants.ComponentWhereIncluded);
                 var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
+                var position = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatiorID);
                 if (name == null || (included == null && sign == null)) 
                 {
                     continue;
@@ -215,14 +216,15 @@ namespace GostDOC.Models
                 CombineProperties combine = new CombineProperties()
                 {
                     Name = name.Text,
-                    Included = included?.Text ?? sign.Text 
+                    Included = included?.Text ?? sign.Text,
+                    Position = position?.Text ?? ""
                 };
 
                 // Parse component count
                 uint count = ParseCount(cmp);
 
                 Component existing = null;
-                if (components.TryGetValue(combine, out existing))
+                if (_docType != DocType.ItemsList && components.TryGetValue(combine, out existing))
                 {
                     // If already added - increase count and continue
                     existing.Count += count;

@@ -8,15 +8,37 @@ namespace GostDOC.Models
 {
     class CombineProperties : IEquatable<CombineProperties>
     {
+        /// <summary>
+        /// имя
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
         public string Name { get; set; }
+
+        /// <summary>
+        /// куда входит
+        /// </summary>
+        /// <value>
+        /// The included.
+        /// </value>
         public string Included { get; set; }
+
+        /// <summary>
+        /// позиционное обозначение
+        /// </summary>
+        /// <value>
+        /// The position.
+        /// </value>
+        public string Position { get; set; }
+
         public bool Equals(CombineProperties other)
         {
             if (other == null)
             {
                 return false;
             }
-            return string.Equals(other.Name, Name) && string.Equals(other.Included, Included);
+            return string.Equals(other.Name, Name) && string.Equals(other.Included, Included) && string.Equals(other.Position, Position);
         }
         public override bool Equals(object other)
         {
@@ -24,7 +46,7 @@ namespace GostDOC.Models
         }
         public override int GetHashCode()
         {
-            return (Name?.GetHashCode() ?? 0) ^ (Included?.GetHashCode() ?? 0);
+            return (Name?.GetHashCode() ?? 0) ^ (Included?.GetHashCode() ?? 0) ^ (Position?.GetHashCode() ?? 0);
         }
     }
 }

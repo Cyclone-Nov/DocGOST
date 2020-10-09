@@ -81,7 +81,7 @@ public abstract class BasePreparer {
     /// <param name="aConfigs">список всез конфигураций</param>
     /// <returns>список словарей элементов</returns>
     protected IEnumerable<Dictionary<string, Component>>
-        MakeComponentDesignatorsDictionaryOtherConfigs(IDictionary<string, Configuration> aConfigs) {
+    MakeComponentDesignatorsDictionaryOtherConfigs(IDictionary<string, Configuration> aConfigs) {
         var result = new List<Dictionary<string, Component>>();
         // ваыбираем все конфигурации кроме базовой
         var configs = aConfigs.Where(val => !string.Equals(val.Key, Constants.MAIN_CONFIG_INDEX));
