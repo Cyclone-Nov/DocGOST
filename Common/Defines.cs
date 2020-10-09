@@ -359,6 +359,13 @@ namespace GostDOC.Common
         /// </summary>
         public static readonly string ColumnQuantityTotal = "QuantityTotal";
 
+        /// <summary>
+        /// признак форматирования выводимого текста
+        /// Если не пусто, то это заголовок, иначе перенос строки
+        /// </summary>
+        public static readonly string ColumnTextFormat = "TextFormat";
+        
+
         #endregion
 
 

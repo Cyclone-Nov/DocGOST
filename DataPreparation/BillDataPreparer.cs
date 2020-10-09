@@ -36,7 +36,7 @@ namespace GostDOC.DataPreparation
                     // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
                     var mainсomponents = group.Value.Components;
 
-                    AddEmptyRow(table);
+                    //AddEmptyRow(table);
                     FillDataTable(table, group.Key, mainсomponents);
 
                     foreach (var subgroup in group.Value.SubGroups.OrderBy(key => key.Key))
@@ -86,6 +86,7 @@ namespace GostDOC.DataPreparation
             AddColumn(Constants.ColumnQuantityRegul, "Количество на регулир.", typeof(Int32));
             AddColumn(Constants.ColumnQuantityTotal, "Количество всего", typeof(Int32));
             AddColumn(Constants.ColumnFootnote, "Примечание", typeof(string));
+            AddColumn(Constants.ColumnTextFormat, "Форматирование текста", typeof(string));        
 
             return table;
         }
@@ -109,6 +110,7 @@ namespace GostDOC.DataPreparation
             row[Constants.ColumnQuantityRegul] = 0;
             row[Constants.ColumnQuantityTotal] = 0;
             row[Constants.ColumnFootnote] = string.Empty;
+            row[Constants.ColumnTextFormat] = string.Empty;
             
             aTable.Rows.Add(row);
         }
@@ -118,11 +120,13 @@ namespace GostDOC.DataPreparation
         /// </summary>
         /// <param name="aTable"></param>
         /// <param name="aGroupName"></param>
-        private void AddGroupName(DataTable aTable, string aGroupName) {
-            if (string.IsNullOrEmpty(aGroupName)) return;
+        private bool AddGroupName(DataTable aTable, string aGroupName) {
+            if (string.IsNullOrEmpty(aGroupName)) return false;
             DataRow row = aTable.NewRow();
             row[Constants.ColumnName] = aGroupName;
+            row[Constants.ColumnTextFormat] = "1";
             aTable.Rows.Add(row);
+            return true;
         }
 
 
@@ -146,7 +150,8 @@ namespace GostDOC.DataPreparation
             Models.Component[] sortComponents = SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();            
 
             // записываем наименование группы, если есть
-            AddGroupName(aTable, aGroupName);
+            if(AddGroupName(aTable, aGroupName))
+                AddEmptyRow(aTable);
 
             //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
             DataRow row;
@@ -170,11 +175,12 @@ namespace GostDOC.DataPreparation
                 row[Constants.ColumnSupplier] = supplierarr.First();
                 row[Constants.ColumnEntry] = component.GetProperty(Constants.ComponentWhereIncluded);
                 
-                Int32.TryParse(component.GetProperty(Constants.ComponentCountDev), out int cnt_dev);
+                UInt32.TryParse(component.GetProperty(Constants.ComponentCountDev), out uint cnt_dev);
+                if (cnt_dev == 0) cnt_dev = component.Count;
                 row[Constants.ColumnQuantityDevice] = cnt_dev;
-                Int32.TryParse(component.GetProperty(Constants.ComponentCountSet), out int cnt_comp);
+                UInt32.TryParse(component.GetProperty(Constants.ComponentCountSet), out uint cnt_comp);
                 row[Constants.ColumnQuantityComplex] = cnt_comp;
-                Int32.TryParse(component.GetProperty(Constants.ComponentCountReg), out int cnt_reg);
+                UInt32.TryParse(component.GetProperty(Constants.ComponentCountReg), out uint cnt_reg);
                 row[Constants.ColumnQuantityRegul] = cnt_reg;
                 row[Constants.ColumnQuantityTotal] = cnt_dev + cnt_comp + cnt_reg;
                 row[Constants.ColumnFootnote] = notearr.First();            
