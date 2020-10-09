@@ -223,13 +223,8 @@ namespace GostDOC.Models
                 // Parse component count
                 uint count = ParseCount(cmp);
 
-                Component existing = null;
-                if (_docType != DocType.ItemsList && components.TryGetValue(combine, out existing))
-                {
-                    // If already added - increase count and continue
-                    existing.Count += count;
+                if (CombineComponent(components, combine, count))
                     continue;
-                }
 
                 // Create component
                 Component component = new Component(cmp) { Type = aType, Count = count };                
@@ -416,6 +411,41 @@ namespace GostDOC.Models
             {
                 SortComponents(group, group.Name, DocType.Bill);
             }
+        }
+
+        /// <summary>
+        /// объединить компоненты при соблюдении условий
+        /// </summary>
+        /// <param name="aComponents">a components.</param>
+        /// <param name="aCombine">a combine.</param>
+        /// <param name="aCount">a count.</param>
+        /// <returns></returns>
+        private bool CombineComponent(Dictionary<CombineProperties, Component> aComponents, CombineProperties aCombine, uint aCount)
+        {
+            Component existing = null;
+            if(_docType == DocType.Specification || _docType == DocType.ItemsList)
+            { 
+                if (aComponents.TryGetValue(aCombine, out existing))
+                {
+                    // If already added - increase count and continue
+                    existing.Count += aCount;
+                    return true;
+                }
+            }
+            else
+            {
+                var keys = aComponents.Keys.ToArray();                
+                for (var i = 0; i < keys.Length; i++)
+                {                                        
+                    if (keys[i].Name == aCombine.Name && keys[i].Included == aCombine.Included)
+                    {
+                        aComponents[keys[i]].Count += aCount;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private void SetProperty(ComponentXml aComponent, string aName, string aText)
