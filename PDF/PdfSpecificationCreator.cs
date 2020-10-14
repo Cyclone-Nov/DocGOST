@@ -99,6 +99,8 @@ namespace GostDOC.PDF
 
             DrawLines(1);
 
+            AddSecondaryElements(aInDoc, aGraphs);
+
             return lastProcessedRow;
         }
 
@@ -289,6 +291,27 @@ namespace GostDOC.PDF
         private void DrawLines(int pageNumber) {
             var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
             DrawVerticalLine(pageNumber, fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 200);
+        }
+
+        void AddSecondaryElements(Document aInDoc, IDictionary<string, string> aGraphs)
+        {
+            var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
+
+            //var p =
+            //    new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT))
+            //        .SetRotationAngle(DegreesToRadians(90))
+            //        .AddStyle(style)
+            //        .SetFixedPosition(10 * mmW() + 2 - TO_LEFT_CORRECTION, TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * mmW(), 100);
+            //aInDoc.Add(p);
+
+            float bottom = -3;
+            var p = new Paragraph("Копировал")
+                .AddStyle(style)
+                .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 14) * mmW() - TO_LEFT_CORRECTION, bottom, 100);
+            aInDoc.Add(p);
+            p = new Paragraph("Формат А4").AddStyle(style)
+                .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 70) * mmW() + 20 - TO_LEFT_CORRECTION, bottom, 100);
+            aInDoc.Add(p);
         }
 
     }

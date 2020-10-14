@@ -115,6 +115,8 @@ namespace GostDOC.PDF
             string inscription = $"Утвержден {decimal_number}ВП-ЛУ";
             AddText(inscription);
 
+            AddSecondaryElements(aInDoc, aGraphs);
+
             return lpr;
         }
 
@@ -346,6 +348,27 @@ namespace GostDOC.PDF
             DrawVerticalLine(aPageNumber, x, y,THICK_LINE_WIDTH, rightVertLineHeight);
         }
 
+        void AddSecondaryElements(Document aInDoc, IDictionary<string, string> aGraphs)
+        {
+            var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
+
+            //var p =
+            //    new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT))
+            //        .SetRotationAngle(DegreesToRadians(90))
+            //        .AddStyle(style)
+            //        .SetFixedPosition(10 * mmW() + 2 - TO_LEFT_CORRECTION, TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * mmW(), 100);
+            //aInDoc.Add(p);
+
+            float bottom = -4;
+            var p = new Paragraph("Копировал")
+                .AddStyle(style)
+                .SetFixedPosition((60 + 45 + 70 + 50 + 65) * mmW() - TO_LEFT_CORRECTION, bottom, 100);
+            aInDoc.Add(p);
+            p = new Paragraph("Формат А3").AddStyle(style)
+                .SetFixedPosition((60 + 45 + 70 + 50 + 32 + 100) * mmW() + 20 - TO_LEFT_CORRECTION, bottom, 100);
+            aInDoc.Add(p);
+        }
+
         void AddText(string aText)
         {    
             Paragraph paragraph = new Paragraph(aText).
@@ -361,7 +384,7 @@ namespace GostDOC.PDF
             //}
             PdfPage page = _pdfDoc.GetPage(1);
             Canvas canvas = new Canvas(new PdfCanvas(page), page.GetMediaBox());
-            canvas.ShowTextAligned(paragraph, 638, 170, TextAlignment.LEFT);
+            canvas.ShowTextAligned(paragraph, 640, 170, TextAlignment.LEFT);
         }
     }
 }
