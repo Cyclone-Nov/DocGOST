@@ -122,6 +122,8 @@ namespace GostDOC.ExcelExport
 
         private void FillRows(Excel._Worksheet sheet, int maxRows)
         {
+            if (_tbl == null)
+                return;
             int row = MinRowIndex;
             while (row <= maxRows && _tableRow < _tbl.Rows.Count)
             { 

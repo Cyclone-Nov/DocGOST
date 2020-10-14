@@ -122,24 +122,23 @@ namespace GostDOC.ExcelExport
 
         private void FillRows(Excel._Worksheet sheet, int maxRows)
         {
+            if (_tbl == null)
+                return;
+
             int row = 3;
             while (row <= maxRows && _tableRow < _tbl.Rows.Count)
             {
-                // TODO: Fill table items
-                /*
-                sheet.Cells[row, 4] = _tbl.GetTableValue(_tableRow, 1);
-                sheet.Cells[row, 6] = _tbl.GetTableValue(_tableRow, 2);
-                sheet.Cells[row, 7] = _tbl.GetTableValue(_tableRow, 3);
-                sheet.Cells[row, 9] = _tbl.GetTableValue(_tableRow, 4);
-                sheet.Cells[row, 14] = _tbl.GetTableValue(_tableRow, 5);
-
-                int count = _tbl.GetTableValue<int>(_tableRow, 6);
-                if (count > 0)
-                    sheet.Cells[row, 20] = count;
-
-                sheet.Cells[row, 22] = _tbl.GetTableValue(_tableRow, 7);
-                */
-
+                sheet.Cells[row, 4] = _tbl.GetTableValue(_tableRow, 2); // Наименование
+                sheet.Cells[row, 5] = _tbl.GetTableValue(_tableRow, 3);// Код продукции
+                sheet.Cells[row, 6] = _tbl.GetTableValue(_tableRow, 4);// Обозначение документа на поставку
+                sheet.Cells[row, 7] = _tbl.GetTableValue(_tableRow, 5);// Поставщик
+                sheet.Cells[row, 14] = _tbl.GetTableValue(_tableRow, 6);// Куда входит (обозначение)
+                sheet.Cells[row, 19] = _tbl.GetTableValue(_tableRow, 7);// Количество на изделие
+                sheet.Cells[row, 21] = _tbl.GetTableValue(_tableRow, 8);// Количество в комплекты
+                sheet.Cells[row, 23] = _tbl.GetTableValue(_tableRow, 9);// Количество на регулир.
+                sheet.Cells[row, 25] = _tbl.GetTableValue(_tableRow, 10);// Количество всего
+                sheet.Cells[row, 28] = _tbl.GetTableValue(_tableRow, 11);// Примечание
+                
                 row++;
                 _tableRow++;
             }
