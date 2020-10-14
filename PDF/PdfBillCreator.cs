@@ -110,6 +110,11 @@ namespace GostDOC.PDF
 
             DrawLines(1);
 
+            // добавление надписи "Утвержден ХХХВП-ЛУ"
+            aGraphs.TryGetValue(Constants.GRAPH_2, out var decimal_number);            
+            string inscription = $"Утвержден {decimal_number}ВП-ЛУ";
+            AddText(inscription);
+
             return lpr;
         }
 
@@ -224,9 +229,17 @@ namespace GostDOC.PDF
                     if (rowNumber > 4) // если осталось мнее 5 строк для записи группы, то переходим на следующий лист
                     {
                         // если есть место для записи более 4 строк то записываем группу, иначе выходим
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));                        
-                        tbl.AddCell(leftPaddCell.Clone(true).Add(new Paragraph(name)).SetUnderline());
-                        AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 2, leftPaddCell);                        
+                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));
+                        if (!string.IsNullOrEmpty(productCode))
+                        {
+                            tbl.AddCell(leftPaddCell.Clone(true).SetTextAlignment(TextAlignment.RIGHT).Add(new Paragraph(name)).SetUnderline());
+                            tbl.AddCell(leftPaddCell.Clone(true).Add(new Paragraph(productCode)).SetUnderline());
+                            AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 3, leftPaddCell);
+                        } else
+                        {
+                            tbl.AddCell(leftPaddCell.Clone(true).Add(new Paragraph(name)).SetUnderline());
+                            AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 2, leftPaddCell);
+                        }                        
                         rowNumber--;
                     }
                     else                 
@@ -251,15 +264,6 @@ namespace GostDOC.PDF
                 outLastProcessedRow++;
             }
 
-
-            //for (int i = 0; i < (rowNumber-1)*10; ++i) {
-            //    tbl.AddCell(CreateCell().SetHeight(8*mmH()));
-            //}
-            //for (int i = 0; i < 10; ++i) {
-            //    tbl.AddCell(CreateCell().SetBorderBottom(THICK_BORDER).SetHeight(8*mmH()));
-            //}
-
-
              // дополним таблицу пустыми строками если она не полностью заполнена
             if (rowNumber > 0) {
                 for(int j = 0; j < rowNumber;j++)
@@ -268,8 +272,7 @@ namespace GostDOC.PDF
                     var cell = centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString()));
                     if (j + 1 == rowNumber)
                         cell.SetBorderBottom(new SolidBorder(THICK_LINE_WIDTH));
-                    tbl.AddCell(cell);  
-                    
+                    tbl.AddCell(cell);                      
                     
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS-1, centrAlignCell, (j+1 == rowNumber) ? true : false);
                 }
@@ -341,6 +344,24 @@ namespace GostDOC.PDF
             x = APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - -3.9f + bottomHorizLineWidth;
             y = BOTTOM_MARGIN+2f;
             DrawVerticalLine(aPageNumber, x, y,THICK_LINE_WIDTH, rightVertLineHeight);
+        }
+
+        void AddText(string aText)
+        {    
+            Paragraph paragraph = new Paragraph(aText).
+                  SetMargin(0).                  
+                  SetFont(f1).
+                  SetFontSize(14);
+
+            // уменьшаем размер шрифта пока не впишемся в установленный размер
+            //RootRenderer canvasRenderer = canvas.getRenderer();
+            //while (paragraph.createRendererSubTree().setParent(canvasRenderer).layout(new LayoutContext(new LayoutArea(pageNumber, new Rectangle(allowedWidth, fontSize * 2)))).getStatus() != LayoutResult.FULL)
+            //{
+            //    paragraph.setFontSize(--fontSize);
+            //}
+            PdfPage page = _pdfDoc.GetPage(1);
+            Canvas canvas = new Canvas(new PdfCanvas(page), page.GetMediaBox());
+            canvas.ShowTextAligned(paragraph, 638, 170, TextAlignment.LEFT);
         }
     }
 }

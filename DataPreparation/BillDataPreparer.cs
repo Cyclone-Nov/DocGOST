@@ -19,41 +19,38 @@ namespace GostDOC.DataPreparation
         /// <param name="aConfigs"></param>
         /// <returns></returns>    
         public override DataTable CreateDataTable(IDictionary<string, Configuration> aConfigs)
-        {
-            
-             // выбираем основную конфигурацию
-            Configuration mainConfig = null;
-            if (!aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out mainConfig))
-                return null;        
-            
-            var data = mainConfig.Bill;            
-
-            DataTable table = CreateTable("BillData");
-            foreach (var group in data.OrderBy(key => key.Key))
-            {
-                if (group.Value.Components.Count() > 0 || group.Value.SubGroups.Count() > 0)
-                {
-                    // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
-                    var mainсomponents = group.Value.Components;
-
-                    //AddEmptyRow(table);
-                    FillDataTable(table, group.Key, mainсomponents);
-
-                    foreach (var subgroup in group.Value.SubGroups.OrderBy(key => key.Key))
-                    {
-                        // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
-                        var сomponents = subgroup.Value.Components;
-                        FillDataTable(table, subgroup.Value.Name, сomponents);
-                    }
-                }
+        {            
+            if(aConfigs == null)
+            { 
+                // todo: add to log
+                return null;
             }
 
-            // для каждой следующей конфигурации надо получить только те компоненты, которы не встречаются в первой 
-            //var data_deltas_list = GetDataDelta(aConfigs);
+            // подговтовим данные для переменных данных для исполнений
+            Configuration mainConfig = null;
+            var listPreparedConfigs = PrepareConfigs(aConfigs, out mainConfig);
 
-            // затем по остальным
+            if (mainConfig == null)
+            {
+                // todo: add to log
+                return null;
+            }
 
+            DataTable table = CreateTable("BillData");
+            
+            // заполнение данных из основного исполнения
+            FillConfiguration(table, mainConfig);
 
+            // заполним переменные данные исполнений, если они есть
+            if (listPreparedConfigs != null && listPreparedConfigs.Count() > 0)
+            {
+                AddAppDataSign(table);
+                
+                foreach (var config in listPreparedConfigs.OrderBy(key => key.Key))
+                {
+                    FillConfiguration(table, config.Value, config.Key, false);
+                }
+            }         
 
             return table;           
         }
@@ -91,6 +88,167 @@ namespace GostDOC.DataPreparation
             return table;
         }
 
+        /// <summary>
+        /// добавить в таблицу данны надписи "Переменные данные исполнений"
+        /// </summary>
+        /// <param name="table">The table.</param>
+        private void AddAppDataSign(DataTable aTable)
+        {
+            AddEmptyRow(aTable);
+            var row = aTable.NewRow();
+            row[Constants.ColumnName] = "Переменные данные";
+            row[Constants.ColumnProductCode] = "исполнений";            
+            //row[Constants.ColumnDeliveryDocSign] = ;
+            aTable.Rows.Add(row);
+            AddEmptyRow(aTable);
+        }
+
+        /// <summary>
+        /// подготовить данные конфигураций к выводу в таблицу данных
+        /// </summary>
+        /// <param name="aConfigs">a configs.</param>
+        /// <param name="aMainConfig">a main configuration.</param>
+        /// <returns></returns>
+        private IDictionary<string, Configuration> PrepareConfigs(IDictionary<string, Configuration> aConfigs, out Configuration aMainConfig)
+        {
+            if (aConfigs == null || !aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))
+            {
+                aMainConfig = null;
+                return null;
+            }
+            
+            if (aConfigs.Count() == 1)
+            {
+                aMainConfig = mainConfig;
+                return null;
+            }
+
+            // если конфигураций несколько
+            IDictionary<string, Configuration> preparedConfigs = new Dictionary<string, Configuration>();
+            aMainConfig = new Configuration();
+            aMainConfig.Graphs = mainConfig.Graphs;
+            var deltaMainConfig = new Configuration();
+            deltaMainConfig.Graphs = mainConfig.Graphs;
+            var mainData = mainConfig.Bill;
+
+            Dictionary<string, Configuration> otherConfigs = new Dictionary<string, Configuration>();
+            foreach (var config in aConfigs)
+            {
+                if (!string.Equals(config.Key, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    otherConfigs.Add(config.Key, config.Value.DeepCopy());
+                }
+            }
+
+            foreach (var group in mainData.OrderBy(key => key.Key))
+            {
+                foreach (var component in group.Value.Components)
+                {
+                    if (CheckComponent(otherConfigs, component, group.Key))
+                    {
+                        if (!aMainConfig.Bill.ContainsKey(group.Key))
+                        {
+                            aMainConfig.Bill.Add(group.Key, new Group());
+                            aMainConfig.Bill[group.Key].Name = group.Key;
+                        }
+                        aMainConfig.Bill[group.Key].Components.Add(component);
+                    }
+                    else
+                    {
+                        if(!deltaMainConfig.Bill.ContainsKey(group.Key))
+                        {   
+                            deltaMainConfig.Bill.Add(group.Key, new Group());                            
+                        }
+                        deltaMainConfig.Bill[group.Key].Components.Add(component);
+                        //otherConfigs[Constants.MAIN_CONFIG_INDEX].Bill[group.Key].Components.Add(component);
+                    }
+                }
+
+                foreach (var subgroup in group.Value.SubGroups.OrderBy(key2 => key2.Key))
+                {
+                    foreach (var component in subgroup.Value.Components)
+                    {
+                        if (CheckComponent(otherConfigs, component, group.Key, subgroup.Key))
+                        {
+                            if (!aMainConfig.Bill.ContainsKey(group.Key))
+                            {
+                                aMainConfig.Bill.Add(group.Key, new Group());
+                            }
+                            if (!aMainConfig.Bill[group.Key].SubGroups.ContainsKey(subgroup.Key))
+                            {
+                                aMainConfig.Bill[group.Key].SubGroups.Add(subgroup.Key, new Group());
+                            }
+                            aMainConfig.Bill[group.Key].SubGroups[subgroup.Key].Components.Add(component);
+                        } else
+                        {
+                            if (!deltaMainConfig.Bill.ContainsKey(group.Key))
+                            {
+                                deltaMainConfig.Bill.Add(group.Key, new Group());
+                            }
+                            if (!deltaMainConfig.Bill[group.Key].SubGroups.ContainsKey(subgroup.Key))
+                            {
+                                deltaMainConfig.Bill[group.Key].SubGroups.Add(subgroup.Key, new Group());
+                            }
+                            deltaMainConfig.Bill[group.Key].SubGroups[subgroup.Key].Components.Add(component);                            
+                        }
+                    }
+                }
+            }
+
+            preparedConfigs = otherConfigs;
+            preparedConfigs.Add(Constants.MAIN_CONFIG_INDEX, deltaMainConfig);
+
+            return preparedConfigs;
+        }
+
+        /// <summary>
+        /// заполнить таблицу данных <paramref name="aTable"/> данными из конфигурации <paramref name="aConfig"/>
+        /// </summary>
+        /// <param name="aTable">итоговая таблица с данными</param>
+        /// <param name="aConfig">конфигурация</param>
+        /// <param name="aManyConfigs">признак наличия нескольких конфигураций: если <c>true</c> то несколько конфигураций</param>
+        private void FillConfiguration(DataTable aTable, Configuration aConfig, string aConfigName = "", bool aMainConfig = true)
+        {
+            string configName = "";
+            if (!aMainConfig) 
+            {
+                if (aConfig.Graphs.TryGetValue(Constants.GRAPH_2, out var sign)) // получим значение графы "Обозначение"
+                {
+                    if (string.Equals(aConfigName, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        configName = sign; // "Обозначение"
+                    } else
+                    {
+                        configName = $"{sign}{aConfigName}"; // "Обозначение"-"aConfigName"
+                    }
+                }
+
+                var row = aTable.NewRow();
+                row[Constants.ColumnName] = configName;
+                row[Constants.ColumnTextFormat] = "1";
+                //row[Constants.ColumnProductCode] = ;
+                //row[Constants.ColumnDeliveryDocSign] = ;
+                aTable.Rows.Add(row);
+                AddEmptyRow(aTable);
+            }            
+
+            var data = aConfig.Bill;
+
+            foreach (var group in data.OrderBy(key => key.Key))
+            {
+                if (group.Value.Components.Count() > 0 || group.Value.SubGroups.Count() > 0)
+                {
+                    var mainсomponents = group.Value.Components;
+                    FillDataTable(aTable, group.Key, mainсomponents);
+
+                    foreach (var subgroup in group.Value.SubGroups.OrderBy(key => key.Key))
+                    {
+                        var сomponents = subgroup.Value.Components;
+                        FillDataTable(aTable, subgroup.Key, сomponents);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// добавить пустую строку в таблицу данных
@@ -138,10 +296,7 @@ namespace GostDOC.DataPreparation
         /// <param name="aComponents"></param>
         /// <param name="aOtherComponents"></param>
         /// <param name="aSchemaDesignation"></param>
-        private void FillDataTable(
-                DataTable aTable, 
-                string aGroupName, 
-                IEnumerable<Models.Component> aComponents) {
+        private void FillDataTable(DataTable aTable, string aGroupName, IEnumerable<Models.Component> aComponents) {
 
             if (!aComponents.Any()) return;
             // записываем компоненты в таблицу данных
@@ -267,6 +422,102 @@ namespace GostDOC.DataPreparation
             aTable.AcceptChanges();
         }
 
+
+        /// <summary>
+        /// определение наличия компонента во всех конфигурациях
+        /// </summary>
+        /// <param name="aComponent">a component.</param>
+        /// <param name="aGroupName">Name of a group.</param>
+        /// <param name="aOtherConfigs">a other configs.</param>
+        /// <returns></returns>
+        private bool CheckComponent(Dictionary<string, Configuration> aOtherConfigs, Component aComponent, string aGroupName, string aSubGroupName = "")
+        {            
+            List<Component> removeList = null;            
+            bool bRemoveGroup = false;
+            Component removeComponent = null;
+            bool result = false;
+
+            foreach (var config in aOtherConfigs)
+            {
+                if (string.IsNullOrEmpty(aSubGroupName))
+                {
+                    bRemoveGroup = false;
+                    if (config.Value.Bill.ContainsKey(aGroupName))
+                    {   
+                        foreach (var othercomp in config.Value.Bill[aGroupName].Components)
+                        {
+                            if(EquealsBillComponents(othercomp, aComponent))
+                            {
+                                removeList = config.Value.Bill[aGroupName].Components;
+                                removeComponent = othercomp;
+                                bRemoveGroup = (removeList.Count() == 1);
+                                break;
+                            }
+                        }
+
+                        if (removeList != null)
+                        {
+                            removeList?.Remove(removeComponent);
+                            removeList = null;
+                            result = true;
+
+                            if (bRemoveGroup)
+                                config.Value.Bill.Remove(aGroupName);
+                        }
+                    }                        
+                }
+                else
+                {
+                    if (config.Value.Bill.ContainsKey(aGroupName))
+                    {
+
+                        if (config.Value.Bill[aGroupName].SubGroups.ContainsKey(aSubGroupName))
+                        {
+                            foreach (var othercomp in config.Value.Bill[aGroupName].SubGroups[aSubGroupName].Components)
+                            {
+                                if (EquealsBillComponents(othercomp, aComponent))
+                                {
+                                    removeList = config.Value.Bill[aGroupName].SubGroups[aSubGroupName].Components;
+                                    removeComponent = othercomp;
+                                    bRemoveGroup = (removeList.Count() == 1);
+                                    break;
+                                }
+                            }
+
+                            if (removeList != null)
+                            {
+                                removeList?.Remove(removeComponent);
+                                removeList = null;
+                                result = true;
+                                if (bRemoveGroup)
+                                    config.Value.Bill[aGroupName].SubGroups.Remove(aSubGroupName);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+
+        private bool EquealsBillComponents(Component aFirstComponent, Component aSecondComponent)
+        {
+            string name1 = aFirstComponent.GetProperty(Constants.ComponentName);
+            string name2 = aSecondComponent.GetProperty(Constants.ComponentName);
+
+            string entry1 = aFirstComponent.GetProperty(Constants.ComponentWhereIncluded); 
+            string entry2 = aSecondComponent.GetProperty(Constants.ComponentWhereIncluded); 
+
+            if (string.Equals(name1, name2) &&
+                string.Equals(entry1, entry2) &&
+                aFirstComponent.Count == aSecondComponent.Count)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
 
