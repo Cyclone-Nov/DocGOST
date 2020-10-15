@@ -103,23 +103,30 @@ internal class PdfElementListCreator : PdfCreator {
         aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
         DrawLines(1);
-        AddSecondaryElements(aInDoc, aGraphs);
+        AddCopyFormatSubscription(aInDoc);
+        AddVerticalProjectSubscription(aInDoc, aGraphs);
 
         return lastProcessedRow;
     }
 
-    void AddSecondaryElements(Document aInDoc, IDictionary<string, string> aGraphs) {
+    void AddVerticalProjectSubscription(Document aInDoc, IDictionary<string, string> aGraphs)
+    {
         var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
 
-        var p = 
+        var p =
             new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT))
                 .SetRotationAngle(DegreesToRadians(90))
                 .AddStyle(style)
                 .SetFixedPosition(10 * mmW() + 2 - TO_LEFT_CORRECTION, TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * mmW(), 100);
         aInDoc.Add(p);
+    }
+
+    void AddCopyFormatSubscription(Document aInDoc) 
+    {
+        var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
 
         float bottom = -2;
-        p = new Paragraph("Копировал")
+        var p = new Paragraph("Копировал")
             .AddStyle(style)
             .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 14) * mmW()-TO_LEFT_CORRECTION, bottom, 100);
         aInDoc.Add(p);
@@ -165,6 +172,8 @@ internal class PdfElementListCreator : PdfCreator {
         aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
         DrawLines(aPageNumber);
+
+        AddCopyFormatSubscription(aInPdfDoc);
 
         return lastProcessedRow;
     }
@@ -228,6 +237,11 @@ internal class PdfElementListCreator : PdfCreator {
                 : (string) row[columnName];
 
             string position = GetCellString(Constants.ColumnPosition);
+            if (string.Equals(position,"VD9 - VD12", StringComparison.InvariantCultureIgnoreCase))
+            {
+
+            }
+
             string name = GetCellString(Constants.ColumnName);
             string note = GetCellString(Constants.ColumnFootnote);
             int quantity = (row[Constants.ColumnQuantity] == DBNull.Value)

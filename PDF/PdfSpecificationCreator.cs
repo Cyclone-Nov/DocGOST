@@ -99,7 +99,7 @@ namespace GostDOC.PDF
 
             DrawLines(1);
 
-            AddSecondaryElements(aInDoc, aGraphs);
+            AddCopyFormatSubscription(aInDoc);
 
             return lastProcessedRow;
         }
@@ -122,6 +122,8 @@ namespace GostDOC.PDF
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
             DrawLines(_currentPageNumber);
+
+            AddCopyFormatSubscription(aInDoc);
 
             return lastProcessedRow;
         }
@@ -293,16 +295,9 @@ namespace GostDOC.PDF
             DrawVerticalLine(pageNumber, fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 200);
         }
 
-        void AddSecondaryElements(Document aInDoc, IDictionary<string, string> aGraphs)
+        void AddCopyFormatSubscription(Document aInDoc)
         {
             var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
-
-            //var p =
-            //    new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT))
-            //        .SetRotationAngle(DegreesToRadians(90))
-            //        .AddStyle(style)
-            //        .SetFixedPosition(10 * mmW() + 2 - TO_LEFT_CORRECTION, TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * mmW(), 100);
-            //aInDoc.Add(p);
 
             float bottom = -3;
             var p = new Paragraph("Копировал")

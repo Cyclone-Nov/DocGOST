@@ -115,7 +115,7 @@ namespace GostDOC.PDF
             string inscription = $"Утвержден {decimal_number}ВП-ЛУ";
             AddText(inscription);
 
-            AddSecondaryElements(aInDoc, aGraphs);
+            AddCopyFormatSubscription(aInDoc);
 
             return lpr;
         }
@@ -136,6 +136,9 @@ namespace GostDOC.PDF
             aInDoc.Add(dataTable);
 
             DrawLines(aPageNumber);
+
+            AddCopyFormatSubscription(aInDoc);
+
             return lastNextProcessedRow;
         }
 
@@ -348,16 +351,9 @@ namespace GostDOC.PDF
             DrawVerticalLine(aPageNumber, x, y,THICK_LINE_WIDTH, rightVertLineHeight);
         }
 
-        void AddSecondaryElements(Document aInDoc, IDictionary<string, string> aGraphs)
+        void AddCopyFormatSubscription(Document aInDoc)
         {
             var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
-
-            //var p =
-            //    new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT))
-            //        .SetRotationAngle(DegreesToRadians(90))
-            //        .AddStyle(style)
-            //        .SetFixedPosition(10 * mmW() + 2 - TO_LEFT_CORRECTION, TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * mmW(), 100);
-            //aInDoc.Add(p);
 
             float bottom = -4;
             var p = new Paragraph("Копировал")
