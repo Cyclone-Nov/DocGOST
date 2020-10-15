@@ -57,7 +57,8 @@ namespace GostDOC.ExcelExport
             var val = tbl.Rows[row].ItemArray[col];
             if (val != System.DBNull.Value)
             {
-                return ((BasePreparer.FormattedString)val).Value;
+                if (val is BasePreparer.FormattedString)
+                    return ((BasePreparer.FormattedString)val).Value;
             }
             return string.Empty;
         }

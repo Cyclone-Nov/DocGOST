@@ -37,6 +37,10 @@ namespace GostDOC.ExcelExport
                         export.Export(app, aFilePath);
                     }
                 }
+                catch(Exception ex)
+                {
+
+                }
                 finally
                 {
                     // App quit
