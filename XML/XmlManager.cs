@@ -13,7 +13,7 @@ namespace GostDOC.Models
 {
     class XmlManager
     {
-        private Converter _defaults = new Converter();
+        //private Converter _defaults = new Converter();
         private RootXml _xml = null;
         private DocType _docType = DocType.None;
         private string _dir = string.Empty;
@@ -334,7 +334,7 @@ namespace GostDOC.Models
             }
 
             // Set group name from designator ID
-            string groupName = _defaults.GetGroupName(designatorID);
+            string groupName = GroupNameConverter.GetGroupName(designatorID);
             if (!string.IsNullOrEmpty(groupName))
             {
                 if (string.IsNullOrEmpty(result[1].GroupName))

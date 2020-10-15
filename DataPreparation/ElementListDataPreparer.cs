@@ -43,7 +43,8 @@ internal class ElementListDataPreparer : BasePreparer {
                 AddEmptyRow(table);
                 FillDataTable(table, "", mainсomponents, otherConfigsElements, schemaDesignation);
 
-                foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key)) {
+                foreach (var subgroup in others.SubGroups.OrderBy(key => GroupNameConverter.GetSymbol(key.Key)))
+                {
                     // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
                     var сomponents = subgroup.Value.Components.Where(val =>
                         !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
@@ -102,7 +103,12 @@ internal class ElementListDataPreparer : BasePreparer {
                 string component_name = GetComponentName(HasStandardDoc[i] == 2, component);
                 uint component_count = component.Count; //1; // always only one! GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
                 bool haveToChangeName = string.Equals(component.GetProperty(Constants.ComponentPresence),"0") ||
-                                        HaveToChangeComponentName(component, aOtherComponents);                
+                                        HaveToChangeComponentName(component, aOtherComponents);
+                string desig = component.GetProperty(Constants.ComponentDesignatiorID);
+                if (string.Equals(desig, "VD9", StringComparison.InvariantCultureIgnoreCase))
+                {
+
+                }
                 List<string> component_designators = new List<string>{ component.GetProperty(Constants.ComponentDesignatiorID) };
 
                 bool same;
@@ -280,7 +286,7 @@ internal class ElementListDataPreparer : BasePreparer {
             else if (aDesignators.Count() == 2)
                 designator = $"{aDesignators.First()},{aDesignators.Last()}";
             else
-                designator = $"{aDesignators.First()} - {aDesignators.Last()}";
+                designator = $"{aDesignators.First()}-{aDesignators.Last()}";
 
             return designator;
         }

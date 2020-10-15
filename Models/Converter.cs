@@ -8,16 +8,16 @@ using GostDOC.Common;
 
 namespace GostDOC.Models
 {
-    class Converter
+    static class GroupNameConverter
     {
-        Dictionary<string, Tuple<string, string>> _groupNames = new Dictionary<string, Tuple<string, string>>();
+        static Dictionary<string, Tuple<string, string>> _groupNames = new Dictionary<string, Tuple<string, string>>();
 
-        public Converter()
+        static GroupNameConverter()
         {
             FillGroupNames();
         }
 
-        public string GetGroupName(string aSymbol, bool isOneElement = false)
+        public static string GetGroupName(string aSymbol, bool isOneElement = false)
         {
             if (!string.IsNullOrEmpty(aSymbol))
             {
@@ -32,7 +32,28 @@ namespace GostDOC.Models
             return string.Empty;
         }
 
-        private void FillGroupNames()
+        /// <summary>
+        /// Получить соответствующий символ по имени группы
+        /// </summary>
+        /// <param name="aGroupName">Name of a group.</param>        
+        /// <returns></returns>
+        public static string GetSymbol(string aGroupName)
+        {
+            if (!string.IsNullOrEmpty(aGroupName))
+            {                
+                foreach(var group in _groupNames)
+                {
+                    if (string.Equals(group.Value.Item1, aGroupName, StringComparison.InvariantCultureIgnoreCase) ||
+                        string.Equals(group.Value.Item2, aGroupName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return group.Key;
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
+        private static void FillGroupNames()
         {
             foreach (var line in Utils.ReadCfgFileLines("PhysicalDesignators"))
             {
