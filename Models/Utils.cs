@@ -208,6 +208,14 @@ namespace GostDOC.Models
             return prop.Value ?? string.Empty;
         }
 
+        public static void SetPropertyValue(this Component current, string aPropertyName, string aValue)
+        {
+            if (!string.IsNullOrEmpty(aPropertyName) && current.Properties.ContainsKey(aPropertyName))
+            {
+                current.Properties[aPropertyName] = aValue;
+            }
+        }
+
         public static int CompareTo(this Component first, Component second, string propertyName)
         {
             string x = first.GetProperty(propertyName);
