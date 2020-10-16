@@ -228,6 +228,11 @@ namespace GostDOC.Models
 
                 // Create component
                 Component component = new Component(cmp) { Type = aType, Count = count };                
+                if(_docType == DocType.Specification && position!= null && !string.IsNullOrEmpty(position.Text))
+                {
+                    component.SetPropertyValue(Constants.ComponentNote, position.Text);
+                }
+
                 // Fill group info
                 SubGroupInfo[] groups = UpdateGroups(cmp, component);
 
