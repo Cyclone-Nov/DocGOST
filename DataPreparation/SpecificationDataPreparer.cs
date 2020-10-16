@@ -81,6 +81,8 @@ namespace GostDOC.DataPreparation
             Fill(Constants.GroupMaterials);
             Fill(Constants.GroupKits);
 
+            RemoveLastEmptyRows(table);
+
             return table;
             //return null;
         }
@@ -260,13 +262,35 @@ namespace GostDOC.DataPreparation
 
         private new void AddEmptyRow(DataTable aTable) 
         {
-            DataRow row = aTable.NewRow();
-            // TODO
-//            row[Constants.ColumnName] = string.Empty;
-//            row[Constants.ColumnPosition] = string.Empty;
-//            row[Constants.ColumnQuantity] = 0;
-//            row[Constants.ColumnFootnote] = string.Empty;
+            DataRow row = aTable.NewRow();            
             aTable.Rows.Add(row);
+        }
+
+        private void RemoveLastEmptyRows(DataTable table)
+        {
+            if (table.Rows.Count > 1)
+            {
+                bool empty_str = false;
+                int last_index = table.Rows.Count - 1;
+                do
+                {
+                    empty_str = false;
+                    var arr = table.Rows[last_index].ItemArray;
+                    if (string.IsNullOrEmpty(arr[1].ToString()) &&
+                        string.IsNullOrEmpty(arr[2].ToString()) &&
+                        string.IsNullOrEmpty(arr[3].ToString()) &&
+                        string.IsNullOrEmpty(arr[4].ToString()) &&
+                        string.IsNullOrEmpty(arr[5].ToString()) &&
+                        string.IsNullOrEmpty(arr[6].ToString()) &&
+                        string.IsNullOrEmpty(arr[7].ToString()))
+                    {
+                        empty_str = true;
+                        table.Rows.RemoveAt(last_index);
+                        last_index = table.Rows.Count - 1;
+                    }
+                }
+                while (empty_str);
+            }
         }
 
     }

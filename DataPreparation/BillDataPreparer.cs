@@ -50,7 +50,9 @@ namespace GostDOC.DataPreparation
                 {
                     FillConfiguration(table, config.Value, config.Key, false);
                 }
-            }         
+            }
+
+            RemoveLastEmptyRows(table);
 
             return table;           
         }
@@ -517,6 +519,37 @@ namespace GostDOC.DataPreparation
             }
 
             return false;
+        }
+
+        private void RemoveLastEmptyRows(DataTable table)
+        {
+            if (table.Rows.Count > 1)
+            {
+                bool empty_str = false;
+                int last_index = table.Rows.Count - 1;
+                do
+                {
+                    empty_str = false;
+                    var arr = table.Rows[last_index].ItemArray;
+                    if (string.IsNullOrEmpty(arr[1].ToString()) &&
+                        string.IsNullOrEmpty(arr[2].ToString()) &&
+                        string.IsNullOrEmpty(arr[3].ToString()) &&
+                        string.IsNullOrEmpty(arr[4].ToString()) &&
+                        string.IsNullOrEmpty(arr[5].ToString()) &&                        
+                        (int)arr[6] == 0 &&
+                        (int)arr[7] == 0 &&
+                        (int)arr[8] == 0 &&
+                        (int)arr[9] == 0 &&
+                        string.IsNullOrEmpty(arr[10].ToString()) &&
+                        string.IsNullOrEmpty(arr[11].ToString()))
+                    {
+                        empty_str = true;
+                        table.Rows.RemoveAt(last_index);
+                        last_index = table.Rows.Count - 1;
+                    }
+                }
+                while (empty_str);
+            }
         }
     }
 }

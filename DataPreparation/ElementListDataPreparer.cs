@@ -50,11 +50,11 @@ internal class ElementListDataPreparer : BasePreparer {
                         !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
                     FillDataTable(table, subgroup.Value.Name, сomponents, otherConfigsElements, schemaDesignation);
                 }
-            }
 
+                RemoveLastEmptyRows(table);
+            }
             return table;
         }
-
         return null;
     }
 
@@ -290,5 +290,29 @@ internal class ElementListDataPreparer : BasePreparer {
 
             return designator;
         }
-}
+
+        private void RemoveLastEmptyRows(DataTable table)
+        {
+            if (table.Rows.Count > 1)
+            {
+                bool empty_str = false;
+                int last_index = table.Rows.Count -1;
+                do
+                {
+                    empty_str = false;
+                    var arr = table.Rows[last_index].ItemArray;
+                    if (string.IsNullOrEmpty(arr[1].ToString()) &&
+                        string.IsNullOrEmpty(arr[2].ToString()) &&
+                        (int)arr[3] == 0                        &&
+                        string.IsNullOrEmpty(arr[4].ToString()))
+                    {
+                        empty_str = true;                        
+                        table.Rows.RemoveAt(last_index);
+                        last_index = table.Rows.Count - 1;
+                    }                     
+                }
+                while (empty_str);
+            }
+        }
+    }
 }
