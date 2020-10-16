@@ -190,7 +190,8 @@ namespace GostDOC.PDF
         /// <param name="aInPdfDoc">a in PDF document.</param>
         internal void AddRegisterList(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, int aPageNumber)
         {
-            aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+            //aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+            aInPdfDoc.Add(new AreaBreak(PageSize.A4));
 
             SetPageMargins(aInPdfDoc);
 
@@ -203,7 +204,10 @@ namespace GostDOC.PDF
 
 
             // добавить таблицу с основной надписью для последуюших старницы
-            aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = Type }));
+            var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = Type });
+            titleBlock.SetFixedPosition(DATA_TABLE_LEFT, TOP_MARGIN + 4.01f,
+                TITLE_BLOCK_WIDTH - 0.02f);
+            aInPdfDoc.Add(titleBlock);
 
             // добавить таблицу с нижней дополнительной графой
             aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
@@ -769,7 +773,7 @@ namespace GostDOC.PDF
             float next_left = 0;
             string text = string.Empty;
 
-            if (_pageSize == PageSize.A4)
+            if (_pageSize.GetWidth() == PageSize.A4.GetWidth())
             {
                 bottom = -2;
                 left = (7 + 10 + 32 + 15 + 10 + 14) * mmW() - TO_LEFT_CORRECTION;
