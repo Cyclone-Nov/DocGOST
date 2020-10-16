@@ -121,20 +121,6 @@ internal class PdfElementListCreator : PdfCreator {
         aInDoc.Add(p);
     }
 
-    void AddCopyFormatSubscription(Document aInDoc) 
-    {
-        var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
-
-        float bottom = -2;
-        var p = new Paragraph("Копировал")
-            .AddStyle(style)
-            .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 14) * mmW()-TO_LEFT_CORRECTION, bottom, 100);
-        aInDoc.Add(p);
-        p = new Paragraph("Формат А4").AddStyle(style)
-            .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 70) * mmW() + 20 - TO_LEFT_CORRECTION, bottom, 100);
-        aInDoc.Add(p);
-    }
-
     void DrawLines(int aPageNumber) {
         if (aPageNumber == 1) {
             var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
@@ -167,8 +153,8 @@ internal class PdfElementListCreator : PdfCreator {
 
         // добавить таблицу с основной надписью для последуюших старницы
         aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList}));
-
-        // добавить таблицу с нижней дополнительной графой
+        //titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -15f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+        
         aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
         DrawLines(aPageNumber);
@@ -237,11 +223,6 @@ internal class PdfElementListCreator : PdfCreator {
                 : (string) row[columnName];
 
             string position = GetCellString(Constants.ColumnPosition);
-            if (string.Equals(position,"VD9 - VD12", StringComparison.InvariantCultureIgnoreCase))
-            {
-
-            }
-
             string name = GetCellString(Constants.ColumnName);
             string note = GetCellString(Constants.ColumnFootnote);
             int quantity = (row[Constants.ColumnQuantity] == DBNull.Value)

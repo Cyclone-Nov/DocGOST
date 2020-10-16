@@ -59,8 +59,10 @@ namespace GostDOC.PDF
         protected static readonly float TOP_MARGIN = TOP_MARGIN_MM * mmH()-7;
         protected static readonly float RIGHT_MARGIN = RIGHT_MARGIN_MM * mmW();
 
-        protected const float THICK_LINE_WIDTH = 2f; 
-        
+        protected const float THICK_LINE_WIDTH = 2f;
+
+        protected const float THIN_LINE_WIDTH = 0.5f; 
+
         protected static readonly float TITLE_BLOCK_WIDTH_MM = 185;
         protected static readonly float TITLE_BLOCK_WIDTH = TITLE_BLOCK_WIDTH_MM * mmW()+TO_LEFT_CORRECTION*2;
         protected static readonly float DEFAULT_TITLE_BLOCK_CELL_HEIGHT = 5 * mmH();
@@ -201,13 +203,15 @@ namespace GostDOC.PDF
 
 
             // добавить таблицу с основной надписью для последуюших старницы
-            aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber }));
+            aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = Type }));
 
             // добавить таблицу с нижней дополнительной графой
             aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
             var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
             DrawVerticalLine(aPageNumber, fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 200);
+
+            AddCopyFormatSubscription(aInPdfDoc);
         }
 
         Table CreateRegisterTable() {
@@ -286,10 +290,12 @@ namespace GostDOC.PDF
 
         protected static Border THICK_BORDER = new SolidBorder(THICK_LINE_WIDTH);
 
-//        protected static Border THICK_BORDER {
-//            return new SolidBorder(THICK_LINE_WIDTH);
-//        }
-        
+        protected static Border THIN_BORDER = new SolidBorder(THIN_LINE_WIDTH);
+
+        //        protected static Border THICK_BORDER {
+        //            return new SolidBorder(THICK_LINE_WIDTH);
+        //        }
+
         protected static string GetGraphByName(IDictionary<string, string> aGraphs, string graph) {
             if (!aGraphs.TryGetValue(graph, out var s)) {
                 s = string.Empty; 
@@ -579,7 +585,7 @@ namespace GostDOC.PDF
             var aPageSize = titleBlockStruct.PageSize;   
 
             float[] columnSizes = {
-                7 * mmW(), 
+                7.5f * mmW(), 
                 10 * mmW(),
                 23 * mmW(),
                 15 * mmW(),
@@ -598,7 +604,7 @@ namespace GostDOC.PDF
             }
 
             for (int i = 0; i < 5; ++i) {
-                tbl.AddCell(CreateCell().SetBorderTop(THICK_BORDER));
+                tbl.AddCell(CreateCell().SetBorderTop(THICK_BORDER).SetBorderLeft(THICK_BORDER));
             }
 
             var graph2 = GetGraphByName(aGraphs, Constants.GRAPH_2) + GetAdditionalGraph2(titleBlockStruct.DocType);            
@@ -648,21 +654,23 @@ namespace GostDOC.PDF
             }
 
             void AddGraphCell2(Cell cell, string text ) {
-                tbl.AddCell(cell.Clone(false).Add(CreateParagraph(text).SetTextAlignment(TextAlignment.CENTER)));
+                tbl.AddCell(cell.Clone(false).Add(CreateParagraph(text).SetTextAlignment(TextAlignment.CENTER)).SetBorderLeft(THICK_BORDER));
             }
+            var topAndBottomBorderCell = titleBlockHeightCell.Clone(false).SetBorderBottom(THICK_BORDER).SetBorderTop(THICK_BORDER);
 
-            AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_14));
+            //AddGraphCell();
+            AddGraphCell2(topAndBottomBorderCell.SetBorderTop(Border.NO_BORDER).SetBorderBottom(THIN_BORDER), GetGraphByName(aGraphs, Constants.GRAPH_14));
             AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_15));
             AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_16));
             AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_17));
             AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_18));
 
-            var topAndBottomBorderCell = titleBlockHeightCell.Clone(false).SetBorderBottom(THICK_BORDER).SetBorderTop(THICK_BORDER);
-            AddGraphCell2(topAndBottomBorderCell, "Изм.");
-            AddGraphCell2(topAndBottomBorderCell, "Лист");
-            AddGraphCell2(topAndBottomBorderCell, "№ докум.");
-            AddGraphCell2(topAndBottomBorderCell, "Подп.");
-            AddGraphCell2(topAndBottomBorderCell, "Дата");
+            
+            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER), "Изм.");
+            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER), "Лист");
+            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER), "№ докум.");
+            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER), "Подп.");
+            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER), "Дата");
 
 
             // switch A3/A4
@@ -750,6 +758,36 @@ namespace GostDOC.PDF
             tbl.SetFixedPosition(APPEND_GRAPHS_LEFT, BOTTOM_MARGIN, APPEND_GRAPHS_WIDTH);
 
             return tbl;
+        }
+
+        protected void AddCopyFormatSubscription(iText.Layout.Document aInDoc)
+        {
+            var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
+
+            float bottom = 0;
+            float left = 0;
+            float next_left = 0;
+            string text = string.Empty;
+
+            if (_pageSize == PageSize.A4)
+            {
+                bottom = -2;
+                left = (7 + 10 + 32 + 15 + 10 + 14) * mmW() - TO_LEFT_CORRECTION;
+                next_left = (7 + 10 + 32 + 15 + 10 + 70) * mmW() + 20 - TO_LEFT_CORRECTION;
+                text = "Формат А4";
+            }
+            else
+            {
+                bottom = -4;
+                left = (60 + 45 + 70 + 50 + 65) * mmW() - TO_LEFT_CORRECTION;
+                next_left = (60 + 45 + 70 + 50 + 32 + 100) * mmW() + 20 - TO_LEFT_CORRECTION;
+                text = "Формат А3";
+            }
+
+            var p = new Paragraph("Копировал").AddStyle(style).SetFixedPosition(left, bottom, 100);
+            aInDoc.Add(p);
+            p = new Paragraph(text).AddStyle(style).SetFixedPosition(next_left, bottom, 100);
+            aInDoc.Add(p);
         }
 
         /// <summary>

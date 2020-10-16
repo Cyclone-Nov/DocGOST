@@ -351,20 +351,6 @@ namespace GostDOC.PDF
             DrawVerticalLine(aPageNumber, x, y,THICK_LINE_WIDTH, rightVertLineHeight);
         }
 
-        void AddCopyFormatSubscription(Document aInDoc)
-        {
-            var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
-
-            float bottom = -4;
-            var p = new Paragraph("Копировал")
-                .AddStyle(style)
-                .SetFixedPosition((60 + 45 + 70 + 50 + 65) * mmW() - TO_LEFT_CORRECTION, bottom, 100);
-            aInDoc.Add(p);
-            p = new Paragraph("Формат А3").AddStyle(style)
-                .SetFixedPosition((60 + 45 + 70 + 50 + 32 + 100) * mmW() + 20 - TO_LEFT_CORRECTION, bottom, 100);
-            aInDoc.Add(p);
-        }
-
         void AddText(string aText)
         {    
             Paragraph paragraph = new Paragraph(aText).

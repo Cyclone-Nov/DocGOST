@@ -295,19 +295,5 @@ namespace GostDOC.PDF
             DrawVerticalLine(pageNumber, fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 200);
         }
 
-        void AddCopyFormatSubscription(Document aInDoc)
-        {
-            var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
-
-            float bottom = -3;
-            var p = new Paragraph("Копировал")
-                .AddStyle(style)
-                .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 14) * mmW() - TO_LEFT_CORRECTION, bottom, 100);
-            aInDoc.Add(p);
-            p = new Paragraph("Формат А4").AddStyle(style)
-                .SetFixedPosition((7 + 10 + 32 + 15 + 10 + 70) * mmW() + 20 - TO_LEFT_CORRECTION, bottom, 100);
-            aInDoc.Add(p);
-        }
-
     }
 }
