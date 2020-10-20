@@ -82,6 +82,11 @@ namespace GostDOC.ExcelExport
                 // Remove 2nd sheet
                 aApp.Sheets["2"].Delete();
             }
+
+            // Update ЛРИ
+            aApp.Sheets["ЛРИ"].Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+            aApp.Sheets["ЛРИ"].Cells[37, 19] = pages + 1;
+
             // Select 1st sheet
             aApp.Sheets["1"].Select();
             // Save
@@ -107,7 +112,7 @@ namespace GostDOC.ExcelExport
                 sheet.Cells[38, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
             }
             // Set pages count
-            sheet.Cells[35, 29] = Pages;
+            sheet.Cells[35, 29] = Pages + 1;
             // Fill data
             FillRows(sheet, MaxRowIndexFirst);
         }
