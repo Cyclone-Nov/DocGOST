@@ -8,6 +8,8 @@ namespace GostDOC.Models
 {
     class CombineProperties : IEquatable<CombineProperties>
     {
+        private bool _combinePosition = false;
+
         /// <summary>
         /// имя
         /// </summary>
@@ -32,11 +34,21 @@ namespace GostDOC.Models
         /// </value>
         public string Position { get; set; }
 
+        public CombineProperties(bool aCombinePosition)
+        {
+            _combinePosition = aCombinePosition;
+        }
+
         public bool Equals(CombineProperties other)
         {
             if (other == null)
             {
                 return false;
+            }
+
+            if (_combinePosition)
+            {
+                return string.Equals(other.Name, Name) && string.Equals(other.Included, Included);
             }
             return string.Equals(other.Name, Name) && string.Equals(other.Included, Included) && string.Equals(other.Position, Position);
         }
@@ -46,6 +58,10 @@ namespace GostDOC.Models
         }
         public override int GetHashCode()
         {
+            if (_combinePosition)
+            {
+                return (Name?.GetHashCode() ?? 0) ^ (Included?.GetHashCode() ?? 0);
+            }
             return (Name?.GetHashCode() ?? 0) ^ (Included?.GetHashCode() ?? 0) ^ (Position?.GetHashCode() ?? 0);
         }
     }
