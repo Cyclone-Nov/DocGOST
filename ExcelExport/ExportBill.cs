@@ -15,6 +15,7 @@ namespace GostDOC.ExcelExport
         private const int MinRowIndex = 3;
         private const int MaxRowIndexFirst = 26;
         private const int MaxRowIndexSecond = 32;
+        private const string BillPostfix = "ВП";
 
         private const int RowCountFirst = MaxRowIndexFirst - MinRowIndex + 1;
         private const int RowCountSecond = MaxRowIndexSecond - MinRowIndex + 1;
@@ -34,7 +35,7 @@ namespace GostDOC.ExcelExport
                 {
                     if (_tbl.Rows.Count > RowCountFirst)
                     {
-                        count = (_tbl.Rows.Count - RowCountFirst) % RowCountSecond + 1;
+                        count += (_tbl.Rows.Count - RowCountFirst) / RowCountSecond + 1;
                     }
                 }
                 return count;
@@ -58,15 +59,20 @@ namespace GostDOC.ExcelExport
             {
                 // Fill 2nd sheet
                 var sheet = aApp.Sheets["2"];
-                FillSheet(sheet);
 
-                // Fill other sheets
-                for (int i = 3; i < pages; i++)
+                for (int i = 3; i <= pages; i++)
                 {
                     // Copy 2nd sheet
                     sheet.Copy(After: aApp.Sheets[i - 1]);
                     // Set name
                     aApp.Sheets[i].Name = i.ToString();
+                }
+
+                FillSheet(sheet);
+
+                // Fill other sheets
+                for (int i = 3; i <= pages; i++)
+                {
                     // Fill sheet
                     FillSheet(aApp.Sheets[i]);
                 }
@@ -76,6 +82,11 @@ namespace GostDOC.ExcelExport
                 // Remove 2nd sheet
                 aApp.Sheets["2"].Delete();
             }
+
+            // Update ЛРИ
+            aApp.Sheets["ЛРИ"].Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+            aApp.Sheets["ЛРИ"].Cells[37, 19] = pages + 1;
+
             // Select 1st sheet
             aApp.Sheets["1"].Select();
             // Save
@@ -90,7 +101,7 @@ namespace GostDOC.ExcelExport
             {
                 // Fill main title
                 sheet.Cells[34, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1);
-                sheet.Cells[31, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+                sheet.Cells[31, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2) + BillPostfix;
                 sheet.Cells[35, 24] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4);
                 sheet.Cells[35, 25] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a);
                 sheet.Cells[35, 26] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b);
@@ -101,7 +112,7 @@ namespace GostDOC.ExcelExport
                 sheet.Cells[38, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
             }
             // Set pages count
-            sheet.Cells[35, 29] = Pages;
+            sheet.Cells[35, 29] = Pages + 1;
             // Fill data
             FillRows(sheet, MaxRowIndexFirst);
         }
@@ -114,7 +125,7 @@ namespace GostDOC.ExcelExport
             if (_graphs != null)
             {
                 // Set title
-                sheet.Cells[35, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+                sheet.Cells[35, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2) + BillPostfix;
             }
             // Fill data
             FillRows(sheet, MaxRowIndexSecond);

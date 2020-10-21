@@ -14,8 +14,8 @@ namespace GostDOC.ExcelExport
     class ExportSp : IExcelExport
     {
         private const int MinRowIndex = 2;
-        private const int MaxRowIndexFirst = 27;
-        private const int MaxRowIndexSecond = 34;
+        private const int MaxRowIndexFirst = 25;
+        private const int MaxRowIndexSecond = 30;
 
         private const int RowCountFirst = MaxRowIndexFirst - MinRowIndex + 1;
         private const int RowCountSecond = MaxRowIndexSecond - MinRowIndex + 1;
@@ -35,7 +35,7 @@ namespace GostDOC.ExcelExport
                 {
                     if (_tbl.Rows.Count > RowCountFirst)
                     {
-                        count = (_tbl.Rows.Count - RowCountFirst) % RowCountSecond + 1;
+                        count += (_tbl.Rows.Count - RowCountFirst) / RowCountSecond + 1;
                     }
                 }
                 return count;
@@ -56,17 +56,23 @@ namespace GostDOC.ExcelExport
             int pages = Pages;
             if (pages > 1)
             {
-                // Fill 2nd sheet
+                // Create 2nd sheet
                 var sheet = aApp.Sheets["2"];
-                FillSheet(sheet);
 
-                // Fill other sheets
-                for (int i = 3; i < pages; i++)
+                for (int i = 3; i <= pages; i++)
                 {
                     // Copy 2nd sheet
                     sheet.Copy(After: aApp.Sheets[i - 1]);
                     // Set name
                     aApp.Sheets[i].Name = i.ToString();
+                }
+
+                // Fill 2nd sheet
+                FillSheet(sheet);
+
+                // Fill other sheets
+                for (int i = 3; i <= pages; i++)
+                {
                     // Fill sheet
                     FillSheet(aApp.Sheets[i]);
                 }
@@ -76,11 +82,15 @@ namespace GostDOC.ExcelExport
                 // Remove 2nd sheet
                 aApp.Sheets["2"].Delete();
             }
+
+            // Update ЛРИ
+            aApp.Sheets["ЛРИ"].Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+            aApp.Sheets["ЛРИ"].Cells[37, 19] = pages + 1;
+
             // Select 1st sheet
             aApp.Sheets["1"].Select();
             // Save
             wb.SaveAs(aFilePath);
-
         }
 
         public void FillFirstSheet(Excel.Application aApp)
@@ -102,7 +112,7 @@ namespace GostDOC.ExcelExport
                 sheet.Cells[39, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
             }
             // Set pages count
-            sheet.Cells[36, 22] = Pages;
+            sheet.Cells[36, 22] = Pages + 1;
             // Fill data
             FillRows(sheet, MaxRowIndexFirst);
         }
@@ -124,6 +134,7 @@ namespace GostDOC.ExcelExport
         {
             if (_tbl == null)
                 return;
+
             int row = MinRowIndex;
             while (row <= maxRows && _tableRow < _tbl.Rows.Count)
             { 

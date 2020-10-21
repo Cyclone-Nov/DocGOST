@@ -208,16 +208,17 @@ namespace GostDOC.Models
                 var included = cmp.Properties.Find(x => x.Name == Constants.ComponentWhereIncluded);
                 var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
                 var position = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatiorID);
+
                 if (name == null || (included == null && sign == null)) 
                 {
                     continue;
                 }
 
-                CombineProperties combine = new CombineProperties()
+                CombineProperties combine = new CombineProperties(_docType == DocType.Specification)
                 {
                     Name = name.Text,
                     Included = included?.Text ?? sign.Text,
-                    Position = position?.Text ?? ""
+                    Position = position?.Text ?? string.Empty
                 };
 
                 // Parse component count
@@ -228,10 +229,6 @@ namespace GostDOC.Models
 
                 // Create component
                 Component component = new Component(cmp) { Type = aType, Count = count };                
-                if(_docType == DocType.Specification && position!= null && !string.IsNullOrEmpty(position.Text))
-                {
-                    component.SetPropertyValue(Constants.ComponentNote, position.Text);
-                }
 
                 // Fill group info
                 SubGroupInfo[] groups = UpdateGroups(cmp, component);
@@ -273,6 +270,11 @@ namespace GostDOC.Models
 
                 // Save added component for counting
                 components.Add(combine, component);
+            }            
+
+            if (_docType == DocType.Specification)
+            {
+                UpdatePositions(components);
             }
         }
 
@@ -428,8 +430,24 @@ namespace GostDOC.Models
         private bool CombineComponent(Dictionary<CombineProperties, Component> aComponents, CombineProperties aCombine, uint aCount)
         {
             Component existing = null;
-            if(_docType == DocType.Specification || _docType == DocType.ItemsList)
-            { 
+            if (_docType == DocType.Specification)
+            {
+                if (aComponents.TryGetValue(aCombine, out existing))
+                {
+                    // If already added - increase count
+                    existing.Count += aCount;
+
+                    // Update pos
+                    string currentPos;
+                    if (!string.IsNullOrEmpty(aCombine.Position) && existing.Properties.TryGetValue(Constants.ComponentDesignatiorID, out currentPos))
+                    {
+                        existing.Properties[Constants.ComponentDesignatiorID] = currentPos + "," + aCombine.Position;
+                    }
+                    return true;
+                }
+            }
+            else if (_docType == DocType.ItemsList) 
+            {
                 if (aComponents.TryGetValue(aCombine, out existing))
                 {
                     // If already added - increase count and continue
@@ -525,6 +543,106 @@ namespace GostDOC.Models
         private string ParseNameSign(IList<GraphXml> aGraphs)
         {
             return ParseGraphValue(aGraphs, Constants.GraphName) + " " + ParseGraphValue(aGraphs, Constants.GraphSign);
+        }
+
+        private Tuple<string, int> ParseDesignatorId(string aInput)
+        {
+            Regex regex = new Regex(@"(\D*)(\d*)");
+            Match match = regex.Match(aInput);
+            if (match.Success)
+            {
+                string s = match.Groups[1].Value;
+                int v = int.Parse(match.Groups[2].Value);
+                return new Tuple<string, int>(s, v);
+            }
+            return new Tuple<string, int>(string.Empty, 0);
+        }
+
+        private void UpdatePositions(IDictionary<CombineProperties, Component> aComponents)
+        {
+            foreach (var cmp in aComponents.Values)
+            {
+                string currentPos;
+                if (cmp.Properties.TryGetValue(Constants.ComponentDesignatiorID, out currentPos))
+                {
+                    // Split ids
+                    string[] split = currentPos.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    // Sort ids
+                    Array.Sort(split, (x, y) =>
+                    {
+                        int r = x.Length.CompareTo(y.Length);
+                        // Compare length
+                        if (r == 0)
+                        {
+                            // Compare strings
+                            r = string.Compare(x, y);
+                        }
+                        return r;
+                    });
+
+                    string result = string.Empty;
+                    List<Tuple<string, int>> items = new List<Tuple<string, int>>();
+                    for (int i = 0; i < split.Length; i++)
+                    {
+                        if (items.Count == 0)
+                        {
+                            // Add current id in list
+                            items.Add(ParseDesignatorId(split[i]));
+                            continue;
+                        }
+
+                        // Get previous and current
+                        var p = items.Last();
+                        var c = ParseDesignatorId(split[i]);
+
+                        // Add to list
+                        items.Add(c);
+                        // Compare with previous
+                        if (c.Item1 == p.Item1)
+                        {
+                            if (c.Item2 == p.Item2 + 1)
+                            {
+                                if (i != split.Length - 1)
+                                {
+                                    // Skip list processing
+                                    continue;
+                                }
+                            }
+                        }
+
+                        if (items.Count > 2)
+                        {
+                            // Add ids with "-"
+                            var f = items.First();
+                            var l = items.Last();
+
+                            if (!string.IsNullOrEmpty(result))
+                            {
+                                result += ", ";
+                            }
+                            result += f.Item1 + f.Item2.ToString() + "-" + l.Item1 + l.Item2.ToString();
+                        }
+                        else
+                        {
+                            // Add ids with ","
+                            foreach (var item in items)
+                            {
+                                if (!string.IsNullOrEmpty(result) && !result.EndsWith(", "))
+                                {
+                                    result += ", ";
+                                }
+                                result += item.Item1 + item.Item2.ToString();
+                            }
+                        }
+                        // Clear ids 
+                        items.Clear();
+                    }
+
+                    // Save updated id
+                    cmp.Properties[Constants.ComponentDesignatiorID] = result;
+                }
+            }
         }
     }
 }
