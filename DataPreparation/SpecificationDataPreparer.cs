@@ -250,13 +250,12 @@ namespace GostDOC.DataPreparation
                 }
             }
 
+            AddEmptyRow(aTable);
             if (aGroupName != Constants.GroupDoc)
             {
                 AddEmptyRow(aTable);
-                //AddGroupName(dataToFill.Table, dataToFill.GroupName);
-                AddEmptyRow(aTable);
+                //AddGroupName(dataToFill.Table, dataToFill.GroupName);                
             }
-
         }
 
         private bool AddSubgroup(DataTable aTable, string aGroupName, List<Component> aSortComponents, ref int aPos)
@@ -266,11 +265,12 @@ namespace GostDOC.DataPreparation
                 return false;
             }
 
-            AddGroupName(aTable, aGroupName);
+            if (AddGroupName(aTable, aGroupName))
+                AddEmptyRow(aTable);
 
             AddComponents(aTable, aSortComponents, ref aPos);
 
-            //AddEmptyRow(dataToFill.Table);
+            AddEmptyRow(aTable);
             aTable.AcceptChanges();
 
             return true;
@@ -286,7 +286,8 @@ namespace GostDOC.DataPreparation
                 uint component_count = component.Count;// GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
 
                 string[] namearr = PdfUtils.SplitStringByWidth(63, component_name).ToArray();
-                var note = component.GetProperty(Constants.ComponentNote);
+                var desigantor_id = component.GetProperty(Constants.ComponentDesignatiorID);
+                var note = string.IsNullOrEmpty(desigantor_id) ? component.GetProperty(Constants.ComponentNote) : desigantor_id;
                 string[] notearr = PdfUtils.SplitStringByWidth(22, note).ToArray();
 
                 row = aTable.NewRow();

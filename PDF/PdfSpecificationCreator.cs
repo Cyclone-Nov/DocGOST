@@ -222,12 +222,17 @@ namespace GostDOC.PDF
 
                 void AddCellFormatted(BasePreparer.FormattedString fs) {
                     Cell c = new Cell();
-                    if (fs.TextAlignment == TextAlignment.CENTER) {
-                        c = (centrAlignCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
-                    } else if (name.TextAlignment == TextAlignment.LEFT) {
-                        c = (leftPaddCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
+                    if (fs != null)
+                    {
+                        if (fs.TextAlignment == TextAlignment.CENTER)
+                        {
+                            c = (centrAlignCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
+                        } else if (name.TextAlignment == TextAlignment.LEFT)
+                        {
+                            c = (leftPaddCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
+                        }
+                        if (fs.IsUnderlined) c.SetUnderline(0.5f, -1);
                     }
-                    if (fs.IsUnderlined) c.SetUnderline(0.5f, -1);
                     tbl.AddCell(c);
                 }
 
