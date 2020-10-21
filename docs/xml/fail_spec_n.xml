@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <transaction Type="GostDoc" Date="10.06.2020" Time="17:13:13">
+    <project Project_Name="Новый проект">
+      <configurations>
+        <configuration name="-00">
+          <graphs>
+            <graph name="Шифр PCB" value="" />
+            <graph name="Характер работы" value="" />
+            <graph name="Формат PCB" value="" />
+            <graph name="Утвердил" value="" />
+            <graph name="Указания изменение" value="" />
+            <graph name="Разработал схемотехник" value="" />
+            <graph name="Разработал конструктор" value="" />
+            <graph name="Раздел" value="" />
+            <graph name="Проект" value="" />
+            <graph name="Проверил схемотехник" value="" />
+            <graph name="Проверил конструктор" value="" />
+            <graph name="Примечание" value="" />
+            <graph name="Порядковый номер изменения" value="" />
+            <graph name="Первичная применяемость" value="" />
+            <graph name="Обозначение PCB" value="" />
+            <graph name="Обозначение" value="" />
+            <graph name="Нормоконтроль" value="" />
+            <graph name="Номер документа" value="" />
+            <graph name="Наименование PCB" value="" />
+            <graph name="Наименование" value="" />
+            <graph name="Литера3" value="" />
+            <graph name="Литера2" value="" />
+            <graph name="Литера" value="" />
+            <graph name="Код документа" value="" />
+            <graph name="Дополнительная графа" value="" />
+            <graph name="Дата изменения" value="" />
+            <graph name="Вид документа" value="" />
+            <graph name="Комментарии СП" value="" />
+            <graph name="Комментарии ВП" value="" />
+          </graphs>
+          <documents />
+          <components>
+            <component>
+              <properties>
+                <property name="Раздел СП" value="Прочие изделия" />
+                <property name="Наименование" />
+                <property name="Обозначение" />
+                <property name="Код продукции" />
+                <property name="Формат" />
+                <property name="Документ на поставку" />
+                <property name="Поставщик" />
+                <property name="Количество на изд." value="1200" />
+                <property name="Количество в комп." value="0" />
+                <property name="Количество на рег." value="0" />
+                <property name="Примечание" />
+              </properties>
+            </component>
+          </components>
+          <componentsPCB />
+        </configuration>
+      </configurations>
+    </project>
+  </transaction>
+</xml>
