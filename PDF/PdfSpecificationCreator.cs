@@ -222,12 +222,17 @@ namespace GostDOC.PDF
 
                 void AddCellFormatted(BasePreparer.FormattedString fs) {
                     Cell c = new Cell();
-                    if (fs.TextAlignment == TextAlignment.CENTER) {
-                        c = (centrAlignCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
-                    } else if (name.TextAlignment == TextAlignment.LEFT) {
-                        c = (leftPaddCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
+                    if (fs != null)
+                    {
+                        if (fs.TextAlignment == TextAlignment.CENTER)
+                        {
+                            c = (centrAlignCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
+                        } else if (name.TextAlignment == TextAlignment.LEFT)
+                        {
+                            c = (leftPaddCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
+                        }
+                        if (fs.IsUnderlined) c.SetUnderline(0.5f, -1);
                     }
-                    if (fs.IsUnderlined) c.SetUnderline(0.5f, -1);
                     tbl.AddCell(c);
                 }
 
@@ -235,10 +240,10 @@ namespace GostDOC.PDF
                     ? 0
                     : (int) row[Constants.ColumnQuantity];
 
-                if (name == null) {
+                if (name == null && string.IsNullOrEmpty(note) ) {
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS, leftPaddCell);
                     remainingPdfTableRows--;
-                } else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(zone) && string.IsNullOrEmpty(sign))  {
+                } else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(zone) && string.IsNullOrEmpty(sign) && string.IsNullOrEmpty(note))  {
                     // наименование группы
                     if (remainingPdfTableRows > 4)  {
                         // если есть место для записи более 4 строк то записываем группу, иначе выходим

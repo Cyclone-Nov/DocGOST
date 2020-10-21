@@ -79,51 +79,48 @@ namespace GostDOC.PDF
         /// <returns></returns>
         public static List<string> SplitStringByWidth(float aLength, string aString, float aFontSize = PdfDefines.DefaultFontSize)
         {
+            if (string.IsNullOrEmpty(aString))
+                return new List<string>() { string.Empty};
+
             List<string> name_strings = new List<string>();
-            int default_padding = 4;
+            int default_padding = 2;
             float maxLength = aLength * PdfDefines.mmAXw - default_padding;
             var font = PdfDefines.MainFont;
             float currLength = font.GetWidth(aString, aFontSize);
 
-            GetLimitSubstring(name_strings, maxLength, currLength, aString);
+            if (currLength < maxLength)
+            {
+                name_strings.Add(aString);
+            } else
+            {
+                string fullName = aString;
+
+                do
+                {
+                    // извлекаем из строки то число символов, которое может поместиться в указанную длину maxLength
+                    int symbOnMaxLength = (int)((fullName.Length / currLength) * maxLength);
+                    string partName = fullName.Substring(0, symbOnMaxLength);
+
+                    // пробуем найти ближайший символ, по которому можно переносить фразу и извлечем часть для первой строки
+                    int index = partName.LastIndexOfAny(new char[] { ' ', '-', '.', ',' });
+                    if (index < 0)
+                    {
+                        name_strings.Add(partName);
+                        fullName = fullName.Substring(symbOnMaxLength + 1);
+                    } else
+                    {
+                        name_strings.Add(fullName.Substring(0, index));
+                        fullName = fullName.Substring(index).TrimStart();
+                    }
+                    currLength = font.GetWidth(fullName, aFontSize);
+                }
+                while (currLength > maxLength);
+                name_strings.Add(fullName);
+            }
 
             return name_strings;
         }
 
-        /// <summary>
-        /// разделить строку на писок строк по максимально допустимой ширине строки
-        /// </summary>
-        /// <param name="name_strings">результат в виде списка строк</param>
-        /// <param name="maxLength">ограничение на ширину строки</param>
-        /// <param name="currLength">текущая ширина фразы</param>
-        /// <param name="aFullName">фраза которую надо разделить</param>
-        public static void GetLimitSubstring(List<string> name_strings, float maxLength, float currLength, string aFullName)
-        {
-            if (currLength < maxLength)
-            {
-                name_strings.Add(aFullName);
-            } else
-            {
-                string fullName = aFullName;
-                // извлекаем из строки то число символов, которое может поместиться в указанную длину maxLength
-                int symbOnMaxLength = (int)((fullName.Length / currLength) * maxLength);
-                string partName = fullName.Substring(0, symbOnMaxLength);
-                
-                // пробуем найти ближайший символ, по которому можно переносить фразу и извлечем часть для первой строки
-                int index = partName.LastIndexOfAny(new char[] { ' ', '-', '.' });
-                if (index < 0)
-                {
-                    name_strings.Add(partName);
-                    fullName = fullName.Substring(symbOnMaxLength + 1);
-                }
-                else
-                {
-                    name_strings.Add(fullName.Substring(0, index));
-                    fullName = fullName.Substring(index + 1);
-                }
-                currLength = fullName.Length;
-                GetLimitSubstring(name_strings, maxLength, currLength, fullName);
-            }
-        }
+        
     }
 }
