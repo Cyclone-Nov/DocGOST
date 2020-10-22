@@ -140,5 +140,15 @@ namespace GostDOC.UI
             }
             return null;
         }
+
+        public static void ShowLoadErrors(IList<string> aErrors)
+        {
+            LoadErrors dlg = new LoadErrors();
+            dlg.ViewModel.SetErrors(aErrors);
+            var result = dlg.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+            }
+        }
     }
 }
