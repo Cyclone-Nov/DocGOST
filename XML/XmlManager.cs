@@ -19,6 +19,8 @@ namespace GostDOC.Models
         private string _dir = string.Empty;
         private Group _currentAssemblyD27 = null;
 
+        private ErrorHandler _error = ErrorHandler.Instance;
+
         public XmlManager()
         {
         }
@@ -209,8 +211,15 @@ namespace GostDOC.Models
                 var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
                 var position = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatiorID);
 
-                if (name == null || (included == null && sign == null)) 
+                if (name == null)
                 {
+                    _error.Error($"Имя компонента не задано!");
+                    continue;
+                }
+
+                if (included == null && sign == null) 
+                {
+                    _error.Error($"Компонент {name}: 'Куда входит' или 'Обозначение' не задано!");
                     continue;
                 }
 
@@ -315,7 +324,10 @@ namespace GostDOC.Models
                 new SubGroupInfo()
             };
 
-            string designatorID = string.Empty;
+
+            var id = aSrc.Properties.Find(x => x.Name == Constants.ComponentDesignatiorID)?.Text ?? string.Empty;
+            var name = aSrc.Properties.Find(x => x.Name == Constants.ComponentName)?.Text ?? string.Empty;
+
             foreach (var property in aSrc.Properties)
             {
                 if (property.Name == Constants.GroupNameSp)
@@ -334,35 +346,24 @@ namespace GostDOC.Models
                 {
                     result[1].SubGroupName = property.Text;
                 }
-                else if (property.Name == Constants.ComponentDesignatiorID)
+                else if (property.Name == Constants.ComponentType && result[0].GroupName == Constants.GroupOthers && string.IsNullOrEmpty(result[0].SubGroupName))
                 {
-                    designatorID = property.Text;
+                    if (string.IsNullOrEmpty(id))
+                    {
+                        // Not radio component, set group name from Type field
+                        result[0].SubGroupName = property.Text;
+
+                        if (string.IsNullOrEmpty(GroupNames.GetGroupName(property.Text)))
+                        {
+                            _error.Error($"Элемент типа {id} в словаре GroupNames.cfg не найден!");
+                        }
+                    }
                 }
             }
 
-            // Set group name from designator ID
-            string groupName = GroupNameConverter.GetGroupName(designatorID);
-            if (!string.IsNullOrEmpty(groupName))
+            if (result[0].GroupName == Constants.GroupOthers && string.IsNullOrEmpty(result[0].SubGroupName))
             {
-                if (string.IsNullOrEmpty(result[1].GroupName))
-                {
-                    result[1].GroupName = groupName;
-                    aDst.Properties[Constants.GroupNameB] = groupName;
-                }
-
-                if (result[0].GroupName == Constants.GroupOthers)
-                {
-                    if (string.IsNullOrEmpty(result[0].SubGroupName))
-                    {
-                        result[0].SubGroupName = groupName;
-                        aDst.Properties[Constants.SubGroupNameSp] = groupName;
-                    }
-                    if (string.IsNullOrEmpty(result[1].SubGroupName))
-                    {
-                        result[1].SubGroupName = groupName;
-                        aDst.Properties[Constants.SubGroupNameB] = groupName;
-                    }
-                }
+                _error.Error($"Не задан Подраздел СП для {name}!");
             }
 
             return result;
@@ -434,15 +435,21 @@ namespace GostDOC.Models
             {
                 if (aComponents.TryGetValue(aCombine, out existing))
                 {
-                    // If already added - increase count
-                    existing.Count += aCount;
-
                     // Update pos
                     string currentPos;
                     if (!string.IsNullOrEmpty(aCombine.Position) && existing.Properties.TryGetValue(Constants.ComponentDesignatiorID, out currentPos))
                     {
+                        if (!string.IsNullOrEmpty(currentPos) && currentPos == aCombine.Position)
+                        {
+                            _error.Error($"Компонент {aCombine.Name}: повторяющееся позиционное обозначение!");
+                            return true;
+                        }
                         existing.Properties[Constants.ComponentDesignatiorID] = currentPos + "," + aCombine.Position;
                     }
+
+                    // If already added - increase count
+                    existing.Count += aCount;
+
                     return true;
                 }
             }
