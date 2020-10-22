@@ -46,7 +46,7 @@ namespace GostDOC.PDF
                 case DocType.ItemsList:
                     {                     
                         RowsOnFirstPage = 24;
-                        RowsOnNextPage = 31;
+                        RowsOnNextPage = 29;
                     }
                     break;                
                 default:
