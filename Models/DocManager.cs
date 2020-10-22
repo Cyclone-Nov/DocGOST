@@ -62,6 +62,34 @@ namespace GostDOC.Models
         /// сохранить изменения в pdf для типа документа aDocType
         /// </summary>
         /// <param name="aDocType">Тип документа</param>
+        /// <param name="aFilePath">Тип документа</param>
+        /// <returns></returns>        
+        public bool SavePDF(DocType aDocType, string aFilePath)
+        {
+            DataTable dataTable = _prepareDataManager.GetDataTable(aDocType);
+            IDictionary<string, string> mainConfigGraphs = null;
+            bool res = true;
+            if (GetMainConfigurationGraphs(out mainConfigGraphs))
+            {
+                 if (_pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs))
+                 {
+                    try
+                    {
+                        var data = _pdfManager.GetPDFData(aDocType);
+                        System.IO.File.WriteAllBytes(aFilePath, data);
+                    } catch (Exception ex)
+                    {
+                        res = false;
+                    }
+                 }
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// сохранить изменения в pdf для типа документа aDocType
+        /// </summary>
+        /// <param name="aDocType">Тип документа</param>
         /// <returns></returns>        
         public bool PreparePDF(DocType aDocType)
         {

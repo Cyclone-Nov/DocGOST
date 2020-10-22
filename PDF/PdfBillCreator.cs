@@ -115,7 +115,9 @@ namespace GostDOC.PDF
             string inscription = $"Утвержден {decimal_number}ВП-ЛУ";
             AddText(inscription);
 
-            AddCopyFormatSubscription(aInDoc);
+            AddCopyFormatSubscription(aInDoc, 1);
+
+            AddVerticalProjectSubscription(aInDoc, aGraphs);
 
             return lpr;
         }
@@ -137,7 +139,9 @@ namespace GostDOC.PDF
 
             DrawLines(aPageNumber);
 
-            AddCopyFormatSubscription(aInDoc);
+            AddCopyFormatSubscription(aInDoc, aPageNumber);
+
+            AddVerticalProjectSubscription(aInDoc, aGraphs);
 
             return lastNextProcessedRow;
         }
