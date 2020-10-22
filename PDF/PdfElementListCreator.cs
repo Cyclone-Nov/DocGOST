@@ -222,7 +222,7 @@ internal class PdfElementListCreator : PdfCreator {
 
             if (string.IsNullOrEmpty(name)) 
             {
-                AddEmptyRowToPdfTable(tbl, 1, 4, leftPaddCell);
+                AddEmptyRowToPdfTable(tbl, 1, 4, leftPaddCell, remainingPdfTableRows == 1 ? true : false);
                 remainingPdfTableRows--;
             }
             else if (string.IsNullOrEmpty(position) && quantity == 0) 
@@ -242,6 +242,11 @@ internal class PdfElementListCreator : PdfCreator {
             }
             else 
             {
+                if (remainingPdfTableRows == 1)
+                {
+                    centrAlignCell.SetBorderBottom(THICK_BORDER);
+                    leftPaddCell.SetBorderBottom(THICK_BORDER);
+                }
                 // просто запишем строку
                 tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
                 tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(name)));
