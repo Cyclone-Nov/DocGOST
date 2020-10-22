@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Common;
@@ -91,6 +92,8 @@ namespace GostDOC.ExcelExport
             aApp.Sheets["1"].Select();
             // Save
             wb.SaveAs(aFilePath);
+            // Close
+            wb.Close(false);
         }
 
         public void FillFirstSheet(Excel.Application aApp)
@@ -138,17 +141,17 @@ namespace GostDOC.ExcelExport
             int row = MinRowIndex;
             while (row <= maxRows && _tableRow < _tbl.Rows.Count)
             { 
-                sheet.Cells[row, 4] = _tbl.GetTableValue(_tableRow, 1);
-                sheet.Cells[row, 6] = _tbl.GetTableValue(_tableRow, 2);
-                sheet.Cells[row, 7] = _tbl.GetTableValue(_tableRow, 3);
-                sheet.Cells[row, 9] = _tbl.GetTableValue(_tableRow, 4);
-                sheet.Cells[row, 14] = _tbl.GetTableValue(_tableRow, 5);
+                sheet.Cells[row, 4] = _tbl.GetTableValueFS(_tableRow, 1);
+                sheet.Cells[row, 6] = _tbl.GetTableValueFS(_tableRow, 2);
+                sheet.Cells[row, 7] = _tbl.GetTableValueFS(_tableRow, 3);
+                sheet.Cells[row, 9] = _tbl.GetTableValueFS(_tableRow, 4);
+                sheet.Cells[row, 14] = _tbl.GetTableValueFS(_tableRow, 5);
 
                 int count = _tbl.GetTableValue<int>(_tableRow, 6);
                 if (count > 0)
                     sheet.Cells[row, 20] = count;
                
-                sheet.Cells[row, 22] = _tbl.GetTableValue(_tableRow, 7);
+                sheet.Cells[row, 22] = _tbl.GetTableValueFS(_tableRow, 7);
 
                 row++;
                 _tableRow++;

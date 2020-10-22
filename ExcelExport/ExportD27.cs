@@ -66,6 +66,8 @@ namespace GostDOC.ExcelExport
 
             // Save
             wb.SaveAs(aFilePath);
+            // Close
+            wb.Close(false);
         }
 
         private void Reset()
