@@ -82,6 +82,9 @@ namespace GostDOC.PDF
             if (string.IsNullOrEmpty(aString))
                 return new List<string>() { string.Empty};
 
+            //string val = "R120, R123,";
+            //int ind = val.LastIndexOfAny(new char[] { ' ', '-', '.', ',' }, val.Length - 1);
+
             List<string> name_strings = new List<string>();
             int default_padding = 2;
             float maxLength = aLength * PdfDefines.mmAXw - default_padding;
@@ -109,8 +112,8 @@ namespace GostDOC.PDF
                         fullName = fullName.Substring(symbOnMaxLength + 1);
                     } else
                     {
-                        name_strings.Add(fullName.Substring(0, index));
-                        fullName = fullName.Substring(index).TrimStart();
+                        name_strings.Add(fullName.Substring(0, index + 1).TrimEnd());
+                        fullName = fullName.Substring(index+1).TrimStart();
                     }
                     currLength = font.GetWidth(fullName, aFontSize);
                 }

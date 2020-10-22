@@ -616,6 +616,18 @@ namespace GostDOC.ViewModels
 
         private void ExportPDF(object obj)
         {
+            bool enabled = IsExportPdfEnabled.Value;
+            if (enabled)
+            {
+                if (_selectedItem == null)
+                    return;
+
+                var path = CommonDialogs.SaveFileAs("PDF files *.pdf", "Сохранить файл");
+                if (!string.IsNullOrEmpty(path))
+                {
+                    _docManager.SavePDF(_docType, path);
+                }
+            }
         }
 
         private void ExportExcel(object obj)

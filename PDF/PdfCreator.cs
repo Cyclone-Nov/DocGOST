@@ -215,7 +215,9 @@ namespace GostDOC.PDF
             var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
             DrawVerticalLine(aPageNumber, fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 200);
 
-            AddCopyFormatSubscription(aInPdfDoc);
+            AddCopyFormatSubscription(aInPdfDoc, aPageNumber);
+
+            AddVerticalProjectSubscription(aInPdfDoc, aGraphs);
         }
 
         Table CreateRegisterTable() {
@@ -234,14 +236,18 @@ namespace GostDOC.PDF
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
             Paragraph CreateParagraph(string text) {
-                var style = new Style().SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFontSize(12).SetFont(f1).SetPaddingTop(-2);
+                var style = new Style().SetTextAlignment(TextAlignment.CENTER).SetFontSize(12).SetFont(f1).SetPaddingTop(-2);
                 return new Paragraph(text).AddStyle(style);
             }
 
-            Cell CreateCell(int rowspan , int colspan) => new Cell(rowspan, colspan).SetBorder(THICK_BORDER);
+            Cell CreateCell(int rowspan , int colspan) => new Cell(rowspan, colspan).SetBorder(THICK_BORDER).
+                                                                                     SetVerticalAlignment(VerticalAlignment.MIDDLE).
+                                                                                     SetHorizontalAlignment(HorizontalAlignment.CENTER);
 
             tbl.AddCell(new Cell(1, 10).
                 SetBorder(THICK_BORDER).
+                SetVerticalAlignment(VerticalAlignment.MIDDLE).
+                SetHorizontalAlignment(HorizontalAlignment.CENTER).
                 SetHeight(10*mmH()).
                 Add(CreateParagraph("Лист регистрации изменений")));
 
@@ -253,10 +259,10 @@ namespace GostDOC.PDF
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Подп.")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Дата")));
 
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Измененных")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Заменяемых")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Новых")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("Аннулированных")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("измененных")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("заменяемых")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("новых")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("аннулированных")));
 
 
             for (int i = 0; i < (RowNumberOnNextPage-4) * 10; ++i) {
@@ -670,11 +676,11 @@ namespace GostDOC.PDF
             AddGraphCell(GetGraphByName(aGraphs, Constants.GRAPH_18));
 
             
-            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER), "Изм.");
-            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER), "Лист");
-            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER), "№ докум.");
-            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER), "Подп.");
-            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER), "Дата");
+            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER).SetBorderTop(THICK_BORDER), "Изм.");
+            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER).SetBorderTop(THICK_BORDER), "Лист");
+            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER).SetBorderTop(THICK_BORDER), "№ докум.");
+            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER).SetBorderTop(THICK_BORDER), "Подп.");
+            AddGraphCell2(topAndBottomBorderCell.SetBorderBottom(THICK_BORDER).SetBorderTop(THICK_BORDER), "Дата");
 
 
             // switch A3/A4
@@ -764,7 +770,21 @@ namespace GostDOC.PDF
             return tbl;
         }
 
-        protected void AddCopyFormatSubscription(iText.Layout.Document aInDoc)
+
+        protected void AddVerticalProjectSubscription(iText.Layout.Document aInDoc, IDictionary<string, string> aGraphs)
+        {
+            var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
+
+            var p =
+                new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT))
+                    .SetRotationAngle(DegreesToRadians(90))
+                    .AddStyle(style)
+                    .SetFixedPosition(10 * mmW() + 2 - TO_LEFT_CORRECTION, TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * mmW(), 100);
+            aInDoc.Add(p);
+        }
+
+
+        protected void AddCopyFormatSubscription(iText.Layout.Document aInDoc, int aPageNumber)
         {
             var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
 
@@ -773,7 +793,10 @@ namespace GostDOC.PDF
             float next_left = 0;
             string text = string.Empty;
 
-            if (_pageSize.GetWidth() == PageSize.A4.GetWidth())
+            var page = _pdfDoc.GetPage(aPageNumber);
+            var size = page.GetPageSize();
+
+            if (size.GetWidth() == PageSize.A4.GetWidth())
             {
                 bottom = -2;
                 left = (7 + 10 + 32 + 15 + 10 + 14) * mmW() - TO_LEFT_CORRECTION;
@@ -790,6 +813,7 @@ namespace GostDOC.PDF
 
             var p = new Paragraph("Копировал").AddStyle(style).SetFixedPosition(left, bottom, 100);
             aInDoc.Add(p);
+
             p = new Paragraph(text).AddStyle(style).SetFixedPosition(next_left, bottom, 100);
             aInDoc.Add(p);
         }

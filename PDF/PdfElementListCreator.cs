@@ -103,23 +103,12 @@ internal class PdfElementListCreator : PdfCreator {
         aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
         DrawLines(1);
-        AddCopyFormatSubscription(aInDoc);
+        AddCopyFormatSubscription(aInDoc, 1);
         AddVerticalProjectSubscription(aInDoc, aGraphs);
 
         return lastProcessedRow;
     }
 
-    void AddVerticalProjectSubscription(Document aInDoc, IDictionary<string, string> aGraphs)
-    {
-        var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
-
-        var p =
-            new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT))
-                .SetRotationAngle(DegreesToRadians(90))
-                .AddStyle(style)
-                .SetFixedPosition(10 * mmW() + 2 - TO_LEFT_CORRECTION, TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 45 * mmW(), 100);
-        aInDoc.Add(p);
-    }
 
     void DrawLines(int aPageNumber) {
         if (aPageNumber == 1) {
@@ -159,7 +148,9 @@ internal class PdfElementListCreator : PdfCreator {
 
         DrawLines(aPageNumber);
 
-        AddCopyFormatSubscription(aInPdfDoc);
+        AddCopyFormatSubscription(aInPdfDoc, aPageNumber);
+
+        AddVerticalProjectSubscription(aInPdfDoc, aGraphs);
 
         return lastProcessedRow;
     }

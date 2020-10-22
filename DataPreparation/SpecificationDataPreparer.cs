@@ -215,6 +215,7 @@ namespace GostDOC.DataPreparation
             }
 
             // наименование раздела
+            AddEmptyRow(aTable);
             if (AddGroupName(aTable, aGroupName))
                 AddEmptyRow(aTable);
 
@@ -250,11 +251,11 @@ namespace GostDOC.DataPreparation
                 }
             }
 
-            AddEmptyRow(aTable);
             if (aGroupName != Constants.GroupDoc)
             {
                 AddEmptyRow(aTable);
-                //AddGroupName(dataToFill.Table, dataToFill.GroupName);                
+                AddEmptyRow(aTable);
+                aPos += 2;
             }
         }
 

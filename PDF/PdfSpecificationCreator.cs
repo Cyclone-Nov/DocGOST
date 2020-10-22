@@ -99,7 +99,9 @@ namespace GostDOC.PDF
 
             DrawLines(1);
 
-            AddCopyFormatSubscription(aInDoc);
+            AddCopyFormatSubscription(aInDoc, 1);
+
+            AddVerticalProjectSubscription(aInDoc, aGraphs);
 
             return lastProcessedRow;
         }
@@ -115,15 +117,20 @@ namespace GostDOC.PDF
                 TITLE_BLOCK_WIDTH);
             aInDoc.Add(dataTable);
             
-            // добавить таблицу с основной надписью 
-            aInDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNamuber, DocType = DocType.Specification}));
+            // добавить таблицу с основной надписью             
+            var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNamuber, DocType = DocType.Specification });
+            titleBlock.SetFixedPosition(DATA_TABLE_LEFT, TOP_MARGIN + 4.01f, TITLE_BLOCK_WIDTH - 0.02f);
+            aInDoc.Add(titleBlock);
+
 
             // добавить таблицу с нижней дополнительной графой
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
             DrawLines(_currentPageNumber);
 
-            AddCopyFormatSubscription(aInDoc);
+            AddCopyFormatSubscription(aInDoc, aPageNamuber);
+
+            AddVerticalProjectSubscription(aInDoc, aGraphs);
 
             return lastProcessedRow;
         }
@@ -221,7 +228,7 @@ namespace GostDOC.PDF
                 var name = GetCellStringFormatted(Constants.ColumnName);
 
                 void AddCellFormatted(BasePreparer.FormattedString fs) {
-                    Cell c = new Cell();
+                    Cell c = null;
                     if (fs != null)
                     {
                         if (fs.TextAlignment == TextAlignment.CENTER)
@@ -233,6 +240,10 @@ namespace GostDOC.PDF
                         }
                         if (fs.IsUnderlined) c.SetUnderline(0.5f, -1);
                     }
+                    else
+                    {
+                        c = centrAlignCell.Clone(false);
+                    }
                     tbl.AddCell(c);
                 }
 
@@ -240,8 +251,8 @@ namespace GostDOC.PDF
                     ? 0
                     : (int) row[Constants.ColumnQuantity];
 
-                if (name == null && string.IsNullOrEmpty(note) ) {
-                    AddEmptyRowToPdfTable(tbl, 1, COLUMNS, leftPaddCell);
+                if (name == null && string.IsNullOrEmpty(note) ) {                    
+                    AddEmptyRowToPdfTable(tbl, 1, COLUMNS, leftPaddCell, remainingPdfTableRows == 1 ? true : false);
                     remainingPdfTableRows--;
                 } else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(zone) && string.IsNullOrEmpty(sign) && string.IsNullOrEmpty(note))  {
                     // наименование группы

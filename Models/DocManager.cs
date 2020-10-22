@@ -62,6 +62,47 @@ namespace GostDOC.Models
         /// сохранить изменения в pdf для типа документа aDocType
         /// </summary>
         /// <param name="aDocType">Тип документа</param>
+        /// <param name="aFilePath">Тип документа</param>
+        /// <returns></returns>        
+        public bool SavePDF(DocType aDocType, string aFilePath)
+        {
+            DataTable dataTable = _prepareDataManager.GetDataTable(aDocType);
+            IDictionary<string, string> mainConfigGraphs = null;
+            bool res = true;
+            if (GetMainConfigurationGraphs(out mainConfigGraphs))
+            {
+                 if (_pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs))
+                 {
+                    var data = _pdfManager.GetPDFData(aDocType);                    
+                    using (System.IO.FileStream fParameter = new System.IO.FileStream(aFilePath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+                    {
+                        using (System.IO.StreamWriter m_WriterParameter = new System.IO.StreamWriter(fParameter))
+                        {
+                            try
+                            {
+                                m_WriterParameter.BaseStream.Seek(0, System.IO.SeekOrigin.End);
+                                m_WriterParameter.Write(data);
+                                m_WriterParameter.Flush();
+                            } catch (Exception ex)
+                            {
+                                res = false;
+                            } finally
+                            {                                
+                                m_WriterParameter.Dispose();
+                                fParameter.Close();
+                            }
+                        }
+                    }
+                    
+                }
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// сохранить изменения в pdf для типа документа aDocType
+        /// </summary>
+        /// <param name="aDocType">Тип документа</param>
         /// <returns></returns>        
         public bool PreparePDF(DocType aDocType)
         {
