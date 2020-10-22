@@ -73,28 +73,15 @@ namespace GostDOC.Models
             {
                  if (_pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs))
                  {
-                    var data = _pdfManager.GetPDFData(aDocType);                    
-                    using (System.IO.FileStream fParameter = new System.IO.FileStream(aFilePath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+                    try
                     {
-                        using (System.IO.StreamWriter m_WriterParameter = new System.IO.StreamWriter(fParameter))
-                        {
-                            try
-                            {
-                                m_WriterParameter.BaseStream.Seek(0, System.IO.SeekOrigin.End);
-                                m_WriterParameter.Write(data);
-                                m_WriterParameter.Flush();
-                            } catch (Exception ex)
-                            {
-                                res = false;
-                            } finally
-                            {                                
-                                m_WriterParameter.Dispose();
-                                fParameter.Close();
-                            }
-                        }
+                        var data = _pdfManager.GetPDFData(aDocType);
+                        System.IO.File.WriteAllBytes(aFilePath, data);
+                    } catch (Exception ex)
+                    {
+                        res = false;
                     }
-                    
-                }
+                 }
             }
             return res;
         }
