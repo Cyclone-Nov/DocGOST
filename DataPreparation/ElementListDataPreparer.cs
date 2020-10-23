@@ -100,15 +100,12 @@ internal class ElementListDataPreparer : BasePreparer {
             for (int i = 0; i < sortComponents.Length;)
             {
                 var component = sortComponents[i];
-                string component_name = GetComponentName(HasStandardDoc[i] == 2, component);
+                string component_name = GetComponentName(HasStandardDoc[i] == 1, component);
                 uint component_count = component.Count; //1; // always only one! GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
                 bool haveToChangeName = string.Equals(component.GetProperty(Constants.ComponentPresence),"0") ||
                                         HaveToChangeComponentName(component, aOtherComponents);
-                string desig = component.GetProperty(Constants.ComponentDesignatiorID);
-                if (string.Equals(desig, "VD9", StringComparison.InvariantCultureIgnoreCase))
-                {
-
-                }
+             
+                
                 List<string> component_designators = new List<string>{ component.GetProperty(Constants.ComponentDesignatiorID) };
 
                 bool same;
@@ -118,7 +115,7 @@ internal class ElementListDataPreparer : BasePreparer {
                     do 
                     {
                         var componentNext = sortComponents[j];
-                        string componentNext_name = GetComponentName(HasStandardDoc[j] == 2, componentNext);
+                        string componentNext_name = GetComponentName(HasStandardDoc[j] == 1, componentNext);
 
                         if (string.Equals(component_name, componentNext_name))
                         {
@@ -135,7 +132,7 @@ internal class ElementListDataPreparer : BasePreparer {
                 i = j;
 
                 string component_designator = MakeComponentDesignatorsString(component_designators);
-
+                string[] desigantorarr = PdfUtils.SplitStringByWidth(18, component_designator).ToArray();
                 // вчисляем длины полей и переносим на следующуй строку при необходимости 
                 // разобьем наименование на несколько строк исходя из длины текста
                 var name = (haveToChangeName) ? change_name : component_name;
@@ -144,21 +141,24 @@ internal class ElementListDataPreparer : BasePreparer {
                 string[] notearr = PdfUtils.SplitStringByWidth(45, note).ToArray();
 
                 row = aTable.NewRow();
-                row[Constants.ColumnPosition] = component_designator;
+                row[Constants.ColumnPosition] = desigantorarr.First();
                 row[Constants.ColumnName] = namearr.First();
                 row[Constants.ColumnQuantity] = component_count;
                 row[Constants.ColumnFootnote] = notearr.First();
                 aTable.Rows.Add(row);
 
                 int max = Math.Max(namearr.Length, notearr.Length);
+                max = Math.Max(max, desigantorarr.Length);
                 if (max > 1)
                 {
                     int ln_name = namearr.Length;
                     int ln_note = notearr.Length;
+                    int ln_designator = desigantorarr.Length;
 
                     for (int ln = 1; ln< max; ln++)
                     {
                         row = aTable.NewRow();
+                        row[Constants.ColumnPosition] = (ln_designator > ln) ? desigantorarr[ln] : string.Empty;
                         row[Constants.ColumnName] = (ln_name > ln) ? namearr[ln] : string.Empty;
                         row[Constants.ColumnFootnote] = (ln_note > ln) ? notearr[ln] : string.Empty;
                         aTable.Rows.Add(row);
@@ -286,7 +286,9 @@ internal class ElementListDataPreparer : BasePreparer {
             else if (aDesignators.Count() == 2)
                 designator = $"{aDesignators.First()},{aDesignators.Last()}";
             else
+            {                
                 designator = $"{aDesignators.First()}-{aDesignators.Last()}";
+            }
 
             return designator;
         }
