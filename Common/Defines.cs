@@ -255,6 +255,8 @@ namespace GostDOC.Common
         /// </summary>
         public static readonly string GroupMainCompontns = "";
 
+        public static readonly string GroupOthersB = "Прочие";
+
         #endregion
 
 

@@ -68,6 +68,8 @@ namespace GostDOC.Models
                 AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB);
                 AddComponents(newCfg, cfg.Components, ComponentType.Component);
 
+                // Move single elements to group "Прочие"
+                MoveSingleElements(newCfg);
                 // Sort components
                 SortComponents(newCfg);
                 // Fill default graphs
@@ -654,6 +656,71 @@ namespace GostDOC.Models
 
                     // Save updated id
                     cmp.Properties[Constants.ComponentDesignatiorID] = result;
+                }
+            }
+        }
+
+
+        private void MoveSingleElements(Lazy<Group> aOthers, IDictionary<string, Group> aGroups)
+        {
+            foreach (var gp in aGroups.AsNotNull().ToList())
+            {
+                MoveSingleElements(aOthers, gp.Value.SubGroups);
+
+                if (gp.Value.Components.Count == 1)
+                {
+                    aOthers.Value.Components.AddRange(gp.Value.Components);
+                    aGroups.Remove(gp.Key);
+                }
+
+                if (gp.Value.Components.Count == 0 && (gp.Value.SubGroups == null || gp.Value.SubGroups.Count == 0))
+                {
+                    aGroups.Remove(gp.Key);
+                }
+            }
+        }
+
+        private void MoveSingleElements(Group aGroup)
+        {
+            foreach (var gp in aGroup.SubGroups.AsNotNull().ToList())
+            {
+                if (gp.Value.Components.Count == 1)
+                {
+                    // Update component name
+                    Component cp = gp.Value.Components.First();
+                    string type = cp.GetProperty(Constants.ComponentType);
+                    string name = cp.GetProperty(Constants.ComponentName);
+                    cp.SetPropertyValue(Constants.ComponentName, type + " " + name);
+                    // Move component to parent group
+                    aGroup.Components.Add(cp);
+                    // Remove subgroup
+                    aGroup.SubGroups.Remove(gp.Key);
+                }
+            }
+        }
+
+        private void MoveSingleElements(Configuration aCfg)
+        {
+            if (_docType == DocType.Bill)
+            {
+                Lazy<Group> others = new Lazy<Group>(() =>
+                {
+                    Group groupOthers;
+                    if (!aCfg.Bill.TryGetValue(Constants.GroupOthersB, out groupOthers))
+                    {
+                        groupOthers = new Group() { Name = Constants.GroupOthersB };
+                        aCfg.Bill.Add(groupOthers.Name, groupOthers);
+                    }
+                    return groupOthers;
+                });
+
+                MoveSingleElements(others, aCfg.Bill);
+            }
+            else if (_docType == DocType.Specification)
+            {
+                foreach (var gp in aCfg.Specification)
+                {
+                    MoveSingleElements(gp.Value);
                 }
             }
         }
