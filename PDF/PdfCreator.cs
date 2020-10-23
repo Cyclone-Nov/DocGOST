@@ -478,7 +478,8 @@ namespace GostDOC.PDF
 
             var graph11Cell = leftTableCell.Clone(false).SetTextAlignment(TextAlignment.LEFT);
             AddCellWithText(leftTableCell2Column, "Разраб.");
-            mainTable.AddCell(graph11Cell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_11sp_dev))));
+            string dev_str = (Type == DocType.Specification) ? GetGraph(Constants.GRAPH_11sp_dev) : GetGraph(Constants.GRAPH_11bl_dev);
+            mainTable.AddCell(graph11Cell.Clone(false).Add(CreatePaddingTopParagraph(dev_str)));
             for (int i = 0; i < 2; ++i) {
                 mainTable.AddCell(leftTableCell.Clone(false));
             }
@@ -510,7 +511,8 @@ namespace GostDOC.PDF
             #region Пров.
 
             AddCellWithText(leftTableCell2Column, "Пров.");
-            mainTable.AddCell(graph11Cell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_11sp_chk))));
+            string chk_str = (Type == DocType.Specification) ? GetGraph(Constants.GRAPH_11sp_chk) : GetGraph(Constants.GRAPH_11bl_chk);
+            mainTable.AddCell(graph11Cell.Clone(false).Add(CreatePaddingTopParagraph(chk_str)));
             for (int i = 0; i < 2; ++i) {
                 mainTable.AddCell(leftTableCell.Clone(false));
             }
