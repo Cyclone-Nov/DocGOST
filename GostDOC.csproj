@@ -176,7 +176,9 @@
     <Compile Include="DataPreparation\PrepareManager.cs" />
     <Compile Include="Models\DocumentTypes.cs" />
     <Compile Include="ExcelExport\ExcelManager.cs" />
+    <Compile Include="Models\ErrorHandler.cs" />
     <Compile Include="Models\GroupData.cs" />
+    <Compile Include="Models\GroupNames.cs" />
     <Compile Include="Models\MaterialNode.cs" />
     <Compile Include="Models\MenuNode.cs" />
     <Compile Include="Models\MoveInfo.cs" />
@@ -195,10 +197,14 @@
     <Compile Include="UserControls\NameValueControl.xaml.cs">
       <DependentUpon>NameValueControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\LoadErrorsVM.cs" />
     <Compile Include="ViewModels\MaterialsVM.cs" />
     <Compile Include="ViewModels\NewFileVM.cs" />
     <Compile Include="Views\EditMaterials.xaml.cs">
       <DependentUpon>EditMaterials.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LoadErrors.xaml.cs">
+      <DependentUpon>LoadErrors.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\NewFile.xaml.cs">
       <DependentUpon>NewFile.xaml</DependentUpon>
@@ -208,7 +214,7 @@
       <DependentUpon>NewMaterial.xaml</DependentUpon>
     </Compile>
     <Compile Include="XML\XUtils.cs" />
-    <Compile Include="Models\Converter.cs" />
+    <Compile Include="Models\GroupNameConverter.cs" />
     <Compile Include="Models\DataStructures.cs" />
     <Compile Include="Models\Node.cs" />
     <Compile Include="XML\XmlManager.cs" />
@@ -248,6 +254,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EditMaterials.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LoadErrors.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -350,6 +360,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Settings\GroupNames.cfg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

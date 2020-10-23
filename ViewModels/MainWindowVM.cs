@@ -47,6 +47,9 @@ namespace GostDOC.ViewModels
         private UndoRedoStack<IList<object>> _undoRedoGraphs = new UndoRedoStack<IList<object>>();
 
         private ExcelManager _excelManager = new ExcelManager();
+        
+        private ErrorHandler _loadError = ErrorHandler.Instance;
+        private List<string> _loadErrors = new List<string>();
 
         public ObservableProperty<string> Title { get; } = new ObservableProperty<string>();
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
@@ -175,6 +178,8 @@ namespace GostDOC.ViewModels
             _docManager.Load();
             // Subscribe to drag and drop events
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
+            // Subscribe to load errors
+            _loadError.ErrorAdded += OnLoadError;
             // Update title
             UpdateTitle();
         }
@@ -718,6 +723,9 @@ namespace GostDOC.ViewModels
                 // Update visual data
                 UpdateData();
 
+                // Show errors
+                ShowErrors();
+
                 return true;
             }
             else
@@ -964,33 +972,41 @@ namespace GostDOC.ViewModels
                 Title.Value = WindowTitle + " - " + Path.GetFileName(_filePath);
             }
         }
-
         private void UpdateUndoRedoComponents()
         {
             // Update undo / redo stack
             _undoRedoComponents.Add(Components.GetMementos());
             UpdateUndoRedoMenu(_undoRedoComponents);
         }
-
         private void UpdateUndoRedoGraph()
         {
             // Update undo / redo stack
             _undoRedoGraphs.Add(GeneralGraphValues.GetMementos());
             UpdateUndoRedoMenu(_undoRedoGraphs);
         }
-
         private void HideTables()
         {
             IsSpecificationTableVisible.Value = false;
             IsBillTableVisible.Value = false;
             IsGeneralGraphValuesVisible.Value = false;
         }
-
         private void UpdateDocType(DocType aType)
         {
             _docType = aType;
             IsExportExcelEnabled.Value = _excelManager.CanExport(_docType);
             IsExportPdfEnabled.Value = _docType == DocType.Specification || _docType == DocType.Bill || _docType == DocType.ItemsList;
+        }
+        private void OnLoadError(object sender, TEventArgs<string> e)
+        {
+            _loadErrors.Add(e.Arg);
+        }
+        private void ShowErrors()
+        {
+            if (_loadErrors.Count > 0)
+            {
+                CommonDialogs.ShowLoadErrors(_loadErrors);
+                _loadErrors.Clear();
+            }
         }
     }
 }
