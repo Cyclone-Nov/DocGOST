@@ -128,10 +128,12 @@ public abstract class BasePreparer {
     /// <param name="aHasStandardDoc">признак наличия ГОСТ/ТУ символов в документе на поставку</param>
     /// <param name="component">компонент</param>
     /// <returns></returns>
-    protected string GetComponentName(bool aHasStandardDoc, Models.Component component) {
-        return (aHasStandardDoc)
-            ? component.GetProperty(Constants.ComponentName)
-            : $"{component.GetProperty(Constants.ComponentName)} {component.GetProperty(Constants.ComponentDoc)}";
+    protected string GetComponentName(bool aHasStandardDoc, Models.Component component) {        
+        if (aHasStandardDoc)
+        {
+            return $"{component.GetProperty(Constants.ComponentName)} {component.GetProperty(Constants.ComponentDoc)}";
+        }
+        return component.GetProperty(Constants.ComponentName);
     }
 
     /// <summary>

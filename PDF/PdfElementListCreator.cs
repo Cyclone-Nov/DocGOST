@@ -141,9 +141,11 @@ internal class PdfElementListCreator : PdfCreator {
         aInPdfDoc.Add(dataTable);
 
         // добавить таблицу с основной надписью для последуюших старницы
-        aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList}));
-        //titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -15f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
-        
+        //aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList}));
+        var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList });
+        titleBlock.SetFixedPosition(DATA_TABLE_LEFT, TOP_MARGIN + 4.01f, TITLE_BLOCK_WIDTH - 0.02f);
+        aInPdfDoc.Add(titleBlock);
+
         aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
         DrawLines(aPageNumber);
@@ -220,14 +222,14 @@ internal class PdfElementListCreator : PdfCreator {
                 ? 0
                 : (int) row[Constants.ColumnQuantity];
 
-            if (string.IsNullOrEmpty(name)) 
+            if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(position)) 
             {
                 AddEmptyRowToPdfTable(tbl, 1, 4, leftPaddCell, remainingPdfTableRows == 1 ? true : false);
                 remainingPdfTableRows--;
-            }
+            }            
             else if (string.IsNullOrEmpty(position) && quantity == 0) 
             {
-                // это наименование группы или перенос предыдущей строки?
+                // это наименование группы
                 if (remainingPdfTableRows > 4) 
                 {
                     // если есть место для записи более 4 строк то записываем группу, иначе выходим
@@ -247,11 +249,19 @@ internal class PdfElementListCreator : PdfCreator {
                     centrAlignCell.SetBorderBottom(THICK_BORDER);
                     leftPaddCell.SetBorderBottom(THICK_BORDER);
                 }
+
                 // просто запишем строку
                 tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
                 tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(name)));
-                tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity.ToString())));
+
+                if(string.IsNullOrEmpty(name))
+                    tbl.AddCell(centrAlignCell.Clone(false));
+                else
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity.ToString())));
+
                 tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));
+
+
                 remainingPdfTableRows--; 
             }
             outLastProcessedRow++;
