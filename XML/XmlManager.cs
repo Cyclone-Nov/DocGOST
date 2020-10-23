@@ -571,9 +571,15 @@ namespace GostDOC.Models
             {
                 string currentPos;
                 if (cmp.Properties.TryGetValue(Constants.ComponentDesignatiorID, out currentPos))
-                {
+                {                    
                     // Split ids
                     string[] split = currentPos.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    
+                    if (split.Length < 2)
+                    {
+                        // Not needed to process 1 or 0 values
+                        continue;
+                    }
 
                     // Sort ids
                     Array.Sort(split, (x, y) =>

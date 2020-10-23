@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Common;
@@ -10,6 +11,8 @@ namespace GostDOC.ExcelExport
 {
     class ExcelManager
     {
+        public event EventHandler ExportComplete;
+
         public bool CanExport(DocType aDocType)
         {
             return aDocType == DocType.D27 || aDocType == DocType.Specification || aDocType == DocType.Bill;
@@ -39,12 +42,14 @@ namespace GostDOC.ExcelExport
                 }
                 catch(Exception ex)
                 {
-
                 }
                 finally
                 {
                     // App quit
+                    app?.Application.Quit();
                     app?.Quit();
+
+                    ExportComplete?.Invoke(this, new EventArgs());
                 }
             });
         } 

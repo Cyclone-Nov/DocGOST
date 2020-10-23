@@ -91,6 +91,8 @@ namespace GostDOC.ExcelExport
             aApp.Sheets["1"].Select();
             // Save
             wb.SaveAs(aFilePath);
+                        // Close
+            wb.Close(false);
         }
 
         public void FillFirstSheet(Excel.Application aApp)
@@ -138,16 +140,16 @@ namespace GostDOC.ExcelExport
 
             int row = 3;
             while (row <= maxRows && _tableRow < _tbl.Rows.Count)
-            {
-                sheet.Cells[row, 4] = _tbl.GetTableValue<string>(_tableRow, 1); // Наименование
-                sheet.Cells[row, 5] = _tbl.GetTableValue<string>(_tableRow, 2);// Код продукции
-                sheet.Cells[row, 6] = _tbl.GetTableValue<string>(_tableRow, 3);// Обозначение документа на поставку
-                sheet.Cells[row, 7] = _tbl.GetTableValue<string>(_tableRow, 4);// Поставщик
-                sheet.Cells[row, 14] = _tbl.GetTableValue<string>(_tableRow, 5);// Куда входит (обозначение)
-                sheet.Cells[row, 19] = _tbl.GetTableValue<Int32>(_tableRow, 6);// Количество на изделие
-                sheet.Cells[row, 21] = _tbl.GetTableValue<Int32>(_tableRow, 7);// Количество в комплекты
-                sheet.Cells[row, 23] = _tbl.GetTableValue<Int32>(_tableRow, 8);// Количество на регулир.
-                sheet.Cells[row, 25] = _tbl.GetTableValue<Int32>(_tableRow, 9);// Количество всего
+            {                
+                sheet.Cells[row, 4] = _tbl.GetTableValue(_tableRow, 1); // Наименование
+                sheet.Cells[row, 5] = _tbl.GetTableValue(_tableRow, 2);// Код продукции
+                sheet.Cells[row, 6] = _tbl.GetTableValue(_tableRow, 3);// Обозначение документа на поставку
+                sheet.Cells[row, 7] = _tbl.GetTableValue(_tableRow, 4);// Поставщик
+                sheet.Cells[row, 14] = _tbl.GetTableValue(_tableRow, 5);// Куда входит (обозначение)
+                sheet.Cells[row, 19] = _tbl.GetTableValue<int>(_tableRow, 6);// Количество на изделие
+                sheet.Cells[row, 21] = _tbl.GetTableValue<int>(_tableRow, 7);// Количество в комплекты
+                sheet.Cells[row, 23] = _tbl.GetTableValue<int>(_tableRow, 8);// Количество на регулир.
+                sheet.Cells[row, 25] = _tbl.GetTableValue<int>(_tableRow, 9);// Количество всего
                 sheet.Cells[row, 28] = _tbl.GetTableValue(_tableRow, 11);// Примечание
                 
                 row++;

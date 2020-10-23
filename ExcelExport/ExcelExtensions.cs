@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -53,6 +54,16 @@ namespace GostDOC.ExcelExport
         }
 
         public static string GetTableValue(this DataTable tbl, int row, int col)
+        {
+            var val = tbl.Rows[row].ItemArray[col];
+            if (val != System.DBNull.Value)
+            {
+                return val.ToString();
+            }
+            return string.Empty;
+        }
+
+        public static string GetTableValueFS(this DataTable tbl, int row, int col)
         {
             var val = tbl.Rows[row].ItemArray[col];
             if (val != System.DBNull.Value)

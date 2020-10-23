@@ -51,6 +51,8 @@ namespace GostDOC.ViewModels
         private ErrorHandler _loadError = ErrorHandler.Instance;
         private List<string> _loadErrors = new List<string>();
 
+        private Progress _progress = null;
+
         public ObservableProperty<string> Title { get; } = new ObservableProperty<string>();
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
@@ -180,6 +182,8 @@ namespace GostDOC.ViewModels
             DragDropFile.FileDropped += OnDragDropFile_FileDropped;
             // Subscribe to load errors
             _loadError.ErrorAdded += OnLoadError;
+            // Subscribe to export complete event
+            _excelManager.ExportComplete += OnExportComplete;
             // Update title
             UpdateTitle();
         }
@@ -642,7 +646,9 @@ namespace GostDOC.ViewModels
                 var path = CommonDialogs.SaveFileAs("Excel Files *.xlsx | *.xlsx", "Сохранить файл");
                 if (!string.IsNullOrEmpty(path))
                 {
+                    _progress = new Progress();
                     _excelManager.Export(_docType, path);
+                    _progress.ShowDialog();
                 }
             }
         }
@@ -1007,6 +1013,17 @@ namespace GostDOC.ViewModels
                 CommonDialogs.ShowLoadErrors(_loadErrors);
                 _loadErrors.Clear();
             }
+        }
+        private void OnExportComplete(object sender, EventArgs e)
+        {
+            DispatcherHelper.CheckBeginInvokeOnUI(() =>
+            {
+                if (_progress != null)
+                {
+                    _progress.Close();
+                    _progress = null;
+                }
+            }); 
         }
     }
 }
