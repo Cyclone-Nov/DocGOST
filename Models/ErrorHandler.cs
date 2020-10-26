@@ -9,6 +9,8 @@ namespace GostDOC.Models
 {
     class ErrorHandler
     {
+        private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
+
         #region Singleton
         private static readonly Lazy<ErrorHandler> _instance = new Lazy<ErrorHandler>(() => new ErrorHandler(), true);
         public static ErrorHandler Instance => _instance.Value;
@@ -22,6 +24,8 @@ namespace GostDOC.Models
         public void Error(string aError)
         {
             ErrorAdded?.Invoke(this, new TEventArgs<string>(aError));
+
+            _log.Error(aError);
         }
     }
 }

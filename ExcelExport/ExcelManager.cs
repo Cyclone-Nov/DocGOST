@@ -11,6 +11,8 @@ namespace GostDOC.ExcelExport
 {
     class ExcelManager
     {
+        private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
+
         public event EventHandler ExportComplete;
 
         public bool CanExport(DocType aDocType)
@@ -42,6 +44,7 @@ namespace GostDOC.ExcelExport
                 }
                 catch(Exception ex)
                 {
+                    _log.Error(ex);
                 }
                 finally
                 {
