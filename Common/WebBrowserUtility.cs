@@ -63,8 +63,11 @@ namespace GostDOC.Common
                 if (data != null)
                 {
                     var http = HttpDataToBrowser.Instance;
-                    http.SetData(data);
-                    browser.Navigate(new Uri(http.HostUri), string.Empty, null, null);
+                    lock (http)
+                    {
+                        http.SetData(data);
+                        browser.Navigate(new Uri(http.HostUri), string.Empty, null, null);
+                    }
                 }
                 else
                 {
