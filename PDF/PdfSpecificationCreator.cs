@@ -186,7 +186,7 @@ namespace GostDOC.PDF
                 .SetFont(f1)
                 .SetBorderLeft(THICK_BORDER)
                 .SetBorderRight(THICK_BORDER)
-                .SetFontSize(14);
+                .SetFontSize(Constants.SpecificationFontSize);
             Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2)
                 .SetHeight(8 * PdfDefines.mmAXh)
                 .SetTextAlignment(TextAlignment.LEFT)
@@ -194,7 +194,7 @@ namespace GostDOC.PDF
                 .SetFont(f1)
                 .SetBorderLeft(THICK_BORDER)
                 .SetBorderRight(THICK_BORDER)
-                .SetFontSize(14);
+                .SetFontSize(Constants.SpecificationFontSize);
 
             int remainingPdfTableRows = (aDataTableStruct.FirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
             outLastProcessedRow = aStartRow;
