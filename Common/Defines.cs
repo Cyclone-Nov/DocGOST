@@ -97,6 +97,29 @@ namespace GostDOC.Common
             return string.Empty;
         }
 
+        /// <summary>
+        /// Получить строку с кодом документа по типу документа
+        /// </summary>
+        /// <param name="aDocType">Type of a document.</param>
+        /// <returns></returns>
+        public static string GetDocumentName(DocType aDocType, bool aFullName = true)
+        {
+            switch (aDocType)
+            {
+                case DocType.Bill:
+                    return aFullName ? @"Ведомость покупных изделий" : @"ВП";
+                case DocType.ItemsList:
+                    return aFullName ? @"Перечень элементов":@"ПЭ3";
+                case DocType.Specification:
+                    return aFullName ? @"Спецификация" : @"СП";
+                case DocType.D27:
+                    return @"Ведомость комплектации";
+                case DocType.None:
+                    return string.Empty;
+            }
+            return string.Empty;
+        }
+
     }
 
     public static class Constants {
@@ -202,7 +225,7 @@ namespace GostDOC.Common
         /// <summary>
         /// название графы №25 Первичное применение изделия в структуре xml
         /// </summary>
-        public static readonly string GRAPH_25 = "Перв. примен";
+        public static readonly string GRAPH_25 = "Первичная применяемость";
 
         public static readonly string GRAPH_27 = "";
         public static readonly string GRAPH_28 = "";
@@ -391,5 +414,14 @@ namespace GostDOC.Common
         public static readonly string TemplatesFolder = "Templates";
         public static readonly string SpecificationTemplateName = "specification";
         public static readonly string BillTemplateName = "purchased_items_list";
+
+
+        #region Шрифты
+
+        public static readonly float SpecificationFontSize = 12.0f;
+        public static readonly float BillFontSize = 12.0f;
+        public static readonly float ItemListFontSize = 12.0f;
+
+        #endregion
     }
 }
