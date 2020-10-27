@@ -172,7 +172,7 @@ namespace GostDOC.DataPreparation
                 }
 
                 var row = aTable.NewRow();
-                row[Constants.ColumnName] = configName;
+                row[Constants.ColumnName] = new FormattedString {Value = configName};
                 row[Constants.ColumnTextFormat] = "1";
                 aTable.Rows.Add(row);
                 AddEmptyRow(aTable);
