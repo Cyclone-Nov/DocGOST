@@ -101,11 +101,14 @@ namespace GostDOC.PDF
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
             var titleBlock = CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, CurrentPage = 1,  DocType = DocType.Bill});
-            titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -15f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -14.7f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
             aInDoc.Add(titleBlock);
 
             var dataTable = CreateTable(aData, true, 0, out var lpr);
-            dataTable.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, PdfDefines.A3Width - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 15f, COLUMN_SIZES.Sum() + 8*mmW() +0.5f);
+            dataTable.SetFixedPosition(
+                APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, 
+                PdfDefines.A3Width - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 22f, 
+                COLUMN_SIZES.Sum() +13.25f);
             aInDoc.Add(dataTable);
 
             DrawLines(1);
