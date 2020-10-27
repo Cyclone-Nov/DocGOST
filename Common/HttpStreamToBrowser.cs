@@ -39,13 +39,14 @@ namespace GostDOC.Common
             System.Net.IPEndPoint[] tcpListenersArray = IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners();
             bool portIsBusy = tcpListenersArray.Any(tcp => tcp.Port == port);
             return portIsBusy;
-        } 
+        }
 
-        public void SetData(byte[] aData)
+        public IAsyncResult SetData(byte[] aData)
         {
-            _httpListener.BeginGetContext((ar) => {
+            return _httpListener.BeginGetContext((ar) => {
 
-                HttpListenerContext context = _httpListener.EndGetContext(ar);
+                var listener = (HttpListener)ar.AsyncState;
+                HttpListenerContext context = listener.EndGetContext(ar);
 
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
@@ -63,8 +64,8 @@ namespace GostDOC.Common
                 }
 
                 response.Close();
-            }, null);
+            }, _httpListener);
         }
-        
+
     }
 }
