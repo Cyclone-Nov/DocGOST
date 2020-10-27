@@ -381,9 +381,8 @@ namespace GostDOC.DataPreparation
         {
             AddEmptyRow(aTable);
             var row = aTable.NewRow();
-            row[Constants.ColumnName] = "Переменные данные";
-            row[Constants.ColumnProductCode] = "исполнений";
-            //row[Constants.ColumnDeliveryDocSign] = ;
+            row[Constants.ColumnName] = new FormattedString{Value= "Переменные данные"};
+            row[Constants.ColumnProductCode] = new FormattedString{Value = "исполнений"};
             aTable.Rows.Add(row);
             AddEmptyRow(aTable);
         }
