@@ -633,8 +633,8 @@ namespace GostDOC.ViewModels
 
                 string filename = string.Empty;
                 if (!string.IsNullOrEmpty(_filePath))
-                {
-                    filename = $"{_docType.ToString()} {Path.GetFileNameWithoutExtension(_filePath)}.pdf";
+                {                    
+                    filename = $"{Path.GetFileNameWithoutExtension(_filePath)} {Common.Converters.GetDocumentName(_docType)}.pdf";
                 }
                 var path = CommonDialogs.SaveFileAs("PDF files (*.pdf) | *.pdf", "Сохранить файл", filename);
                 if (!string.IsNullOrEmpty(path))
