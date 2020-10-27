@@ -239,7 +239,7 @@ namespace GostDOC.DataPreparation
             var sort = SortFactory.GetSort(sortType);
 
             var сomponents = sort.Sort(group.Components.ToList());
-            AddComponents(aTable, сomponents, ref aPos, aGroupName != Constants.GroupDoc);
+            AddComponents(aTable, сomponents, ref aPos, !string.Equals(aGroupName, Constants.GroupDoc));
 
             // добавляем подгруппы
             foreach (var subgroup in group.SubGroups.OrderBy(key => key.Key))
