@@ -240,14 +240,26 @@ namespace GostDOC.DataPreparation
 
             var сomponents = sort.Sort(group.Components.ToList());
             AddComponents(aTable, сomponents, ref aPos, !string.Equals(aGroupName, Constants.GroupDoc));
+            
+            if (сomponents.Count > 0 && group.SubGroups.Count > 0)
+            {
+                AddEmptyRow(aTable);
+            }
 
             // добавляем подгруппы
             foreach (var subgroup in group.SubGroups.OrderBy(key => key.Key))
             {
                 if (subgroup.Value.Components.Count > 0)
                 {
+                    var subgroupNamesArr = subgroup.Key.Split(new char[] {'\\'});
+                    string subGroupName = string.Empty;
+                    if (subgroupNamesArr.Length == 2 && subgroup.Value.Components.Count > 1)                    
+                        subGroupName = subgroupNamesArr[1];                    
+                    else
+                        subGroupName = subgroupNamesArr[0];
+
                     var mainсomponents = sort.Sort(subgroup.Value.Components.ToList());
-                    AddSubgroup(aTable, subgroup.Key, mainсomponents, ref aPos);
+                    AddSubgroup(aTable, subGroupName, mainсomponents, ref aPos);
                 }
             }
 
@@ -286,10 +298,11 @@ namespace GostDOC.DataPreparation
                 string component_name = component.GetProperty(Constants.ComponentName);
                 uint component_count = component.Count;// GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
 
-                string[] namearr = PdfUtils.SplitStringByWidth(63, component_name).ToArray();
+                string[] namearr = PdfUtils.SplitStringByWidth(60, component_name, Constants.SpecificationFontSize).ToArray();
                 var desigantor_id = component.GetProperty(Constants.ComponentDesignatiorID);
+
                 var note = string.IsNullOrEmpty(desigantor_id) ? component.GetProperty(Constants.ComponentNote) : desigantor_id;
-                string[] notearr = PdfUtils.SplitStringByWidth(22, note).ToArray();
+                string[] notearr = PdfUtils.SplitStringByWidth(22, note, Constants.SpecificationFontSize).ToArray();
 
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString { Value = component.GetProperty(Constants.ComponentFormat) };

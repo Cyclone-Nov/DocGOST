@@ -690,7 +690,7 @@ namespace GostDOC.Models
                     Component cp = gp.Value.Components.First();
                     string type = cp.GetProperty(Constants.ComponentType);
                     string name = cp.GetProperty(Constants.ComponentName);
-                    cp.SetPropertyValue(Constants.ComponentName, type + " " + name);
+                    cp.SetPropertyValue(Constants.ComponentName, name);//type + " " + name);
                     // Move component to parent group
                     aGroup.Components.Add(cp);
                     // Remove subgroup

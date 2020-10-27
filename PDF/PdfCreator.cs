@@ -720,6 +720,32 @@ namespace GostDOC.PDF
             return c;
         }
 
+        protected static Cell CreateAppendGraphWideTextCell(float height, string text = null)
+        {
+            var c = new Cell();
+            if (text != null)
+            {
+                c.Add(
+                    new Paragraph(text)
+                        .SetFont(f1)
+                        .SetFontSize(14)
+                        .SetRotationAngle(DegreesToRadians(90))
+                        .SetFixedLeading(10)
+                        .SetPadding(0)
+                        .SetPaddingTop(3)
+                        .SetPaddingRight(-10)
+                        .SetPaddingLeft(-10)
+                        .SetMargin(0)
+                        .SetItalic()
+                        .SetWidth(height)
+                        .SetTextAlignment(TextAlignment.CENTER));
+            }
+
+            c.SetHorizontalAlignment(HorizontalAlignment.CENTER).SetVerticalAlignment(VerticalAlignment.MIDDLE).SetMargin(0)
+                .SetPadding(0).SetHeight(height).SetBorder(new SolidBorder(2));
+
+            return c;
+        }
 
         /// <summary>
         /// создать таблицу для верхней дополнительной графы
@@ -729,8 +755,8 @@ namespace GostDOC.PDF
         float[] columnSizes = {5 * mmW(), 7 * mmW()};
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
-            tbl.AddCell(CreateAppendGraphCell(60 * mmW(), "Перв. примен."));
-            tbl.AddCell(CreateAppendGraphCell(60 * mmW()));
+            tbl.AddCell(CreateAppendGraphCell(60 * mmW(), "Перв. примен."));            
+            tbl.AddCell(CreateAppendGraphWideTextCell(60 * mmW(), GetGraphByName(aGraphs, Constants.GRAPH_25)));
 
             tbl.AddCell(CreateAppendGraphCell(60 * mmW(), "Справ. №"));
             tbl.AddCell(CreateAppendGraphCell(60 * mmW()));
