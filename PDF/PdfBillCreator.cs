@@ -137,7 +137,7 @@ namespace GostDOC.PDF
             
             int lastNextProcessedRow;
             var dataTable = CreateTable(aData, false, aStartRow, out lastNextProcessedRow);
-            dataTable.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, PdfDefines.A3Width - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 15f, COLUMN_SIZES.Sum() + 8*mmW() +0.5f);
+            dataTable.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, PdfDefines.A3Width - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 15f, COLUMN_SIZES.Sum() + 0*mmW() +13.25f);
             aInDoc.Add(dataTable);
 
             DrawLines(aPageNumber);
@@ -283,7 +283,7 @@ namespace GostDOC.PDF
                     inc++;
                     var cell = centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString()));
                     if (j + 1 == rowNumber)
-                        cell.SetBorderBottom(new SolidBorder(THICK_LINE_WIDTH));
+                        cell.SetBorderBottom(THICK_BORDER);
                     tbl.AddCell(cell);                      
                     
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS-1, centrAlignCell, (j+1 == rowNumber) ? true : false);
