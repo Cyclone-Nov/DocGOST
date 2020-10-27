@@ -29,11 +29,6 @@ namespace GostDOC.PDF
         protected static PdfFont f1 = PdfDefines.MainFont;
         protected readonly float DATA_TABLE_LEFT = 19.3f * mmW() - TO_LEFT_CORRECTION;
 
-        /// <summary>
-        /// The save path
-        /// </summary>
-        public readonly string SavePath;
-
         public readonly DocType Type;
         
         internal readonly PageSize _pageSize;
@@ -51,12 +46,12 @@ namespace GostDOC.PDF
         protected static readonly float LEFT_MARGIN_MM = 8;
         protected static readonly float RIGHT_MARGIN_MM = 5;
 
-        protected static readonly float TO_LEFT_CORRECTION = 10;
+        protected static readonly float TO_LEFT_CORRECTION = 0;
 
 
-        protected static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH() - 3;
+        protected static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH()/* - 3*/;
         protected static readonly float LEFT_MARGIN = LEFT_MARGIN_MM * mmW();
-        protected static readonly float TOP_MARGIN = TOP_MARGIN_MM * mmH()-7;
+        protected static readonly float TOP_MARGIN = TOP_MARGIN_MM * mmH()/*-7*/;
         protected static readonly float RIGHT_MARGIN = RIGHT_MARGIN_MM * mmW();
 
         protected const float THICK_LINE_WIDTH = 2f;
@@ -64,13 +59,13 @@ namespace GostDOC.PDF
         protected const float THIN_LINE_WIDTH = 0.5f; 
 
         protected static readonly float TITLE_BLOCK_WIDTH_MM = 185;
-        protected static readonly float TITLE_BLOCK_WIDTH = TITLE_BLOCK_WIDTH_MM * mmW()+TO_LEFT_CORRECTION*2;
+        protected static readonly float TITLE_BLOCK_WIDTH = TITLE_BLOCK_WIDTH_MM * mmW() + TO_LEFT_CORRECTION*2;
         protected static readonly float DEFAULT_TITLE_BLOCK_CELL_HEIGHT = 5 * mmH();
         protected static readonly float TITLE_BLOCK_FIRST_PAGE_FULL_HEIGHT_MM = (15 + 5 + 5 + 15 + 8 + 14);
         protected static readonly float TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM = (15 + 5 + 5 + 15);
 
 
-        protected readonly float TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE = (5 + 287 - 60 * 2) * mmW();
+        protected readonly float TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE = (5 + 287 - 60 * 2) * mmH();
         protected readonly float APPEND_GRAPHS_LEFT = (20 - 5 - 7) * mmW() - TO_LEFT_CORRECTION;
         protected readonly float APPEND_GRAPHS_WIDTH = (5 + 7) * mmW();
 
@@ -178,6 +173,11 @@ namespace GostDOC.PDF
         }
 
         protected void SetPageMargins(iText.Layout.Document aDoc) {
+            aDoc.SetLeftMargin(0);
+            aDoc.SetRightMargin(0);
+            aDoc.SetTopMargin(0);
+            aDoc.SetBottomMargin(0);
+            return;
             aDoc.SetLeftMargin(LEFT_MARGIN);
             aDoc.SetRightMargin(RIGHT_MARGIN);
             aDoc.SetTopMargin(TOP_MARGIN);
@@ -737,8 +737,8 @@ namespace GostDOC.PDF
 
             tbl.SetFixedPosition(
                 APPEND_GRAPHS_LEFT, 
-                PdfDefines.A4Height - (TOP_MARGIN + GetTableHeight(tbl, 1)) + 5.5f,
-                //TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE, 
+                PdfDefines.A4Height - (TOP_MARGIN + GetTableHeight(tbl, 1)) /*+ 5.5f*/,
+                // TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE, 
                 APPEND_GRAPHS_WIDTH);
 
             return tbl;
@@ -800,7 +800,7 @@ namespace GostDOC.PDF
 
             if (size.GetWidth() == PageSize.A4.GetWidth())
             {
-                bottom = -2;
+                bottom = /*-2*/0;
                 left = (7 + 10 + 32 + 15 + 10 + 14) * mmW() - TO_LEFT_CORRECTION;
                 next_left = (7 + 10 + 32 + 15 + 10 + 70) * mmW() + 20 - TO_LEFT_CORRECTION;
                 text = "Формат А4";

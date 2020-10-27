@@ -69,8 +69,6 @@ namespace GostDOC.PDF
                 AddRegisterList(_doc, graphs, _currentPageNumber);
             }
             
-            //AddPageCountOnFirstPage(_doc, _currentPageNumber);
-
             _doc.Close();            
         }
 
@@ -83,8 +81,8 @@ namespace GostDOC.PDF
             var dataTable = CreateDataTable(new DataTableStruct{Data=aData, FirstPage = true, StartRow = 0}, out var lastProcessedRow);
             dataTable.SetFixedPosition(
                 DATA_TABLE_LEFT,
-                PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 5.51f,
-                TITLE_BLOCK_WIDTH - 0.02f);
+                PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN),
+                TITLE_BLOCK_WIDTH /*- 0.02f*/);
 
             aInDoc.Add(dataTable);
             
@@ -107,19 +105,22 @@ namespace GostDOC.PDF
         }
 
         internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNamuber, int aStartRow) {
+
+            SetPageMargins(aInDoc);
+
             aInDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
             SetPageMargins(aInDoc);
             var dataTable = CreateDataTable(new DataTableStruct{Graphs = aGraphs, Data = aData, FirstPage = false, StartRow = aStartRow}, out var lastProcessedRow);
             dataTable.SetFixedPosition(
                 DATA_TABLE_LEFT,
-                PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 5.51f,
+                PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN),
                 TITLE_BLOCK_WIDTH);
             aInDoc.Add(dataTable);
             
             // добавить таблицу с основной надписью             
             var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNamuber, DocType = DocType.Specification });
-            titleBlock.SetFixedPosition(DATA_TABLE_LEFT, TOP_MARGIN + 4.01f, TITLE_BLOCK_WIDTH - 0.02f);
+            titleBlock.SetFixedPosition(DATA_TABLE_LEFT, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH - 0.02f);
             aInDoc.Add(titleBlock);
 
 
@@ -137,8 +138,8 @@ namespace GostDOC.PDF
 
         void AddDataTableHeader(Table aTable) {
 
-            Cell headerCell = new Cell().SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorder(THICK_BORDER).SetHeight(15*mmH());
-            Paragraph CreateParagraph(string text) => new Paragraph(text).SetFont(f1).SetItalic().SetTextAlignment(TextAlignment.CENTER).SetFontSize(14);
+            Cell headerCell = new Cell().SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorder(THICK_BORDER).SetHeight(15*mmH()).SetPadding(0);
+            Paragraph CreateParagraph(string text) => new Paragraph(text).SetFont(f1).SetItalic().SetTextAlignment(TextAlignment.CENTER).SetFontSize(14)/*.SetMargin(0)*/;
 
             Table AddHeaderCell90(string text) => 
                 aTable.AddCell(headerCell.Clone(false)
@@ -300,13 +301,6 @@ namespace GostDOC.PDF
             }
 
             return tbl;
-        }
-
-        private new void SetPageMargins(iText.Layout.Document aDoc) {
-            aDoc.SetLeftMargin(8 * mmW());
-            aDoc.SetRightMargin(5 * mmW());
-            aDoc.SetTopMargin(5 * mmW());
-            aDoc.SetBottomMargin(5 * mmW());
         }
 
         private void DrawLines(int pageNumber) {
