@@ -223,7 +223,7 @@ namespace GostDOC.PDF
                 string format = GetCellString(Constants.ColumnFormat);
                 string zone = GetCellString(Constants.ColumnZone);
                 string position = GetCellString(Constants.ColumnPosition);
-                string sign = GetCellString(Constants.ColumnSign);
+                var sign = GetCellStringFormatted(Constants.ColumnSign);
                 string note = GetCellString(Constants.ColumnFootnote);
 
                 var name = GetCellStringFormatted(Constants.ColumnName);
@@ -231,13 +231,13 @@ namespace GostDOC.PDF
                 void AddCellFormatted(BasePreparer.FormattedString fs) {
                     Cell c = null;
                     if (fs != null)
-                    {
+                    {                        
                         if (fs.TextAlignment == TextAlignment.CENTER)
                         {
-                            c = (centrAlignCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
-                        } else if (name.TextAlignment == TextAlignment.LEFT)
+                            c = (centrAlignCell.Clone(false).Add(new Paragraph(fs.Value))); // наименование
+                        } else if (fs.TextAlignment == TextAlignment.LEFT)
                         {
-                            c = (leftPaddCell.Clone(false).Add(new Paragraph(name.Value))); // наименование
+                            c = (leftPaddCell.Clone(false).Add(new Paragraph(fs.Value))); // наименование
                         }
                         if (fs.IsUnderlined) c.SetUnderline(0.5f, -1);
                     }
@@ -252,17 +252,20 @@ namespace GostDOC.PDF
                     ? 0
                     : (int) row[Constants.ColumnQuantity];
 
-                if (name == null && string.IsNullOrEmpty(note) ) {                    
+                if (name == null && sign == null && string.IsNullOrEmpty(note) ) {                    
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS, leftPaddCell, remainingPdfTableRows == 1 ? true : false);
                     remainingPdfTableRows--;
-                } else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(zone) && string.IsNullOrEmpty(sign) && string.IsNullOrEmpty(note))  {
+                } else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(zone) && string.IsNullOrEmpty(note))  {
                     // наименование группы
                     if (remainingPdfTableRows > 4)  {
                         // если есть место для записи более 4 строк то записываем группу, иначе выходим
                         tbl.AddCell(centrAlignCell.Clone(false)); // формат
                         tbl.AddCell(centrAlignCell.Clone(false)); // зона
                         tbl.AddCell(centrAlignCell.Clone(false)); // поз
-                        tbl.AddCell(centrAlignCell.Clone(false)); // обозначение
+                        if (sign == null)
+                            tbl.AddCell(centrAlignCell.Clone(false)); // обозначение
+                        else
+                            AddCellFormatted(sign);
                         AddCellFormatted(name);
                         tbl.AddCell(centrAlignCell.Clone(false)); // кол
                         tbl.AddCell(centrAlignCell.Clone(false)); // примеч.
@@ -279,7 +282,7 @@ namespace GostDOC.PDF
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(format))); // формат
                     tbl.AddCell(centrAlignCell.Clone(false)); // зона
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(sign))); // обозначение
+                    AddCellFormatted(sign); // обозначение
                     AddCellFormatted(name);
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity == 0 ? "" : quantity.ToString())));
                     tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));
