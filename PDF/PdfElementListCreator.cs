@@ -82,7 +82,7 @@ internal class PdfElementListCreator : PdfCreator {
         var dataTable = CreateDataTable(new DataTableStruct {Data = aData, FirstPage = true, StartRow = 0}, out var lastProcessedRow);
         dataTable.SetFixedPosition(
             DATA_TABLE_LEFT,
-            PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 5.51f,
+            PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN),
             TITLE_BLOCK_WIDTH);
         aInDoc.Add(dataTable);
 
@@ -136,7 +136,7 @@ internal class PdfElementListCreator : PdfCreator {
         var dataTable = CreateDataTable(new DataTableStruct{Data = aData, FirstPage =false, StartRow = aStartRow}, out var lastProcessedRow);
         dataTable.SetFixedPosition(
             DATA_TABLE_LEFT,
-            PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNumber) + TOP_MARGIN) + 5.51f,
+            PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNumber) + TOP_MARGIN),
             TITLE_BLOCK_WIDTH);
         aInPdfDoc.Add(dataTable);
 

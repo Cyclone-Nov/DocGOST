@@ -49,9 +49,9 @@ namespace GostDOC.PDF
         protected static readonly float TO_LEFT_CORRECTION = 0;
 
 
-        protected static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH()/* - 3*/;
+        protected static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH();
         protected static readonly float LEFT_MARGIN = LEFT_MARGIN_MM * mmW();
-        protected static readonly float TOP_MARGIN = TOP_MARGIN_MM * mmH()/*-7*/;
+        protected static readonly float TOP_MARGIN = TOP_MARGIN_MM * mmH();
         protected static readonly float RIGHT_MARGIN = RIGHT_MARGIN_MM * mmW();
 
         protected const float THICK_LINE_WIDTH = 2f;
@@ -833,7 +833,7 @@ namespace GostDOC.PDF
             }
             else
             {
-                bottom = -4;
+                bottom = 0;
                 left = (60 + 45 + 70 + 50 + 65) * mmW() - TO_LEFT_CORRECTION;
                 next_left = (60 + 45 + 70 + 50 + 32 + 100) * mmW() + 20 - TO_LEFT_CORRECTION;
                 text = "Формат А3";

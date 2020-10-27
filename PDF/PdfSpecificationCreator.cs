@@ -229,7 +229,7 @@ namespace GostDOC.PDF
                 var name = GetCellStringFormatted(Constants.ColumnName);
 
                 void AddCellFormatted(BasePreparer.FormattedString fs) {
-                    Cell c = null;
+                    Cell c = centrAlignCell.Clone(false);
                     if (fs != null)
                     {                        
                         if (fs.TextAlignment == TextAlignment.CENTER)
