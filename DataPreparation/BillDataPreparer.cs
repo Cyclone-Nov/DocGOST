@@ -236,18 +236,30 @@ namespace GostDOC.DataPreparation
 
             var data = aConfig.Bill;
 
-            foreach (var group in data.OrderBy(key => key.Key))
+            foreach (var group in data.OrderBy(key => key.Key).Where(key => !string.Equals(key.Key, Constants.SUBGROUPFORSINGLE)))
             {
                 if (group.Value.Components.Count() > 0 || group.Value.SubGroups.Count() > 0)
                 {
                     var mainсomponents = group.Value.Components;
-                    FillDataTable(aTable, group.Key, mainсomponents);
+                    string groupName = GetSubgroupNameByCount(group);
+                    FillDataTable(aTable, groupName, mainсomponents);
 
                     foreach (var subgroup in group.Value.SubGroups.OrderBy(key => key.Key))
                     {
                         var сomponents = subgroup.Value.Components;
-                        FillDataTable(aTable, subgroup.Key, сomponents);
+                        string subGroupName = GetSubgroupNameByCount(subgroup);
+                        FillDataTable(aTable, subGroupName, сomponents);
                     }
+                }
+            }
+
+            // отдельно запишем прогруппу "Прочие"
+            if (data.TryGetValue(Constants.SUBGROUPFORSINGLE, out var group_other))
+            {
+                if (group_other.Components.Count > 0)
+                {
+                    var mainсomponents = group_other.Components.ToList();
+                    FillDataTable(aTable, Constants.SUBGROUPFORSINGLE, mainсomponents);                    
                 }
             }
         }
@@ -304,10 +316,10 @@ namespace GostDOC.DataPreparation
             // записываем компоненты в таблицу данных
 
             // Cортировка компонентов по значению свойства "Позиционное обозначение"
-            Models.Component[] sortComponents = SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();            
+            Models.Component[] sortComponents = SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();
 
             // записываем наименование группы, если есть
-            if(AddGroupName(aTable, aGroupName))
+            if (AddGroupName(aTable, aGroupName))
                 AddEmptyRow(aTable);
 
             //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
@@ -374,11 +386,11 @@ namespace GostDOC.DataPreparation
 
                 // вчисляем длины полей и переносим на следующую строку при необходимости 
                 // разобьем наименование на несколько строк исходя из длины текста
-                string[] namearr = PdfUtils.SplitStringByWidth(60, name).ToArray();       
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.BIllColumn2NameWidth, name, Constants.BillFontSize).ToArray();       
                 var supplier = component.GetProperty(Constants.ComponentSupplier);                 
-                string[] supplierarr = PdfUtils.SplitStringByWidth(55, supplier).ToArray();
+                string[] supplierarr = PdfUtils.SplitStringByWidth(Constants.BIllColumn5SupplierWidth, supplier, Constants.BillFontSize).ToArray();
                 var note = component.GetProperty(Constants.ComponentNote);
-                string[] notearr = PdfUtils.SplitStringByWidth(24, note).ToArray();
+                string[] notearr = PdfUtils.SplitStringByWidth(Constants.BIllColumn11FootnoteWidth, note, Constants.BillFontSize).ToArray();
 
                 row = aTable.NewRow();
                 row[Constants.ColumnName] = namearr.First();

@@ -265,7 +265,11 @@ namespace GostDOC.Models
 
                     if (IsBillComponent(groups[0]))
                     {
-                        // Add to Bill
+                        // Add to Bill                        
+                        if (string.IsNullOrEmpty(groups[1].GroupName))
+                        {
+                            groups[1].GroupName = groups[0].SubGroupName;
+                        }
                         AddComponent(aNewCfg.Bill, component, groups[1]);
                     }
 

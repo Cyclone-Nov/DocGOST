@@ -29,17 +29,17 @@ namespace GostDOC.PDF
         private float MIDDLE_FONT_SIZE = 14;
 
         readonly float[] COLUMN_SIZES = {
-                7 * mmH()-4f,
-                60 * mmW(), 
-                45 * mmW(), 
-                70 * mmW(), 
-                55 * mmW(),
-                70 * mmW(),
-                16 * mmW(),
-                16 * mmW(),
-                16 * mmW(),
-                16 * mmW(),
-                24 * mmW(),
+                Constants.BIllColumn1IncWidth * mmH()-4f,
+                Constants.BIllColumn2NameWidth * mmW(),
+                Constants.BIllColumn3ProductCodeWidth * mmW(),
+                Constants.BIllColumn4DeliveryDocSignWidth * mmW(),
+                Constants.BIllColumn5SupplierWidth * mmW(),
+                Constants.BIllColumn6EntryWidth * mmW(),
+                Constants.BIllColumn7QuantityDeviceWidth * mmW(),
+                Constants.BIllColumn8QuantityComplexWidth * mmW(),
+                Constants.BIllColumn9QuantityRegulWidth * mmW(),
+                Constants.BIllColumn10QuantityTotalWidth * mmW(),
+                Constants.BIllColumn11FootnoteWidth * mmW(),
         };
 
         public PdfBillCreator() : base(DocType.Bill) {
@@ -165,7 +165,7 @@ namespace GostDOC.PDF
                 .SetFont(f1)
                 .SetBorderLeft(THICK_BORDER)
                 .SetBorderRight(THICK_BORDER)
-                .SetFontSize(14)
+                .SetFontSize(Constants.BillFontSize)
                 .SetHeight(CELL_HEIGHT);
             Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2)
                 .SetHeight(8 * PdfDefines.mmAXh)
@@ -174,7 +174,7 @@ namespace GostDOC.PDF
                 .SetFont(f1)
                 .SetBorderLeft(THICK_BORDER)
                 .SetBorderRight(THICK_BORDER)
-                .SetFontSize(14)
+                .SetFontSize(Constants.BillFontSize)
                 .SetHeight(CELL_HEIGHT);
 
             AddDataTableHeader(tbl);
@@ -222,7 +222,7 @@ namespace GostDOC.PDF
                 string textFormat         = GetCellString(Constants.ColumnTextFormat);
 
                 inc++;
-                if (string.IsNullOrEmpty(name) && quantityTotal == 0)  // это пустая строка
+                if (string.IsNullOrEmpty(name) && quantityTotal == 0 && string.IsNullOrEmpty(supplier))  // это пустая строка
                 {
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 1, leftPaddCell);
@@ -373,7 +373,7 @@ namespace GostDOC.PDF
             //}
             PdfPage page = _pdfDoc.GetPage(1);
             Canvas canvas = new Canvas(new PdfCanvas(page), page.GetMediaBox());
-            canvas.ShowTextAligned(paragraph, 640, 170, TextAlignment.LEFT);
+            canvas.ShowTextAligned(paragraph, 657, 170, TextAlignment.LEFT);
         }
     }
 }
