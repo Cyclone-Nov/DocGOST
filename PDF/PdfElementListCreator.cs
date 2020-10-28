@@ -177,7 +177,12 @@ internal class PdfElementListCreator : PdfCreator {
         var aFirstPage = aDataTableStruct.FirstPage;
         var aStartRow = aDataTableStruct.StartRow;
         
-        float[] columnSizes = {20 * mmW(), 110 * mmW(), 10 * mmW(), 45 * mmW()};
+        float[] columnSizes = {
+                Constants.ItemsListColumn1PositionWidth * mmW(),
+                Constants.ItemsListColumn2NameWidth * mmW(),
+                Constants.ItemsListColumn3QuantityWidth * mmW(),
+                Constants.ItemsListColumn4FootnoteWidth * mmW()};
+
         Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
         tbl.SetMargin(0).SetPadding(0);
 
@@ -190,13 +195,13 @@ internal class PdfElementListCreator : PdfCreator {
         tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Кол.")));
         tbl.AddHeaderCell(headerCell.Clone(false).Add(new Paragraph("Примечание")));
 
-        // fill table
+        // base cells
         Cell centrAlignCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 0)
             .SetHeight(8 * PdfDefines.mmAXh).SetTextAlignment(TextAlignment.CENTER).SetItalic().SetFont(f1)
-            .SetFontSize(14);
+            .SetFontSize(Constants.ItemListFontSize);
         Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2)
             .SetHeight(8 * PdfDefines.mmAXh).SetTextAlignment(TextAlignment.LEFT).SetItalic().SetFont(f1)
-            .SetFontSize(14);
+            .SetFontSize(Constants.ItemListFontSize);
 
         int remainingPdfTableRows = (aFirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
         outLastProcessedRow = aStartRow;

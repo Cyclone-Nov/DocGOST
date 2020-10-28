@@ -247,19 +247,23 @@ namespace GostDOC.DataPreparation
             }
 
             // добавляем подгруппы
-            foreach (var subgroup in group.SubGroups.OrderBy(key => key.Key))
+            foreach (var subgroup in group.SubGroups.OrderBy(key => key.Key).Where(key => !string.Equals(key.Key, Constants.SUBGROUPFORSINGLE)))
             {
                 if (subgroup.Value.Components.Count > 0)
                 {
-                    var subgroupNamesArr = subgroup.Key.Split(new char[] {'\\'});
-                    string subGroupName = string.Empty;
-                    if (subgroupNamesArr.Length == 2 && subgroup.Value.Components.Count > 1)                    
-                        subGroupName = subgroupNamesArr[1];                    
-                    else
-                        subGroupName = subgroupNamesArr[0];
-
+                    string subGroupName = GetSubgroupNameByCount(subgroup);
                     var mainсomponents = sort.Sort(subgroup.Value.Components.ToList());
                     AddSubgroup(aTable, subGroupName, mainсomponents, ref aPos);
+                }
+            }
+
+            // отдельно запишем прогруппу "Прочие"
+            if (group.SubGroups.TryGetValue(Constants.SUBGROUPFORSINGLE, out var subgroup_other))
+            {
+                if (subgroup_other.Components.Count > 0)
+                {   
+                    var mainсomponents = sort.Sort(subgroup_other.Components.ToList());
+                    AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, mainсomponents, ref aPos);
                 }
             }
 
@@ -298,11 +302,11 @@ namespace GostDOC.DataPreparation
                 string component_name = component.GetProperty(Constants.ComponentName);
                 uint component_count = component.Count;// GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
 
-                string[] namearr = PdfUtils.SplitStringByWidth(60, component_name, Constants.SpecificationFontSize).ToArray();
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth, component_name, Constants.SpecificationFontSize).ToArray();
                 var desigantor_id = component.GetProperty(Constants.ComponentDesignatiorID);
 
                 var note = string.IsNullOrEmpty(desigantor_id) ? component.GetProperty(Constants.ComponentNote) : desigantor_id;
-                string[] notearr = PdfUtils.SplitStringByWidth(22, note, Constants.SpecificationFontSize).ToArray();
+                string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth, note, Constants.SpecificationFontSize).ToArray();
 
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString { Value = component.GetProperty(Constants.ComponentFormat) };
@@ -313,10 +317,7 @@ namespace GostDOC.DataPreparation
                     row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString() };
                 }
 
-                string designation = component.GetProperty(Constants.ComponentSign);
-                //if (dataToFill.GroupName == Constants.GroupDoc) {
-                //designation += component.GetProperty(Constants.ComponentDocCode);
-                //}
+                string designation = component.GetProperty(Constants.ComponentSign);                
                 row[Constants.ColumnSign] = new FormattedString { Value = designation };
                 row[Constants.ColumnName] = new FormattedString { Value = namearr.First() };
                 row[Constants.ColumnQuantity] = component_count;

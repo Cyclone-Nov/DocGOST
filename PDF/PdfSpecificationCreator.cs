@@ -164,13 +164,13 @@ namespace GostDOC.PDF
             var aStartRow = aDataTableStruct.StartRow;
 
             float[] columnSizes = { 
-                6  * mmW(), 
-                6  * mmW(), 
-                8  * mmW(), 
-                70 * mmW(), 
-                63 * mmW(), 
-                10 * mmW(), 
-                22 * mmW()};
+                Constants.SpecificationColumn1FormatWidth  * mmW(),
+                Constants.SpecificationColumn2ZoneWidth  * mmW(),
+                Constants.SpecificationColumn3PositionWidth  * mmW(),
+                Constants.SpecificationColumn4SignWidth * mmW(),
+                Constants.SpecificationColumn5NameWidth * mmW(),
+                Constants.SpecificationColumn6QuantityWidth * mmW(),
+                Constants.SpecificationColumn7FootnoteWidth * mmW()};
 
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
             tbl.SetMargin(0).SetPadding(0);
