@@ -29,11 +29,6 @@ namespace GostDOC.PDF
         protected static PdfFont f1 = PdfDefines.MainFont;
         protected readonly float DATA_TABLE_LEFT = 19.3f * mmW() - TO_LEFT_CORRECTION;
 
-        /// <summary>
-        /// The save path
-        /// </summary>
-        public readonly string SavePath;
-
         public readonly DocType Type;
         
         internal readonly PageSize _pageSize;
@@ -51,12 +46,13 @@ namespace GostDOC.PDF
         protected static readonly float LEFT_MARGIN_MM = 8;
         protected static readonly float RIGHT_MARGIN_MM = 5;
 
-        protected static readonly float TO_LEFT_CORRECTION = 10;
+        protected static readonly float TO_LEFT_CORRECTION = 0;
+        protected static readonly float BOTTOM_CORRECTION = 0;
 
 
-        protected static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH() - 3;
+        protected static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH() + BOTTOM_CORRECTION;
         protected static readonly float LEFT_MARGIN = LEFT_MARGIN_MM * mmW();
-        protected static readonly float TOP_MARGIN = TOP_MARGIN_MM * mmH()-7;
+        protected static readonly float TOP_MARGIN = TOP_MARGIN_MM * mmH();
         protected static readonly float RIGHT_MARGIN = RIGHT_MARGIN_MM * mmW();
 
         protected const float THICK_LINE_WIDTH = 2f;
@@ -64,13 +60,13 @@ namespace GostDOC.PDF
         protected const float THIN_LINE_WIDTH = 0.5f; 
 
         protected static readonly float TITLE_BLOCK_WIDTH_MM = 185;
-        protected static readonly float TITLE_BLOCK_WIDTH = TITLE_BLOCK_WIDTH_MM * mmW()+TO_LEFT_CORRECTION*2;
+        protected static readonly float TITLE_BLOCK_WIDTH = TITLE_BLOCK_WIDTH_MM * mmW() + TO_LEFT_CORRECTION*2;
         protected static readonly float DEFAULT_TITLE_BLOCK_CELL_HEIGHT = 5 * mmH();
         protected static readonly float TITLE_BLOCK_FIRST_PAGE_FULL_HEIGHT_MM = (15 + 5 + 5 + 15 + 8 + 14);
         protected static readonly float TITLE_BLOCK_FIRST_PAGE_WITHOUT_APPEND_HEIGHT_MM = (15 + 5 + 5 + 15);
 
 
-        protected readonly float TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE = (5 + 287 - 60 * 2) * mmW();
+        protected readonly float TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE = (5 + 287 - 60 * 2) * mmH();
         protected readonly float APPEND_GRAPHS_LEFT = (20 - 5 - 7) * mmW() - TO_LEFT_CORRECTION;
         protected readonly float APPEND_GRAPHS_WIDTH = (5 + 7) * mmW();
 
@@ -178,6 +174,11 @@ namespace GostDOC.PDF
         }
 
         protected void SetPageMargins(iText.Layout.Document aDoc) {
+            aDoc.SetLeftMargin(0);
+            aDoc.SetRightMargin(0);
+            aDoc.SetTopMargin(0);
+            aDoc.SetBottomMargin(0);
+            return;
             aDoc.SetLeftMargin(LEFT_MARGIN);
             aDoc.SetRightMargin(RIGHT_MARGIN);
             aDoc.SetTopMargin(TOP_MARGIN);
@@ -198,14 +199,15 @@ namespace GostDOC.PDF
             var regTable = CreateRegisterTable();
             regTable.SetFixedPosition(
                 DATA_TABLE_LEFT,
-                PdfDefines.A4Height - (GetTableHeight(regTable, 1) + TOP_MARGIN) + 5.51f,
+                PdfDefines.A4Height - (GetTableHeight(regTable, 1) + TOP_MARGIN) /*+ 5.51f*/,
                 TITLE_BLOCK_WIDTH - 0.02f);
             aInPdfDoc.Add(regTable);
 
 
             // добавить таблицу с основной надписью для последуюших старницы
             var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = Type });
-            titleBlock.SetFixedPosition(DATA_TABLE_LEFT, TOP_MARGIN + 4.01f,
+            titleBlock.SetFixedPosition(DATA_TABLE_LEFT,
+                BOTTOM_MARGIN,
                 TITLE_BLOCK_WIDTH - 0.02f);
             aInPdfDoc.Add(titleBlock);
 
@@ -236,7 +238,7 @@ namespace GostDOC.PDF
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
             Paragraph CreateParagraph(string text) {
-                var style = new Style().SetTextAlignment(TextAlignment.CENTER).SetFontSize(12).SetFont(f1).SetPaddingTop(-2);
+                var style = new Style().SetTextAlignment(TextAlignment.CENTER).SetFontSize(12).SetFont(f1).SetPaddingTop(-2).SetItalic();
                 return new Paragraph(text).AddStyle(style);
             }
 
@@ -255,17 +257,17 @@ namespace GostDOC.PDF
             tbl.AddCell(CreateCell(1,4).Add(CreateParagraph("Номера листов (страниц)")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Всего листов (страниц) в докум.")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("№ докум.")));
-            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Входящий № сопроводительного докум. и дата")));
+            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Входящий № сопрово-\nдительного докум. и дата")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Подп.")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Дата")));
 
             tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("измененных")));
             tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("заменяемых")));
             tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("новых")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("аннулированных")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("анну-\nлированных")));
 
 
-            for (int i = 0; i < (RowNumberOnNextPage-4) * 10; ++i) {
+            for (int i = 0; i < (RowNumberOnNextPage-6) * 10; ++i) {
                 tbl.AddCell(new Cell().SetHeight(8*mmH()).SetPadding(0).SetBorderLeft(THICK_BORDER)).SetBorderRight(THICK_BORDER);
             }
             for (int i = 0; i < 10; ++i) {
@@ -720,6 +722,32 @@ namespace GostDOC.PDF
             return c;
         }
 
+        protected static Cell CreateAppendGraphWideTextCell(float height, string text = null)
+        {
+            var c = new Cell();
+            if (text != null)
+            {
+                c.Add(
+                    new Paragraph(text)
+                        .SetFont(f1)
+                        .SetFontSize(14)
+                        .SetRotationAngle(DegreesToRadians(90))
+                        .SetFixedLeading(10)
+                        .SetPadding(0)
+                        .SetPaddingTop(3)
+                        .SetPaddingRight(-10)
+                        .SetPaddingLeft(-10)
+                        .SetMargin(0)
+                        .SetItalic()
+                        .SetWidth(height)
+                        .SetTextAlignment(TextAlignment.CENTER));
+            }
+
+            c.SetHorizontalAlignment(HorizontalAlignment.CENTER).SetVerticalAlignment(VerticalAlignment.MIDDLE).SetMargin(0)
+                .SetPadding(0).SetHeight(height).SetBorder(new SolidBorder(2));
+
+            return c;
+        }
 
         /// <summary>
         /// создать таблицу для верхней дополнительной графы
@@ -729,16 +757,16 @@ namespace GostDOC.PDF
         float[] columnSizes = {5 * mmW(), 7 * mmW()};
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
-            tbl.AddCell(CreateAppendGraphCell(60 * mmW(), "Перв. примен."));
-            tbl.AddCell(CreateAppendGraphCell(60 * mmW()));
+            tbl.AddCell(CreateAppendGraphCell(60 * mmW(), "Перв. примен."));            
+            tbl.AddCell(CreateAppendGraphWideTextCell(60 * mmW(), GetGraphByName(aGraphs, Constants.GRAPH_25)));
 
             tbl.AddCell(CreateAppendGraphCell(60 * mmW(), "Справ. №"));
             tbl.AddCell(CreateAppendGraphCell(60 * mmW()));
 
             tbl.SetFixedPosition(
                 APPEND_GRAPHS_LEFT, 
-                PdfDefines.A4Height - (TOP_MARGIN + GetTableHeight(tbl, 1)) + 5.5f,
-                //TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE, 
+                PdfDefines.A4Height - (TOP_MARGIN + GetTableHeight(tbl, 1)) /*+ 5.5f*/,
+                // TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE, 
                 APPEND_GRAPHS_WIDTH);
 
             return tbl;
@@ -800,14 +828,15 @@ namespace GostDOC.PDF
 
             if (size.GetWidth() == PageSize.A4.GetWidth())
             {
-                bottom = -2;
+                bottom = BOTTOM_MARGIN - BOTTOM_MARGIN_MM * mmH();
                 left = (7 + 10 + 32 + 15 + 10 + 14) * mmW() - TO_LEFT_CORRECTION;
                 next_left = (7 + 10 + 32 + 15 + 10 + 70) * mmW() + 20 - TO_LEFT_CORRECTION;
                 text = "Формат А4";
             }
             else
             {
-                bottom = -4;
+                //bottom = 0;
+                bottom = BOTTOM_MARGIN - BOTTOM_MARGIN_MM * mmH();
                 left = (60 + 45 + 70 + 50 + 65) * mmW() - TO_LEFT_CORRECTION;
                 next_left = (60 + 45 + 70 + 50 + 32 + 100) * mmW() + 20 - TO_LEFT_CORRECTION;
                 text = "Формат А3";

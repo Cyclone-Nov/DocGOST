@@ -81,10 +81,11 @@ namespace GostDOC.UI
             }
         }
 
-        public static string SaveFileAs(string aFilter, string aTitle)
+        public static string SaveFileAs(string aFilter, string aTitle, string aFilename = "")
         {
             SaveFileDialog save = new SaveFileDialog();
             save.Filter = aFilter;
+            save.FileName = aFilename;
             save.Title = aTitle;
             if (save.ShowDialog() == DialogResult.OK)
             {

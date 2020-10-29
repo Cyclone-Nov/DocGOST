@@ -97,6 +97,29 @@ namespace GostDOC.Common
             return string.Empty;
         }
 
+        /// <summary>
+        /// Получить строку с кодом документа по типу документа
+        /// </summary>
+        /// <param name="aDocType">Type of a document.</param>
+        /// <returns></returns>
+        public static string GetDocumentName(DocType aDocType, bool aFullName = true)
+        {
+            switch (aDocType)
+            {
+                case DocType.Bill:
+                    return aFullName ? @"Ведомость покупных изделий" : @"ВП";
+                case DocType.ItemsList:
+                    return aFullName ? @"Перечень элементов":@"ПЭ3";
+                case DocType.Specification:
+                    return aFullName ? @"Спецификация" : @"СП";
+                case DocType.D27:
+                    return @"Ведомость комплектации";
+                case DocType.None:
+                    return string.Empty;
+            }
+            return string.Empty;
+        }
+
     }
 
     public static class Constants {
@@ -202,7 +225,7 @@ namespace GostDOC.Common
         /// <summary>
         /// название графы №25 Первичное применение изделия в структуре xml
         /// </summary>
-        public static readonly string GRAPH_25 = "Перв. примен";
+        public static readonly string GRAPH_25 = "Первичная применяемость";
 
         public static readonly string GRAPH_27 = "";
         public static readonly string GRAPH_28 = "";
@@ -259,6 +282,8 @@ namespace GostDOC.Common
 
         #endregion
 
+
+        public static readonly string SUBGROUPFORSINGLE = "Прочие";
 
         public static readonly string Settings = "Settings";
 
@@ -366,7 +391,108 @@ namespace GostDOC.Common
         /// Если не пусто, то это заголовок, иначе перенос строки
         /// </summary>
         public static readonly string ColumnTextFormat = "TextFormat";
-        
+
+
+        #endregion
+
+        #region Размер столбцов        
+
+        #region Ведомость покупных изделий
+        /// <summary>
+        /// Ширина столбца "№ строки" ведомости покупных изделий
+        /// </summary>
+        public static readonly float BIllColumn1IncWidth             = 7.0f;
+        /// <summary>
+        /// Ширина столбца "Наименование" ведомости покупных изделий
+        /// </summary>
+        public static readonly float BIllColumn2NameWidth            = 60.0f;
+        /// <summary>
+        /// Ширина столбца "Код продукции" ведомости покупных изделий
+        /// </summary>
+        public static readonly float BIllColumn3ProductCodeWidth     = 45.0f;
+        /// <summary>
+        /// Ширина столбца "Обозначение документа на поставку" ведомости покупных изделий
+        /// </summary>
+        public static readonly float BIllColumn4DeliveryDocSignWidth = 70.0f;
+        /// <summary>
+        /// Ширина столбца "Поставщик" ведомости покупных изделий
+        /// </summary>
+        public static readonly float BIllColumn5SupplierWidth        = 55.0f;
+        /// <summary>
+        /// Ширина столбца "Куда входит (обозначение)" ведомости покупных изделий
+        /// </summary>
+        public static readonly float BIllColumn6EntryWidth           = 70.0f;
+        /// <summary>
+        /// Ширина столбца "Количество: на изделие" ведомости покупных изделий
+        /// </summary>
+        public static readonly float BIllColumn7QuantityDeviceWidth  = 16.0f;
+        /// <summary>
+        /// Ширина столбца "Количество: в комплекты" ведомости покупных изделий
+        /// </summary>
+        public static readonly float BIllColumn8QuantityComplexWidth = 16.0f;
+        /// <summary>
+        /// Ширина столбца "Количество: на регулир." ведомости покупных изделий
+        /// </summary>
+        public static readonly float BIllColumn9QuantityRegulWidth   = 16.0f;
+        /// <summary>
+        /// Ширина столбца "Количество: всего" ведомости покупных изделий
+        /// </summary>
+        public static readonly float BIllColumn10QuantityTotalWidth  = 16.0f;
+        /// <summary>
+        /// Ширина столбца "Примечание" ведомости покупных изделий
+        /// </summary>
+        public static readonly float BIllColumn11FootnoteWidth       = 24.0f;
+        #endregion Ведомость покупных изделий
+
+        #region Спецификация
+        /// <summary>
+        /// Ширина столбца "Формат" спецификации
+        /// </summary>
+        public static readonly float SpecificationColumn1FormatWidth   = 6.0f;
+        /// <summary>
+        /// Ширина столбца "Зона" спецификации
+        /// </summary>
+        public static readonly float SpecificationColumn2ZoneWidth     = 6.0f;
+        /// <summary>
+        /// Ширина столбца "Поз." спецификации
+        /// </summary>
+        public static readonly float SpecificationColumn3PositionWidth = 8.0f;
+        /// <summary>
+        /// Ширина столбца "Обозначение" спецификации
+        /// </summary>
+        public static readonly float SpecificationColumn4SignWidth     = 70.0f;
+        /// <summary>
+        /// Ширина столбца "Наименование" спецификации
+        /// </summary>
+        public static readonly float SpecificationColumn5NameWidth     = 63.0f;
+        /// <summary>
+        /// Ширина столбца "Кол." спецификации
+        /// </summary>
+        public static readonly float SpecificationColumn6QuantityWidth = 10.0f;
+        /// <summary>
+        /// Ширина столбца "Примечание" спецификации
+        /// </summary>
+        public static readonly float SpecificationColumn7FootnoteWidth = 22.0f;
+        #endregion Спецификация
+
+        #region Перечень элементов
+        /// <summary>
+        /// Ширина столбца "Поз. обозначение" перечня элементов
+        /// </summary>
+        public static readonly float ItemsListColumn1PositionWidth = 20.0f;
+        /// <summary>
+        /// Ширина столбца "Наименование" перечня элементов
+        /// </summary>
+        public static readonly float ItemsListColumn2NameWidth     = 110.0f;
+        /// <summary>
+        /// Ширина столбца "Кол." перечня элементов
+        /// </summary>
+        public static readonly float ItemsListColumn3QuantityWidth = 10.0f;
+        /// <summary>
+        /// Ширина столбца "Примечание" перечня элементов
+        /// </summary>
+        public static readonly float ItemsListColumn4FootnoteWidth = 45.0f;        
+        #endregion Перечень элементов
 
         #endregion
 
@@ -391,5 +517,14 @@ namespace GostDOC.Common
         public static readonly string TemplatesFolder = "Templates";
         public static readonly string SpecificationTemplateName = "specification";
         public static readonly string BillTemplateName = "purchased_items_list";
+
+
+        #region Шрифты
+
+        public static readonly float SpecificationFontSize = 12.0f;
+        public static readonly float BillFontSize = 12.0f;
+        public static readonly float ItemListFontSize = 12.0f;
+
+        #endregion
     }
 }

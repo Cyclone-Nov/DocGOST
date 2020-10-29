@@ -121,6 +121,23 @@ public abstract class BasePreparer {
         aTable.Columns.Add(c);
     }
 
+    /// <summary>
+    /// получить имя группы  или подгруппы из ключа вида "Единственное число\\Множественное число"
+    /// с учетом кол-ва элементов
+    /// </summary>
+    /// <param name="aSubgroup">a subgroup.</param>
+    /// <returns></returns>
+    protected string GetSubgroupNameByCount(KeyValuePair<string, Group> aSubgroup)
+    {        
+        var subgroupNamesArr = aSubgroup.Key.Split(new char[] { '\\' });
+        string subGroupName = string.Empty;
+        if (subgroupNamesArr.Length == 2 && aSubgroup.Value.Components.Count > 1)
+            subGroupName = subgroupNamesArr[1];
+        else
+            subGroupName = subgroupNamesArr[0];
+
+        return subGroupName;
+    }
 
     /// <summary>
     /// получить имя компонента для столбца "Наименование"
@@ -220,6 +237,7 @@ public abstract class BasePreparer {
 
 
     public class FormattedString {
+
         public string Value;
         public bool IsUnderlined;
         public bool IsBold;

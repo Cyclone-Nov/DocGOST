@@ -48,7 +48,9 @@ internal class ElementListDataPreparer : BasePreparer {
                     // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
                     var сomponents = subgroup.Value.Components.Where(val =>
                         !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
-                    FillDataTable(table, subgroup.Value.Name, сomponents, otherConfigsElements, schemaDesignation);
+
+                        string subGroupName = GetSubgroupNameByCount(subgroup);
+                        FillDataTable(table, subGroupName, сomponents, otherConfigsElements, schemaDesignation);
                 }
 
                 RemoveLastEmptyRows(table);
@@ -132,13 +134,13 @@ internal class ElementListDataPreparer : BasePreparer {
                 i = j;
 
                 string component_designator = MakeComponentDesignatorsString(component_designators);
-                string[] desigantorarr = PdfUtils.SplitStringByWidth(18, component_designator).ToArray();
+                string[] desigantorarr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn1PositionWidth, component_designator, Constants.ItemListFontSize).ToArray();
                 // вчисляем длины полей и переносим на следующуй строку при необходимости 
                 // разобьем наименование на несколько строк исходя из длины текста
                 var name = (haveToChangeName) ? change_name : component_name;
-                string[] namearr = PdfUtils.SplitStringByWidth(110, name).ToArray();       
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn2NameWidth, name, Constants.ItemListFontSize).ToArray();       
                 var note = component.GetProperty(Constants.ComponentNote);
-                string[] notearr = PdfUtils.SplitStringByWidth(45, note).ToArray();
+                string[] notearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn4FootnoteWidth, note, Constants.ItemListFontSize).ToArray();
 
                 row = aTable.NewRow();
                 row[Constants.ColumnPosition] = desigantorarr.First();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,8 +33,11 @@ namespace GostDOC.DataPreparation
             }
             DataTable table = CreateTable("SpecificationData");
 
+            // получим обозначение изделия
+            string sign = GetDeviceSign(aConfigs);
+
             // заполнение данных из основного исполнения
-            FillConfiguration(table, mainConfig);
+            FillConfiguration(table, mainConfig, sign);
 
             // заполним переменные данные исполнений, если они есть
             if (listPreparedConfigs != null && listPreparedConfigs.Count() > 0)
@@ -43,7 +46,7 @@ namespace GostDOC.DataPreparation
 
                 foreach (var config in listPreparedConfigs.OrderBy(key => key.Key))
                 {
-                    FillConfiguration(table, config.Value, config.Key, false);
+                    FillConfiguration(table, config.Value, sign, config.Key, false);
                 }
             }
 
@@ -155,30 +158,27 @@ namespace GostDOC.DataPreparation
         /// <param name="aTable">итоговая таблица с данными</param>
         /// <param name="aConfig">конфигурация</param>
         /// <param name="aManyConfigs">признак наличия нескольких конфигураций: если <c>true</c> то несколько конфигураций</param>
-        private void FillConfiguration(DataTable aTable, Configuration aConfig, string aConfigName = "", bool aMainConfig = true)
+        private void FillConfiguration(DataTable aTable, Configuration aConfig, string aSign, string aConfigName = "", bool aMainConfig = true)
         {
+            var data = aConfig.Specification;
+            if (data.Count == 0)
+                return;
+
             string configName = "";
             if (!aMainConfig)
-            {
-                if (aConfig.Graphs.TryGetValue(Constants.GRAPH_2, out var sign)) // получим значение графы "Обозначение"
-                {
-                    if (string.Equals(aConfigName, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        configName = sign; // "Обозначение"
-                    } else
-                    {
-                        configName = $"{sign}{aConfigName}"; // "Обозначение"-"aConfigName"
-                    }
-                }
+            {                
+                if (string.Equals(aConfigName, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))                
+                    configName = aSign; // "Обозначение"
+                 else                
+                    configName = $"{aSign}{aConfigName}"; // "Обозначение"-"aConfigName"
 
                 var row = aTable.NewRow();
-                row[Constants.ColumnName] = configName;
-                row[Constants.ColumnTextFormat] = "1";
+                row[Constants.ColumnSign] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };
+                //row[Constants.ColumnTextFormat] = new FormattedString { Value = "1" };
                 aTable.Rows.Add(row);
                 AddEmptyRow(aTable);
             }
-
-            var data = aConfig.Specification;
+            
             int position = 0;
 
             AddGroup(aTable, Constants.GroupDoc, data, ref position);
@@ -239,15 +239,31 @@ namespace GostDOC.DataPreparation
             var sort = SortFactory.GetSort(sortType);
 
             var сomponents = sort.Sort(group.Components.ToList());
-            AddComponents(aTable, сomponents, ref aPos, false);
+            AddComponents(aTable, сomponents, ref aPos, !string.Equals(aGroupName, Constants.GroupDoc));
+            
+            if (сomponents.Count > 0 && group.SubGroups.Count > 0)
+            {
+                AddEmptyRow(aTable);
+            }
 
             // добавляем подгруппы
-            foreach (var subgroup in group.SubGroups.OrderBy(key => key.Key))
+            foreach (var subgroup in group.SubGroups.OrderBy(key => key.Key).Where(key => !string.Equals(key.Key, Constants.SUBGROUPFORSINGLE)))
             {
                 if (subgroup.Value.Components.Count > 0)
                 {
+                    string subGroupName = GetSubgroupNameByCount(subgroup);
                     var mainсomponents = sort.Sort(subgroup.Value.Components.ToList());
-                    AddSubgroup(aTable, subgroup.Key, mainсomponents, ref aPos);
+                    AddSubgroup(aTable, subGroupName, mainсomponents, ref aPos);
+                }
+            }
+
+            // отдельно запишем прогруппу "Прочие"
+            if (group.SubGroups.TryGetValue(Constants.SUBGROUPFORSINGLE, out var subgroup_other))
+            {
+                if (subgroup_other.Components.Count > 0)
+                {   
+                    var mainсomponents = sort.Sort(subgroup_other.Components.ToList());
+                    AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, mainсomponents, ref aPos);
                 }
             }
 
@@ -286,10 +302,11 @@ namespace GostDOC.DataPreparation
                 string component_name = component.GetProperty(Constants.ComponentName);
                 uint component_count = component.Count;// GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
 
-                string[] namearr = PdfUtils.SplitStringByWidth(63, component_name).ToArray();
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth, component_name, Constants.SpecificationFontSize).ToArray();
                 var desigantor_id = component.GetProperty(Constants.ComponentDesignatiorID);
+
                 var note = string.IsNullOrEmpty(desigantor_id) ? component.GetProperty(Constants.ComponentNote) : desigantor_id;
-                string[] notearr = PdfUtils.SplitStringByWidth(22, note).ToArray();
+                string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth, note, Constants.SpecificationFontSize).ToArray();
 
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString { Value = component.GetProperty(Constants.ComponentFormat) };
@@ -300,10 +317,7 @@ namespace GostDOC.DataPreparation
                     row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString() };
                 }
 
-                string designation = component.GetProperty(Constants.ComponentSign);
-                //if (dataToFill.GroupName == Constants.GroupDoc) {
-                //designation += component.GetProperty(Constants.ComponentDocCode);
-                //}
+                string designation = component.GetProperty(Constants.ComponentSign);                
                 row[Constants.ColumnSign] = new FormattedString { Value = designation };
                 row[Constants.ColumnName] = new FormattedString { Value = namearr.First() };
                 row[Constants.ColumnQuantity] = component_count;
@@ -371,7 +385,18 @@ namespace GostDOC.DataPreparation
 
             return table;
         }
-       
+
+        private string GetDeviceSign(IDictionary<string, Configuration> aConfigs)
+        {
+            if (aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var aConfig))
+            {
+                if (aConfig.Graphs.TryGetValue(Constants.GRAPH_2, out var sign)) // получим значение графы "Обозначение"
+                {
+                    return sign;
+                }
+            }
+            return string.Empty;
+        }
 
         /// <summary>
         /// добавить в таблицу данны надписи "Переменные данные исполнений"
@@ -381,9 +406,8 @@ namespace GostDOC.DataPreparation
         {
             AddEmptyRow(aTable);
             var row = aTable.NewRow();
-            row[Constants.ColumnName] = "Переменные данные";
-            row[Constants.ColumnProductCode] = "исполнений";
-            //row[Constants.ColumnDeliveryDocSign] = ;
+            row[Constants.ColumnSign] = new FormattedString { Value = "Переменные данные", IsUnderlined = true, TextAlignment = TextAlignment.RIGHT };
+            row[Constants.ColumnName] = new FormattedString { Value = "исполнений", IsUnderlined = true, TextAlignment = TextAlignment.LEFT };            
             aTable.Rows.Add(row);
             AddEmptyRow(aTable);
         }
@@ -487,11 +511,11 @@ namespace GostDOC.DataPreparation
             string name1 = aFirstComponent.GetProperty(Constants.ComponentName);
             string name2 = aSecondComponent.GetProperty(Constants.ComponentName);
 
-            string entry1 = aFirstComponent.GetProperty(Constants.ComponentWhereIncluded);
-            string entry2 = aSecondComponent.GetProperty(Constants.ComponentWhereIncluded);
+            //string entry1 = aFirstComponent.GetProperty(Constants.ComponentWhereIncluded);
+            //string entry2 = aSecondComponent.GetProperty(Constants.ComponentWhereIncluded);
 
             if (string.Equals(name1, name2) &&
-                string.Equals(entry1, entry2) &&
+                //string.Equals(entry1, entry2) &&
                 aFirstComponent.Count == aSecondComponent.Count)
             {
                 return true;

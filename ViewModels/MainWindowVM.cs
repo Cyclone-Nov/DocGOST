@@ -631,7 +631,12 @@ namespace GostDOC.ViewModels
                 if (_selectedItem == null)
                     return;
 
-                var path = CommonDialogs.SaveFileAs("PDF files (*.pdf) | *.pdf", "Сохранить файл");
+                string filename = string.Empty;
+                if (!string.IsNullOrEmpty(_filePath))
+                {                    
+                    filename = $"{Path.GetFileNameWithoutExtension(_filePath)} {Common.Converters.GetDocumentName(_docType)}.pdf";
+                }
+                var path = CommonDialogs.SaveFileAs("PDF files (*.pdf) | *.pdf", "Сохранить файл", filename);
                 if (!string.IsNullOrEmpty(path))
                 {
                     _docManager.SavePDF(_docType, path);

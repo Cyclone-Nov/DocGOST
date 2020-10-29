@@ -265,7 +265,11 @@ namespace GostDOC.Models
 
                     if (IsBillComponent(groups[0]))
                     {
-                        // Add to Bill
+                        // Add to Bill                        
+                        if (string.IsNullOrEmpty(groups[1].GroupName))
+                        {
+                            groups[1].GroupName = groups[0].SubGroupName;
+                        }
                         AddComponent(aNewCfg.Bill, component, groups[1]);
                     }
 
@@ -690,7 +694,7 @@ namespace GostDOC.Models
                     Component cp = gp.Value.Components.First();
                     string type = cp.GetProperty(Constants.ComponentType);
                     string name = cp.GetProperty(Constants.ComponentName);
-                    cp.SetPropertyValue(Constants.ComponentName, type + " " + name);
+                    cp.SetPropertyValue(Constants.ComponentName, name);//type + " " + name);
                     // Move component to parent group
                     aGroup.Components.Add(cp);
                     // Remove subgroup
