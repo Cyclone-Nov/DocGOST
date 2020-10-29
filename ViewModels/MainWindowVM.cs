@@ -77,6 +77,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsUndoEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsRedoEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsSaveEnabled { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<bool> IsSaveAsEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsExportExcelEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsExportPdfEnabled { get; } = new ObservableProperty<bool>(false);
 
@@ -92,7 +93,7 @@ namespace GostDOC.ViewModels
         public ICommand OpenFileD27Cmd => new Command(OpenFileD27);
         public ICommand OpenFileElCmd => new Command(OpenFileEl);
         public ICommand SaveFileCmd => new Command(SaveFile, IsSaveEnabled);
-        public ICommand SaveFileAsCmd => new Command(SaveFileAs);
+        public ICommand SaveFileAsCmd => new Command(SaveFileAs, IsSaveEnabled);
         public ICommand ClosingCmd => new Command<System.ComponentModel.CancelEventArgs>(Closing);
         public ICommand AddComponentCmd => new Command(AddComponent);
         public ICommand RemoveComponentsCmd => new Command<IList<object>>(RemoveComponents);
@@ -340,7 +341,7 @@ namespace GostDOC.ViewModels
 
         private void SaveFileAs(object obj = null)
         {
-            var path = CommonDialogs.SaveFileAs("xml Files *.xml | *.xml", "Сохранить файл");
+            var path = CommonDialogs.SaveFileAs("xml Files *.xml | *.xml", "Сохранить файл", GetDefaultFileName("xml"));
             if (!string.IsNullOrEmpty(path))
             {
                 _filePath = path;
@@ -623,20 +624,21 @@ namespace GostDOC.ViewModels
             }
         }
 
+        private string GetDefaultFileName(string aExtension)
+        {
+            string filename = string.Empty;
+            if (!string.IsNullOrEmpty(_filePath))
+            {
+                filename = $"{Path.GetFileNameWithoutExtension(_filePath)} {Common.Converters.GetDocumentName(_docType)}" + "." + aExtension;
+            }
+            return filename;
+        }
+
         private void ExportPDF(object obj)
         {
-            bool enabled = IsExportPdfEnabled.Value;
-            if (enabled)
+            if (IsExportPdfEnabled.Value)
             {
-                if (_selectedItem == null)
-                    return;
-
-                string filename = string.Empty;
-                if (!string.IsNullOrEmpty(_filePath))
-                {                    
-                    filename = $"{Path.GetFileNameWithoutExtension(_filePath)} {Common.Converters.GetDocumentName(_docType)}.pdf";
-                }
-                var path = CommonDialogs.SaveFileAs("PDF files (*.pdf) | *.pdf", "Сохранить файл", filename);
+                var path = CommonDialogs.SaveFileAs("PDF files (*.pdf) | *.pdf", "Сохранить файл", GetDefaultFileName("pdf"));
                 if (!string.IsNullOrEmpty(path))
                 {
                     _docManager.SavePDF(_docType, path);
@@ -648,7 +650,7 @@ namespace GostDOC.ViewModels
         {
             if (_excelManager.CanExport(_docType))
             {
-                var path = CommonDialogs.SaveFileAs("Excel Files *.xlsx | *.xlsx", "Сохранить файл");
+                var path = CommonDialogs.SaveFileAs("Excel Files *.xlsx | *.xlsx", "Сохранить файл", GetDefaultFileName("xlsx"));
                 if (!string.IsNullOrEmpty(path))
                 {
                     _progress = new Progress();
@@ -707,7 +709,8 @@ namespace GostDOC.ViewModels
                 {
                     DocNodes.Clear();
                     DocNodes.Add(aNode);
-                    IsSaveEnabled.Value = true;
+                    IsSaveEnabled.Value = (aDocType == DocType.Specification || aDocType == DocType.Bill);
+                    
                 }
                 else
                 {
