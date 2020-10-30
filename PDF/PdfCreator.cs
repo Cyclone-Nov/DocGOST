@@ -47,9 +47,10 @@ namespace GostDOC.PDF
         protected static readonly float RIGHT_MARGIN_MM = 5;
 
         protected static readonly float TO_LEFT_CORRECTION = 0;
+        protected static readonly float BOTTOM_CORRECTION = 0;
 
 
-        protected static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH();
+        protected static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH() + BOTTOM_CORRECTION;
         protected static readonly float LEFT_MARGIN = LEFT_MARGIN_MM * mmW();
         protected static readonly float TOP_MARGIN = TOP_MARGIN_MM * mmH();
         protected static readonly float RIGHT_MARGIN = RIGHT_MARGIN_MM * mmW();
@@ -198,14 +199,15 @@ namespace GostDOC.PDF
             var regTable = CreateRegisterTable();
             regTable.SetFixedPosition(
                 DATA_TABLE_LEFT,
-                PdfDefines.A4Height - (GetTableHeight(regTable, 1) + TOP_MARGIN) + 5.51f,
+                PdfDefines.A4Height - (GetTableHeight(regTable, 1) + TOP_MARGIN) /*+ 5.51f*/,
                 TITLE_BLOCK_WIDTH - 0.02f);
             aInPdfDoc.Add(regTable);
 
 
             // добавить таблицу с основной надписью для последуюших старницы
             var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = Type });
-            titleBlock.SetFixedPosition(DATA_TABLE_LEFT, TOP_MARGIN + 4.01f,
+            titleBlock.SetFixedPosition(DATA_TABLE_LEFT,
+                BOTTOM_MARGIN,
                 TITLE_BLOCK_WIDTH - 0.02f);
             aInPdfDoc.Add(titleBlock);
 
@@ -236,7 +238,7 @@ namespace GostDOC.PDF
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
             Paragraph CreateParagraph(string text) {
-                var style = new Style().SetTextAlignment(TextAlignment.CENTER).SetFontSize(12).SetFont(f1).SetPaddingTop(-2);
+                var style = new Style().SetTextAlignment(TextAlignment.CENTER).SetFontSize(12).SetFont(f1).SetPaddingTop(-2).SetItalic();
                 return new Paragraph(text).AddStyle(style);
             }
 
@@ -255,17 +257,17 @@ namespace GostDOC.PDF
             tbl.AddCell(CreateCell(1,4).Add(CreateParagraph("Номера листов (страниц)")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Всего листов (страниц) в докум.")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("№ докум.")));
-            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Входящий № сопроводительного докум. и дата")));
+            tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Входящий № сопрово-\nдительного докум. и дата")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Подп.")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Дата")));
 
             tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("измененных")));
             tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("заменяемых")));
             tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("новых")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("аннулированных")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("анну-\nлированных")));
 
 
-            for (int i = 0; i < (RowNumberOnNextPage-4) * 10; ++i) {
+            for (int i = 0; i < (RowNumberOnNextPage-6) * 10; ++i) {
                 tbl.AddCell(new Cell().SetHeight(8*mmH()).SetPadding(0).SetBorderLeft(THICK_BORDER)).SetBorderRight(THICK_BORDER);
             }
             for (int i = 0; i < 10; ++i) {
@@ -399,11 +401,11 @@ namespace GostDOC.PDF
 
             #region Right Upper (additional)
 
-            mainTable.AddCell(new Cell(1, 1).SetHeight(14*mmH()).SetBorder(THICK_BORDER));
-            mainTable.AddCell(new Cell(1, 1).SetBorder(THICK_BORDER));
-            mainTable.AddCell(new Cell(1,6).SetBorder(THICK_BORDER));
+            mainTable.AddCell(new Cell(1, 1).SetHeight(14*mmH()).SetBorder(THICK_BORDER).SetPadding(0));
+            mainTable.AddCell(new Cell(1, 1).SetBorder(THICK_BORDER).SetPadding(0));
+            mainTable.AddCell(new Cell(1,6).SetBorder(THICK_BORDER).SetPadding(0));
 
-            mainTable.AddCell(new Cell(1,8).SetHeight(8*mmH()).SetBorder(THICK_BORDER));
+            mainTable.AddCell(new Cell(1,8).SetHeight(8*mmH()).SetBorder(THICK_BORDER).SetPadding(0));
 
             #endregion
 
@@ -826,14 +828,15 @@ namespace GostDOC.PDF
 
             if (size.GetWidth() == PageSize.A4.GetWidth())
             {
-                bottom = /*-2*/0;
+                bottom = BOTTOM_MARGIN - BOTTOM_MARGIN_MM * mmH();
                 left = (7 + 10 + 32 + 15 + 10 + 14) * mmW() - TO_LEFT_CORRECTION;
                 next_left = (7 + 10 + 32 + 15 + 10 + 70) * mmW() + 20 - TO_LEFT_CORRECTION;
                 text = "Формат А4";
             }
             else
             {
-                bottom = 0;
+                //bottom = 0;
+                bottom = BOTTOM_MARGIN - BOTTOM_MARGIN_MM * mmH();
                 left = (60 + 45 + 70 + 50 + 65) * mmW() - TO_LEFT_CORRECTION;
                 next_left = (60 + 45 + 70 + 50 + 32 + 100) * mmW() + 20 - TO_LEFT_CORRECTION;
                 text = "Формат А3";

@@ -102,18 +102,18 @@ namespace GostDOC.Common
         /// </summary>
         /// <param name="aDocType">Type of a document.</param>
         /// <returns></returns>
-        public static string GetDocumentName(DocType aDocType, bool aFullName = true)
+        public static string GetDocumentName(DocType aDocType, bool aFullName = false)
         {
             switch (aDocType)
             {
                 case DocType.Bill:
-                    return aFullName ? @"Ведомость покупных изделий" : @"ВП";
+                    return aFullName ? "Ведомость покупных изделий" : "ВП";
                 case DocType.ItemsList:
-                    return aFullName ? @"Перечень элементов":@"ПЭ3";
+                    return aFullName ? "Перечень элементов": "ПЭ3";
                 case DocType.Specification:
-                    return aFullName ? @"Спецификация" : @"СП";
+                    return aFullName ? "Спецификация" : "СП";
                 case DocType.D27:
-                    return @"Ведомость комплектации";
+                    return aFullName ? "Ведомость комплектации" : "ВК";
                 case DocType.None:
                     return string.Empty;
             }

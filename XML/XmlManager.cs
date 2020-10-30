@@ -41,7 +41,12 @@ namespace GostDOC.Models
             aResult.Name = _xml.Transaction.Project.Name;
             aResult.Type = ParseProjectType(_xml.Transaction.Type);
 
-            if (aResult.Type == ProjectType.GostDocB && (_docType != DocType.Bill || _docType != DocType.D27))
+            if (aDocType == DocType.Bill)
+            {
+                aResult.Type = ProjectType.GostDocB;
+            }
+
+            if (aResult.Type == ProjectType.GostDocB && _docType != DocType.Bill && _docType != DocType.D27)
             {
                 return false;
             }
@@ -352,19 +357,6 @@ namespace GostDOC.Models
                 {
                     result[1].SubGroupName = property.Text;
                 }
-                else if (property.Name == Constants.ComponentType && result[0].GroupName == Constants.GroupOthers && string.IsNullOrEmpty(result[0].SubGroupName))
-                {
-                    if (string.IsNullOrEmpty(id))
-                    {
-                        // Not radio component, set group name from Type field
-                        result[0].SubGroupName = property.Text;
-
-                        if (string.IsNullOrEmpty(GroupNames.GetGroupName(property.Text)))
-                        {
-                            _error.Error($"Элемент типа {id} в словаре GroupNames.cfg не найден!");
-                        }
-                    }
-                }
             }
 
             if (result[0].GroupName == Constants.GroupOthers && string.IsNullOrEmpty(result[0].SubGroupName))
@@ -571,6 +563,38 @@ namespace GostDOC.Models
             return new Tuple<string, int>(string.Empty, 0);
         }
 
+        private void ProcessItems(Dictionary<string, Tuple<string, int>> aItems, StringBuilder aBulder)
+        {
+            if (aItems.Count == 0)
+            {
+                return;
+            }
+            else if (aItems.Count <= 2)
+            {
+                // Add ids with ","
+                foreach (var item in aItems)
+                {
+                    if (aBulder.Length > 0 && !aBulder.EndsWith(","))
+                    {
+                        aBulder.Append(", ");
+                    }
+                    aBulder.Append(item.Key);
+                }
+            }
+            else
+            {
+                // Add ids with "-"
+                var f = aItems.First();
+                var l = aItems.Last();
+
+                if (aBulder.Length > 0)
+                {
+                    aBulder.Append(", ");
+                }
+                aBulder.Append(f.Key + "-" + l.Key);
+            }
+        }
+
         private void UpdatePositions(IDictionary<CombineProperties, Component> aComponents)
         {
             foreach (var cmp in aComponents.Values)
@@ -600,66 +624,52 @@ namespace GostDOC.Models
                         return r;
                     });
 
-                    string result = string.Empty;
-                    List<Tuple<string, int>> items = new List<Tuple<string, int>>();
+                    StringBuilder result = new StringBuilder();
+                    Dictionary<string, Tuple<string, int>> items = new Dictionary<string, Tuple<string, int>>();
                     for (int i = 0; i < split.Length; i++)
                     {
                         if (items.Count == 0)
                         {
                             // Add current id in list
-                            items.Add(ParseDesignatorId(split[i]));
-                            continue;
+                            items.Add(split[i], ParseDesignatorId(split[i]));
+                            continue;                            
                         }
 
                         // Get previous and current
                         var p = items.Last();
                         var c = ParseDesignatorId(split[i]);
 
-                        // Add to list
-                        items.Add(c);
                         // Compare with previous
-                        if (c.Item1 == p.Item1)
+                        if (c.Item1 == p.Value.Item1)
                         {
-                            if (c.Item2 == p.Item2 + 1)
+                            if (c.Item2 == p.Value.Item2 + 1)
                             {
-                                if (i != split.Length - 1)
-                                {
-                                    // Skip list processing
-                                    continue;
-                                }
+                                // Add to list
+                                items.Add(split[i], c);
                             }
-                        }
-
-                        if (items.Count > 2)
-                        {
-                            // Add ids with "-"
-                            var f = items.First();
-                            var l = items.Last();
-
-                            if (!string.IsNullOrEmpty(result))
+                            else
                             {
-                                result += ", ";
+                                // Process collected items
+                                ProcessItems(items, result);
+                                // Clear ids 
+                                items.Clear();
+                                // Add to list
+                                items.Add(split[i], c);
                             }
-                            result += f.Item1 + f.Item2.ToString() + "-" + l.Item1 + l.Item2.ToString();
                         }
                         else
                         {
-                            // Add ids with ","
-                            foreach (var item in items)
-                            {
-                                if (!string.IsNullOrEmpty(result) && !result.EndsWith(", "))
-                                {
-                                    result += ", ";
-                                }
-                                result += item.Item1 + item.Item2.ToString();
-                            }
+                            // Process collected items
+                            ProcessItems(items, result);
+                            // Clear ids 
+                            items.Clear();
                         }
-                        // Clear ids 
-                        items.Clear();
                     }
+                    // Process remained items
+                    ProcessItems(items, result);
 
                     // Save updated id
-                    cmp.Properties[Constants.ComponentDesignatorID] = result;
+                    cmp.Properties[Constants.ComponentDesignatorID] = result.ToString();
                 }
             }
         }
