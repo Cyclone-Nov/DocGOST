@@ -73,8 +73,8 @@ namespace GostDOC.Models
                 AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB);
                 AddComponents(newCfg, cfg.Components, ComponentType.Component);
 
-                // Move single elements to group "Прочие"
-                MoveSingleElements(newCfg);
+                // Move single elements to group "Прочие" and update group names
+                ProcessGroupNames(newCfg);
                 // Sort components
                 SortComponents(newCfg);
                 // Fill default graphs
@@ -674,17 +674,56 @@ namespace GostDOC.Models
             }
         }
 
+        private void UpdateGroupNames(IDictionary<string, Group> aGroups, Group aGroup, string aNewName)
+        {
+            aGroups.Remove(aGroup.Name);
+            // Update name, add back
+            aGroup.Name = aNewName;
+            aGroups.Add(aNewName, aGroup);
+        }
 
-        private void MoveSingleElements(Lazy<Group> aOthers, IDictionary<string, Group> aGroups)
+        private void UpdateGroupNames(IDictionary<string, Group> aGroups, Group aGroup) 
+        {
+            if (aGroup.Name.Contains(@"\"))
+            {
+                string[] split = aGroup.Name.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                if (split.Length == 2)
+                {
+                    string name = aGroup.Components.Count > 1 ? split[1] : split[0];
+                    UpdateGroupNames(aGroups, aGroup, name);
+                }
+            }
+            else
+            {
+                if (aGroup.Components.Count > 1)
+                {
+                    var name = GroupNames.GetGroupName(aGroup.Name);
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        _error.Error($"Элемент {aGroup.Name} в словаре GroupNames.cfg не найден!");
+                    }
+                    else
+                    {
+                        UpdateGroupNames(aGroups, aGroup, name);
+                    }
+                }
+            }
+        }
+
+        private void ProcessGroupNames(Lazy<Group> aOthers, IDictionary<string, Group> aGroups)
         {
             foreach (var gp in aGroups.AsNotNull().ToList())
             {
-                MoveSingleElements(aOthers, gp.Value.SubGroups);
+                ProcessGroupNames(aOthers, gp.Value.SubGroups);
 
                 if (gp.Value.Components.Count == 1)
                 {
                     aOthers.Value.Components.AddRange(gp.Value.Components);
                     aGroups.Remove(gp.Key);
+                }
+                else
+                {
+                    UpdateGroupNames(aGroups, gp.Value);
                 }
 
                 if (gp.Value.Components.Count == 0 && (gp.Value.SubGroups == null || gp.Value.SubGroups.Count == 0))
@@ -694,7 +733,7 @@ namespace GostDOC.Models
             }
         }
 
-        private void MoveSingleElements(Group aGroup)
+        private void ProcessGroupNames(Group aGroup)
         {
             foreach (var gp in aGroup.SubGroups.AsNotNull().ToList())
             {
@@ -704,16 +743,20 @@ namespace GostDOC.Models
                     Component cp = gp.Value.Components.First();
                     string type = cp.GetProperty(Constants.ComponentType);
                     string name = cp.GetProperty(Constants.ComponentName);
-                    cp.SetPropertyValue(Constants.ComponentName, name);//type + " " + name);
+                    cp.SetPropertyValue(Constants.ComponentName, name.Contains(type) ? name : type + " " + name);
                     // Move component to parent group
                     aGroup.Components.Add(cp);
                     // Remove subgroup
                     aGroup.SubGroups.Remove(gp.Key);
                 }
+                else
+                {
+                    UpdateGroupNames(aGroup.SubGroups, gp.Value);
+                }
             }
         }
 
-        private void MoveSingleElements(Configuration aCfg)
+        private void ProcessGroupNames(Configuration aCfg)
         {
             if (_docType == DocType.Bill)
             {
@@ -728,13 +771,13 @@ namespace GostDOC.Models
                     return groupOthers;
                 });
 
-                MoveSingleElements(others, aCfg.Bill);
+                ProcessGroupNames(others, aCfg.Bill);
             }
             else if (_docType == DocType.Specification)
             {
                 foreach (var gp in aCfg.Specification)
                 {
-                    MoveSingleElements(gp.Value);
+                    ProcessGroupNames(gp.Value);
                 }
             }
         }
