@@ -546,5 +546,42 @@ namespace GostDOC.Common
         public static string DesignatiorID { get; internal set; }
 
         #endregion
+
+
+        #region Количество строк на страницах документоа
+        /// <summary>
+        /// количество строк на первом листе для ведомости покупных изделий (ВП)
+        /// </summary>
+        public static readonly int BillRowsOnFirstPage = 26;
+        /// <summary>
+        /// количество строк на всех листах кроме первого для ведомости покупных изделий (ВП)
+        /// </summary>
+        public static readonly int BillRowsOnNextPage = 32;
+        /// <summary>
+        /// количество строк на первом листе для спецификации
+        /// </summary>
+        public static readonly int SpecificationRowsOnFirstPage = 24;
+        /// <summary>
+        /// количество строк на всех листах кроме первого для спецификации
+        /// </summary>
+        public static readonly int SpecificationRowsOnNextPage = 29;
+        /// <summary>
+        /// количество строк на первом листе для перечня элементов (ПЭ3)
+        /// </summary>
+        public static readonly int ItemListRowsOnFirstPage = 24;
+        /// <summary>
+        /// количество строк на всех листах кроме первого для перечня элементов (ПЭ3)
+        /// </summary>
+        public static readonly int ItemListRowsOnNextPage = 29;
+        /// <summary>
+        /// количество строк на первом листе для документа по умолчанию
+        /// </summary>
+        public static readonly int DefaultRowsOnFirstPage = 24;
+        /// <summary>
+        /// количество строк на всех листах кроме первого для документа по умолчанию
+        /// </summary>
+        public static readonly int DefaultRowsOnNextPage = 29;
+
+        #endregion Количество строк на страницах документоа
     }
 }
