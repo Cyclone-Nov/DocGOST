@@ -221,12 +221,14 @@ namespace GostDOC.PDF
                         ? null 
                         : ((BasePreparer.FormattedString) row[columnName]);
 
-
-                string format = GetCellString(Constants.ColumnFormat);
-                string zone = GetCellString(Constants.ColumnZone);
-                string position = GetCellString(Constants.ColumnPosition);
+                string format = GetCellString(Constants.ColumnFormat).Truncate(3);
+                string zone = GetCellString(Constants.ColumnZone).Truncate(3);
+                string position = GetCellString(Constants.ColumnPosition).Truncate(3);
+                string note = GetCellString(Constants.ColumnFootnote).Truncate(10);
                 var sign = GetCellStringFormatted(Constants.ColumnSign);
-                string note = GetCellString(Constants.ColumnFootnote);
+                if (sign != null) {
+                    sign.Value = sign.Value.Truncate(38);
+                }
 
                 var name = GetCellStringFormatted(Constants.ColumnName);
 
