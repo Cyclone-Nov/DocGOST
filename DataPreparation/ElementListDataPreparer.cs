@@ -24,7 +24,7 @@ internal class ElementListDataPreparer : BasePreparer {
         Configuration mainConfig = null;
         if (!aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out mainConfig))
             return null;
-        var data = mainConfig.Specification;
+        var data = mainConfig.Specification;        
         string schemaDesignation = GetSchemaDesignation(mainConfig);
 
         // из остальных конфигураций получаем список словарей с соответсвующими компонентами
@@ -36,23 +36,15 @@ internal class ElementListDataPreparer : BasePreparer {
         if (data.TryGetValue(Constants.GroupOthers, out others)) {
             DataTable table = CreateTable("ElementListData");
             if (others.Components.Count() > 0 || others.SubGroups.Count() > 0) {
-                // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
-                var mainсomponents = others.Components.Where(val =>
-                    !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
 
-                AddEmptyRow(table);
-                FillDataTable(table, "", mainсomponents, otherConfigsElements, schemaDesignation);
+                // подготавливаем список из всех компонентов
+                var allComponentsDic = PrepareComponentsList(others);
 
-                foreach (var subgroup in others.SubGroups.OrderBy(key => GroupNameConverter.GetSymbol(key.Key)))
-                {
-                    // выбираем только компоненты с заданными занчением для свойства "Позиционое обозначение"
-                    var сomponents = subgroup.Value.Components.Where(val =>
-                        !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
+                // заполняем таблицу данных
+                //AddEmptyRow(table);
+                FillDataTable(table, allComponentsDic, otherConfigsElements, schemaDesignation);
 
-                        string subGroupName = GetSubgroupNameByCount(subgroup);
-                        FillDataTable(table, subGroupName, сomponents, otherConfigsElements, schemaDesignation);
-                }
-
+                // удаляем пусты строки в конце
                 RemoveLastEmptyRows(table);
             }
             return table;
@@ -60,6 +52,118 @@ internal class ElementListDataPreparer : BasePreparer {
         return null;
     }
 
+
+        ///// <summary>
+        ///// заполнить таблицу данных
+        ///// </summary>
+        ///// <param name="aTable"></param>
+        ///// <param name="aGroupName"></param>
+        ///// <param name="aComponents"></param>
+        ///// <param name="aOtherComponents"></param>
+        ///// <param name="aSchemaDesignation"></param>
+        //private void FillDataTable(
+        //        DataTable aTable, 
+        //        string aGroupName, 
+        //        IEnumerable<Models.Component> aComponents, 
+        //        IEnumerable<Dictionary<string, Component>> aOtherComponents, string aSchemaDesignation) {
+
+        //    if (!aComponents.Any()) return;
+        //    // записываем компоненты в таблицу данных
+
+        //    // Cортировка компонентов по значению свойства "Позиционное обозначение"
+        //    Models.Component[] sortComponents = SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();
+        //    // для признаков составления наименования для данного компонента
+        //    int[] HasStandardDoc;
+
+        //    string change_name = $"см. табл. {aSchemaDesignation}";
+
+        //    //ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем номера компонентов с совпадающим значением                
+        //    Dictionary<string /* GOST/TY string*/, List<int> /* array indexes */> StandardDic =
+        //        FindComponentsWithStandardDoc(sortComponents, out HasStandardDoc);
+
+        //    // записываем наименование группы, если есть
+        //    AddGroupName(aTable, aGroupName);
+
+        //    // записываем строки с гост/ту в начале таблицы, если они есть для нескольких компонентов
+        //    if (!AddStandardDocsToTable(aGroupName, sortComponents, aTable, StandardDic)) {
+        //        AddEmptyRow(aTable);
+        //    }
+
+        //    //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
+        //    DataRow row;
+        //    for (int i = 0; i < sortComponents.Length;)
+        //    {
+        //        var component = sortComponents[i];
+        //        string component_name = GetComponentName(HasStandardDoc[i] == 1, component);
+        //        uint component_count = component.Count; //1; // always only one! GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
+        //        bool haveToChangeName = string.Equals(component.GetProperty(Constants.ComponentPresence),"0") ||
+        //                                HaveToChangeComponentName(component, aOtherComponents);
+             
+                
+        //        List<string> component_designators = new List<string>{ component.GetProperty(Constants.ComponentDesignatiorID) };
+
+        //        bool same;
+        //        int j = i + 1;
+        //        if (j < sortComponents.Length && !haveToChangeName) 
+        //        {
+        //            do 
+        //            {
+        //                var componentNext = sortComponents[j];
+        //                string componentNext_name = GetComponentName(HasStandardDoc[j] == 1, componentNext);
+
+        //                if (string.Equals(component_name, componentNext_name))
+        //                {
+        //                    same = true;
+        //                    component_count++;
+        //                    j++;
+        //                    component_designators.Add(componentNext.GetProperty(Constants.ComponentDesignatiorID));
+        //                }
+        //                else
+        //                    same = false;
+        //            } while (same && j < sortComponents.Length);
+        //        }
+
+        //        i = j;
+
+        //        string component_designator = MakeComponentDesignatorsString(component_designators);
+        //        string[] desigantorarr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn1PositionWidth, component_designator, Constants.ItemListFontSize).ToArray();
+        //        // вчисляем длины полей и переносим на следующуй строку при необходимости 
+        //        // разобьем наименование на несколько строк исходя из длины текста
+        //        var name = (haveToChangeName) ? change_name : component_name;
+        //        string[] namearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn2NameWidth, name, Constants.ItemListFontSize).ToArray();       
+        //        var note = component.GetProperty(Constants.ComponentNote);
+        //        string[] notearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn4FootnoteWidth, note, Constants.ItemListFontSize).ToArray();
+
+        //        row = aTable.NewRow();
+        //        row[Constants.ColumnPosition] = desigantorarr.First();
+        //        row[Constants.ColumnName] = namearr.First();
+        //        row[Constants.ColumnQuantity] = component_count;
+        //        row[Constants.ColumnFootnote] = notearr.First();
+        //        aTable.Rows.Add(row);
+
+        //        int max = Math.Max(namearr.Length, notearr.Length);
+        //        max = Math.Max(max, desigantorarr.Length);
+        //        if (max > 1)
+        //        {
+        //            int ln_name = namearr.Length;
+        //            int ln_note = notearr.Length;
+        //            int ln_designator = desigantorarr.Length;
+
+        //            for (int ln = 1; ln< max; ln++)
+        //            {
+        //                row = aTable.NewRow();
+        //                row[Constants.ColumnPosition] = (ln_designator > ln) ? desigantorarr[ln] : string.Empty;
+        //                row[Constants.ColumnName] = (ln_name > ln) ? namearr[ln] : string.Empty;
+        //                row[Constants.ColumnFootnote] = (ln_note > ln) ? notearr[ln] : string.Empty;
+        //                aTable.Rows.Add(row);
+        //            }
+        //        }
+
+        //    }
+
+        //    AddEmptyRow(aTable);
+        //    aTable.AcceptChanges();
+        //}
 
         /// <summary>
         /// заполнить таблицу данных
@@ -70,82 +174,72 @@ internal class ElementListDataPreparer : BasePreparer {
         /// <param name="aOtherComponents"></param>
         /// <param name="aSchemaDesignation"></param>
         private void FillDataTable(
-                DataTable aTable, 
-                string aGroupName, 
-                IEnumerable<Models.Component> aComponents, 
-                IEnumerable<Dictionary<string, Component>> aOtherComponents, string aSchemaDesignation) {
+                DataTable aTable,
+                Dictionary<string, Tuple<string, Component, uint>> aComponentsDic,                
+                IEnumerable<Dictionary<string, Component>> aOtherComponents, string aSchemaDesignation)
+        {
 
-            if (!aComponents.Any()) return;
-            // записываем компоненты в таблицу данных
+            if (!aComponentsDic.Any()) 
+                return;
 
-            // Cортировка компонентов по значению свойства "Позиционное обозначение"
-            Models.Component[] sortComponents = SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();
             // для признаков составления наименования для данного компонента
-            int[] HasStandardDoc;
+            Dictionary<string, int> StandardComponentsDic;
 
             string change_name = $"см. табл. {aSchemaDesignation}";
 
-            //ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем номера компонентов с совпадающим значением                
-            Dictionary<string /* GOST/TY string*/, List<int> /* array indexes */> StandardDic =
-                FindComponentsWithStandardDoc(sortComponents, out HasStandardDoc);
+            //ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем позиционные обозначения компонентов с совпадающим значением                
+            Dictionary< string/* group*/ , Dictionary<string/* GOST/TY string*/, List<string> /* array indexes */>> StandardDic =
+                FindComponentsWithStandardDoc(aComponentsDic, out StandardComponentsDic);
 
-            // записываем наименование группы, если есть
-            AddGroupName(aTable, aGroupName);
 
-            // записываем строки с гост/ту в начале таблицы, если они есть для нескольких компонентов
-            if (!AddStandardDocsToTable(aGroupName, sortComponents, aTable, StandardDic)) {
-                AddEmptyRow(aTable);
-            }
+            var comparer = new DesignatorIDComparer();
 
-            //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
+            // записываем таблицу данных
             DataRow row;
-            for (int i = 0; i < sortComponents.Length;)
+            string lastGroupName = string.Empty;
+            List<string> oldGropus = new List<string>();
+            foreach (var component_pair in aComponentsDic.OrderBy(key => key.Key, comparer))
             {
-                var component = sortComponents[i];
-                string component_name = GetComponentName(HasStandardDoc[i] == 1, component);
-                uint component_count = component.Count; //1; // always only one! GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
-                bool haveToChangeName = string.Equals(component.GetProperty(Constants.ComponentPresence),"0") ||
-                                        HaveToChangeComponentName(component, aOtherComponents);
-             
-                
-                List<string> component_designators = new List<string>{ component.GetProperty(Constants.ComponentDesignatiorID) };
+                var component = component_pair.Value;
+                string designator = GetDesignator(component_pair.Key, component.Item1, component.Item3);
+                uint count = component.Item3;
 
-                bool same;
-                int j = i + 1;
-                if (j < sortComponents.Length && !haveToChangeName) 
+                string subGroupName = component.Item2.GetProperty(Constants.SubGroupNameSp); // GetSubgroupNameByCount(subgroup, component.Item3);
+                if (string.IsNullOrEmpty(lastGroupName) || !string.Equals(subGroupName, lastGroupName)) // если смена группы, то 
                 {
-                    do 
+                    // записываем наименование группы
+                    AddEmptyRow(aTable);
+                    AddGroupName(aTable, subGroupName);
+                    AddEmptyRow(aTable);
+
+                    if (!oldGropus.Contains(subGroupName))
                     {
-                        var componentNext = sortComponents[j];
-                        string componentNext_name = GetComponentName(HasStandardDoc[j] == 1, componentNext);
-
-                        if (string.Equals(component_name, componentNext_name))
+                        // записываем строки с гост/ту в начале группы, если они есть для данной группы
+                        if (!AddStandardDocsToTable(subGroupName, aTable, aComponentsDic, StandardDic))
                         {
-                            same = true;
-                            component_count++;
-                            j++;
-                            component_designators.Add(componentNext.GetProperty(Constants.ComponentDesignatiorID));
+                            //AddEmptyRow(aTable);
                         }
-                        else
-                            same = false;
-                    } while (same && j < sortComponents.Length);
+                        oldGropus.Add(subGroupName);
+                    }
                 }
+                lastGroupName = subGroupName;
+                
 
-                i = j;
+                string component_name = GetComponentName(component_pair.Key, StandardComponentsDic, component.Item2);                
+                bool haveToChangeName = string.Equals(component.Item2.GetProperty(Constants.ComponentPresence), "0") ||
+                                                      HaveToChangeComponentName(component.Item2, aOtherComponents);
 
-                string component_designator = MakeComponentDesignatorsString(component_designators);
-                string[] desigantorarr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn1PositionWidth, component_designator, Constants.ItemListFontSize).ToArray();
-                // вчисляем длины полей и переносим на следующуй строку при необходимости 
-                // разобьем наименование на несколько строк исходя из длины текста
+                string[] desigantorarr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn1PositionWidth, designator, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
+                
                 var name = (haveToChangeName) ? change_name : component_name;
-                string[] namearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn2NameWidth, name, Constants.ItemListFontSize).ToArray();       
-                var note = component.GetProperty(Constants.ComponentNote);
-                string[] notearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn4FootnoteWidth, note, Constants.ItemListFontSize).ToArray();
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn2NameWidth, name, new char[] { '.', ' '}, Constants.ItemListFontSize, true).ToArray();
+                var note = component.Item2.GetProperty(Constants.ComponentNote);
+                string[] notearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn4FootnoteWidth, note, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
 
                 row = aTable.NewRow();
                 row[Constants.ColumnPosition] = desigantorarr.First();
                 row[Constants.ColumnName] = namearr.First();
-                row[Constants.ColumnQuantity] = component_count;
+                row[Constants.ColumnQuantity] = count;
                 row[Constants.ColumnFootnote] = notearr.First();
                 aTable.Rows.Add(row);
 
@@ -157,7 +251,7 @@ internal class ElementListDataPreparer : BasePreparer {
                     int ln_note = notearr.Length;
                     int ln_designator = desigantorarr.Length;
 
-                    for (int ln = 1; ln< max; ln++)
+                    for (int ln = 1; ln < max; ln++)
                     {
                         row = aTable.NewRow();
                         row[Constants.ColumnPosition] = (ln_designator > ln) ? desigantorarr[ln] : string.Empty;
@@ -166,11 +260,105 @@ internal class ElementListDataPreparer : BasePreparer {
                         aTable.Rows.Add(row);
                     }
                 }
-
             }
 
             AddEmptyRow(aTable);
             aTable.AcceptChanges();
+        }
+
+        /// <summary>
+        /// Prepares the components list.
+        /// </summary>
+        /// <param name="aGroup">a group.</param>
+        /// <returns></returns>
+        private Dictionary<string, Tuple<string, Component, uint>> PrepareComponentsList(Group aMainGroup)
+        {
+            Dictionary<string, Tuple<string, Component, uint>> dic = new Dictionary<string, Tuple<string, Component, uint>>();
+
+            var mainсomponents = aMainGroup.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
+            FillPrepareDictionary(dic, mainсomponents);
+            
+            foreach (var subgroup in aMainGroup.SubGroups.OrderBy(key => GroupNameConverter.GetSymbol(key.Key)))
+            {
+                // выбираем только компоненты с заданными занчением для свойства "Позиционное обозначение"
+                var сomponents = subgroup.Value.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
+                FillPrepareDictionary(dic, сomponents);
+            }
+
+            return dic;
+        }
+
+        /// <summary>
+        /// Fills the prepare dictionary.
+        /// </summary>
+        /// <param name="aDic">a dic.</param>
+        /// <param name="aComponents">a components.</param>
+        private void FillPrepareDictionary(Dictionary<string, Tuple<string, Component, uint>> aDic, IEnumerable<Component> aComponents)
+        {
+            foreach (var component in aComponents)
+            {
+                string desigantor = component.GetProperty(Constants.ComponentDesignatorID);                
+                var designators = desigantor.Split(new char[] { '-', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                if (designators.Length == 1)
+                {   
+                    aDic.Add(desigantor.Trim(), new Tuple<string, Component, uint>(string.Empty, component, component.Count));
+                } else if (designators.Length == 2)
+                {
+                    if (desigantor.Contains('-'))
+                    {   
+                        aDic.Add(designators[0].TrimStart(), new Tuple<string, Component, uint>(designators[1].TrimEnd(), component, component.Count));
+                    } else
+                    {
+                        string keyDesignator = designators[0].Trim();
+                        string lastDesignator = designators[1].Trim();
+                        if (GetCountByDesignators(keyDesignator, lastDesignator) == 2)
+                        {                            
+                            aDic.Add(keyDesignator, new Tuple<string, Component, uint>(lastDesignator, component, 2));
+                        } else
+                        {                            
+                            aDic.Add(keyDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                            aDic.Add(lastDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                        }   
+                    }
+                } else
+                {
+                    designators = desigantor.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);                    
+                    for (int i = 0; i < designators.Length;)
+                    {
+                        var first_designator = designators[i].Trim();
+                        if (designators[i].Contains('-'))
+                        {                            
+                            int ind = first_designator.IndexOf('-');
+                            string keyDesigantor = first_designator.Substring(0, ind);
+                            string lastDesigantor = first_designator.Substring(ind + 1);
+                            uint subcount = GetCountByDesignators(keyDesigantor, lastDesigantor);
+                            Tuple<string, Component, uint> component_rec = new Tuple<string, Component, uint>(lastDesigantor, component, subcount);                            
+                            aDic.Add(keyDesigantor, component_rec);                            
+                            i++;
+                        } else
+                        {   
+                            if (designators.Length - i > 1)
+                            {
+                                var next_designator = designators[i + 1].Trim();
+                                if (!next_designator.Contains('-') && GetCountByDesignators(first_designator, next_designator) == 2)
+                                {                                    
+                                    aDic.Add(first_designator, new Tuple<string, Component, uint>(next_designator, component, 2));                                    
+                                    i += 2;
+                                } else
+                                {                                    
+                                    aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));                                    
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                                i++;
+                            }                                                       
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -234,24 +422,31 @@ internal class ElementListDataPreparer : BasePreparer {
         /// <param name="aTable">таблица данных</param>
         /// <param name="aStandardDic">словарь со стандартными документами на поставку</param>
         /// <returns>true - стандартные документы добавлены </returns>
-        private bool AddStandardDocsToTable(string aGroupName, Models.Component[] aComponents, DataTable aTable,
-            Dictionary<string, List<int>> aStandardDic) {
+        private bool AddStandardDocsToTable(string aGroupName, DataTable aTable,
+                                            Dictionary<string, Tuple<string, Component, uint>> aComponentsDic,
+                                            Dictionary<string, Dictionary<string, List<string>>> aStandardDic)
+        {
             bool isApplied = false;
             DataRow row;
             bool applied = false;
-            foreach (var item in aStandardDic) {
-                if (item.Value.Count() > MIN_ITEMS_FOR_COMBINE_BY_STANDARD) {
-                    if (!applied) {
-                        applied = true;
-                        AddEmptyRow(aTable);
-                    }
+            Dictionary<string, List<string>> standards;
+            if (aStandardDic.TryGetValue(aGroupName, out standards))
+            {
+                foreach (var item in standards) 
+                {
+                    if (item.Value.Count() > MIN_ITEMS_FOR_COMBINE_BY_STANDARD) {
+                        if (!applied) {
+                            applied = true;
+                            //AddEmptyRow(aTable);
+                        }
 
-                    row = aTable.NewRow();
-                    var index = item.Value.First();
-                    string name = $"{aGroupName} {aComponents[index].GetProperty(Constants.ComponentType)} {item.Key}";
-                    row[Constants.ColumnName] = name;
-                    aTable.Rows.Add(row);
-                    isApplied = true;
+                        row = aTable.NewRow();
+                        var index = item.Value.First();
+                        string name = $"{aComponentsDic[index].Item2.GetProperty(Constants.ComponentType)} {item.Key}";
+                        row[Constants.ColumnName] = name;
+                        aTable.Rows.Add(row);
+                        isApplied = true;
+                    }
                 }
             }
 
@@ -276,6 +471,19 @@ internal class ElementListDataPreparer : BasePreparer {
             return count;
         }
 
+        private uint GetCountByDesignators(string aFirstDesigantor, string aLastDesigantor)
+        {            
+            var digits = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            int indFirst = aFirstDesigantor.IndexOfAny(digits);
+            int indLast = aLastDesigantor.IndexOfAny(digits);
+            var firstValstr = aFirstDesigantor.Substring(indFirst);
+            var lastValstr = aLastDesigantor.Substring(indLast);
+            uint firstVal = UInt32.Parse(firstValstr);
+            uint lastVal = UInt32.Parse(lastValstr);
+            return (uint)(lastVal - firstVal + 1);
+        }
+
+
         /// <summary>
         /// составить строку для столбца "Поз. обозначение"
         /// </summary>
@@ -293,6 +501,23 @@ internal class ElementListDataPreparer : BasePreparer {
             }
 
             return designator;
+        }
+
+        /// <summary>
+        /// составить строку для столбца "Поз. обозначение"
+        /// </summary>
+        /// <param name="aDesignators">список позиционных обозначений всех индентичных элементов</param>
+        /// <returns></returns>
+        private string GetDesignator(string aFirstDesignator, string aLastDesignator, uint count)
+        {            
+            if (count == 1)
+                return aFirstDesignator;
+            else if (count == 2)
+                return $"{aFirstDesignator},{aLastDesignator}";
+            else
+            {
+                return $"{aFirstDesignator}-{aLastDesignator}";
+            }
         }
 
         private void RemoveLastEmptyRows(DataTable table)

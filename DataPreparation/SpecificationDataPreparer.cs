@@ -302,11 +302,11 @@ namespace GostDOC.DataPreparation
                 string component_name = component.GetProperty(Constants.ComponentName);
                 uint component_count = component.Count;// GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
 
-                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth, component_name, Constants.SpecificationFontSize).ToArray();
-                var desigantor_id = component.GetProperty(Constants.ComponentDesignatiorID);
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize, true).ToArray();
+                var desigantor_id = component.GetProperty(Constants.ComponentDesignatorID);
 
                 var note = string.IsNullOrEmpty(desigantor_id) ? component.GetProperty(Constants.ComponentNote) : desigantor_id;
-                string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth, note, Constants.SpecificationFontSize).ToArray();
+                string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth, note, new char[] { ' ', '-', ',' }, Constants.SpecificationFontSize).ToArray();
 
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString { Value = component.GetProperty(Constants.ComponentFormat) };

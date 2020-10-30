@@ -93,16 +93,16 @@ public abstract class BasePreparer {
                 if (others.Components.Count() > 0 || others.SubGroups.Count() > 0) {
                     // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
                     var mainсomponents = others.Components.Where(val =>
-                        !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
+                        !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
                     foreach (var comp in mainсomponents)
-                        dic.Add(comp.GetProperty(Constants.ComponentDesignatiorID), comp);
+                        dic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
 
                     foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key)) {
                         // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
                         var сomponents = subgroup.Value.Components.Where(val =>
-                            !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatiorID)));
+                            !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
                         foreach (var comp in сomponents)
-                            dic.Add(comp.GetProperty(Constants.ComponentDesignatiorID), comp);
+                            dic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
                     }
 
                     result.Add(dic);
@@ -145,8 +145,9 @@ public abstract class BasePreparer {
     /// <param name="aHasStandardDoc">признак наличия ГОСТ/ТУ символов в документе на поставку</param>
     /// <param name="component">компонент</param>
     /// <returns></returns>
-    protected string GetComponentName(bool aHasStandardDoc, Models.Component component) {        
-        if (aHasStandardDoc)
+    protected string GetComponentName(string aKey, Dictionary<string, int> aHasStandardDoc, Models.Component component)
+    {        
+        if (aHasStandardDoc.ContainsKey(aKey) && aHasStandardDoc[aKey] == 1)        
         {
             return $"{component.GetProperty(Constants.ComponentName)} {component.GetProperty(Constants.ComponentDoc)}";
         }
@@ -157,16 +158,17 @@ public abstract class BasePreparer {
     /// определение необходимости заменять имя копонента на основе набора правил
     /// </summary>
     /// <param name="aComponent">компонент</param>
-    /// <param name="aOtherPerformances">список словарей всех компонентов в других исполнениях</param>
+    /// <param name="aOtherInstances">список словарей всех компонентов в других исполнениях</param>
     /// <returns>true - имя компонента необходимо заменить</returns>
     protected bool HaveToChangeComponentName(Component aComponent,
-        IEnumerable<Dictionary<string, Component>> aOtherPerformances) {
-        string designator = aComponent.GetProperty(Constants.ComponentDesignatiorID);
+                                             IEnumerable<Dictionary<string, Component>> aOtherInstances) 
+    {
+        string designator = aComponent.GetProperty(Constants.ComponentDesignatorID);
         // найдем в других исполнениях компонент с таким же позиционным обозначением
         List<Component> same_components = new List<Component>();
-        foreach (var performance in aOtherPerformances) {
-            if (performance.ContainsKey(designator)) {
-                same_components.Add(performance[designator]);
+        foreach (var instance in aOtherInstances) {
+            if (instance.ContainsKey(designator)) {
+                same_components.Add(instance[designator]);
             }
         }
 
@@ -187,53 +189,70 @@ public abstract class BasePreparer {
     }
 
 
-      /// <summary>
-        /// поиск компонент с наличием ТУ/ГОСТ в свойстве "Документ на поставку", заполнение словаря с индексами найденных компонент для
-        /// значения "Документ на поставку" и сохранение номера компонентов с совпадающим значением                
-        /// </summary>
-        /// <param name="aComponents">отсортированный массив компонентов</param>
-        /// <param name="aHasStandardDoc">массив компонентов с отметками о наличии стандартных документов и объединения в группы:
-        /// 0 - компонент не имеет документа на поставку по ТУ или ГОСТ, 
-        /// 1 - компонент имеет документ на поставку по ГОСТ ил ТУ, но он один на весь документ, 
-        /// 2 - компонент имеет документ на поставку по ГОСТ ил ТУ и их достаточно чтобы объединить в группу</param>
-        /// <returns></returns>
-        protected Dictionary<string /* документ на поставку по ГОСТ ил ТУ*/, List<int> /* список номеров компонентов, относящися к данному документу */> 
-            FindComponentsWithStandardDoc(Models.Component[] aComponents, out int[] aHasStandardDoc) {
-            Dictionary<string, List<int>> StandardDic = new Dictionary<string, List<int>>();
-            aHasStandardDoc = new int[aComponents.Length];
+    /// <summary>
+    /// поиск компонент с наличием ТУ/ГОСТ в свойстве "Документ на поставку", заполнение словаря с индексами найденных компонент для
+    /// значения "Документ на поставку" и сохранение номера компонентов с совпадающим значением                
+    /// </summary>
+    /// <param name="aComponents">отсортированный массив компонентов</param>
+    /// <param name="aHasStandardDoc">массив компонентов с отметками о наличии стандартных документов и объединения в группы:
+    /// 1 - компонент имеет документ на поставку по ГОСТ или ТУ, но он один на весь документ, 
+    /// 2 - компонент имеет документ на поставку по ГОСТ или ТУ и их достаточно чтобы объединить в группу</param>
+    /// <returns></returns>
+    protected Dictionary<string /*группа*/, Dictionary<string /*документ на поставку по ГОСТ ил ТУ*/, List<string>> /* список поз. обозначений компонентов, относящися к данному документу */> 
+    FindComponentsWithStandardDoc(Dictionary<string, Tuple<string, Component, uint>> aComponentsDic, out Dictionary<string, int> aHasStandardDoc) 
+    {
+        Dictionary<string, Dictionary<string, List<string>>> StandardDic = new Dictionary<string, Dictionary<string, List<string>>>();
+        aHasStandardDoc = new Dictionary<string, int>();
 
-            for (int i = 0; i < aComponents.Length; i++) {
-                string docToSupply = aComponents[i].GetProperty(Constants.ComponentDoc);
-                if (string.IsNullOrEmpty(docToSupply)) continue;
-                if (string.Equals(docToSupply.Substring(0, 4).ToLower(), "гост") ||
-                    string.Equals(docToSupply.Substring(docToSupply.Length - 2, 2).ToLower(), "ту")) {
-                    List<int> list;
-                    if (StandardDic.TryGetValue(docToSupply, out list)) {
-                        if (list.Count < MIN_ITEMS_FOR_COMBINE_BY_STANDARD) {
-                            aHasStandardDoc[i] = 1;
-                        }
-                        else if (list.Count > MIN_ITEMS_FOR_COMBINE_BY_STANDARD) {
-                            aHasStandardDoc[i] = 2;
-                        }
-                        else {
-                            aHasStandardDoc[list[0]] = 2;
-                            aHasStandardDoc[list[1]] = 2;
-                            aHasStandardDoc[list[2]] = 2;
-                            aHasStandardDoc[i] = 2;
-                        }
+        foreach (var component in aComponentsDic)
+        {
+            string docToSupply = component.Value.Item2.GetProperty(Constants.ComponentDoc);            
+            if (string.IsNullOrEmpty(docToSupply)) 
+                continue;
+            string groupName = component.Value.Item2.GetProperty(Constants.SubGroupNameSp);
+            
+            if (docToSupply.StartsWith("гост", StringComparison.InvariantCultureIgnoreCase) ||
+                docToSupply.EndsWith("ту", StringComparison.InvariantCultureIgnoreCase)) 
+            {
+                    Dictionary<string, List<string>> groupStandards;
+                    if (StandardDic.TryGetValue(groupName, out groupStandards))
+                    {
+                        List<string> list; // список позиционных обозначений для объединения элементов по ГОСТ/ТУ
+                        if (groupStandards.TryGetValue(docToSupply, out list))
+                        {
+                            if (list.Count < MIN_ITEMS_FOR_COMBINE_BY_STANDARD)
+                            {
+                                aHasStandardDoc[component.Key] = 1;
+                            } else if (list.Count > MIN_ITEMS_FOR_COMBINE_BY_STANDARD)
+                            {
+                                aHasStandardDoc[component.Key] = 2;
+                            } else
+                            {
+                                aHasStandardDoc[list[0]] = 2;
+                                aHasStandardDoc[list[1]] = 2;
+                                aHasStandardDoc[list[2]] = 2;
+                                aHasStandardDoc[component.Key] = 2;
+                            }
 
-                        list.Add(i);
+                            list.Add(component.Key);
+                        } else
+                        {
+                            list = new List<string> { component.Key };
+                            aHasStandardDoc[component.Key] = 1;
+                            groupStandards.Add(docToSupply, list);
+                        }
                     }
-                    else {
-                        list = new List<int> {i};
-                        aHasStandardDoc[i] = 1;
-                        StandardDic.Add(docToSupply, list);
+                    else
+                    {   
+                        groupStandards = new Dictionary<string, List<string>>{ { docToSupply, new List<string> { component.Key } } };
+                        aHasStandardDoc[component.Key] = 1;                        
+                        StandardDic.Add(groupName, groupStandards);
                     }
-                }
             }
-
-            return StandardDic;
         }
+
+        return StandardDic;
+    }
 
 
     public class FormattedString {
