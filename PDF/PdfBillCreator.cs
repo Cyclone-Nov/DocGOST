@@ -133,24 +133,25 @@ namespace GostDOC.PDF
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
             var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber, CurrentPage = aPageNumber, DocType = DocType.Bill });
-            titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -14.8f-5f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -14.8f-5f, 
+                                        BOTTOM_MARGIN, 
+                                        TITLE_BLOCK_WIDTH);
             aInDoc.Add(titleBlock);
             
             int lastNextProcessedRow;
             var dataTable = CreateTable(aData, false, aStartRow, out lastNextProcessedRow);
             dataTable.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, 
-                PdfDefines.A3Width - (GetTableHeight(dataTable, aPageNumber) + TOP_MARGIN),
-                COLUMN_SIZES.Sum() + 0*mmW() +13.25f-5f);
+                                       PdfDefines.A3Width - (GetTableHeight(dataTable, aPageNumber) + TOP_MARGIN),
+                                       COLUMN_SIZES.Sum() + 0*mmW() +13.25f-5f);
             aInDoc.Add(dataTable);
 
             DrawLines(aPageNumber);
-
             AddCopyFormatSubscription(aInDoc, aPageNumber);
-
             AddVerticalProjectSubscription(aInDoc, aGraphs);
 
             return lastNextProcessedRow;
         }
+
 
         Table CreateTable(DataTable aData, bool firstPage, int aStartRow, out int outLastProcessedRow) {
             int COLUMNS = COLUMN_SIZES.Length;
@@ -189,10 +190,9 @@ namespace GostDOC.PDF
             int inc = 0;
             for (int ind = aStartRow; ind < Rows.Length; ind++)
             {
-                if (rowNumber <= 0) {
+                if (rowNumber <= 0) 
                     break;
-                }
-
+               
                 if(rowNumber == 1)
                 {
                     centrAlignCell = centrAlignCell.SetBorderBottom(THICK_BORDER);
@@ -205,7 +205,7 @@ namespace GostDOC.PDF
                     (row[columnName] == DBNull.Value) ? string.Empty : (string) row[columnName];
 
                 BasePreparer.FormattedString GetCellStringFormatted(string columnName) =>
-                    (row[columnName] == System.DBNull.Value) ? null : ((BasePreparer.FormattedString) row[columnName]);
+                    (row[columnName] == DBNull.Value) ? null : ((BasePreparer.FormattedString) row[columnName]);
                                     
                 string name               = GetCellString(Constants.ColumnName);
                 string productCode        = GetCellString(Constants.ColumnProductCode);
@@ -220,11 +220,10 @@ namespace GostDOC.PDF
                 string strQuantityReg     = quantityReg == 0 ? "-" : quantityReg.ToString();
                 int    quantityTotal      = (row[Constants.ColumnQuantityTotal] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityTotal];
                 string strQuantityTotal   = quantityTotal == 0 ? "-" : quantityTotal.ToString();
-                string note               = GetCellString(Constants.ColumnFootnote);
-                string textFormat         = GetCellString(Constants.ColumnTextFormat);
+                string note               = GetCellString(Constants.ColumnFootnote);                
 
                 inc++;
-                if (string.IsNullOrEmpty(name) && quantityTotal == 0 && string.IsNullOrEmpty(supplier) && string.IsNullOrEmpty(note))  // это пустая строка
+                if (IsEmptyRow(row))
                 {
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 1, leftPaddCell);
@@ -238,7 +237,7 @@ namespace GostDOC.PDF
                         tbl.AddCell(leftPaddCell.Clone(false)); // Примечание
                         rowNumber--;
                 }
-                else if (!string.IsNullOrEmpty(textFormat))  // это наименование группы
+                else if (IsGroupName(row))
                 {                    
                     if (rowNumber > 4) // если осталось мнее 5 строк для записи группы, то переходим на следующий лист
                     {
@@ -264,15 +263,15 @@ namespace GostDOC.PDF
                     // просто запишем строку
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));                        
                     tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(name)));
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(productCode))); // Код продукции
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(deliveryDocSign))); // Обозначение документа на поставку
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(supplier))); // Поставщик
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(entry))); // Куда входит (обозначение)
-                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityDev))); // Количество на изделие
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(productCode)));          // Код продукции
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(deliveryDocSign)));      // Обозначение документа на поставку
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(supplier)));             // Поставщик
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(entry)));                // Куда входит (обозначение)
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityDev)));     // Количество на изделие
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityComplex))); // Количество в комплекты
-                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityReg))); // Количество на регулир.
-                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityTotal))); // Количество всего
-                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note))); // Примечание
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityReg)));     // Количество на регулир.
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityTotal)));   // Количество всего
+                    tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));                 // Примечание
                     rowNumber--; 
                 }
                 outLastProcessedRow++;
@@ -376,15 +375,53 @@ namespace GostDOC.PDF
                   SetFont(f1).
                   SetFontSize(14);
 
-            // уменьшаем размер шрифта пока не впишемся в установленный размер
-            //RootRenderer canvasRenderer = canvas.getRenderer();
-            //while (paragraph.createRendererSubTree().setParent(canvasRenderer).layout(new LayoutContext(new LayoutArea(pageNumber, new Rectangle(allowedWidth, fontSize * 2)))).getStatus() != LayoutResult.FULL)
-            //{
-            //    paragraph.setFontSize(--fontSize);
-            //}
             PdfPage page = _pdfDoc.GetPage(1);
             Canvas canvas = new Canvas(new PdfCanvas(page), page.GetMediaBox());
             canvas.ShowTextAligned(paragraph, 657, 170, TextAlignment.LEFT);
         }
+
+        /// <summary>
+        /// проверка на пустую строку
+        /// </summary>
+        /// <param name="aRow">a row.</param>
+        /// <returns>
+        ///   <c>true</c> if [is empty row] [the specified a row]; otherwise, <c>false</c>.
+        /// </returns>
+        bool IsEmptyRow(DataRow aRow)
+        {
+            //string.IsNullOrEmpty(name) && quantityTotal == 0 && string.IsNullOrEmpty(supplier) && string.IsNullOrEmpty(note)
+            if ((aRow[Constants.ColumnName] == DBNull.Value) && string.IsNullOrEmpty((string)aRow[Constants.ColumnName])         &&
+                (aRow[Constants.ColumnSupplier] == DBNull.Value) && string.IsNullOrEmpty((string)aRow[Constants.ColumnSupplier]) &&
+                (aRow[Constants.ColumnFootnote] == DBNull.Value) && string.IsNullOrEmpty((string)aRow[Constants.ColumnFootnote]) &&
+                (aRow[Constants.ColumnQuantityTotal] == DBNull.Value) && (int)aRow[Constants.ColumnQuantityTotal] == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// проверка строки на заголовок
+        /// </summary>
+        /// <param name="aRow">a row.</param>
+        /// <returns>
+        ///   <c>true</c> if [is empty row] [the specified a row]; otherwise, <c>false</c>.
+        /// </returns>
+        bool IsGroupName(DataRow aRow)
+        {            
+            if ((aRow[Constants.ColumnTextFormat] == DBNull.Value) && 
+                !string.IsNullOrEmpty((string)aRow[Constants.ColumnTextFormat]))
+            {
+                return true;
+            }
+            return false;
+        }
+
+
+        void WriteRowToTable(Table aTable, DataRow aRow)
+        { 
+            
+        }
+
     }
 }

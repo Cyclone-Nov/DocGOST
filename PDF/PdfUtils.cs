@@ -27,32 +27,32 @@ namespace GostDOC.PDF
             {
                 case DocType.Bill:
                     {                        
-                        RowsOnFirstPage = 26;
-                        RowsOnNextPage = 32;
+                        RowsOnFirstPage = Constants.BillRowsOnFirstPage;
+                        RowsOnNextPage = Constants.BillRowsOnNextPage;
                     }
                     break;
                 case DocType.D27:
                     {                     
-                        RowsOnFirstPage = 24;
-                        RowsOnNextPage = 29;
+                        RowsOnFirstPage = Constants.DefaultRowsOnFirstPage;
+                        RowsOnNextPage = Constants.DefaultRowsOnNextPage;
                     }
                     break;
                 case DocType.Specification: 
                     {                    
-                        RowsOnFirstPage = 24;
-                        RowsOnNextPage = 29;
+                        RowsOnFirstPage = Constants.SpecificationRowsOnFirstPage;
+                        RowsOnNextPage = Constants.SpecificationRowsOnNextPage;
                     }
                     break;
                 case DocType.ItemsList:
                     {                     
-                        RowsOnFirstPage = 24;
-                        RowsOnNextPage = 29;
+                        RowsOnFirstPage = Constants.ItemListRowsOnFirstPage;
+                        RowsOnNextPage = Constants.ItemListRowsOnNextPage;
                     }
                     break;                
                 default:
                     {                     
-                        RowsOnFirstPage = 26;
-                        RowsOnNextPage = 33;
+                        RowsOnFirstPage = Constants.DefaultRowsOnFirstPage;
+                        RowsOnNextPage = Constants.DefaultRowsOnNextPage;
                     }
                     break;
             }

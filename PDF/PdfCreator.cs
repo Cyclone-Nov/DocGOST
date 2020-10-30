@@ -909,6 +909,13 @@ namespace GostDOC.PDF
             cell.SetBorderRight(aRightBorder == 0 ? Border.NO_BORDER : new SolidBorder(aRightBorder));
 
             return cell;
-        }        
+        }
+
+        // уменьшаем размер шрифта пока не впишемся в установленный размер
+        //RootRenderer canvasRenderer = canvas.getRenderer();
+        //while (paragraph.createRendererSubTree().setParent(canvasRenderer).layout(new LayoutContext(new LayoutArea(pageNumber, new Rectangle(allowedWidth, fontSize * 2)))).getStatus() != LayoutResult.FULL)
+        //{
+        //    paragraph.setFontSize(--fontSize);
+        //}
     }
 }

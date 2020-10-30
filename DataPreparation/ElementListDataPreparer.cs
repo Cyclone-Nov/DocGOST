@@ -30,8 +30,7 @@ internal class ElementListDataPreparer : BasePreparer {
         // из остальных конфигураций получаем список словарей с соответсвующими компонентами
         var otherConfigsElements = MakeComponentDesignatorsDictionaryOtherConfigs(aConfigs);
 
-        // работаем по основной конфигурации
-        // нужны только компоненты из раздела "Прочие изделия"
+        // работаем по основной конфигурации,нужны только компоненты из раздела "Прочие изделия"
         Group others;
         if (data.TryGetValue(Constants.GroupOthers, out others)) {
             DataTable table = CreateTable("ElementListData");
@@ -39,9 +38,7 @@ internal class ElementListDataPreparer : BasePreparer {
 
                 // подготавливаем список из всех компонентов
                 var allComponentsDic = PrepareComponentsList(others);
-
-                // заполняем таблицу данных
-                //AddEmptyRow(table);
+                                                
                 FillDataTable(table, allComponentsDic, otherConfigsElements, schemaDesignation);
 
                 // удаляем пусты строки в конце
@@ -520,6 +517,10 @@ internal class ElementListDataPreparer : BasePreparer {
             }
         }
 
+        /// <summary>
+        /// удаление пустых строк в конце таблицы данных
+        /// </summary>
+        /// <param name="table">The table.</param>
         private void RemoveLastEmptyRows(DataTable table)
         {
             if (table.Rows.Count > 1)
