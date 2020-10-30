@@ -33,6 +33,8 @@ namespace GostDOC.PDF
         public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs) 
         {
             var graphs = aMainGraphs;
+            if (aData == null)
+                return;
 
             if (_pdfWriter != null)
             {
