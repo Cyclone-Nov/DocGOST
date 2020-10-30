@@ -116,7 +116,7 @@ namespace GostDOC.ViewModels
             Note.Value = GetValue(Constants.ComponentNote, aComponent);
             Sign.Value = GetValue(Constants.ComponentSign, aComponent);
 
-            DesignatorID.Value = GetValue(Constants.ComponentDesignatiorID, aComponent);
+            DesignatorID.Value = GetValue(Constants.ComponentDesignatorID, aComponent);
             NoteSP.Value = string.IsNullOrEmpty(DesignatorID.Value) ? Note.Value : DesignatorID.Value;
             WhereIncluded.Value = GetValue(Constants.ComponentWhereIncluded, aComponent);
 

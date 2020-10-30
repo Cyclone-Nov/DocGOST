@@ -211,7 +211,7 @@ namespace GostDOC.Models
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
                 var included = cmp.Properties.Find(x => x.Name == Constants.ComponentWhereIncluded);
                 var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
-                var position = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatiorID);
+                var position = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatorID);
 
                 if (name == null)
                 {
@@ -331,7 +331,7 @@ namespace GostDOC.Models
             };
 
 
-            var id = aSrc.Properties.Find(x => x.Name == Constants.ComponentDesignatiorID)?.Text ?? string.Empty;
+            var id = aSrc.Properties.Find(x => x.Name == Constants.ComponentDesignatorID)?.Text ?? string.Empty;
             var name = aSrc.Properties.Find(x => x.Name == Constants.ComponentName)?.Text ?? string.Empty;
 
             foreach (var property in aSrc.Properties)
@@ -443,14 +443,14 @@ namespace GostDOC.Models
                 {
                     // Update pos
                     string currentPos;
-                    if (!string.IsNullOrEmpty(aCombine.Position) && existing.Properties.TryGetValue(Constants.ComponentDesignatiorID, out currentPos))
+                    if (!string.IsNullOrEmpty(aCombine.Position) && existing.Properties.TryGetValue(Constants.ComponentDesignatorID, out currentPos))
                     {
                         if (!string.IsNullOrEmpty(currentPos) && currentPos == aCombine.Position)
                         {
                             _error.Error($"Компонент {aCombine.Name}: повторяющееся позиционное обозначение!");
                             return true;
                         }
-                        existing.Properties[Constants.ComponentDesignatiorID] = currentPos + "," + aCombine.Position;
+                        existing.Properties[Constants.ComponentDesignatorID] = currentPos + "," + aCombine.Position;
                     }
 
                     // If already added - increase count
@@ -576,7 +576,7 @@ namespace GostDOC.Models
             foreach (var cmp in aComponents.Values)
             {
                 string currentPos;
-                if (cmp.Properties.TryGetValue(Constants.ComponentDesignatiorID, out currentPos))
+                if (cmp.Properties.TryGetValue(Constants.ComponentDesignatorID, out currentPos))
                 {                    
                     // Split ids
                     string[] split = currentPos.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -659,7 +659,7 @@ namespace GostDOC.Models
                     }
 
                     // Save updated id
-                    cmp.Properties[Constants.ComponentDesignatiorID] = result;
+                    cmp.Properties[Constants.ComponentDesignatorID] = result;
                 }
             }
         }
