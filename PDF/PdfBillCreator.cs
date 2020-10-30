@@ -207,20 +207,20 @@ namespace GostDOC.PDF
                 BasePreparer.FormattedString GetCellStringFormatted(string columnName) =>
                     (row[columnName] == System.DBNull.Value) ? null : ((BasePreparer.FormattedString) row[columnName]);
                                     
-                string name               = GetCellString(Constants.ColumnName);
-                string productCode        = GetCellString(Constants.ColumnProductCode);
-                string deliveryDocSign    = GetCellString(Constants.ColumnDeliveryDocSign);
-                string supplier           = GetCellString(Constants.ColumnSupplier);
-                string entry              = GetCellString(Constants.ColumnEntry);
+                string name               = GetCellString(Constants.ColumnName).Truncate(35);
+                string productCode        = GetCellString(Constants.ColumnProductCode).Truncate(24);
+                string deliveryDocSign    = GetCellString(Constants.ColumnDeliveryDocSign).Truncate(32);
+                string supplier           = GetCellString(Constants.ColumnSupplier).Truncate(35);
+                string entry              = GetCellString(Constants.ColumnEntry).Truncate(42);
                 int    quantityDev        = (row[Constants.ColumnQuantityDevice] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityDevice];
-                string strQuantityDev     = quantityDev == 0 ? "-" : quantityDev.ToString();
+                string strQuantityDev     = quantityDev == 0 ? "-" : quantityDev.ToString().Truncate(5);
                 int    quantityComplex    = (row[Constants.ColumnQuantityComplex] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityComplex];
-                string strQuantityComplex = quantityComplex == 0 ? "-" : quantityComplex.ToString();
+                string strQuantityComplex = quantityComplex == 0 ? "-" : quantityComplex.ToString().Truncate(5);
                 int    quantityReg        = (row[Constants.ColumnQuantityRegul] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityRegul];
-                string strQuantityReg     = quantityReg == 0 ? "-" : quantityReg.ToString();
+                string strQuantityReg     = quantityReg == 0 ? "-" : quantityReg.ToString().Truncate(5);
                 int    quantityTotal      = (row[Constants.ColumnQuantityTotal] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityTotal];
-                string strQuantityTotal   = quantityTotal == 0 ? "-" : quantityTotal.ToString();
-                string note               = GetCellString(Constants.ColumnFootnote);
+                string strQuantityTotal   = quantityTotal == 0 ? "-" : quantityTotal.ToString().Truncate(5);
+                string note               = GetCellString(Constants.ColumnFootnote).Truncate(12);
                 string textFormat         = GetCellString(Constants.ColumnTextFormat);
 
                 inc++;
