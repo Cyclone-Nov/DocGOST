@@ -88,7 +88,7 @@ namespace GostDOC.PDF
             var font = PdfDefines.MainFont;
             float currLength = font.GetWidth(aString, aFontSize);
 
-            const string GOST_PREF = @"ГОСТ ";
+            List<string> PREF_ARR = new List<string>() { @" ГОСТ ", @" ОСТ ", @" ТУ ", @" ANSI ", @" ISO ", @" DIN " };
 
             if (currLength < maxLength)
             {
@@ -103,7 +103,7 @@ namespace GostDOC.PDF
                     string partName = fullName.Substring(0, symbOnMaxLength);
 
                     // пробуем найти ближайший символ, по которому можно переносить фразу и извлечем часть для первой строки
-                    int index = (aUseGOST && partName.Contains(GOST_PREF)) ? partName.IndexOf(GOST_PREF) : partName.LastIndexOfAny(aDelimiters);                    
+                    int index = (aUseGOST && PREF_ARR.Any(s=> partName.Contains(s))) ? partName.IndexOf(PREF_ARR.Find(b => partName.Contains(b))) : partName.LastIndexOfAny(aDelimiters);
                     if (index < 0)
                     {
                         name_strings.Add(partName);
