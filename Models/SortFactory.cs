@@ -52,8 +52,8 @@ namespace GostDOC.Models
         {
             aItems.Sort((x, y) =>
             {
-                string dX = x.GetProperty(Constants.ComponentDesignatiorID);
-                string dY = y.GetProperty(Constants.ComponentDesignatiorID);
+                string dX = x.GetProperty(Constants.ComponentDesignatorID);
+                string dY = y.GetProperty(Constants.ComponentDesignatorID);
 
                 if (string.IsNullOrEmpty(dX))
                     return -1;
@@ -73,7 +73,32 @@ namespace GostDOC.Models
             });
             return aItems;
         }
-    }    
+    }
+
+
+    class DesignatorIDComparer : IComparer<string>
+    {
+        public int Compare(string x, string y)
+        {
+            if (string.IsNullOrEmpty(x))
+                return -1;
+
+            if (string.IsNullOrEmpty(y))
+                return 1;
+
+            Tuple<string, int> dX = Common.Converters.SplitDesignatorToStringAndNumber(x);//x.GetProperty(Constants.ComponentDesignatorID);
+            Tuple<string, int> dY = Common.Converters.SplitDesignatorToStringAndNumber(y);// y.GetProperty(Constants.ComponentDesignatorID);
+
+            int result = string.Compare(dX.Item1, dY.Item1);
+
+            if (result == 0)
+            {
+                return dX.Item2 - dY.Item2;
+            }
+
+            return result;
+        }
+    }
 
     class NameSortRegex : ISort<Component>
     {
