@@ -29,17 +29,17 @@ namespace GostDOC.PDF
         private float MIDDLE_FONT_SIZE = 14;
 
         readonly float[] COLUMN_SIZES = {
-                Constants.BIllColumn1IncWidth * mmH()-4f,
-                Constants.BIllColumn2NameWidth * mmW(),
-                Constants.BIllColumn3ProductCodeWidth * mmW(),
-                Constants.BIllColumn4DeliveryDocSignWidth * mmW(),
-                Constants.BIllColumn5SupplierWidth * mmW(),
-                Constants.BIllColumn6EntryWidth * mmW(),
-                Constants.BIllColumn7QuantityDeviceWidth * mmW(),
-                Constants.BIllColumn8QuantityComplexWidth * mmW(),
-                Constants.BIllColumn9QuantityRegulWidth * mmW(),
-                Constants.BIllColumn10QuantityTotalWidth * mmW(),
-                Constants.BIllColumn11FootnoteWidth * mmW(),
+                Constants.BillColumn1IncWidth * mmH()-4f,
+                Constants.BillColumn2NameWidth * mmW(),
+                Constants.BillColumn3ProductCodeWidth * mmW(),
+                Constants.BillColumn4DeliveryDocSignWidth * mmW(),
+                Constants.BillColumn5SupplierWidth * mmW(),
+                Constants.BillColumn6EntryWidth * mmW(),
+                Constants.BillColumn7QuantityDeviceWidth * mmW(),
+                Constants.BillColumn8QuantityComplexWidth * mmW(),
+                Constants.BillColumn9QuantityRegulWidth * mmW(),
+                Constants.BillColumn10QuantityTotalWidth * mmW(),
+                Constants.BillColumn11FootnoteWidth * mmW(),
         };
 
         public PdfBillCreator() : base(DocType.Bill) {
