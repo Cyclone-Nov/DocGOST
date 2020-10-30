@@ -401,11 +401,11 @@ namespace GostDOC.PDF
 
             #region Right Upper (additional)
 
-            mainTable.AddCell(new Cell(1, 1).SetHeight(14*mmH()).SetBorder(THICK_BORDER));
-            mainTable.AddCell(new Cell(1, 1).SetBorder(THICK_BORDER));
-            mainTable.AddCell(new Cell(1,6).SetBorder(THICK_BORDER));
+            mainTable.AddCell(new Cell(1, 1).SetHeight(14*mmH()).SetBorder(THICK_BORDER).SetPadding(0));
+            mainTable.AddCell(new Cell(1, 1).SetBorder(THICK_BORDER).SetPadding(0));
+            mainTable.AddCell(new Cell(1,6).SetBorder(THICK_BORDER).SetPadding(0));
 
-            mainTable.AddCell(new Cell(1,8).SetHeight(8*mmH()).SetBorder(THICK_BORDER));
+            mainTable.AddCell(new Cell(1,8).SetHeight(8*mmH()).SetBorder(THICK_BORDER).SetPadding(0));
 
             #endregion
 
