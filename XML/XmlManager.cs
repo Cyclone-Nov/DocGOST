@@ -50,7 +50,8 @@ namespace GostDOC.Models
 
             if (aResult.Type == ProjectType.GostDocB && _docType != DocType.Bill && _docType != DocType.D27)
             {
-                return false;
+                _error.Error($"Попытка открыть файл ведомости в другом режиме!");
+                return true;
             }
 
             aResult.Version = _xml.Transaction.Version;
