@@ -558,16 +558,14 @@ namespace GostDOC.ViewModels
         }
 
         private void UpdatePdf(object obj)
-        {
-            if (_selectedItem == null)
-                return;
-            
-            // TODO: async
-            /*res = await*/ 
-            if(_docManager.PrepareData(_docType))
-            { 
-                _docManager.PreparePDF(_docType);
-                CurrentPdfData.Value = _docManager.GetPdfData(_docType);
+        {   
+            if (IsExportPdfEnabled.Value)
+            {
+                if (_docManager.PrepareData(_docType))
+                {
+                    _docManager.PreparePDF(_docType);
+                    CurrentPdfData.Value = _docManager.GetPdfData(_docType);
+                }
             }
         }
 

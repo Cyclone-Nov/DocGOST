@@ -23,23 +23,21 @@ namespace GostDOC.PDF
 {
     class PdfBillCreator : PdfCreator
     {
-//        protected new readonly float LEFT_MARGIN = 5 * mmW();
-//        protected new readonly float RIGHT_MARGIN = 5 * mmH();
-
         private float MIDDLE_FONT_SIZE = 14;
+        //protected new static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH() + 4f;
 
         readonly float[] COLUMN_SIZES = {
-                Constants.BIllColumn1IncWidth * mmH()-4f,
-                Constants.BIllColumn2NameWidth * mmW(),
-                Constants.BIllColumn3ProductCodeWidth * mmW(),
-                Constants.BIllColumn4DeliveryDocSignWidth * mmW(),
-                Constants.BIllColumn5SupplierWidth * mmW(),
-                Constants.BIllColumn6EntryWidth * mmW(),
-                Constants.BIllColumn7QuantityDeviceWidth * mmW(),
-                Constants.BIllColumn8QuantityComplexWidth * mmW(),
-                Constants.BIllColumn9QuantityRegulWidth * mmW(),
-                Constants.BIllColumn10QuantityTotalWidth * mmW(),
-                Constants.BIllColumn11FootnoteWidth * mmW(),
+                Constants.BillColumn1IncWidth * mmH()-4f,
+                Constants.BillColumn2NameWidth * mmW(),
+                Constants.BillColumn3ProductCodeWidth * mmW(),
+                Constants.BillColumn4DeliveryDocSignWidth * mmW(),
+                Constants.BillColumn5SupplierWidth * mmW(),
+                Constants.BillColumn6EntryWidth * mmW(),
+                Constants.BillColumn7QuantityDeviceWidth * mmW(),
+                Constants.BillColumn8QuantityComplexWidth * mmW(),
+                Constants.BillColumn9QuantityRegulWidth * mmW(),
+                Constants.BillColumn10QuantityTotalWidth * mmW(),
+                Constants.BillColumn11FootnoteWidth * mmW(),
         };
 
         public PdfBillCreator() : base(DocType.Bill) {
@@ -101,14 +99,17 @@ namespace GostDOC.PDF
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
             var titleBlock = CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, CurrentPage = 1,  DocType = DocType.Bill});
-            titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -14.7f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            titleBlock.SetFixedPosition(
+                PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -14.7f -5f, 
+                BOTTOM_MARGIN, 
+                TITLE_BLOCK_WIDTH);
             aInDoc.Add(titleBlock);
 
             var dataTable = CreateTable(aData, true, 0, out var lpr);
             dataTable.SetFixedPosition(
                 APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, 
-                PdfDefines.A3Width - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 22f, 
-                COLUMN_SIZES.Sum() +13.25f);
+                PdfDefines.A3Width - (GetTableHeight(dataTable, 1) + TOP_MARGIN),
+                COLUMN_SIZES.Sum() +13.25f-5f);
             aInDoc.Add(dataTable);
 
             DrawLines(1);
@@ -132,14 +133,14 @@ namespace GostDOC.PDF
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
             var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber, CurrentPage = aPageNumber, DocType = DocType.Bill });
-            titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -14.8f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
+            titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -14.8f-5f, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH);
             aInDoc.Add(titleBlock);
             
             int lastNextProcessedRow;
             var dataTable = CreateTable(aData, false, aStartRow, out lastNextProcessedRow);
             dataTable.SetFixedPosition(APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f, 
-                PdfDefines.A3Width - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 22f, 
-                COLUMN_SIZES.Sum() + 0*mmW() +13.25f);
+                PdfDefines.A3Width - (GetTableHeight(dataTable, aPageNumber) + TOP_MARGIN),
+                COLUMN_SIZES.Sum() + 0*mmW() +13.25f-5f);
             aInDoc.Add(dataTable);
 
             DrawLines(aPageNumber);
@@ -150,7 +151,6 @@ namespace GostDOC.PDF
 
             return lastNextProcessedRow;
         }
-
 
         Table CreateTable(DataTable aData, bool firstPage, int aStartRow, out int outLastProcessedRow) {
             int COLUMNS = COLUMN_SIZES.Length;
@@ -278,7 +278,7 @@ namespace GostDOC.PDF
                 outLastProcessedRow++;
             }
 
-             // дополним таблицу пустыми строками если она не полностью заполнена
+            // дополним таблицу пустыми строками если она не полностью заполнена
             if (rowNumber > 0) {
                 for(int j = 0; j < rowNumber;j++)
                 {
@@ -303,18 +303,26 @@ namespace GostDOC.PDF
         /// <param name="aTable">a table.</param>
         void AddDataTableHeader(Table aTable) {
 
-            Cell CreateCell(int rowspan=1, int colspan=1) => new Cell(rowspan, colspan).SetPadding(0).SetMargin(0).SetBorderLeft(THICK_BORDER).SetBorderRight(THICK_BORDER);
+            Cell CreateCell(int rowspan=1, int colspan=1) => 
+                new Cell(rowspan, colspan)
+                    .SetPadding(0)
+                    //.SetMargin(0)
+                    .SetBorderLeft(THICK_BORDER)
+                    .SetBorderRight(THICK_BORDER);
 
             var mainHeaderCell = new Cell(2, 1)
                 .SetFontSize(MIDDLE_FONT_SIZE)
+                .SetHeight(27*mmH())
+                .SetPadding(0)
                 .SetVerticalAlignment(VerticalAlignment.MIDDLE)
                 .SetTextAlignment(TextAlignment.CENTER)
-                .SetBorder(THICK_BORDER).SetPadding(0);
+                .SetBorder(THICK_BORDER);
             var mainHeaderCell11 = new Cell(1, 1)
                 .SetFontSize(MIDDLE_FONT_SIZE)
+                .SetPadding(0)
                 .SetVerticalAlignment(VerticalAlignment.MIDDLE)
                 .SetTextAlignment(TextAlignment.CENTER)
-                .SetBorder(THICK_BORDER).SetPadding(0);
+                .SetBorder(THICK_BORDER);
 
             void AddMainHeaderCell(string text) => aTable.AddCell(mainHeaderCell.Clone(false).Add(new Paragraph(text)));
 
@@ -334,10 +342,11 @@ namespace GostDOC.PDF
                     .SetBorder(THICK_BORDER)
                     .SetVerticalAlignment(VerticalAlignment.MIDDLE)
                     .SetFontSize(MIDDLE_FONT_SIZE)
-                    .SetHeight(9*mmH()).Add(new Paragraph("Количество")));
+                    //.SetHeight(9*mmH())
+                    .Add(new Paragraph("Количество")));
             AddMainHeaderCell("Примечание");
             
-            void AddSecondaryHeaderCell(string text) => aTable.AddCell(mainHeaderCell11.Clone(false).SetHeight(18*mmH()).Add(new Paragraph(text)));
+            void AddSecondaryHeaderCell(string text) => aTable.AddCell(mainHeaderCell11.Clone(false).SetHeight(18*mmH()).Add(new Paragraph(text).SetFixedLeading(12f)));
 
             AddSecondaryHeaderCell("на из-\nделие");
             AddSecondaryHeaderCell("в ком-\nплекте");
@@ -355,7 +364,7 @@ namespace GostDOC.PDF
             DrawHorizontalLine(aPageNumber, APPEND_GRAPHS_LEFT, y, THICK_LINE_WIDTH,bottomHorizLineWidth);
         
             var rightVertLineHeight = PdfDefines.A3Width - BOTTOM_MARGIN * 2 - 10f;
-            x = APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - -3.9f + bottomHorizLineWidth;
+            x = APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - -3.9f + bottomHorizLineWidth - 5f;
             y = BOTTOM_MARGIN+2f;
             DrawVerticalLine(aPageNumber, x, y,THICK_LINE_WIDTH, rightVertLineHeight);
         }

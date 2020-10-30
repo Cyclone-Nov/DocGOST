@@ -77,13 +77,10 @@ namespace GostDOC.PDF
         /// <param name="aString">строка для разбивки</param>
         /// <param name="aFontSize">размер шрифта</param>
         /// <returns></returns>
-        public static List<string> SplitStringByWidth(float aLength, string aString, float aFontSize = PdfDefines.DefaultFontSize)
+        public static List<string> SplitStringByWidth(float aLength, string aString, char[] aDelimiters, float aFontSize = PdfDefines.DefaultFontSize, bool aUseGOST = false)
         {
-            if (string.IsNullOrEmpty(aString))
-                return new List<string>() { string.Empty};
-
-            //string val = "R120, R123,";
-            //int ind = val.LastIndexOfAny(new char[] { ' ', '-', '.', ',' }, val.Length - 1);
+            if (string.IsNullOrEmpty(aString) || aDelimiters == null || aDelimiters.Length == 0)
+                return new List<string>() { string.Empty};                          
 
             List<string> name_strings = new List<string>();
             int default_padding = 2;
@@ -91,13 +88,14 @@ namespace GostDOC.PDF
             var font = PdfDefines.MainFont;
             float currLength = font.GetWidth(aString, aFontSize);
 
+            List<string> PREF_ARR = new List<string>() { @" ГОСТ ", @" ОСТ ", @" ТУ ", @" ANSI ", @" ISO ", @" DIN " };
+
             if (currLength < maxLength)
             {
                 name_strings.Add(aString);
             } else
             {
                 string fullName = aString;
-
                 do
                 {
                     // извлекаем из строки то число символов, которое может поместиться в указанную длину maxLength
@@ -105,15 +103,15 @@ namespace GostDOC.PDF
                     string partName = fullName.Substring(0, symbOnMaxLength);
 
                     // пробуем найти ближайший символ, по которому можно переносить фразу и извлечем часть для первой строки
-                    int index = partName.LastIndexOfAny(new char[] { ' ', '-', '.', ',' });
+                    int index = (aUseGOST && PREF_ARR.Any(s=> partName.Contains(s))) ? partName.IndexOf(PREF_ARR.Find(b => partName.Contains(b))) : partName.LastIndexOfAny(aDelimiters);
                     if (index < 0)
                     {
                         name_strings.Add(partName);
                         fullName = fullName.Substring(symbOnMaxLength + 1);
                     } else
                     {
-                        name_strings.Add(fullName.Substring(0, index + 1).TrimEnd());
-                        fullName = fullName.Substring(index+1).TrimStart();
+                        name_strings.Add(fullName.Substring(0, index).TrimEnd());
+                        fullName = fullName.Substring(index).TrimStart();
                     }
                     currLength = font.GetWidth(fullName, aFontSize);
                 }

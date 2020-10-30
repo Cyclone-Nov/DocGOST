@@ -386,11 +386,11 @@ namespace GostDOC.DataPreparation
 
                 // вчисляем длины полей и переносим на следующую строку при необходимости 
                 // разобьем наименование на несколько строк исходя из длины текста
-                string[] namearr = PdfUtils.SplitStringByWidth(Constants.BIllColumn2NameWidth, name, Constants.BillFontSize).ToArray();       
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.BillColumn2NameWidth, name, new char[] { ' ','.','-'} ,Constants.BillFontSize).ToArray();
                 var supplier = component.GetProperty(Constants.ComponentSupplier);                 
-                string[] supplierarr = PdfUtils.SplitStringByWidth(Constants.BIllColumn5SupplierWidth, supplier, Constants.BillFontSize).ToArray();
+                string[] supplierarr = PdfUtils.SplitStringByWidth(Constants.BillColumn5SupplierWidth, supplier, new char[] { ' ', '.', '-' }, Constants.BillFontSize).ToArray();
                 var note = component.GetProperty(Constants.ComponentNote);
-                string[] notearr = PdfUtils.SplitStringByWidth(Constants.BIllColumn11FootnoteWidth, note, Constants.BillFontSize).ToArray();
+                string[] notearr = PdfUtils.SplitStringByWidth(Constants.BillColumn11FootnoteWidth, note, new char[] { ' ', '.', '-' }, Constants.BillFontSize).ToArray();
 
                 row = aTable.NewRow();
                 row[Constants.ColumnName] = namearr.First();

@@ -168,7 +168,17 @@ namespace GostDOC.PDF
                 
 
         protected float GetTableHeight(Table table, int pageNumber) {
-            var result = table.CreateRendererSubTree().SetParent(_doc.GetRenderer()).Layout(new LayoutContext(new LayoutArea(pageNumber, new Rectangle(0, 0, PageSize.A4.GetWidth(), PageSize.A4.GetHeight()))));
+            float width, heigth;
+            if (_pageSize.Contains(PageSize.A3)) {
+                width = PageSize.A3.GetHeight();
+                heigth = PageSize.A3.GetHeight();
+            }
+            else {
+                width = PageSize.A4.GetWidth();
+                heigth = PageSize.A4.GetHeight();
+            }
+            //var result = table.CreateRendererSubTree().SetParent(_doc.GetRenderer()).Layout(new LayoutContext(new LayoutArea(pageNumber, new Rectangle(0, 0, _pageSize.GetWidth(), _pageSize.GetHeight()))));
+            var result = table.CreateRendererSubTree().SetParent(_doc.GetRenderer()).Layout(new LayoutContext(new LayoutArea(pageNumber, new Rectangle(0, 0, width, heigth))));
             float tableHeight = result.GetOccupiedArea().GetBBox().GetHeight();
             return tableHeight;
         }
@@ -401,15 +411,18 @@ namespace GostDOC.PDF
 
             #region Right Upper (additional)
 
-            mainTable.AddCell(new Cell(1, 1).SetHeight(14*mmH()).SetBorder(THICK_BORDER));
-            mainTable.AddCell(new Cell(1, 1).SetBorder(THICK_BORDER));
-            mainTable.AddCell(new Cell(1,6).SetBorder(THICK_BORDER));
+            mainTable.AddCell(new Cell(1, 1).SetHeight(14*mmH()).SetBorder(THICK_BORDER).SetPadding(0));
+            mainTable.AddCell(new Cell(1, 1).SetBorder(THICK_BORDER).SetPadding(0));
+            mainTable.AddCell(new Cell(1,6).SetBorder(THICK_BORDER).SetPadding(0));
 
-            mainTable.AddCell(new Cell(1,8).SetHeight(8*mmH()).SetBorder(THICK_BORDER));
+            mainTable.AddCell(new Cell(1,8).SetHeight(8*mmH()).SetBorder(THICK_BORDER).SetPadding(0));
 
             #endregion
 
             float leftTableCellHeight = 5 * mmH() -0.775f;
+            if (_pageSize.Contains(PageSize.A3)) {
+                leftTableCellHeight = leftTableCellHeight - 0.1f;
+            }
             Cell leftTableCell = new Cell(1, 1)
                 .SetHeight(leftTableCellHeight)
                 .SetPadding(0)
@@ -496,7 +509,7 @@ namespace GostDOC.PDF
             var graph1Cell = new Cell(5, 3)
                 .SetTextAlignment(TextAlignment.CENTER)
                 .SetVerticalAlignment(VerticalAlignment.MIDDLE)
-                .SetBorder(THICK_BORDER).Add(new Paragraph(GetGraph(Constants.GRAPH_1)).SetFontSize(20));
+                .SetBorder(THICK_BORDER).Add(new Paragraph(GetGraph(Constants.GRAPH_1)).SetFontSize(20).SetFixedLeading(15f));
             if (!string.IsNullOrEmpty(documentTypeGraph1)) {
                 graph1Cell.Add(new Paragraph(documentTypeGraph1).SetFontSize(12));
             }

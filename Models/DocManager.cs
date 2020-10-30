@@ -67,6 +67,12 @@ namespace GostDOC.Models
         public bool SavePDF(DocType aDocType, string aFilePath)
         {
             DataTable dataTable = _prepareDataManager.GetDataTable(aDocType);
+            if (dataTable == null)
+            {
+                if (!_prepareDataManager.PrepareDataTable(aDocType, Project.Configurations))
+                    return false;
+            }
+
             IDictionary<string, string> mainConfigGraphs = null;
             bool res = true;
             if (GetMainConfigurationGraphs(out mainConfigGraphs))

@@ -120,6 +120,24 @@ namespace GostDOC.Common
             return string.Empty;
         }
 
+
+        public static Tuple<string, int> SplitDesignatorToStringAndNumber(string s)
+        {
+            string val = string.Empty;
+            int dig = 0;
+            for (int i = 0; i<s.Length ;i++)
+            {
+                if (Char.IsDigit(s[i]))
+                {
+                    val = s.Substring(0, i);
+                    dig = Int32.Parse(s.Substring(i));
+                    break;
+                }
+            }
+
+            return new Tuple<string, int>(val, dig);
+        }
+
     }
 
     public static class Constants {
@@ -310,7 +328,7 @@ namespace GostDOC.Common
         public static readonly string ComponentPresence = "Наличие компонента";
         public static readonly string ComponentSign = "Обозначение";
         public static readonly string ComponentWhereIncluded = "Куда входит";
-        public static readonly string ComponentDesignatiorID = "Позиционное обозначение";
+        public static readonly string ComponentDesignatorID = "Позиционное обозначение";
         
         #endregion
 
@@ -401,47 +419,47 @@ namespace GostDOC.Common
         /// <summary>
         /// Ширина столбца "№ строки" ведомости покупных изделий
         /// </summary>
-        public static readonly float BIllColumn1IncWidth             = 7.0f;
+        public static readonly float BillColumn1IncWidth             = 7.0f;
         /// <summary>
         /// Ширина столбца "Наименование" ведомости покупных изделий
         /// </summary>
-        public static readonly float BIllColumn2NameWidth            = 60.0f;
+        public static readonly float BillColumn2NameWidth            = 60.0f;
         /// <summary>
         /// Ширина столбца "Код продукции" ведомости покупных изделий
         /// </summary>
-        public static readonly float BIllColumn3ProductCodeWidth     = 45.0f;
+        public static readonly float BillColumn3ProductCodeWidth     = 45.0f;
         /// <summary>
         /// Ширина столбца "Обозначение документа на поставку" ведомости покупных изделий
         /// </summary>
-        public static readonly float BIllColumn4DeliveryDocSignWidth = 70.0f;
+        public static readonly float BillColumn4DeliveryDocSignWidth = 70.0f;
         /// <summary>
         /// Ширина столбца "Поставщик" ведомости покупных изделий
         /// </summary>
-        public static readonly float BIllColumn5SupplierWidth        = 55.0f;
+        public static readonly float BillColumn5SupplierWidth        = 55.0f;
         /// <summary>
         /// Ширина столбца "Куда входит (обозначение)" ведомости покупных изделий
         /// </summary>
-        public static readonly float BIllColumn6EntryWidth           = 70.0f;
+        public static readonly float BillColumn6EntryWidth           = 70.0f;
         /// <summary>
         /// Ширина столбца "Количество: на изделие" ведомости покупных изделий
         /// </summary>
-        public static readonly float BIllColumn7QuantityDeviceWidth  = 16.0f;
+        public static readonly float BillColumn7QuantityDeviceWidth  = 16.0f;
         /// <summary>
         /// Ширина столбца "Количество: в комплекты" ведомости покупных изделий
         /// </summary>
-        public static readonly float BIllColumn8QuantityComplexWidth = 16.0f;
+        public static readonly float BillColumn8QuantityComplexWidth = 16.0f;
         /// <summary>
         /// Ширина столбца "Количество: на регулир." ведомости покупных изделий
         /// </summary>
-        public static readonly float BIllColumn9QuantityRegulWidth   = 16.0f;
+        public static readonly float BillColumn9QuantityRegulWidth   = 16.0f;
         /// <summary>
         /// Ширина столбца "Количество: всего" ведомости покупных изделий
         /// </summary>
-        public static readonly float BIllColumn10QuantityTotalWidth  = 16.0f;
+        public static readonly float BillColumn10QuantityTotalWidth  = 16.0f;
         /// <summary>
         /// Ширина столбца "Примечание" ведомости покупных изделий
         /// </summary>
-        public static readonly float BIllColumn11FootnoteWidth       = 24.0f;
+        public static readonly float BillColumn11FootnoteWidth       = 24.0f;
         #endregion Ведомость покупных изделий
 
         #region Спецификация
