@@ -27,8 +27,8 @@ namespace GostDOC.PDF
             {
                 case DocType.Bill:
                     {                        
-                        RowsOnFirstPage = 24;
-                        RowsOnNextPage = 29;
+                        RowsOnFirstPage = 26;
+                        RowsOnNextPage = 32;
                     }
                     break;
                 case DocType.D27:
