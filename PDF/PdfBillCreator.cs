@@ -224,7 +224,7 @@ namespace GostDOC.PDF
                 string textFormat         = GetCellString(Constants.ColumnTextFormat);
 
                 inc++;
-                if (string.IsNullOrEmpty(name) && quantityTotal == 0 && string.IsNullOrEmpty(supplier))  // это пустая строка
+                if (string.IsNullOrEmpty(name) && quantityTotal == 0 && string.IsNullOrEmpty(supplier) && string.IsNullOrEmpty(note))  // это пустая строка
                 {
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 1, leftPaddCell);
