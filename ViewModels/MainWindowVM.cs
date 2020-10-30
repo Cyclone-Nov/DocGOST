@@ -927,6 +927,7 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentCountDev, aSrc.CountDev.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCountSet, aSrc.CountSet.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCountReg, aSrc.CountReg.Value.ToString());
+            aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
         }
 
         private void UpdateTableContextMenu()
