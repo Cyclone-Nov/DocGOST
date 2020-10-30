@@ -84,8 +84,8 @@ namespace GostDOC.ExcelExport
             }
 
             // Update ЛРИ
-            aApp.Sheets["ЛРИ"].Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
-            aApp.Sheets["ЛРИ"].Cells[37, 19] = pages + 1;
+            aApp.Sheets["ЛРИ"].Cells[34, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+            aApp.Sheets["ЛРИ"].Cells[36, 19] = pages + 1;
 
             // Select 1st sheet
             aApp.Sheets["1"].Select();
