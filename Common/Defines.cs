@@ -543,6 +543,8 @@ namespace GostDOC.Common
         public static readonly float BillFontSize = 12.0f;
         public static readonly float ItemListFontSize = 12.0f;
 
+        public static string DesignatiorID { get; internal set; }
+
         #endregion
     }
 }
