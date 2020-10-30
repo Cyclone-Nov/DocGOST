@@ -24,7 +24,6 @@ namespace GostDOC.ViewModels
         public ObservableProperty<uint> Count { get; } = new ObservableProperty<uint>(0);
         public ObservableProperty<string> DesignatorID { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> Note { get; } = new ObservableProperty<string>();
-        public ObservableProperty<string> NoteSP { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> Sign { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> WhereIncluded { get; } = new ObservableProperty<string>();
 
@@ -42,7 +41,6 @@ namespace GostDOC.ViewModels
             public uint CountReg { get; set; }
             public string DesignatorID { get; set; }
             public string Note { get; set; }
-            public string NoteSP { get; set; }
             public string Sign { get; set; }
             public string WhereIncluded { get; set; }
         }
@@ -65,7 +63,6 @@ namespace GostDOC.ViewModels
                     CountReg = CountReg.Value,
                     DesignatorID = DesignatorID.Value,
                     Note = Note.Value,
-                    NoteSP = NoteSP.Value,
                     Sign = Sign.Value,
                     WhereIncluded = WhereIncluded.Value
                 };
@@ -86,7 +83,6 @@ namespace GostDOC.ViewModels
                 CountReg.Value = memento.CountReg;
                 DesignatorID.Value = memento.DesignatorID;
                 Note.Value = memento.Note;
-                NoteSP.Value = memento.NoteSP;
                 Sign.Value = memento.Sign;
                 WhereIncluded.Value = memento.WhereIncluded;
             }
@@ -116,8 +112,7 @@ namespace GostDOC.ViewModels
             Note.Value = GetValue(Constants.ComponentNote, aComponent);
             Sign.Value = GetValue(Constants.ComponentSign, aComponent);
 
-            DesignatorID.Value = GetValue(Constants.DesignatiorID, aComponent);
-            NoteSP.Value = string.IsNullOrEmpty(Note.Value) ? DesignatorID.Value : Note.Value;
+            DesignatorID.Value = GetValue(Constants.ComponentDesignatorID, aComponent);
             WhereIncluded.Value = GetValue(Constants.ComponentWhereIncluded, aComponent);
 
             if (CountDev.Value == 0)

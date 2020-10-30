@@ -151,7 +151,7 @@ namespace GostDOC.ExcelExport
                 if (count > 0)
                     sheet.Cells[row, 20] = count;
                
-                sheet.Cells[row, 22] = _tbl.GetTableValueFS(_tableRow, 7);
+                sheet.Cells[row, 21] = _tbl.GetTableValueFS(_tableRow, 7);
 
                 row++;
                 _tableRow++;

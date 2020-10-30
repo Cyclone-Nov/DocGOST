@@ -16,6 +16,7 @@ namespace GostDOC.Models
         //private Converter _defaults = new Converter();
         private RootXml _xml = null;
         private DocType _docType = DocType.None;
+        private ProjectType _projectType = ProjectType.Other;
         private string _dir = string.Empty;
         private Group _currentAssemblyD27 = null;
 
@@ -36,10 +37,11 @@ namespace GostDOC.Models
             }
 
             _dir = Path.GetDirectoryName(aFilePath);
+            _projectType = ParseProjectType(_xml.Transaction.Type);
 
             // Set project var's
             aResult.Name = _xml.Transaction.Project.Name;
-            aResult.Type = ParseProjectType(_xml.Transaction.Type);
+            aResult.Type = _projectType;
 
             if (aDocType == DocType.Bill)
             {
@@ -48,7 +50,8 @@ namespace GostDOC.Models
 
             if (aResult.Type == ProjectType.GostDocB && _docType != DocType.Bill && _docType != DocType.D27)
             {
-                return false;
+                _error.Error($"Попытка открыть файл ведомости в другом режиме!");
+                return true;
             }
 
             aResult.Version = _xml.Transaction.Version;
@@ -292,7 +295,7 @@ namespace GostDOC.Models
                 components.Add(combine, component);
             }            
 
-            if (_docType == DocType.Specification)
+            if (_docType == DocType.Specification && _projectType == ProjectType.Other)
             {
                 UpdatePositions(components);
             }

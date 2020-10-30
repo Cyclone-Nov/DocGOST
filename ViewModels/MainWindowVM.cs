@@ -615,7 +615,6 @@ namespace GostDOC.ViewModels
                     {
                         ComponentVM cmp = new ComponentVM();
                         cmp.Name.Value = material.Name;
-                        cmp.NoteSP.Value = material.Note;
                         Components.Add(cmp);
                     }
                 }
@@ -928,15 +927,7 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentCountDev, aSrc.CountDev.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCountSet, aSrc.CountSet.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCountReg, aSrc.CountReg.Value.ToString());
-
-            if (aSrc.NoteSP.Value != aSrc.DesignatorID.Value)
-            {
-                aDst.Properties.Add(Constants.ComponentNote, aSrc.NoteSP.Value);
-            }
-            else
-            {
-                aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
-            }
+            aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
         }
 
         private void UpdateTableContextMenu()
