@@ -702,12 +702,12 @@ namespace GostDOC.ViewModels
             {
                 UpdateDocType(aDocType);
 
+                DocNodes.Clear();
+
                 if (OpenFile(path))
                 {
-                    DocNodes.Clear();
                     DocNodes.Add(aNode);
-                    IsSaveEnabled.Value = (aDocType == DocType.Specification || aDocType == DocType.Bill);
-                    
+                    IsSaveEnabled.Value = (aDocType == DocType.Specification || aDocType == DocType.Bill);                    
                 }
                 else
                 {
@@ -725,23 +725,25 @@ namespace GostDOC.ViewModels
             // Save file path to title
             UpdateTitle();
 
+            Components.Clear();
+            GeneralGraphValues.Clear();
+
             // Parse xml files
-            if (_docManager.LoadData(_filePath, _docType))
+            switch (_docManager.LoadData(_filePath, _docType))
             {
-                Components.Clear();
-                GeneralGraphValues.Clear();
-
-                // Update visual data
-                UpdateData();
-
-                // Show errors
-                ShowErrors();
-
-                return true;
-            }
-            else
-            {
-                System.Windows.MessageBox.Show("Некорректный Формат файла!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
+                case OpenFileResult.Ok:
+                    // Update visual data
+                    UpdateData();
+                    // Show errors
+                    ShowErrors();
+                    // Success
+                    return true;
+                case OpenFileResult.FileFormatError:
+                    System.Windows.MessageBox.Show("Попытка открыть файл ведомости в другом режиме!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
+                    break;
+                case OpenFileResult.Fail:
+                    System.Windows.MessageBox.Show("Некорректный Формат файла!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
+                    break;
             }
             return false;
         }

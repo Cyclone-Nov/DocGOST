@@ -15,7 +15,7 @@ namespace GostDOC.ExcelExport
     class ExportSp : IExcelExport
     {
         private const int MinRowIndex = 2;
-        private const int MaxRowIndexFirst = 25;
+        private const int MaxRowIndexFirst = 24;
         private const int MaxRowIndexSecond = 30;
 
         private const int RowCountFirst = MaxRowIndexFirst - MinRowIndex + 1;
@@ -103,21 +103,21 @@ namespace GostDOC.ExcelExport
             if (_graphs != null)
             {
                 // Fill main title
-                sheet.Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1);
-                sheet.Cells[32, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
-                sheet.Cells[36, 16] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4);
-                sheet.Cells[36, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a);
-                sheet.Cells[36, 18] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b);
+                sheet.Cells[33, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1);
+                sheet.Cells[30, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+                sheet.Cells[34, 15] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4);
+                sheet.Cells[34, 16] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a);
+                sheet.Cells[34, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b);
 
-                sheet.Cells[35, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_dev);
-                sheet.Cells[36, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_chk);
-                sheet.Cells[38, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11norm);
-                sheet.Cells[39, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
+                sheet.Cells[33, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_dev);
+                sheet.Cells[34, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_chk);
+                sheet.Cells[36, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11norm);
+                sheet.Cells[37, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
             }
             // Set pages count
-            sheet.Cells[36, 22] = Pages + 1;
+            sheet.Cells[34, 20] = Pages + 1;
             // Fill data
-            FillRows(sheet, MaxRowIndexFirst);
+            FillRows(sheet, MaxRowIndexFirst, true);
         }
 
         public void FillSheet(Excel._Worksheet sheet)
@@ -133,7 +133,7 @@ namespace GostDOC.ExcelExport
             FillRows(sheet, MaxRowIndexSecond);
         }
 
-        private void FillRows(Excel._Worksheet sheet, int maxRows)
+        private void FillRows(Excel._Worksheet sheet, int maxRows, bool aFirst = false)
         {
             if (_tbl == null)
                 return;
@@ -149,7 +149,7 @@ namespace GostDOC.ExcelExport
 
                 int count = _tbl.GetTableValue<int>(_tableRow, 6);
                 if (count > 0)
-                    sheet.Cells[row, 20] = count;
+                    sheet.Cells[row, aFirst ? 19 : 20] = count;
                
                 sheet.Cells[row, 21] = _tbl.GetTableValueFS(_tableRow, 7);
 

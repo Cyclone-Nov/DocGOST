@@ -38,7 +38,7 @@ namespace GostDOC.Models
             DocumentTypes.Load();
         }
 
-        public bool LoadData(string aFilePath, DocType aDocType)
+        public OpenFileResult LoadData(string aFilePath, DocType aDocType)
         {
             return XmlManager.LoadData(Project, aFilePath, aDocType);
         }

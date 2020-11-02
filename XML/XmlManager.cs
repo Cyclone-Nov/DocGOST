@@ -26,14 +26,14 @@ namespace GostDOC.Models
         {
         }
 
-        public bool LoadData(Project aResult, string aFilePath, DocType aDocType)
+        public OpenFileResult LoadData(Project aResult, string aFilePath, DocType aDocType)
         {
             _xml = new RootXml();
             _docType = aDocType;
 
             if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref _xml, aFilePath))
             {
-                return false;
+                return OpenFileResult.Fail;
             }
 
             _dir = Path.GetDirectoryName(aFilePath);
@@ -50,8 +50,7 @@ namespace GostDOC.Models
 
             if (aResult.Type == ProjectType.GostDocB && _docType != DocType.Bill && _docType != DocType.D27)
             {
-                _error.Error($"Попытка открыть файл ведомости в другом режиме!");
-                return true;
+                return OpenFileResult.FileFormatError;
             }
 
             aResult.Version = _xml.Transaction.Version;
@@ -87,7 +86,7 @@ namespace GostDOC.Models
 
                 aResult.Configurations.Add(newCfg.Name, newCfg);
             }
-            return true;
+            return OpenFileResult.Ok;
         }
 
         public bool SaveData(Project aPrj, string aFilePath)

@@ -73,6 +73,13 @@ namespace GostDOC.Common
         GostDocB,
         Other
     }
+
+    public enum OpenFileResult
+    {
+        Ok,
+        FileFormatError,
+        Fail
+    }
     
     public static class Converters
     {
