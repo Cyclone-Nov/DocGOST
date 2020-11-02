@@ -211,15 +211,20 @@ namespace GostDOC.PDF
                 string productCode        = GetCellString(Constants.ColumnProductCode).Truncate(24);
                 string deliveryDocSign    = GetCellString(Constants.ColumnDeliveryDocSign).Truncate(32);
                 string supplier           = GetCellString(Constants.ColumnSupplier).Truncate(35);
-                string entry              = GetCellString(Constants.ColumnEntry).Truncate(42);
-                int    quantityDev        = (row[Constants.ColumnQuantityDevice] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityDevice];
-                string strQuantityDev     = quantityDev == 0 ? "-" : quantityDev.ToString().Truncate(5);
-                int    quantityComplex    = (row[Constants.ColumnQuantityComplex] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityComplex];
-                string strQuantityComplex = quantityComplex == 0 ? "-" : quantityComplex.ToString().Truncate(5);
-                int    quantityReg        = (row[Constants.ColumnQuantityRegul] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityRegul];
-                string strQuantityReg     = quantityReg == 0 ? "-" : quantityReg.ToString().Truncate(5);
-                int    quantityTotal      = (row[Constants.ColumnQuantityTotal] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantityTotal];
-                string strQuantityTotal   = quantityTotal == 0 ? "-" : quantityTotal.ToString().Truncate(5);
+                string entry              = GetCellString(Constants.ColumnEntry).Truncate(42);                
+                string strQuantityDev = string.Empty, strQuantityComplex = string.Empty, strQuantityReg = string.Empty, strQuantityTotal = string.Empty;
+                int quantityTotal = 0;
+                if (row[Constants.ColumnQuantityDevice] != DBNull.Value)
+                {
+                    strQuantityDev = ((int)row[Constants.ColumnQuantityDevice]).ToString().Truncate(5);
+                    int quantityComplex = (row[Constants.ColumnQuantityComplex] == DBNull.Value) ? 0 : (int)row[Constants.ColumnQuantityComplex];
+                    strQuantityComplex = quantityComplex == 0 ? "-" : quantityComplex.ToString().Truncate(5);
+                    int quantityReg = (row[Constants.ColumnQuantityRegul] == DBNull.Value) ? 0 : (int)row[Constants.ColumnQuantityRegul];
+                    strQuantityReg = quantityReg == 0 ? "-" : quantityReg.ToString().Truncate(5);
+                    quantityTotal = (row[Constants.ColumnQuantityTotal] == DBNull.Value) ? 0 : (int)row[Constants.ColumnQuantityTotal];
+                    strQuantityTotal = quantityTotal == 0 ? "-" : quantityTotal.ToString().Truncate(5);
+                }
+                
                 string note               = GetCellString(Constants.ColumnFootnote).Truncate(12);
 
                 inc++;
@@ -238,7 +243,7 @@ namespace GostDOC.PDF
                         rowNumber--;
                 }
                 else if (IsGroupName(row))
-                {                    
+                {
                     if (rowNumber > 4) // если осталось мнее 5 строк для записи группы, то переходим на следующий лист
                     {
                         // если есть место для записи более 4 строк то записываем группу, иначе выходим
@@ -252,11 +257,13 @@ namespace GostDOC.PDF
                         {
                             tbl.AddCell(leftPaddCell.Clone(true).Add(new Paragraph(name)).SetUnderline());
                             AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 2, leftPaddCell);
-                        }                        
+                        }
                         rowNumber--;
+                    } else
+                    {
+                        inc--;
+                        break;
                     }
-                    else                 
-                        break;                
                 }
                 else 
                 {
@@ -390,10 +397,10 @@ namespace GostDOC.PDF
         bool IsEmptyRow(DataRow aRow)
         {
             //string.IsNullOrEmpty(name) && quantityTotal == 0 && string.IsNullOrEmpty(supplier) && string.IsNullOrEmpty(note)
-            if ((aRow[Constants.ColumnName] == DBNull.Value) && string.IsNullOrEmpty((string)aRow[Constants.ColumnName])         &&
-                (aRow[Constants.ColumnSupplier] == DBNull.Value) && string.IsNullOrEmpty((string)aRow[Constants.ColumnSupplier]) &&
-                (aRow[Constants.ColumnFootnote] == DBNull.Value) && string.IsNullOrEmpty((string)aRow[Constants.ColumnFootnote]) &&
-                (aRow[Constants.ColumnQuantityTotal] == DBNull.Value) && (int)aRow[Constants.ColumnQuantityTotal] == 0)
+            if (((aRow[Constants.ColumnName] == DBNull.Value) || string.IsNullOrEmpty((string)aRow[Constants.ColumnName]))         &&
+                ((aRow[Constants.ColumnSupplier] == DBNull.Value) || string.IsNullOrEmpty((string)aRow[Constants.ColumnSupplier])) &&
+                ((aRow[Constants.ColumnFootnote] == DBNull.Value) || string.IsNullOrEmpty((string)aRow[Constants.ColumnFootnote])) &&
+                ((aRow[Constants.ColumnQuantityTotal] == DBNull.Value) || (int)aRow[Constants.ColumnQuantityTotal] == 0))
             {
                 return true;
             }
