@@ -13,12 +13,12 @@ namespace GostDOC.ExcelExport
     class ExportBill : IExcelExport
     {
         private const int MinRowIndex = 3;
-        private const int MaxRowIndexFirst = 26;
-        private const int MaxRowIndexSecond = 32;
+        private readonly int MaxRowIndexFirst = Constants.BillRowsOnFirstPage;
+        private readonly int MaxRowIndexSecond = Constants.BillRowsOnNextPage;
         private const string BillPostfix = "ВП";
 
-        private const int RowCountFirst = MaxRowIndexFirst - MinRowIndex + 1;
-        private const int RowCountSecond = MaxRowIndexSecond - MinRowIndex + 1;
+        private readonly int RowCountFirst = Constants.BillRowsOnFirstPage - MinRowIndex + 1;
+        private readonly int RowCountSecond = Constants.BillRowsOnNextPage - MinRowIndex + 1;
 
         private PrepareManager _prepareManager = PrepareManager.Instance;
         private DocManager _docManager = DocManager.Instance;

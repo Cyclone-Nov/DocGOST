@@ -122,35 +122,35 @@ namespace GostDOC.PDF
                 case DocType.Bill:
                     {
                         _pageSize = new PageSize(PageSize.A3);
-                        RowNumberOnFirstPage = 26;
-                        RowNumberOnNextPage = 32;
+                        RowNumberOnFirstPage = Constants.BillRowsOnFirstPage;
+                        RowNumberOnNextPage = Constants.BillRowsOnNextPage;
                     }
                     break;
                 case DocType.D27:
                     {
                         _pageSize = new PageSize(PageSize.A3);
-                        RowNumberOnFirstPage = 24;
-                        RowNumberOnNextPage = 29;
+                        RowNumberOnFirstPage = Constants.BillRowsOnFirstPage;
+                        RowNumberOnNextPage = Constants.BillRowsOnNextPage;
                     }
                     break;
                 case DocType.Specification: {
                         _pageSize = new PageSize(PageSize.A4);
-                        RowNumberOnFirstPage = 24;
-                        RowNumberOnNextPage = 29;
+                        RowNumberOnFirstPage = Constants.SpecificationRowsOnFirstPage;
+                        RowNumberOnNextPage = Constants.SpecificationRowsOnNextPage;
                     }
                     break;
                 case DocType.ItemsList:
                     {
                         _pageSize = new PageSize(PageSize.A4);
-                        RowNumberOnFirstPage = 24;
-                        RowNumberOnNextPage = 29;
+                        RowNumberOnFirstPage = Constants.ItemListRowsOnFirstPage;
+                        RowNumberOnNextPage = Constants.ItemListRowsOnNextPage;
                     }
                     break;                
                 default:
                     {
                         _pageSize = new PageSize(PageSize.A4);
-                        RowNumberOnFirstPage = 26;
-                        RowNumberOnNextPage = 33;
+                        RowNumberOnFirstPage = Constants.DefaultRowsOnFirstPage;
+                        RowNumberOnNextPage = Constants.DefaultRowsOnNextPage;
                     }
                     break;
             }
