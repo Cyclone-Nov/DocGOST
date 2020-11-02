@@ -409,7 +409,7 @@ namespace GostDOC.PDF
         /// </returns>
         bool IsGroupName(DataRow aRow)
         {            
-            if ((aRow[Constants.ColumnTextFormat] == DBNull.Value) && 
+            if ((aRow[Constants.ColumnTextFormat] != DBNull.Value) && 
                 !string.IsNullOrEmpty((string)aRow[Constants.ColumnTextFormat]))
             {
                 return true;

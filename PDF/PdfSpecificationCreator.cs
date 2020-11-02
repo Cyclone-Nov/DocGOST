@@ -224,7 +224,7 @@ namespace GostDOC.PDF
                 string format = GetCellString(Constants.ColumnFormat).Truncate(3);
                 string zone = GetCellString(Constants.ColumnZone).Truncate(3);
                 string position = GetCellString(Constants.ColumnPosition).Truncate(3);
-                string note = GetCellString(Constants.ColumnFootnote).Truncate(10);
+                string note = GetCellString(Constants.ColumnFootnote).Truncate(14);
                 var sign = GetCellStringFormatted(Constants.ColumnSign);
                 if (sign != null) {
                     sign.Value = sign.Value.Truncate(38);

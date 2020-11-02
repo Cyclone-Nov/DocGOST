@@ -120,8 +120,8 @@ namespace GostDOC.PDF
                         fullName = fullName.Substring(symbOnMaxLength + 1);
                     } else
                     {
-                        name_strings.Add(fullName.Substring(0, index).TrimEnd());
-                        fullName = fullName.Substring(index).TrimStart();
+                        name_strings.Add(fullName.Substring(0, index+1).TrimEnd());
+                        fullName = fullName.Substring(index+1).TrimStart();
                     }
                     currLength = font.GetWidth(fullName, aFontSize);
                 }

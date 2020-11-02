@@ -306,7 +306,8 @@ namespace GostDOC.DataPreparation
                 var desigantor_id = component.GetProperty(Constants.ComponentDesignatorID);
 
                 var note = component.GetProperty(Constants.ComponentNote);
-                string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth, note, new char[] { ' ', '-', ',' }, Constants.SpecificationFontSize).ToArray();
+
+                string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth - 3, note, new char[] {'-', ',' }, Constants.SpecificationFontSize).ToArray();
 
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString { Value = component.GetProperty(Constants.ComponentFormat) };
