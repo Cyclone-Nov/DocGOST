@@ -559,11 +559,11 @@ namespace GostDOC.Common
         /// <summary>
         /// количество строк на первом листе для ведомости покупных изделий (ВП)
         /// </summary>
-        public static readonly int BillRowsOnFirstPage = 24;
+        public static readonly int BillRowsOnFirstPage = 26;
         /// <summary>
         /// количество строк на всех листах кроме первого для ведомости покупных изделий (ВП)
         /// </summary>
-        public static readonly int BillRowsOnNextPage = 29;
+        public static readonly int BillRowsOnNextPage = 32;
         /// <summary>
         /// количество строк на первом листе для спецификации
         /// </summary>
