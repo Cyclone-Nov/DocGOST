@@ -703,7 +703,7 @@ namespace GostDOC.Models
                     var name = GroupNames.GetGroupName(aGroup.Name);
                     if (string.IsNullOrEmpty(name))
                     {
-                        _error.Error($"Элемент {aGroup.Name} в словаре GroupNames.cfg не найден!");
+                        _error.Error($"Множественное число для группы {aGroup.Name} в словаре GroupNames.cfg не найдено!");
                     }
                     else
                     {
