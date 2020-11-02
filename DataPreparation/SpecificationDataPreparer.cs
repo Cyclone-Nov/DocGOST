@@ -257,7 +257,7 @@ namespace GostDOC.DataPreparation
                 }
             }
 
-            // отдельно запишем прогруппу "Прочие"
+            // отдельно запишем подгруппу "Прочие"
             if (group.SubGroups.TryGetValue(Constants.SUBGROUPFORSINGLE, out var subgroup_other))
             {
                 if (subgroup_other.Components.Count > 0)
@@ -305,7 +305,7 @@ namespace GostDOC.DataPreparation
                 string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize, true).ToArray();
                 var desigantor_id = component.GetProperty(Constants.ComponentDesignatorID);
 
-                var note = string.IsNullOrEmpty(desigantor_id) ? component.GetProperty(Constants.ComponentNote) : desigantor_id;
+                var note = component.GetProperty(Constants.ComponentNote);
                 string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth, note, new char[] { ' ', '-', ',' }, Constants.SpecificationFontSize).ToArray();
 
                 row = aTable.NewRow();
