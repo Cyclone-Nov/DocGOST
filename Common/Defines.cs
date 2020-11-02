@@ -567,7 +567,7 @@ namespace GostDOC.Common
         /// <summary>
         /// количество строк на первом листе для спецификации
         /// </summary>
-        public static readonly int SpecificationRowsOnFirstPage = 24;
+        public static readonly int SpecificationRowsOnFirstPage = 23;
         /// <summary>
         /// количество строк на всех листах кроме первого для спецификации
         /// </summary>
