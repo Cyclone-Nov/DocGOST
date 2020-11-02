@@ -47,7 +47,7 @@ namespace GostDOC.PDF
         protected static readonly float RIGHT_MARGIN_MM = 5;
 
         protected static readonly float TO_LEFT_CORRECTION = 0;
-        protected static readonly float BOTTOM_CORRECTION = 0;
+        protected static readonly float BOTTOM_CORRECTION = 10f;
 
 
         protected static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH() + BOTTOM_CORRECTION;
@@ -473,7 +473,7 @@ namespace GostDOC.PDF
 
             AddLeftUpperCell("Изм.");
             AddLeftUpperCell("Лист");
-            AddLeftUpperCell("№ Докум");
+            AddLeftUpperCell("№ докум");
             AddLeftUpperCell("Подп.");
             AddLeftUpperCell("Дата");
 
