@@ -150,7 +150,7 @@ namespace GostDOC.ExcelExport
                 sheet.Cells[row, 21] = _tbl.GetTableValue<int>(_tableRow, 7);// Количество в комплекты
                 sheet.Cells[row, 23] = _tbl.GetTableValue<int>(_tableRow, 8);// Количество на регулир.
                 sheet.Cells[row, 25] = _tbl.GetTableValue<int>(_tableRow, 9);// Количество всего
-                sheet.Cells[row, 28] = _tbl.GetTableValue(_tableRow, 11);// Примечание
+                sheet.Cells[row, 28] = _tbl.GetTableValue(_tableRow, 10);// Примечание
                 
                 row++;
                 _tableRow++;
