@@ -258,8 +258,21 @@ public abstract class BasePreparer {
     public class FormattedString {
 
         public string Value;
+        /// <summary>
+        /// строка должна быть с нижним подчеркиванием
+        /// </summary>
         public bool IsUnderlined;
+        /// <summary>
+        /// строка должна быть с верхним подчеркиванием
+        /// </summary>
+        public bool IsOverlined;
+        /// <summary>
+        /// шрифт должен быть Bold
+        /// </summary>
         public bool IsBold;
+        /// <summary>
+        /// выравнивание строки
+        /// </summary>
         public TextAlignment TextAlignment;
     }
 }

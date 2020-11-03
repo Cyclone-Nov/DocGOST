@@ -202,7 +202,7 @@ namespace GostDOC.PDF
                 row = Rows[ind];
 
                 string GetCellString(string columnName) =>
-                    (row[columnName] == DBNull.Value) ? string.Empty : (string) row[columnName];
+                    (row[columnName] == DBNull.Value) ? string.Empty : ((BasePreparer.FormattedString)row[columnName]).Value;
 
                 BasePreparer.FormattedString GetCellStringFormatted(string columnName) =>
                     (row[columnName] == DBNull.Value) ? null : ((BasePreparer.FormattedString) row[columnName]);
@@ -212,23 +212,22 @@ namespace GostDOC.PDF
                 string deliveryDocSign    = GetCellString(Constants.ColumnDeliveryDocSign).Truncate(32);
                 string supplier           = GetCellString(Constants.ColumnSupplier).Truncate(35);
                 string entry              = GetCellString(Constants.ColumnEntry).Truncate(42);                
-                string strQuantityDev = string.Empty, strQuantityComplex = string.Empty, strQuantityReg = string.Empty, strQuantityTotal = string.Empty;
+                string strQuantityDev = string.Empty, strQuantityComplex = string.Empty, strQuantityReg = string.Empty;
+                string strQuantityTotal = GetCellString(Constants.ColumnQuantityTotal).Truncate(5);
                 int quantityTotal = 0;
+                if (string.IsNullOrEmpty(strQuantityTotal) || string.Equals(strQuantityTotal, "0"))
+                    strQuantityTotal = "-";
+                else
+                    quantityTotal = Int32.Parse(strQuantityTotal);
+                
                 if (row[Constants.ColumnQuantityDevice] != DBNull.Value)
                 {
                     strQuantityDev = ((int)row[Constants.ColumnQuantityDevice]).ToString().Truncate(5);
                     int quantityComplex = (row[Constants.ColumnQuantityComplex] == DBNull.Value) ? 0 : (int)row[Constants.ColumnQuantityComplex];
                     strQuantityComplex = quantityComplex == 0 ? "-" : quantityComplex.ToString().Truncate(5);
                     int quantityReg = (row[Constants.ColumnQuantityRegul] == DBNull.Value) ? 0 : (int)row[Constants.ColumnQuantityRegul];
-                    strQuantityReg = quantityReg == 0 ? "-" : quantityReg.ToString().Truncate(5);
-                    quantityTotal = (row[Constants.ColumnQuantityTotal] == DBNull.Value) ? 0 : (int)row[Constants.ColumnQuantityTotal];
-                    strQuantityTotal = quantityTotal == 0 ? "-" : quantityTotal.ToString().Truncate(5);
+                    strQuantityReg = quantityReg == 0 ? "-" : quantityReg.ToString().Truncate(5);                                        
                 }                
-                if (row[Constants.ColumnQuantityTotal] != DBNull.Value)
-                {
-                    quantityTotal = (int)row[Constants.ColumnQuantityTotal];
-                    strQuantityTotal = quantityTotal == 0 ? "-" : quantityTotal.ToString().Truncate(5);
-                }
 
                 string note             = GetCellString(Constants.ColumnFootnote).Truncate(12);
 
@@ -402,10 +401,10 @@ namespace GostDOC.PDF
         bool IsEmptyRow(DataRow aRow)
         {
             //string.IsNullOrEmpty(name) && quantityTotal == 0 && string.IsNullOrEmpty(supplier) && string.IsNullOrEmpty(note)
-            if (((aRow[Constants.ColumnName] == DBNull.Value) || string.IsNullOrEmpty((string)aRow[Constants.ColumnName]))         &&
-                ((aRow[Constants.ColumnSupplier] == DBNull.Value) || string.IsNullOrEmpty((string)aRow[Constants.ColumnSupplier])) &&
-                ((aRow[Constants.ColumnFootnote] == DBNull.Value) || string.IsNullOrEmpty((string)aRow[Constants.ColumnFootnote])) &&
-                ((aRow[Constants.ColumnQuantityTotal] == DBNull.Value) || (int)aRow[Constants.ColumnQuantityTotal] == 0))
+            if (string.IsNullOrEmpty(aRow[Constants.ColumnName].ToString())     &&
+                string.IsNullOrEmpty(aRow[Constants.ColumnSupplier].ToString()) &&
+                string.IsNullOrEmpty(aRow[Constants.ColumnFootnote].ToString()) &&
+                string.IsNullOrEmpty(aRow[Constants.ColumnQuantityTotal].ToString()))
             {
                 return true;
             }
@@ -421,8 +420,7 @@ namespace GostDOC.PDF
         /// </returns>
         bool IsGroupName(DataRow aRow)
         {            
-            if ((aRow[Constants.ColumnTextFormat] != DBNull.Value) && 
-                !string.IsNullOrEmpty((string)aRow[Constants.ColumnTextFormat]))
+            if (!string.IsNullOrEmpty(aRow[Constants.ColumnTextFormat].ToString()))
             {
                 return true;
             }

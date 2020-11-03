@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GostDOC.Common;
 using GostDOC.Models;
 using GostDOC.PDF;
+using iText.Layout.Properties;
 
 namespace GostDOC.DataPreparation
 {
@@ -75,17 +76,17 @@ namespace GostDOC.DataPreparation
             void AddColumn(string aColumnName, string aCaption, Type aType) =>
                 this.AddColumn(table, aColumnName, aCaption, aType);
 
-            AddColumn(Constants.ColumnName, "Наименование", typeof(string));
-            AddColumn(Constants.ColumnProductCode, "Код продукции", typeof(string));
-            AddColumn(Constants.ColumnDeliveryDocSign, "Обозначение документа на поставку", typeof(string));
-            AddColumn(Constants.ColumnSupplier, "Поставщик", typeof(string));
-            AddColumn(Constants.ColumnEntry, "Куда входит (обозначение)", typeof(string));
+            AddColumn(Constants.ColumnName, "Наименование", typeof(FormattedString));
+            AddColumn(Constants.ColumnProductCode, "Код продукции", typeof(FormattedString));
+            AddColumn(Constants.ColumnDeliveryDocSign, "Обозначение документа на поставку", typeof(FormattedString));
+            AddColumn(Constants.ColumnSupplier, "Поставщик", typeof(FormattedString));
+            AddColumn(Constants.ColumnEntry, "Куда входит (обозначение)", typeof(FormattedString));
             AddColumn(Constants.ColumnQuantityDevice, "Количество на изделие", typeof(Int32));
             AddColumn(Constants.ColumnQuantityComplex, "Количество в комплекты", typeof(Int32));
             AddColumn(Constants.ColumnQuantityRegul, "Количество на регулир.", typeof(Int32));
-            AddColumn(Constants.ColumnQuantityTotal, "Количество всего", typeof(Int32));
-            AddColumn(Constants.ColumnFootnote, "Примечание", typeof(string));
-            AddColumn(Constants.ColumnTextFormat, "Форматирование текста", typeof(string));        
+            AddColumn(Constants.ColumnQuantityTotal, "Количество всего", typeof(FormattedString));
+            AddColumn(Constants.ColumnFootnote, "Примечание", typeof(FormattedString));
+            AddColumn(Constants.ColumnTextFormat, "Форматирование текста", typeof(FormattedString));        
 
             return table;
         }
@@ -98,9 +99,8 @@ namespace GostDOC.DataPreparation
         {
             AddEmptyRow(aTable);
             var row = aTable.NewRow();
-            row[Constants.ColumnName] = "Переменные данные";
-            row[Constants.ColumnProductCode] = "исполнений";            
-            //row[Constants.ColumnDeliveryDocSign] = ;
+            row[Constants.ColumnName] = new FormattedString { Value = "Переменные данные", TextAlignment = TextAlignment.RIGHT };
+            row[Constants.ColumnProductCode] = new FormattedString { Value = "исполнений", TextAlignment = TextAlignment.LEFT };            
             aTable.Rows.Add(row);
             AddEmptyRow(aTable);
         }
@@ -226,8 +226,8 @@ namespace GostDOC.DataPreparation
                 }
 
                 var row = aTable.NewRow();
-                row[Constants.ColumnName] = configName;
-                row[Constants.ColumnTextFormat] = "1";                
+                row[Constants.ColumnName] = new FormattedString { Value = configName }; 
+                row[Constants.ColumnTextFormat] = new FormattedString { Value = "1" };                
                 aTable.Rows.Add(row);
                 AddEmptyRow(aTable);
             }            
@@ -269,19 +269,17 @@ namespace GostDOC.DataPreparation
         private void AddEmptyRow(DataTable aTable) 
         {
             DataRow row = aTable.NewRow();
-
-            row[Constants.ColumnName] = string.Empty;
-            row[Constants.ColumnProductCode] = string.Empty;
-            row[Constants.ColumnDeliveryDocSign] = string.Empty;
-            row[Constants.ColumnSupplier] = string.Empty;
-            row[Constants.ColumnEntry] = string.Empty;
-            row[Constants.ColumnQuantityDevice] = 0;
-            row[Constants.ColumnQuantityComplex] = 0;
-            row[Constants.ColumnQuantityRegul] = 0;
-            row[Constants.ColumnQuantityTotal] = 0;
-            row[Constants.ColumnFootnote] = string.Empty;
-            row[Constants.ColumnTextFormat] = string.Empty;
-            
+            //row[Constants.ColumnName] = string.Empty;
+            //row[Constants.ColumnProductCode] = string.Empty;
+            //row[Constants.ColumnDeliveryDocSign] = string.Empty;
+            //row[Constants.ColumnSupplier] = string.Empty;
+            //row[Constants.ColumnEntry] = string.Empty;
+            //row[Constants.ColumnQuantityDevice] = 0;
+            //row[Constants.ColumnQuantityComplex] = 0;
+            //row[Constants.ColumnQuantityRegul] = 0;
+            //row[Constants.ColumnQuantityTotal] = 0;
+            //row[Constants.ColumnFootnote] = string.Empty;
+            //row[Constants.ColumnTextFormat] = string.Empty;            
             aTable.Rows.Add(row);
         }
 
@@ -293,8 +291,8 @@ namespace GostDOC.DataPreparation
         private bool AddGroupName(DataTable aTable, string aGroupName) {
             if (string.IsNullOrEmpty(aGroupName)) return false;
             DataRow row = aTable.NewRow();
-            row[Constants.ColumnName] = aGroupName;
-            row[Constants.ColumnTextFormat] = "1";
+            row[Constants.ColumnName] = new FormattedString { Value = aGroupName, IsUnderlined = true };
+            row[Constants.ColumnTextFormat] = new FormattedString { Value = "1"};
             aTable.Rows.Add(row);
             return true;
         }
@@ -344,7 +342,7 @@ namespace GostDOC.DataPreparation
                     if (string.Equals(prevName, name) && string.Equals(prevProductCode, productCode) && string.Equals(prevComponentDoc, componentDoc))
                     {
                         row = aTable.NewRow();
-                        row[Constants.ColumnEntry] = component.GetProperty(Constants.ComponentWhereIncluded);
+                        row[Constants.ColumnEntry] = new FormattedString { Value = component.GetProperty(Constants.ComponentWhereIncluded) };
                         UInt32.TryParse(component.GetProperty(Constants.ComponentCountDev), out uint cnt_dev_n);
                         if (cnt_dev_n == 0) cnt_dev_n = component.Count;
                         row[Constants.ColumnQuantityDevice] = cnt_dev_n;
@@ -352,7 +350,7 @@ namespace GostDOC.DataPreparation
                         row[Constants.ColumnQuantityComplex] = cnt_comp_n;
                         UInt32.TryParse(component.GetProperty(Constants.ComponentCountReg), out uint cnt_reg_n);
                         row[Constants.ColumnQuantityRegul] = cnt_reg_n;
-                        row[Constants.ColumnQuantityTotal] = cnt_dev_n + cnt_comp_n + cnt_reg_n;
+                        row[Constants.ColumnQuantityTotal] = new FormattedString { Value = (cnt_dev_n + cnt_comp_n + cnt_reg_n).ToString() };
                         aTable.Rows.Add(row);
 
                         if (prevCnt > 0)
@@ -366,16 +364,15 @@ namespace GostDOC.DataPreparation
                         if (i == sortComponents.Length - 1)
                         {
                             row = aTable.NewRow();
-                            row[Constants.ColumnQuantityTotal] = compCount;                        
+                            row[Constants.ColumnQuantityTotal] = new FormattedString { Value = (compCount).ToString(), IsOverlined = true };
                             aTable.Rows.Add(row);
-                        }
-                        
+                        }                        
                         continue;
                     }
                     else if (compCount > 0)  // запишем сумму по предыдущим одинаковым компонентам и обнулим так как произошел переход
                     {
                         row = aTable.NewRow();
-                        row[Constants.ColumnQuantityTotal] = compCount;                        
+                        row[Constants.ColumnQuantityTotal] = new FormattedString { Value = (compCount).ToString(), IsOverlined = true };                        
                         aTable.Rows.Add(row);
                         compCount = 0;
                         continue;
@@ -391,11 +388,11 @@ namespace GostDOC.DataPreparation
                 string[] notearr = PdfUtils.SplitStringByWidth(Constants.BillColumn11FootnoteWidth, note, new char[] { ' ', '.', '-' }, Constants.BillFontSize).ToArray();
 
                 row = aTable.NewRow();
-                row[Constants.ColumnName] = namearr.First();
-                row[Constants.ColumnProductCode] = component.GetProperty(Constants.ComponentProductCode);
-                row[Constants.ColumnDeliveryDocSign] = component.GetProperty(Constants.ComponentDoc);
-                row[Constants.ColumnSupplier] = supplierarr.First();
-                row[Constants.ColumnEntry] = component.GetProperty(Constants.ComponentWhereIncluded);
+                row[Constants.ColumnName] = new FormattedString { Value = namearr.First() };
+                row[Constants.ColumnProductCode] = new FormattedString { Value = component.GetProperty(Constants.ComponentProductCode) };
+                row[Constants.ColumnDeliveryDocSign] = new FormattedString { Value = component.GetProperty(Constants.ComponentDoc) };
+                row[Constants.ColumnSupplier] = new FormattedString { Value = supplierarr.First() };
+                row[Constants.ColumnEntry] = new FormattedString { Value = component.GetProperty(Constants.ComponentWhereIncluded) };
                 
                 UInt32.TryParse(component.GetProperty(Constants.ComponentCountDev), out uint cnt_dev);
                 if (cnt_dev == 0) cnt_dev = component.Count;
@@ -405,8 +402,8 @@ namespace GostDOC.DataPreparation
                 UInt32.TryParse(component.GetProperty(Constants.ComponentCountReg), out uint cnt_reg);
                 row[Constants.ColumnQuantityRegul] = cnt_reg;
                 prevCnt = cnt_dev + cnt_comp + cnt_reg;
-                row[Constants.ColumnQuantityTotal] = prevCnt;
-                row[Constants.ColumnFootnote] = notearr.First();            
+                row[Constants.ColumnQuantityTotal] = new FormattedString { Value = prevCnt.ToString() };
+                row[Constants.ColumnFootnote] = new FormattedString { Value = notearr.First() };            
                 aTable.Rows.Add(row);
 
                 int max = Math.Max(namearr.Length, notearr.Length);
@@ -420,9 +417,9 @@ namespace GostDOC.DataPreparation
                     for (int ln = 1; ln< max; ln++)
                     {
                         row = aTable.NewRow();
-                        row[Constants.ColumnName] = (ln_name > ln) ? namearr[ln] : string.Empty;
-                        row[Constants.ColumnSupplier] = (ln_supplier > ln) ? supplierarr[ln] : string.Empty;
-                        row[Constants.ColumnFootnote] = (ln_note > ln) ? notearr[ln] : string.Empty;
+                        row[Constants.ColumnName] = new FormattedString { Value = (ln_name > ln) ? namearr[ln] : string.Empty };
+                        row[Constants.ColumnSupplier] = new FormattedString { Value = (ln_supplier > ln) ? supplierarr[ln] : string.Empty };
+                        row[Constants.ColumnFootnote] = new FormattedString { Value = (ln_note > ln) ? notearr[ln] : string.Empty };
                         aTable.Rows.Add(row);
                     }
                 }
@@ -545,11 +542,11 @@ namespace GostDOC.DataPreparation
                         string.IsNullOrEmpty(arr[2].ToString()) &&
                         string.IsNullOrEmpty(arr[3].ToString()) &&
                         string.IsNullOrEmpty(arr[4].ToString()) &&
-                        string.IsNullOrEmpty(arr[5].ToString()) &&                        
-                        (int)arr[6] == 0 &&
-                        (int)arr[7] == 0 &&
-                        (int)arr[8] == 0 &&
-                        (int)arr[9] == 0 &&
+                        string.IsNullOrEmpty(arr[5].ToString()) &&
+                        string.IsNullOrEmpty(arr[6].ToString()) &&
+                        string.IsNullOrEmpty(arr[7].ToString()) &&
+                        string.IsNullOrEmpty(arr[8].ToString()) &&
+                        string.IsNullOrEmpty(arr[9].ToString()) &&
                         string.IsNullOrEmpty(arr[10].ToString()) &&
                         string.IsNullOrEmpty(arr[11].ToString()))
                     {
