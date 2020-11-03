@@ -223,9 +223,14 @@ namespace GostDOC.PDF
                     strQuantityReg = quantityReg == 0 ? "-" : quantityReg.ToString().Truncate(5);
                     quantityTotal = (row[Constants.ColumnQuantityTotal] == DBNull.Value) ? 0 : (int)row[Constants.ColumnQuantityTotal];
                     strQuantityTotal = quantityTotal == 0 ? "-" : quantityTotal.ToString().Truncate(5);
+                }                
+                if (row[Constants.ColumnQuantityTotal] != DBNull.Value)
+                {
+                    quantityTotal = (int)row[Constants.ColumnQuantityTotal];
+                    strQuantityTotal = quantityTotal == 0 ? "-" : quantityTotal.ToString().Truncate(5);
                 }
-                
-                string note               = GetCellString(Constants.ColumnFootnote).Truncate(12);
+
+                string note             = GetCellString(Constants.ColumnFootnote).Truncate(12);
 
                 inc++;
                 if (IsEmptyRow(row))
@@ -238,7 +243,7 @@ namespace GostDOC.PDF
                 {
                         tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));                        
                         AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 3, leftPaddCell);                        
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityTotal)).SetUnderline(1, 12.0f)); // Количество всего
+                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityTotal)).SetUnderline(1, 10.0f)); // Количество всего
                         tbl.AddCell(leftPaddCell.Clone(false)); // Примечание
                         rowNumber--;
                 }
