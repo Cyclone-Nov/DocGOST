@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using GostDOC.Common;
+using iText.StyledXmlParser;
 
 namespace GostDOC.Models
 {
@@ -246,7 +247,7 @@ namespace GostDOC.Models
                     continue;
 
                 // Create component
-                Component component = new Component(cmp) { Type = aType, Count = count };                
+                Component component = new Component(cmp, _docType == DocType.Specification) { Type = aType, Count = count };                
 
                 // Fill group info
                 SubGroupInfo[] groups = UpdateGroups(cmp, component);
@@ -682,6 +683,14 @@ namespace GostDOC.Models
             // Update name, add back
             aGroup.Name = aNewName;
             aGroups.Add(aNewName, aGroup);
+
+            if (_docType == DocType.ItemsList)
+            {
+                foreach (var cmp in aGroup.Components)
+                {
+                    cmp.Properties[Constants.SubGroupNameSp] = aGroup.Name;
+                }
+            }
         }
 
         private void UpdateGroupNames(IDictionary<string, Group> aGroups, Group aGroup) 
@@ -739,6 +748,10 @@ namespace GostDOC.Models
         {
             foreach (var gp in aGroup.SubGroups.AsNotNull().ToList())
             {
+                // Update group names
+                UpdateGroupNames(aGroup.SubGroups, gp.Value);
+
+                // Move single component to parent group
                 if (gp.Value.Components.Count == 1)
                 {
                     // Update component name
@@ -749,11 +762,7 @@ namespace GostDOC.Models
                     // Move component to parent group
                     aGroup.Components.Add(cp);
                     // Remove subgroup
-                    aGroup.SubGroups.Remove(gp.Key);
-                }
-                else
-                {
-                    UpdateGroupNames(aGroup.SubGroups, gp.Value);
+                    aGroup.SubGroups.Remove(gp.Value.Name);
                 }
             }
         }
@@ -775,7 +784,7 @@ namespace GostDOC.Models
 
                 ProcessGroupNames(others, aCfg.Bill);
             }
-            else if (_docType == DocType.Specification)
+            else
             {
                 foreach (var gp in aCfg.Specification)
                 {

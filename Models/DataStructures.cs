@@ -19,18 +19,21 @@ namespace GostDOC.Models
         {
             Guid = aGuid;
         }
-        public Component(ComponentXml aComponent)
+        public Component(ComponentXml aComponent, bool aUpdateNote = false)
         {
             Properties.AddRange(aComponent.Properties);
 
-            // set designator id to note if last one is empty
-            string id;
-            if (Properties.TryGetValue(Constants.ComponentDesignatorID, out id) && !string.IsNullOrEmpty(id))
+            if (aUpdateNote)
             {
-                string note;
-                if (Properties.TryGetValue(Constants.ComponentNote, out note) && string.IsNullOrEmpty(note))
+                // set designator id to note if last one is empty
+                string id;
+                if (Properties.TryGetValue(Constants.ComponentDesignatorID, out id) && !string.IsNullOrEmpty(id))
                 {
-                    Properties[Constants.ComponentNote] = id;
+                    string note;
+                    if (Properties.TryGetValue(Constants.ComponentNote, out note) && string.IsNullOrEmpty(note))
+                    {
+                        Properties[Constants.ComponentNote] = id;
+                    }
                 }
             }
         }
