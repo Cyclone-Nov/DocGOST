@@ -217,7 +217,6 @@ namespace GostDOC.Models
             foreach (var cmp in aComponents)
             {
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
-                var included = cmp.Properties.Find(x => x.Name == Constants.ComponentWhereIncluded);
                 var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
                 var position = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatorID);
 
@@ -227,16 +226,16 @@ namespace GostDOC.Models
                     continue;
                 }
 
-                if (included == null && sign == null) 
+                if (sign == null) 
                 {
-                    _error.Error($"Компонент {name}: 'Куда входит' или 'Обозначение' не задано!");
+                    _error.Error($"Компонент {name}: 'Обозначение' не задано!");
                     continue;
                 }
 
                 CombineProperties combine = new CombineProperties(_docType == DocType.Specification)
                 {
                     Name = name.Text,
-                    Included = included?.Text ?? sign.Text,
+                    Sign = sign.Text,
                     Position = position?.Text ?? string.Empty
                 };
 
@@ -468,7 +467,7 @@ namespace GostDOC.Models
                 var keys = aComponents.Keys.ToArray();                
                 for (var i = 0; i < keys.Length; i++)
                 {                                        
-                    if (keys[i].Name == aCombine.Name && keys[i].Included == aCombine.Included)
+                    if (keys[i].Name == aCombine.Name && keys[i].Sign == aCombine.Sign)
                     {
                         aComponents[keys[i]].Count += aCount;
                         return true;

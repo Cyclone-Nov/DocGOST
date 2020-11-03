@@ -24,7 +24,7 @@ namespace GostDOC.Models
         /// <value>
         /// The included.
         /// </value>
-        public string Included { get; set; }
+        public string Sign { get; set; }
 
         /// <summary>
         /// позиционное обозначение
@@ -48,9 +48,9 @@ namespace GostDOC.Models
 
             if (_combinePosition)
             {
-                return string.Equals(other.Name, Name) && string.Equals(other.Included, Included);
+                return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign);
             }
-            return string.Equals(other.Name, Name) && string.Equals(other.Included, Included) && string.Equals(other.Position, Position);
+            return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign) && string.Equals(other.Position, Position);
         }
         public override bool Equals(object other)
         {
@@ -60,9 +60,9 @@ namespace GostDOC.Models
         {
             if (_combinePosition)
             {
-                return (Name?.GetHashCode() ?? 0) ^ (Included?.GetHashCode() ?? 0);
+                return (Name?.GetHashCode() ?? 0) ^ (Sign?.GetHashCode() ?? 0);
             }
-            return (Name?.GetHashCode() ?? 0) ^ (Included?.GetHashCode() ?? 0) ^ (Position?.GetHashCode() ?? 0);
+            return (Name?.GetHashCode() ?? 0) ^ (Sign?.GetHashCode() ?? 0) ^ (Position?.GetHashCode() ?? 0);
         }
     }
 }
