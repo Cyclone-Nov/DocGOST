@@ -227,9 +227,7 @@ namespace GostDOC.DataPreparation
 
                 var row = aTable.NewRow();
                 row[Constants.ColumnName] = configName;
-                row[Constants.ColumnTextFormat] = "1";
-                //row[Constants.ColumnProductCode] = ;
-                //row[Constants.ColumnDeliveryDocSign] = ;
+                row[Constants.ColumnTextFormat] = "1";                
                 aTable.Rows.Add(row);
                 AddEmptyRow(aTable);
             }            

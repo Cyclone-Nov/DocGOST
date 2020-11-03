@@ -47,7 +47,7 @@ namespace GostDOC.PDF
         protected static readonly float RIGHT_MARGIN_MM = 5;
 
         protected static readonly float TO_LEFT_CORRECTION = 0;
-        protected static readonly float BOTTOM_CORRECTION = 0;
+        protected static readonly float BOTTOM_CORRECTION = 10f;
 
 
         protected static readonly float BOTTOM_MARGIN = BOTTOM_MARGIN_MM * mmH() + BOTTOM_CORRECTION;
@@ -122,35 +122,35 @@ namespace GostDOC.PDF
                 case DocType.Bill:
                     {
                         _pageSize = new PageSize(PageSize.A3);
-                        RowNumberOnFirstPage = 26;
-                        RowNumberOnNextPage = 32;
+                        RowNumberOnFirstPage = Constants.BillRowsOnFirstPage;
+                        RowNumberOnNextPage = Constants.BillRowsOnNextPage;
                     }
                     break;
                 case DocType.D27:
                     {
                         _pageSize = new PageSize(PageSize.A3);
-                        RowNumberOnFirstPage = 24;
-                        RowNumberOnNextPage = 29;
+                        RowNumberOnFirstPage = Constants.BillRowsOnFirstPage;
+                        RowNumberOnNextPage = Constants.BillRowsOnNextPage;
                     }
                     break;
                 case DocType.Specification: {
                         _pageSize = new PageSize(PageSize.A4);
-                        RowNumberOnFirstPage = 24;
-                        RowNumberOnNextPage = 29;
+                        RowNumberOnFirstPage = Constants.SpecificationRowsOnFirstPage;
+                        RowNumberOnNextPage = Constants.SpecificationRowsOnNextPage;
                     }
                     break;
                 case DocType.ItemsList:
                     {
                         _pageSize = new PageSize(PageSize.A4);
-                        RowNumberOnFirstPage = 24;
-                        RowNumberOnNextPage = 29;
+                        RowNumberOnFirstPage = Constants.ItemListRowsOnFirstPage;
+                        RowNumberOnNextPage = Constants.ItemListRowsOnNextPage;
                     }
                     break;                
                 default:
                     {
                         _pageSize = new PageSize(PageSize.A4);
-                        RowNumberOnFirstPage = 26;
-                        RowNumberOnNextPage = 33;
+                        RowNumberOnFirstPage = Constants.DefaultRowsOnFirstPage;
+                        RowNumberOnNextPage = Constants.DefaultRowsOnNextPage;
                     }
                     break;
             }
@@ -473,7 +473,7 @@ namespace GostDOC.PDF
 
             AddLeftUpperCell("Изм.");
             AddLeftUpperCell("Лист");
-            AddLeftUpperCell("№ Докум");
+            AddLeftUpperCell("№ докум");
             AddLeftUpperCell("Подп.");
             AddLeftUpperCell("Дата");
 

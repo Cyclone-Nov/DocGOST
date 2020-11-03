@@ -143,7 +143,7 @@ internal class PdfElementListCreator : PdfCreator {
         // добавить таблицу с основной надписью для последуюших старницы
         //aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList}));
         var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList });
-        titleBlock.SetFixedPosition(DATA_TABLE_LEFT, TOP_MARGIN + 4.01f, TITLE_BLOCK_WIDTH - 0.02f);
+        titleBlock.SetFixedPosition(DATA_TABLE_LEFT, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH - 0.02f);
         aInPdfDoc.Add(titleBlock);
 
         aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
