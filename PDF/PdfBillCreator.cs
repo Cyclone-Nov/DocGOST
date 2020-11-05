@@ -117,7 +117,7 @@ namespace GostDOC.PDF
             // добавление надписи "Утвержден ХХХВП-ЛУ"
             aGraphs.TryGetValue(Constants.GRAPH_2, out var decimal_number);            
             string inscription = $"Утвержден {decimal_number}ВП-ЛУ";
-            AddText(inscription);
+            AddInscriptionText(inscription);
 
             AddCopyFormatSubscription(aInDoc, 1);
 
@@ -212,8 +212,8 @@ namespace GostDOC.PDF
                 string deliveryDocSign    = GetCellString(Constants.ColumnDeliveryDocSign).Truncate(32);
                 string supplier           = GetCellString(Constants.ColumnSupplier).Truncate(35);
                 string entry              = GetCellString(Constants.ColumnEntry).Truncate(42);                
-                string strQuantityDev = string.Empty, strQuantityComplex = string.Empty, strQuantityReg = string.Empty;
-                string strQuantityTotal = GetCellString(Constants.ColumnQuantityTotal).Truncate(5);
+                string strQuantityDev     = string.Empty, strQuantityComplex = string.Empty, strQuantityReg = string.Empty;
+                string strQuantityTotal   = GetCellString(Constants.ColumnQuantityTotal).Truncate(5);
                 int quantityTotal = 0;
                 if (string.IsNullOrEmpty(strQuantityTotal) || string.Equals(strQuantityTotal, "0"))
                     strQuantityTotal = "-";
@@ -235,13 +235,13 @@ namespace GostDOC.PDF
                 if (IsEmptyRow(row))
                 {
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));
-                    AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 1, leftPaddCell);
+                    AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 1, leftPaddCell, rowNumber == 1);
                     rowNumber--;
                 } 
                 else if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(entry) && quantityTotal > 0)  // это строка с суммой по элементам
                 {
                         tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));                        
-                        AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 3, leftPaddCell);                        
+                        AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 3, leftPaddCell, rowNumber == 1);                        
                         tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityTotal)).SetUnderline(1, 10.0f)); // Количество всего
                         tbl.AddCell(leftPaddCell.Clone(false)); // Примечание
                         rowNumber--;
@@ -298,7 +298,7 @@ namespace GostDOC.PDF
                         cell.SetBorderBottom(THICK_BORDER);
                     tbl.AddCell(cell);                      
                     
-                    AddEmptyRowToPdfTable(tbl, 1, COLUMNS-1, centrAlignCell, (j+1 == rowNumber) ? true : false);
+                    AddEmptyRowToPdfTable(tbl, 1, COLUMNS-1, centrAlignCell, (j+1 == rowNumber));
                 }
             }
             if (outLastProcessedRow == aData.Rows.Count) {
@@ -379,12 +379,13 @@ namespace GostDOC.PDF
             DrawVerticalLine(aPageNumber, x, y,THICK_LINE_WIDTH, rightVertLineHeight);
         }
 
-        void AddText(string aText)
+        void AddInscriptionText(string aText)
         {    
             Paragraph paragraph = new Paragraph(aText).
                   SetMargin(0).                  
                   SetFont(f1).
-                  SetFontSize(14);
+                  SetFontSize(14).
+                  SetItalic();
 
             PdfPage page = _pdfDoc.GetPage(1);
             Canvas canvas = new Canvas(new PdfCanvas(page), page.GetMediaBox());
