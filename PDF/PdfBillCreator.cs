@@ -399,8 +399,7 @@ namespace GostDOC.PDF
         ///   <c>true</c> if [is empty row] [the specified a row]; otherwise, <c>false</c>.
         /// </returns>
         bool IsEmptyRow(DataRow aRow)
-        {
-            //string.IsNullOrEmpty(name) && quantityTotal == 0 && string.IsNullOrEmpty(supplier) && string.IsNullOrEmpty(note)
+        {            
             if (string.IsNullOrEmpty(aRow[Constants.ColumnName].ToString())     &&
                 string.IsNullOrEmpty(aRow[Constants.ColumnSupplier].ToString()) &&
                 string.IsNullOrEmpty(aRow[Constants.ColumnFootnote].ToString()) &&
