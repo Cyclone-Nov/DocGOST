@@ -195,10 +195,13 @@ internal class ElementListDataPreparer : BasePreparer {
             DataRow row;
             string lastGroupName = string.Empty;
             List<string> oldGropus = new List<string>();
-            foreach (var component_pair in aComponentsDic.OrderBy(key => key.Key, comparer))
+            
+            var component_pair_arr = aComponentsDic.OrderBy(key => key.Key, comparer).ToArray();
+            for (int i=0; i < component_pair_arr.Length;)
             {
-                var component = component_pair.Value;
-                string designator = GetDesignator(component_pair.Key, component.Item1, component.Item3);
+                var component = component_pair_arr[i].Value;
+                string key = component_pair_arr[i].Key;
+                string designator = GetDesignator(key, component.Item1, component.Item3);
                 uint count = component.Item3;
 
                 string subGroupName = component.Item2.GetProperty(Constants.SubGroupNameSp); // GetSubgroupNameByCount(subgroup, component.Item3);
@@ -220,12 +223,39 @@ internal class ElementListDataPreparer : BasePreparer {
                     }
                 }
                 lastGroupName = subGroupName;
-                
 
-                string component_name = GetComponentName(component_pair.Key, StandardComponentsDic, component.Item2);                
+                string component_name = GetComponentName(key, StandardComponentsDic, component.Item2);                
                 bool haveToChangeName = string.Equals(component.Item2.GetProperty(Constants.ComponentPresence), "0") ||
                                                       HaveToChangeComponentName(component.Item2, aOtherComponents);
 
+                List<string> component_designators = new List<string> { designator };
+
+                bool same;
+                int j = i + 1;
+                var component_count = count;
+                if (j < component_pair_arr.Length && !haveToChangeName)
+                {
+                    do
+                    {
+                        var componentNext = component_pair_arr[j].Value;
+                        var nextKey = component_pair_arr[j].Key;
+                        uint nextCount = componentNext.Item3;
+                        string componentNext_name = GetComponentName(nextKey, StandardComponentsDic, componentNext.Item2);
+
+                        if (string.Equals(component_name, componentNext_name))
+                        {
+                            same = true;
+                            component_count+= nextCount;
+                            j++;
+                            component_designators.Add(GetDesignator(nextKey, componentNext.Item1, componentNext.Item3));
+                        } else
+                            same = false;
+                    } while (same && j < component_pair_arr.Length);
+                }
+
+                i = j;
+
+                var designators = MakeComponentDesignatorsString(component_designators);
                 string[] desigantorarr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn1PositionWidth, designator, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
                 
                 var name = (haveToChangeName) ? change_name : component_name;
@@ -236,7 +266,7 @@ internal class ElementListDataPreparer : BasePreparer {
                 row = aTable.NewRow();
                 row[Constants.ColumnPosition] = desigantorarr.First();
                 row[Constants.ColumnName] = namearr.First();
-                row[Constants.ColumnQuantity] = count;
+                row[Constants.ColumnQuantity] = component_count;
                 row[Constants.ColumnFootnote] = notearr.First();
                 aTable.Rows.Add(row);
 

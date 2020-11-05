@@ -227,12 +227,12 @@ internal class PdfElementListCreator : PdfCreator {
                 ? 0
                 : (int) row[Constants.ColumnQuantity];
 
-            if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(position)) 
+            if (IsEmptyRow(row)) 
             {
                 AddEmptyRowToPdfTable(tbl, 1, 4, leftPaddCell, remainingPdfTableRows == 1 ? true : false);
                 remainingPdfTableRows--;
             }            
-            else if (string.IsNullOrEmpty(position) && quantity == 0) 
+            else if (IsGroupName(row)) 
             {
                 // это наименование группы
                 if (remainingPdfTableRows > 4) 
@@ -281,9 +281,47 @@ internal class PdfElementListCreator : PdfCreator {
             outLastProcessedRow = 0;
         }
 
-
         return tbl;
     }
 
-}
+    /// <summary>
+    /// проверка на пустую строку
+    /// </summary>
+    /// <param name="aRow">a row.</param>
+    /// <returns>
+    ///   <c>true</c> if [is empty row] [the specified a row]; otherwise, <c>false</c>.
+    /// </returns>
+    bool IsEmptyRow(DataRow aRow)
+    {            
+        if (string.IsNullOrEmpty(aRow[Constants.ColumnName].ToString()) &&
+            string.IsNullOrEmpty(aRow[Constants.ColumnPosition].ToString()))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// проверка строки на заголовок
+    /// </summary>
+    /// <param name="aRow">a row.</param>
+    /// <returns>
+    ///   <c>true</c> if [is empty row] [the specified a row]; otherwise, <c>false</c>.
+    /// </returns>
+    bool IsGroupName(DataRow aRow)
+    {
+            //string.IsNullOrEmpty(position) && quantity == 0
+            //int quantity = (row[Constants.ColumnQuantity] == DBNull.Value)
+            //    ? 0
+            //    : (int)row[Constants.ColumnQuantity];
+
+        if (string.IsNullOrEmpty(aRow[Constants.ColumnPosition].ToString()) &&
+            string.IsNullOrEmpty(aRow[Constants.ColumnQuantity].ToString()))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    }
 }
