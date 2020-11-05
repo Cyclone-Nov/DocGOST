@@ -246,7 +246,7 @@ namespace GostDOC.Models
                     continue;
 
                 // Create component
-                Component component = new Component(cmp, _docType == DocType.Specification) { Type = aType, Count = count };                
+                Component component = new Component(cmp) { Type = aType, Count = count };                
 
                 // Fill group info
                 SubGroupInfo[] groups = UpdateGroups(cmp, component);
@@ -597,6 +597,15 @@ namespace GostDOC.Models
             }
         }
 
+        private void UpdateNote(Component aCmp, string aNote)
+        {
+            string note;
+            if (aCmp.Properties.TryGetValue(Constants.ComponentNote, out note) && string.IsNullOrEmpty(note))
+            {
+                aCmp.Properties[Constants.ComponentNote] = aNote;
+            }
+        }
+
         private void UpdatePositions(IDictionary<CombineProperties, Component> aComponents)
         {
             foreach (var cmp in aComponents.Values)
@@ -610,6 +619,7 @@ namespace GostDOC.Models
                     if (split.Length < 2)
                     {
                         // Not needed to process 1 or 0 values
+                        UpdateNote(cmp, currentPos);
                         continue;
                     }
 
@@ -669,9 +679,10 @@ namespace GostDOC.Models
                     }
                     // Process remained items
                     ProcessItems(items, result);
-
                     // Save updated id
                     cmp.Properties[Constants.ComponentDesignatorID] = result.ToString();
+                    // Update note
+                    UpdateNote(cmp, result.ToString());
                 }
             }
         }

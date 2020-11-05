@@ -39,6 +39,47 @@ namespace GostDOC.ExcelExport
             ws.Cells[r1, c1].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
             ws.Cells[r1, c1].VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
         }
+
+        public static void SetFormattedValue(this Excel._Worksheet ws, int r1, int c1, BasePreparer.FormattedString txt)
+        {
+            if (txt != null)
+            {
+                if (txt.IsOverlined)
+                {
+                    ws.Cells[r1, c1] = "\u035E" + txt.Value;
+                }
+                else
+                {
+                    ws.Cells[r1, c1] = txt.Value;
+                }
+
+                ws.Cells[r1, c1].Font.Bold = txt.IsBold;
+
+                if (txt.IsUnderlined)
+                {
+                    ws.Cells[r1, c1].Font.Underline = Excel.XlUnderlineStyle.xlUnderlineStyleSingle;
+                }
+
+                switch (txt.TextAlignment)
+                {
+                    case iText.Layout.Properties.TextAlignment.CENTER:
+                        ws.Cells[r1, c1].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                        break;
+                    case iText.Layout.Properties.TextAlignment.LEFT:
+                        ws.Cells[r1, c1].HorizontalAlignment = Excel.XlHAlign.xlHAlignLeft;
+                        break;
+                    case iText.Layout.Properties.TextAlignment.RIGHT:
+                        ws.Cells[r1, c1].HorizontalAlignment = Excel.XlHAlign.xlHAlignRight;
+                        break;
+                    case iText.Layout.Properties.TextAlignment.JUSTIFIED:
+                        ws.Cells[r1, c1].HorizontalAlignment = Excel.XlHAlign.xlHAlignJustify;
+                        break;
+                    case iText.Layout.Properties.TextAlignment.JUSTIFIED_ALL:
+                        ws.Cells[r1, c1].HorizontalAlignment = Excel.XlHAlign.xlHAlignFill;
+                        break;
+                }
+            }
+        } 
     }
 
     static class DataTableExtensions
@@ -63,15 +104,14 @@ namespace GostDOC.ExcelExport
             return string.Empty;
         }
 
-        public static string GetTableValueFS(this DataTable tbl, int row, int col)
+        public static BasePreparer.FormattedString GetTableValueFS(this DataTable tbl, int row, int col)
         {
             var val = tbl.Rows[row].ItemArray[col];
             if (val != System.DBNull.Value)
             {
-                if (val is BasePreparer.FormattedString)
-                    return ((BasePreparer.FormattedString)val).Value;
+                return val as BasePreparer.FormattedString;
             }
-            return string.Empty;
+            return null;
         }
 
         public static DataTable GetDataTable(DocType aDocType)

@@ -133,6 +133,15 @@ namespace GostDOC.ExcelExport
             FillRows(sheet, MaxRowIndexSecond);
         }
 
+        private void FillCount(Excel._Worksheet sheet, int row, int col, int tableIndex)
+        {
+            var val = _tbl.GetTableValue<int>(_tableRow, tableIndex);
+            if (val != 0)
+            {
+                sheet.Cells[row, col] = val; 
+            }
+        }
+
         private void FillRows(Excel._Worksheet sheet, int maxRows)
         {
             if (_tbl == null)
@@ -140,17 +149,19 @@ namespace GostDOC.ExcelExport
 
             int row = 3;
             while (row <= maxRows && _tableRow < _tbl.Rows.Count)
-            {                
-                sheet.Cells[row, 4] = _tbl.GetTableValue(_tableRow, 1); // Наименование
-                sheet.Cells[row, 5] = _tbl.GetTableValue(_tableRow, 2);// Код продукции
-                sheet.Cells[row, 6] = _tbl.GetTableValue(_tableRow, 3);// Обозначение документа на поставку
-                sheet.Cells[row, 7] = _tbl.GetTableValue(_tableRow, 4);// Поставщик
-                sheet.Cells[row, 14] = _tbl.GetTableValue(_tableRow, 5);// Куда входит (обозначение)
-                sheet.Cells[row, 19] = _tbl.GetTableValue<int>(_tableRow, 6);// Количество на изделие
-                sheet.Cells[row, 21] = _tbl.GetTableValue<int>(_tableRow, 7);// Количество в комплекты
-                sheet.Cells[row, 23] = _tbl.GetTableValue<int>(_tableRow, 8);// Количество на регулир.
-                sheet.Cells[row, 25] = _tbl.GetTableValue<int>(_tableRow, 9);// Количество всего
-                sheet.Cells[row, 28] = _tbl.GetTableValue(_tableRow, 10);// Примечание
+            {
+                sheet.SetFormattedValue(row, 4, _tbl.GetTableValueFS(_tableRow, 1));  // Наименование
+                sheet.SetFormattedValue(row, 5, _tbl.GetTableValueFS(_tableRow, 2));  // Код продукции
+                sheet.SetFormattedValue(row, 6, _tbl.GetTableValueFS(_tableRow, 3));  // Обозначение документа на поставку
+                sheet.SetFormattedValue(row, 7, _tbl.GetTableValueFS(_tableRow, 4));  // Поставщик
+                sheet.SetFormattedValue(row, 14, _tbl.GetTableValueFS(_tableRow, 5)); // Куда входит (обозначение)
+
+                FillCount(sheet, row, 19, 6); // Количество на изделие
+                FillCount(sheet, row, 21, 7); // Количество в комплекты
+                FillCount(sheet, row, 23, 8); // Количество на регулир.
+
+                sheet.SetFormattedValue(row, 25, _tbl.GetTableValueFS(_tableRow, 9)); // Количество всего
+                sheet.SetFormattedValue(row, 28, _tbl.GetTableValueFS(_tableRow, 10)); // Примечание
                 
                 row++;
                 _tableRow++;

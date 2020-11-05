@@ -140,18 +140,18 @@ namespace GostDOC.ExcelExport
 
             int row = MinRowIndex;
             while (row <= maxRows && _tableRow < _tbl.Rows.Count)
-            { 
-                sheet.Cells[row, 4] = _tbl.GetTableValueFS(_tableRow, 1);
-                sheet.Cells[row, 6] = _tbl.GetTableValueFS(_tableRow, 2);
-                sheet.Cells[row, 7] = _tbl.GetTableValueFS(_tableRow, 3);
-                sheet.Cells[row, 9] = _tbl.GetTableValueFS(_tableRow, 4);
-                sheet.Cells[row, 14] = _tbl.GetTableValueFS(_tableRow, 5);
+            {
+                sheet.SetFormattedValue(row, 4, _tbl.GetTableValueFS(_tableRow, 1));
+                sheet.SetFormattedValue(row, 6, _tbl.GetTableValueFS(_tableRow, 2));
+                sheet.SetFormattedValue(row, 7, _tbl.GetTableValueFS(_tableRow, 3));
+                sheet.SetFormattedValue(row, 9, _tbl.GetTableValueFS(_tableRow, 4));
+                sheet.SetFormattedValue(row, 14, _tbl.GetTableValueFS(_tableRow, 5));
 
                 int count = _tbl.GetTableValue<int>(_tableRow, 6);
                 if (count > 0)
                     sheet.Cells[row, aFirst ? 19 : 20] = count;
-               
-                sheet.Cells[row, 21] = _tbl.GetTableValueFS(_tableRow, 7);
+
+                sheet.SetFormattedValue(row, 21, _tbl.GetTableValueFS(_tableRow, 7));
 
                 row++;
                 _tableRow++;
