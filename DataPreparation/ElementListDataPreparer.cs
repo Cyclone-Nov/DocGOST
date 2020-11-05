@@ -297,65 +297,73 @@ internal class ElementListDataPreparer : BasePreparer {
                 }
 
                 var designators = designator.Split(new char[] { '-', ',' }, StringSplitOptions.RemoveEmptyEntries);
-                if (designators.Length == 1)
-                {   
-                    aDic.Add(designator.Trim(), new Tuple<string, Component, uint>(string.Empty, component, component.Count));
-                } else if (designators.Length == 2)
+
+                try
                 {
-                    if (designator.Contains('-'))
-                    {   
-                        aDic.Add(designators[0].TrimStart(), new Tuple<string, Component, uint>(designators[1].TrimEnd(), component, component.Count));
+
+                    if (designators.Length == 1)
+                    {
+                        aDic.Add(designator.Trim(), new Tuple<string, Component, uint>(string.Empty, component, component.Count));
+                    } else if (designators.Length == 2)
+                    {
+                        if (designator.Contains('-'))
+                        {
+                            aDic.Add(designators[0].TrimStart(), new Tuple<string, Component, uint>(designators[1].TrimEnd(), component, component.Count));
+                        } else
+                        {
+                            string keyDesignator = designators[0].Trim();
+                            string lastDesignator = designators[1].Trim();
+                            if (GetCountByDesignators(keyDesignator, lastDesignator) == 2)
+                            {
+                                aDic.Add(keyDesignator, new Tuple<string, Component, uint>(lastDesignator, component, 2));
+                            } else
+                            {
+                                aDic.Add(keyDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                                aDic.Add(lastDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                            }
+                        }
                     } else
                     {
-                        string keyDesignator = designators[0].Trim();
-                        string lastDesignator = designators[1].Trim();
-                        if (GetCountByDesignators(keyDesignator, lastDesignator) == 2)
-                        {                            
-                            aDic.Add(keyDesignator, new Tuple<string, Component, uint>(lastDesignator, component, 2));
-                        } else
-                        {                            
-                            aDic.Add(keyDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
-                            aDic.Add(lastDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
-                        }   
-                    }
-                } else
-                {
-                    designators = designator.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);                    
-                    for (int i = 0; i < designators.Length;)
-                    {
-                        var first_designator = designators[i].Trim();
-                        if (designators[i].Contains('-'))
-                        {                            
-                            int ind = first_designator.IndexOf('-');
-                            string keyDesigantor = first_designator.Substring(0, ind);
-                            string lastDesigantor = first_designator.Substring(ind + 1);
-                            uint subcount = GetCountByDesignators(keyDesigantor, lastDesigantor);
-                            Tuple<string, Component, uint> component_rec = new Tuple<string, Component, uint>(lastDesigantor, component, subcount);                            
-                            aDic.Add(keyDesigantor, component_rec);                            
-                            i++;
-                        } else
-                        {   
-                            if (designators.Length - i > 1)
+                        designators = designator.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        for (int i = 0; i < designators.Length;)
+                        {
+                            var first_designator = designators[i].Trim();
+                            if (designators[i].Contains('-'))
                             {
-                                var next_designator = designators[i + 1].Trim();
-                                if (!next_designator.Contains('-') && GetCountByDesignators(first_designator, next_designator) == 2)
-                                {                                    
-                                    aDic.Add(first_designator, new Tuple<string, Component, uint>(next_designator, component, 2));                                    
-                                    i += 2;
+                                int ind = first_designator.IndexOf('-');
+                                string keyDesigantor = first_designator.Substring(0, ind);
+                                string lastDesigantor = first_designator.Substring(ind + 1);
+                                uint subcount = GetCountByDesignators(keyDesigantor, lastDesigantor);
+                                Tuple<string, Component, uint> component_rec = new Tuple<string, Component, uint>(lastDesigantor, component, subcount);
+                                aDic.Add(keyDesigantor, component_rec);
+                                i++;
+                            } else
+                            {
+                                if (designators.Length - i > 1)
+                                {
+                                    var next_designator = designators[i + 1].Trim();
+                                    if (!next_designator.Contains('-') && GetCountByDesignators(first_designator, next_designator) == 2)
+                                    {
+                                        aDic.Add(first_designator, new Tuple<string, Component, uint>(next_designator, component, 2));
+                                        i += 2;
+                                    } else
+                                    {
+                                        aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                                        i++;
+                                    }
                                 } else
-                                {                                    
-                                    aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));                                    
+                                {
+                                    aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));
                                     i++;
                                 }
                             }
-                            else
-                            {
-                                aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));
-                                i++;
-                            }                                                       
                         }
                     }
+                } catch(Exception ex)
+                {
+                    // todo: log
                 }
+
             }
         }
 
