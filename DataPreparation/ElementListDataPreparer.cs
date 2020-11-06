@@ -175,27 +175,20 @@ internal class ElementListDataPreparer : BasePreparer {
                 Dictionary<string, Tuple<string, Component, uint>> aComponentsDic,                
                 IEnumerable<Dictionary<string, Component>> aOtherComponents, string aSchemaDesignation)
         {
-
             if (!aComponentsDic.Any()) 
                 return;
-
-            // для признаков составления наименования для данного компонента
-            Dictionary<string, int> StandardComponentsDic;
 
             string change_name = $"см. табл. {aSchemaDesignation}";
 
             //ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем позиционные обозначения компонентов с совпадающим значением                
             Dictionary< string/* group*/ , Dictionary<string/* GOST/TY string*/, List<string> /* array indexes */>> StandardDic =
-                FindComponentsWithStandardDoc(aComponentsDic, out StandardComponentsDic);
-
-
-            var comparer = new DesignatorIDComparer();
+                FindComponentsWithStandardDoc(aComponentsDic, out var StandardComponentsDic);
 
             // записываем таблицу данных
             DataRow row;
             string lastGroupName = string.Empty;
             List<string> oldGropus = new List<string>();
-            
+            var comparer = new DesignatorIDComparer();
             var component_pair_arr = aComponentsDic.OrderBy(key => key.Key, comparer).ToArray();
             for (int i=0; i < component_pair_arr.Length;)
             {
@@ -256,37 +249,9 @@ internal class ElementListDataPreparer : BasePreparer {
                 i = j;
 
                 var designators = MakeComponentDesignatorsString(component_designators);
-                string[] desigantorarr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn1PositionWidth, designator, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
-                
                 var name = (haveToChangeName) ? change_name : component_name;
-                string[] namearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn2NameWidth, name, new char[] { '.', ' '}, Constants.ItemListFontSize, true).ToArray();
                 var note = component.Item2.GetProperty(Constants.ComponentNote);
-                string[] notearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn4FootnoteWidth, note, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
-
-                row = aTable.NewRow();
-                row[Constants.ColumnPosition] = desigantorarr.First();
-                row[Constants.ColumnName] = namearr.First();
-                row[Constants.ColumnQuantity] = component_count;
-                row[Constants.ColumnFootnote] = notearr.First();
-                aTable.Rows.Add(row);
-
-                int max = Math.Max(namearr.Length, notearr.Length);
-                max = Math.Max(max, desigantorarr.Length);
-                if (max > 1)
-                {
-                    int ln_name = namearr.Length;
-                    int ln_note = notearr.Length;
-                    int ln_designator = desigantorarr.Length;
-
-                    for (int ln = 1; ln < max; ln++)
-                    {
-                        row = aTable.NewRow();
-                        row[Constants.ColumnPosition] = (ln_designator > ln) ? desigantorarr[ln] : string.Empty;
-                        row[Constants.ColumnName] = (ln_name > ln) ? namearr[ln] : string.Empty;
-                        row[Constants.ColumnFootnote] = (ln_note > ln) ? notearr[ln] : string.Empty;
-                        aTable.Rows.Add(row);
-                    }
-                }
+                AddNewRow(aTable, designators, name, component_count, note);
             }
 
             AddEmptyRow(aTable);
@@ -324,67 +289,81 @@ internal class ElementListDataPreparer : BasePreparer {
         {
             foreach (var component in aComponents)
             {
-                string desigantor = component.GetProperty(Constants.ComponentDesignatorID);                
-                var designators = desigantor.Split(new char[] { '-', ',' }, StringSplitOptions.RemoveEmptyEntries);
-                if (designators.Length == 1)
-                {   
-                    aDic.Add(desigantor.Trim(), new Tuple<string, Component, uint>(string.Empty, component, component.Count));
-                } else if (designators.Length == 2)
+                string designator = component.GetProperty(Constants.ComponentDesignatorID);
+                string note = component.GetProperty(Constants.ComponentNote);
+                if (string.Equals(designator, note))
                 {
-                    if (desigantor.Contains('-'))
-                    {   
-                        aDic.Add(designators[0].TrimStart(), new Tuple<string, Component, uint>(designators[1].TrimEnd(), component, component.Count));
+                    component.SetPropertyValue(Constants.ComponentNote, string.Empty);
+                }
+
+                var designators = designator.Split(new char[] { '-', ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                try
+                {
+
+                    if (designators.Length == 1)
+                    {
+                        aDic.Add(designator.Trim(), new Tuple<string, Component, uint>(string.Empty, component, component.Count));
+                    } else if (designators.Length == 2)
+                    {
+                        if (designator.Contains('-'))
+                        {
+                            aDic.Add(designators[0].TrimStart(), new Tuple<string, Component, uint>(designators[1].TrimEnd(), component, component.Count));
+                        } else
+                        {
+                            string keyDesignator = designators[0].Trim();
+                            string lastDesignator = designators[1].Trim();
+                            if (GetCountByDesignators(keyDesignator, lastDesignator) == 2)
+                            {
+                                aDic.Add(keyDesignator, new Tuple<string, Component, uint>(lastDesignator, component, 2));
+                            } else
+                            {
+                                aDic.Add(keyDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                                aDic.Add(lastDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                            }
+                        }
                     } else
                     {
-                        string keyDesignator = designators[0].Trim();
-                        string lastDesignator = designators[1].Trim();
-                        if (GetCountByDesignators(keyDesignator, lastDesignator) == 2)
-                        {                            
-                            aDic.Add(keyDesignator, new Tuple<string, Component, uint>(lastDesignator, component, 2));
-                        } else
-                        {                            
-                            aDic.Add(keyDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
-                            aDic.Add(lastDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
-                        }   
-                    }
-                } else
-                {
-                    designators = desigantor.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);                    
-                    for (int i = 0; i < designators.Length;)
-                    {
-                        var first_designator = designators[i].Trim();
-                        if (designators[i].Contains('-'))
-                        {                            
-                            int ind = first_designator.IndexOf('-');
-                            string keyDesigantor = first_designator.Substring(0, ind);
-                            string lastDesigantor = first_designator.Substring(ind + 1);
-                            uint subcount = GetCountByDesignators(keyDesigantor, lastDesigantor);
-                            Tuple<string, Component, uint> component_rec = new Tuple<string, Component, uint>(lastDesigantor, component, subcount);                            
-                            aDic.Add(keyDesigantor, component_rec);                            
-                            i++;
-                        } else
-                        {   
-                            if (designators.Length - i > 1)
+                        designators = designator.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        for (int i = 0; i < designators.Length;)
+                        {
+                            var first_designator = designators[i].Trim();
+                            if (designators[i].Contains('-'))
                             {
-                                var next_designator = designators[i + 1].Trim();
-                                if (!next_designator.Contains('-') && GetCountByDesignators(first_designator, next_designator) == 2)
-                                {                                    
-                                    aDic.Add(first_designator, new Tuple<string, Component, uint>(next_designator, component, 2));                                    
-                                    i += 2;
+                                int ind = first_designator.IndexOf('-');
+                                string keyDesigantor = first_designator.Substring(0, ind);
+                                string lastDesigantor = first_designator.Substring(ind + 1);
+                                uint subcount = GetCountByDesignators(keyDesigantor, lastDesigantor);
+                                Tuple<string, Component, uint> component_rec = new Tuple<string, Component, uint>(lastDesigantor, component, subcount);
+                                aDic.Add(keyDesigantor, component_rec);
+                                i++;
+                            } else
+                            {
+                                if (designators.Length - i > 1)
+                                {
+                                    var next_designator = designators[i + 1].Trim();
+                                    if (!next_designator.Contains('-') && GetCountByDesignators(first_designator, next_designator) == 2)
+                                    {
+                                        aDic.Add(first_designator, new Tuple<string, Component, uint>(next_designator, component, 2));
+                                        i += 2;
+                                    } else
+                                    {
+                                        aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                                        i++;
+                                    }
                                 } else
-                                {                                    
-                                    aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));                                    
+                                {
+                                    aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));
                                     i++;
                                 }
                             }
-                            else
-                            {
-                                aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));
-                                i++;
-                            }                                                       
                         }
                     }
+                } catch(Exception ex)
+                {
+                    // todo: log
                 }
+
             }
         }
 
@@ -414,9 +393,48 @@ internal class ElementListDataPreparer : BasePreparer {
             return table;
         }
 
+        /// <summary>
+        /// добавить новую строку (или строки) с данными в таблицу
+        /// </summary>
+        /// <param name="aTable">a table.</param>
+        /// <param name="aDesignators">a designators.</param>
+        /// <param name="aName">a name.</param>
+        /// <param name="aCount">a count.</param>
+        /// <param name="aNote">a note.</param>
+        private void AddNewRow(DataTable aTable, string aDesignators, string aName, uint aCount, string aNote)
+        {
+            string[] desigantorarr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn1PositionWidth, aDesignators, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
+            string[] namearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn2NameWidth, aName, new char[] { '.', ' ' }, Constants.ItemListFontSize, true).ToArray();
+            string[] notearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn4FootnoteWidth, aNote, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
 
-      
-              /// <summary>
+            var row = aTable.NewRow();
+            row[Constants.ColumnPosition] = desigantorarr.First();
+            row[Constants.ColumnName] = namearr.First();
+            row[Constants.ColumnQuantity] = aCount;
+            row[Constants.ColumnFootnote] = notearr.First();
+            aTable.Rows.Add(row);
+
+            int max = Math.Max(namearr.Length, notearr.Length);
+            max = Math.Max(max, desigantorarr.Length);
+            if (max > 1)
+            {
+                int ln_name = namearr.Length;
+                int ln_note = notearr.Length;
+                int ln_designator = desigantorarr.Length;
+
+                for (int ln = 1; ln < max; ln++)
+                {
+                    row = aTable.NewRow();
+                    row[Constants.ColumnPosition] = (ln_designator > ln) ? desigantorarr[ln] : string.Empty;
+                    row[Constants.ColumnName] = (ln_name > ln) ? namearr[ln] : string.Empty;
+                    row[Constants.ColumnFootnote] = (ln_note > ln) ? notearr[ln] : string.Empty;
+                    aTable.Rows.Add(row);
+                }
+            }
+        }
+
+
+        /// <summary>
         /// добавить пустую строку в таблицу данных
         /// </summary>
         /// <param name="aTable"></param>

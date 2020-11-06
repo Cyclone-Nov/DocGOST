@@ -389,7 +389,10 @@ namespace GostDOC.DataPreparation
 
                 row = aTable.NewRow();
                 row[Constants.ColumnName] = new FormattedString { Value = namearr.First() };
-                row[Constants.ColumnProductCode] = new FormattedString { Value = component.GetProperty(Constants.ComponentProductCode) };
+                if (IsRussianSupplier(supplier))
+                {
+                    row[Constants.ColumnProductCode] = new FormattedString { Value = component.GetProperty(Constants.ComponentProductCode) };
+                }
                 row[Constants.ColumnDeliveryDocSign] = new FormattedString { Value = component.GetProperty(Constants.ComponentDoc) };
                 row[Constants.ColumnSupplier] = new FormattedString { Value = supplierarr.First() };
                 row[Constants.ColumnEntry] = new FormattedString { Value = component.GetProperty(Constants.ComponentWhereIncluded) };
@@ -557,6 +560,32 @@ namespace GostDOC.DataPreparation
                 }
                 while (empty_str);
             }
+        }
+
+        /// <summary>
+        /// проверка что поставщик русский (на основе наличия неанглийских букв в наименовании)
+        /// </summary>
+        /// <param name="aSupplier">a supplier.</param>
+        /// <returns>
+        ///   <c>true</c> if [is russian supplier] [the specified a supplier]; otherwise, <c>false</c>.
+        /// </returns>
+        private bool IsRussianSupplier(string aSupplier)
+        {
+            if (string.IsNullOrEmpty(aSupplier))
+                return true;
+
+            char letter;
+            int i = 0;
+            do
+            {
+                letter = aSupplier[i++];
+            }
+            while (Char.IsDigit(letter) && i < aSupplier.Length);
+
+            if (letter > 128)
+                return true;
+
+            return false;
         }
     }
 }
