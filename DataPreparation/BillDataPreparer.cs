@@ -212,6 +212,7 @@ namespace GostDOC.DataPreparation
         private void FillConfiguration(DataTable aTable, Configuration aConfig, string aConfigName = "", bool aMainConfig = true)
         {
             string configName = "";
+            AddEmptyRow(aTable);
             if (!aMainConfig) 
             {
                 if (aConfig.Graphs.TryGetValue(Constants.GRAPH_2, out var sign)) // получим значение графы "Обозначение"
