@@ -200,7 +200,6 @@ namespace GostDOC.PDF
                 }
 
                 row = Rows[ind];
-
                 string GetCellString(string columnName) =>
                     (row[columnName] == DBNull.Value) ? string.Empty : ((BasePreparer.FormattedString)row[columnName]).Value;
 
@@ -215,18 +214,16 @@ namespace GostDOC.PDF
                 string strQuantityDev     = string.Empty, strQuantityComplex = string.Empty, strQuantityReg = string.Empty;
                 string strQuantityTotal   = GetCellString(Constants.ColumnQuantityTotal).Truncate(5);
                 int quantityTotal = 0;
-                if (string.IsNullOrEmpty(strQuantityTotal) || string.Equals(strQuantityTotal, "0"))
-                    strQuantityTotal = "-";
-                else
+                if (!string.IsNullOrEmpty(strQuantityTotal))
                     quantityTotal = Int32.Parse(strQuantityTotal);
                 
                 if (row[Constants.ColumnQuantityDevice] != DBNull.Value)
                 {
                     strQuantityDev = ((int)row[Constants.ColumnQuantityDevice]).ToString().Truncate(5);
                     int quantityComplex = (row[Constants.ColumnQuantityComplex] == DBNull.Value) ? 0 : (int)row[Constants.ColumnQuantityComplex];
-                    strQuantityComplex = quantityComplex == 0 ? "-" : quantityComplex.ToString().Truncate(5);
+                    strQuantityComplex = quantityComplex == 0 ? string.Empty : quantityComplex.ToString().Truncate(5);
                     int quantityReg = (row[Constants.ColumnQuantityRegul] == DBNull.Value) ? 0 : (int)row[Constants.ColumnQuantityRegul];
-                    strQuantityReg = quantityReg == 0 ? "-" : quantityReg.ToString().Truncate(5);                                        
+                    strQuantityReg = quantityReg == 0 ? string.Empty : quantityReg.ToString().Truncate(5);                                        
                 }                
 
                 string note             = GetCellString(Constants.ColumnFootnote).Truncate(12);
@@ -338,9 +335,20 @@ namespace GostDOC.PDF
 
             aTable.AddCell(
                 mainHeaderCell.Clone(false).Add(
-                    new Paragraph("№ Строки")
-                        .SetTextAlignment(TextAlignment.CENTER).SetHorizontalAlignment(HorizontalAlignment.CENTER)
-                        .SetRotationAngle(DegreesToRadians(90))));
+                    new Paragraph("№ строки")
+                        .SetTextAlignment(TextAlignment.CENTER)                        
+                        .SetRotationAngle(DegreesToRadians(90))                        
+                        .SetPaddingLeft(-10)
+                        .SetPaddingRight(-10)
+                        .SetPaddingBottom(10))                        
+                        .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                        .SetVerticalAlignment(VerticalAlignment.MIDDLE));
+
+            //SetFixedLeading(10)
+            //.SetPadding(0)
+            //.SetPaddingRight(-10)
+            //
+
             AddMainHeaderCell("Наименование");
             AddMainHeaderCell("Код продукции");
             AddMainHeaderCell("Обозначение документа на поставку");
@@ -360,7 +368,7 @@ namespace GostDOC.PDF
 
             AddSecondaryHeaderCell("на из-\nделие");
             AddSecondaryHeaderCell("в ком-\nплекте");
-            AddSecondaryHeaderCell("на ре-\nгулир");
+            AddSecondaryHeaderCell("на ре-\nгулир.");
             AddSecondaryHeaderCell("всего");
         }
 
