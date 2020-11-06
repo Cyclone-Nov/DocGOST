@@ -187,6 +187,7 @@ internal class ElementListDataPreparer : BasePreparer {
             // записываем таблицу данных
             DataRow row;
             string lastGroupName = string.Empty;
+            bool firstGroup = false;
             List<string> oldGropus = new List<string>();
             var comparer = new DesignatorIDComparer();
             var component_pair_arr = aComponentsDic.OrderBy(key => key.Key, comparer).ToArray();
@@ -198,7 +199,7 @@ internal class ElementListDataPreparer : BasePreparer {
                 uint count = component.Item3;
 
                 string subGroupName = component.Item2.GetProperty(Constants.SubGroupNameSp); // GetSubgroupNameByCount(subgroup, component.Item3);
-                if (string.IsNullOrEmpty(lastGroupName) || !string.Equals(subGroupName, lastGroupName)) // если смена группы, то 
+                if (!firstGroup || !string.Equals(subGroupName, lastGroupName)) // если смена группы, то 
                 {
                     // записываем наименование группы
                     AddEmptyRow(aTable);
@@ -214,6 +215,7 @@ internal class ElementListDataPreparer : BasePreparer {
                         }
                         oldGropus.Add(subGroupName);
                     }
+                    firstGroup = true;
                 }
                 lastGroupName = subGroupName;
 

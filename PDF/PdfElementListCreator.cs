@@ -294,7 +294,8 @@ internal class PdfElementListCreator : PdfCreator {
     bool IsEmptyRow(DataRow aRow)
     {            
         if (string.IsNullOrEmpty(aRow[Constants.ColumnName].ToString()) &&
-            string.IsNullOrEmpty(aRow[Constants.ColumnPosition].ToString()))
+            string.IsNullOrEmpty(aRow[Constants.ColumnPosition].ToString()) &&
+            string.IsNullOrEmpty(aRow[Constants.ColumnFootnote].ToString()))
         {
             return true;
         }

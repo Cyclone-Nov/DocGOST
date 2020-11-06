@@ -583,7 +583,7 @@ namespace GostDOC.DataPreparation
             }
             while (Char.IsDigit(letter) && i < aSupplier.Length);
 
-            if (letter > 128)
+            if (letter > 127)
                 return true;
 
             return false;
