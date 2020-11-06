@@ -96,6 +96,12 @@ namespace GostDOC.ExcelExport
             var range = aWs.MergeRange(1, lastCol, complex.Size.Height, lastCol, 2);
             range.Orientation = 90;
 
+            // Supplier
+            int suplier = complex.Size.Width + 3;
+            aWs.Cells[1, suplier] = "Поставщик";
+            var rangeSup = aWs.MergeRange(1, suplier, complex.Size.Height, suplier, 2);
+            rangeSup.Orientation = 90;
+
             // Print components
             int row = complex.Size.Height;
             foreach (var gp in _components)
@@ -111,6 +117,7 @@ namespace GostDOC.ExcelExport
                     aWs.Cells[++row, 1] = component.Name;
                     aWs.Cells[row, component.Column] = component.Count;
                     aWs.Cells[row, lastCol] = $"=SUM(R{row}C{2}:R{row}C{lastCol - 1})";
+                    aWs.Cells[row, suplier] = component.Manufacturer;
                 }
             }
             // Merge general name cells
@@ -153,11 +160,15 @@ namespace GostDOC.ExcelExport
 
             foreach (var cmp in aSrc.Components)
             {
+                string name = cmp.GetProperty(Constants.ComponentName);
+                string doc = cmp.GetProperty(Constants.ComponentDoc);
+
                 ComponentD27 component = new ComponentD27()
                 {
-                    Name = cmp.GetProperty(Constants.ComponentName),
+                    Name = name.Equals(doc, StringComparison.InvariantCultureIgnoreCase) ? name : name + " " + doc,
                     Count = cmp.Count,
-                    Column = _complexColumn
+                    Column = _complexColumn,
+                    Manufacturer = cmp.GetProperty(Constants.ComponentSupplier)
                 };
 
                 AddComponent(cmp.GetProperty(Constants.GroupNameSp), component);
