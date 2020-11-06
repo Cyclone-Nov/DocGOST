@@ -351,7 +351,6 @@ namespace GostDOC.Models
                 new SubGroupInfo()
             };
 
-
             var id = aSrc.Properties.Find(x => x.Name == Constants.ComponentDesignatorID)?.Text ?? string.Empty;
             var name = aSrc.Properties.Find(x => x.Name == Constants.ComponentName)?.Text ?? string.Empty;
 
