@@ -120,7 +120,7 @@ namespace GostDOC.ExcelExport
         private void Print(Excel._Worksheet aWs, ComplexD27 aSrc)
         {
             _nextColor++;
-            if (aSrc.SubComplex != null)
+            if (aSrc.SubComplex?.Count > 0)
             {
                 // Set name
                 aWs.Cells[aSrc.Row, aSrc.Column] = aSrc.Name;
@@ -165,7 +165,7 @@ namespace GostDOC.ExcelExport
 
             _complexColumn++;
        
-            if (aSrc.SubGroups != null) 
+            if (aSrc.SubGroups?.Count > 0) 
             {
                 // Increment level
                 _complexRow++;
