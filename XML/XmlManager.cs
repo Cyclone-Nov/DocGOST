@@ -214,6 +214,8 @@ namespace GostDOC.Models
         {
             var groupD27 = _currentAssemblyD27;
             Dictionary<CombineProperties, Component> components = new Dictionary<CombineProperties, Component>();
+            HashSet<string> positions = new HashSet<string>();
+
             foreach (var cmp in aComponents)
             {
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
@@ -238,6 +240,18 @@ namespace GostDOC.Models
                     Sign = sign.Text,
                     Position = position?.Text ?? string.Empty
                 };
+
+                if (!string.IsNullOrEmpty(combine.Position))
+                {
+                    if (positions.Contains(combine.Position))
+                    {
+                        _error.Error($"Найдено дублирующееся позиционное обозначение {combine.Position}!");
+                    }
+                    else
+                    {
+                        positions.Add(combine.Position);
+                    }
+                }
 
                 // Parse component count
                 uint count = ParseCount(cmp);
@@ -294,7 +308,7 @@ namespace GostDOC.Models
                 components.Add(combine, component);
             }            
 
-            if (_docType == DocType.Specification && _projectType == ProjectType.Other)
+            if (_docType == DocType.Specification)
             {
                 UpdatePositions(components);
             }
@@ -612,7 +626,14 @@ namespace GostDOC.Models
             {
                 string currentPos;
                 if (cmp.Properties.TryGetValue(Constants.ComponentDesignatorID, out currentPos))
-                {                    
+                {       
+                    if (_projectType != ProjectType.Other)
+                    {
+                        // Not needed to process already combined components
+                        UpdateNote(cmp, currentPos);
+                        continue;
+                    }
+
                     // Split ids
                     string[] split = currentPos.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                     
