@@ -695,6 +695,8 @@ namespace GostDOC.Models
                             ProcessItems(items, result);
                             // Clear ids 
                             items.Clear();
+                            // Add to list
+                            items.Add(split[i], c);
                         }
                     }
                     // Process remained items
