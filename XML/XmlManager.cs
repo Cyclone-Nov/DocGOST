@@ -612,11 +612,7 @@ namespace GostDOC.Models
 
         private void UpdateNote(Component aCmp, string aNote)
         {
-            string note;
-            if (aCmp.Properties.TryGetValue(Constants.ComponentNote, out note) && string.IsNullOrEmpty(note))
-            {
-                aCmp.Properties[Constants.ComponentNote] = aNote;
-            }
+            aCmp.Properties[Constants.ComponentNote] = aNote;
         }
 
         private void UpdatePositions(IDictionary<CombineProperties, Component> aComponents)
