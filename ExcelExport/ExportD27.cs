@@ -33,11 +33,11 @@ namespace GostDOC.ExcelExport
         public void Export(Excel.Application aApp, string aFilePath)
         {
             // Create workbook
-            var wb = aApp.Workbooks.Add();
+            Excel.Workbook wb = aApp.Workbooks.Add();
 
             Excel._Worksheet ws = aApp.ActiveSheet;
             Excel._Worksheet firstSheet = aApp.ActiveSheet;
-                        
+
             bool first = true;
             foreach (var cfg in _docManager.Project.Configurations)
             {
@@ -49,6 +49,7 @@ namespace GostDOC.ExcelExport
                 { 
                     ws = aApp.Sheets.Add(After: aApp.Sheets[aApp.Sheets.Count]);
                 }
+
                 // Set sheet name
                 ws.Name = cfg.Key;
                 // Set common fields
@@ -59,11 +60,10 @@ namespace GostDOC.ExcelExport
                 Process(ws, cfg.Value.D27);
                 // Auto fit sheet
                 ws.Columns.AutoFit();
-                ws.Rows.AutoFit();
+                ws.Rows.AutoFit();                
             }
 
             firstSheet.Select();
-
             // Save
             wb.SaveAs(aFilePath);
             // Close
@@ -112,9 +112,17 @@ namespace GostDOC.ExcelExport
                 }
 
                 aWs.SetBoldAlignedText(++row, 1, gp.Name);
+
+                string lastName = string.Empty;
                 foreach (var component in gp.Components.OrderBy(x => x.Name))
                 {
-                    aWs.Cells[++row, 1] = component.Name;
+                    if (lastName != component.Name)
+                    {
+                        row++;
+                        lastName = component.Name;
+                    }
+
+                    aWs.Cells[row, 1] = component.Name;
                     aWs.Cells[row, component.Column] = component.Count;
                     aWs.Cells[row, lastCol] = $"=SUM(R{row}C{2}:R{row}C{lastCol - 1})";
                     aWs.Cells[row, suplier] = component.Manufacturer;

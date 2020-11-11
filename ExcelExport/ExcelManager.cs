@@ -13,7 +13,7 @@ namespace GostDOC.ExcelExport
     {
         private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
 
-        public event EventHandler ExportComplete;
+        public event EventHandler ExportComplete;             
 
         public bool CanExport(DocType aDocType)
         {

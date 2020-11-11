@@ -172,7 +172,7 @@ namespace GostDOC.Models
                 || aGroupInfo.GroupName == Constants.GroupKits;
         }
 
-        private bool ParseAssemblyUnit(Configuration aNewCfg, string aUnitName)
+        private bool ParseAssemblyUnit(Configuration aNewCfg, string aUnitName, uint complexCount)
         {
             string searchCfg = "-00";
 
@@ -202,15 +202,15 @@ namespace GostDOC.Models
                     _currentAssemblyD27.SubGroups.Add(newAssembly.Name, newAssembly);
                     _currentAssemblyD27 = newAssembly;
 
-                    AddComponents(aNewCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB);
-                    AddComponents(aNewCfg, cfg.Components, ComponentType.Component);
+                    AddComponents(aNewCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, complexCount);
+                    AddComponents(aNewCfg, cfg.Components, ComponentType.Component, complexCount);
                     break;
                 }
             }
             return true;
         }
 
-        private void AddComponents(Configuration aNewCfg, List<ComponentXml> aComponents, ComponentType aType)
+        private void AddComponents(Configuration aNewCfg, List<ComponentXml> aComponents, ComponentType aType, uint complexCount = 1)
         {
             var groupD27 = _currentAssemblyD27;
             Dictionary<CombineProperties, Component> components = new Dictionary<CombineProperties, Component>();
@@ -254,7 +254,7 @@ namespace GostDOC.Models
                 }
 
                 // Parse component count
-                uint count = ParseCount(cmp);
+                uint count = ParseCount(cmp) * complexCount;
 
                 if (CombineComponent(components, combine, count))
                     continue;
@@ -280,7 +280,7 @@ namespace GostDOC.Models
                         string val;
                         if (component.Properties.TryGetValue(Constants.ComponentSign, out val) && !string.IsNullOrEmpty(val))
                         {
-                            ParseAssemblyUnit(aNewCfg, val);
+                            ParseAssemblyUnit(aNewCfg, val, component.Count);
                         }
                     }                    
 

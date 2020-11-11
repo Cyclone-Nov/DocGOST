@@ -15,6 +15,16 @@ namespace GostDOC.ExcelExport
         public uint Count { get; set; } = 1;
     }
 
+    class ComponentGroupD27
+    {
+        public string Name { get; set; }
+        public List<ComponentD27> Components { get; set; } = new List<ComponentD27>();
+        public ComponentGroupD27(string aName)
+        {
+            Name = aName;
+        }
+    }
+
     class HeaderSize
     {
         public int Width { get; set; } = 1;
@@ -37,15 +47,5 @@ namespace GostDOC.ExcelExport
         public int Row { get; set; }
         public HeaderSize Size { get; set; } = new HeaderSize();
         public List<ComplexD27> SubComplex { get; set; }
-    }
-
-    class ComponentGroupD27
-    {
-        public string Name { get; set; }
-        public List<ComponentD27> Components { get; set; } = new List<ComponentD27>();
-        public ComponentGroupD27(string aName)
-        {
-            Name = aName;
-        }
     }
 }

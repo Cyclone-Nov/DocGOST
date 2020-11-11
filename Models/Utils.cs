@@ -208,6 +208,20 @@ namespace GostDOC.Models
             return prop.Value ?? string.Empty;
         }
 
+        public static uint GetPropertyNum(this Component current, string name)
+        {
+            var prop = current.Properties.FirstOrDefault(x => x.Key == name);
+            uint res = 0;
+            uint.TryParse(prop.Value, out res);
+            return res;
+        }
+
+        public static uint GetCountProperty(this Component current)
+        {
+            uint count = current.GetPropertyNum(Constants.ComponentCount);
+            return count == 0 ? 1 : count;
+        }
+
         public static void SetPropertyValue(this Component current, string aPropertyName, string aValue)
         {
             if (!string.IsNullOrEmpty(aPropertyName) && current.Properties.ContainsKey(aPropertyName))
