@@ -170,10 +170,34 @@ namespace GostDOC.ExcelExport
             {
                 string name = cmp.GetProperty(Constants.ComponentName);
                 string doc = cmp.GetProperty(Constants.ComponentDoc);
+                string type = cmp.GetProperty(Constants.ComponentType);
+                string group = cmp.GetProperty(Constants.SubGroupNameSp);
+
+                // Add component type (radio details)
+                if (!string.IsNullOrEmpty(group))
+                {
+                    string[] split = group.Split(new char[] { '\\' });
+                    if (split.Length > 1)
+                    {
+                        name = split[0] + " " + name;
+                    }
+                }
+
+                // Add component type (details)
+                if (!string.IsNullOrEmpty(type) && !name.Contains(type))
+                {
+                    name = type + " " + name;
+                }
+
+                // Add document
+                if (!string.IsNullOrEmpty(doc) && !name.Contains(doc))
+                {
+                    name += " " + doc;
+                }
 
                 ComponentD27 component = new ComponentD27()
                 {
-                    Name = name.Equals(doc, StringComparison.InvariantCultureIgnoreCase) ? name : name + " " + doc,
+                    Name = name,
                     Count = cmp.Count,
                     Column = _complexColumn,
                     Manufacturer = cmp.GetProperty(Constants.ComponentSupplier)

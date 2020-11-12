@@ -14,7 +14,8 @@ namespace GostDOC.Models
 {
     class XmlManager
     {
-        //private Converter _defaults = new Converter();
+        private Version MinVersion = new Version(1, 1);
+
         private RootXml _xml = null;
         private DocType _docType = DocType.None;
         private ProjectType _projectType = ProjectType.Other;
@@ -36,6 +37,8 @@ namespace GostDOC.Models
             {
                 return OpenFileResult.Fail;
             }
+
+            CheckVersion(aFilePath);
 
             _dir = Path.GetDirectoryName(aFilePath);
             _projectType = ParseProjectType(_xml.Transaction.Type);
@@ -189,6 +192,8 @@ namespace GostDOC.Models
             {
                 return false;
             }
+
+            CheckVersion(filePath);
 
             foreach (var cfg in xml.Transaction.Project.Configurations)
             {
@@ -817,6 +822,18 @@ namespace GostDOC.Models
                 foreach (var gp in aCfg.Specification)
                 {
                     ProcessGroupNames(gp.Value);
+                }
+            }
+        }
+
+        private void CheckVersion(string aFilePath)
+        {
+            Version v;
+            if (Version.TryParse(_xml.Transaction.Version, out v))
+            {
+                if (v.CompareTo(MinVersion) < 0)
+                {
+                    _error.Error($"Версия файла {aFilePath} меньше {MinVersion.ToString()}!");
                 }
             }
         }
