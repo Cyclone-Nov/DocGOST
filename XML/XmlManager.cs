@@ -833,7 +833,7 @@ namespace GostDOC.Models
             {
                 if (v.CompareTo(MinVersion) < 0)
                 {
-                    _error.Error($"Версия файла {aFilePath} меньше {MinVersion.ToString()}!");
+                    _error.Error($"Версия файла {aFilePath} меньше {MinVersion}!");
                 }
             }
         }
