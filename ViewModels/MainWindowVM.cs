@@ -382,7 +382,10 @@ namespace GostDOC.ViewModels
         
         private void AddComponent(object obj)
         {
-            Components.Add(new ComponentVM());
+            var cmp = new ComponentVM();
+            cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
+            Components.Add(cmp);
+
             UpdateUndoRedoComponents();
         }
 
@@ -581,9 +584,12 @@ namespace GostDOC.ViewModels
                 Document doc = _docTypes.GetDocument(obj.Parent?.Name, obj.Name);
                 if (doc != null)
                 {
+                    var included = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
+
                     ComponentVM cmp = new ComponentVM();
                     cmp.Name.Value = doc.Name;
-                    cmp.Sign.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign) + doc.Code;
+                    cmp.Sign.Value = included + " " + doc.Code;
+                    cmp.WhereIncluded.Value = included;
                     cmp.Format.Value = "A4";
                     Components.Add(cmp);
                 }        
@@ -615,6 +621,7 @@ namespace GostDOC.ViewModels
                     {
                         ComponentVM cmp = new ComponentVM();
                         cmp.Name.Value = material.Name;
+                        cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
                         Components.Add(cmp);
                     }
                 }
