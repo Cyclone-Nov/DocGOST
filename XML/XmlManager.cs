@@ -28,6 +28,15 @@ namespace GostDOC.Models
         {
         }
 
+        public void Reset()
+        {
+            _xml = null;
+            _docType = DocType.None;
+            _projectType = ProjectType.Other;
+            _dir = string.Empty;
+            _currentAssemblyD27 = null;
+        }
+
         public OpenFileResult LoadData(Project aResult, string aFilePath, DocType aDocType)
         {
             _xml = new RootXml();

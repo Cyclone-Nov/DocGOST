@@ -48,6 +48,12 @@ namespace GostDOC.Models
             return XmlManager.SaveData(Project, aFilePath);
         }
 
+        public void Reset()
+        {
+            Project.Type = ProjectType.GostDoc;
+            XmlManager.Reset();
+        }
+
         /// <summary>
         /// подготовить данных перед экспортом
         /// </summary>

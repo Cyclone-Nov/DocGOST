@@ -311,7 +311,9 @@ namespace GostDOC.ViewModels
             }
 
             if (CommonDialogs.CreateConfiguration())
-            {
+            {                
+                _docManager.Reset();
+
                 _shouldSave = true;
                 IsSaveEnabled.Value = true;
 
