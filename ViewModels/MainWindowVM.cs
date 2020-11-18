@@ -642,7 +642,7 @@ namespace GostDOC.ViewModels
                 var val = GeneralGraphValues.Where(k => string.Equals(k.Name.Value, "Обозначение")).ToArray();
                 if (val != null && val.Length > 0 && !string.IsNullOrEmpty(val[0].Text.Value))
                 {
-                    filename = $"{val[0].Text.Value} {Common.Converters.GetDocumentName(_docType)}" + "." + aExtension;
+                    filename = $"{val[0].Text.Value}" + "." + aExtension;
                 }
             }
             return filename;
