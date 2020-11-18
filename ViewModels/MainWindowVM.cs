@@ -56,11 +56,14 @@ namespace GostDOC.ViewModels
         public ObservableProperty<string> Title { get; } = new ObservableProperty<string>();
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<bool> IsD27TableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<ComponentVM> ComponentsSelectedItem { get; } = new ObservableProperty<ComponentVM>();
         public ObservableCollection<ComponentVM> Components { get; } = new ObservableCollection<ComponentVM>();
         // Graphs
         public ObservableProperty<bool> IsGeneralGraphValuesVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableCollection<GraphValueVM> GeneralGraphValues { get; } = new ObservableCollection<GraphValueVM>();
+        public ObservableCollection<ComponentDataVM> ComponentsData { get; } = new ObservableCollection<ComponentDataVM>();
+        public ObservableCollection<ComponentEntryVM> ComponentsEntry { get; } = new ObservableCollection<ComponentEntryVM>();
         // Doc tree
         public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
         // Context menu
@@ -102,7 +105,6 @@ namespace GostDOC.ViewModels
         public ICommand SaveGraphValuesCmd => new Command<GraphPageType>(SaveGraphValues);
         public ICommand AddGroupCmd => new Command(AddGroup);
         public ICommand RemoveGroupCmd => new Command(RemoveGroup);
-        public ICommand SaveComponentsCmd => new Command(SaveComponents);
         public ICommand UpComponentsCmd => new Command<IList<object>>(UpComponents);
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
         public ICommand UpdatePdfCmd => new Command(UpdatePdf, IsExportPdfEnabled);
@@ -116,6 +118,8 @@ namespace GostDOC.ViewModels
         public ICommand UpdateMaterialsCmd => new Command(UpdateMaterials);
         public ICommand CopyCellCmd => new Command<DataGridCellInfo>(CopyCell);
         public ICommand PasteCellCmd => new Command<DataGridCellInfo>(PasteCell);
+        public ICommand AutoSortCheckedCmd => new Command<bool>(AutoSortChecked);
+
         public string WindowTitle
         {
             get
@@ -256,6 +260,7 @@ namespace GostDOC.ViewModels
                     e.CommitEdit(DataGridEditingUnit.Row, false);
                     UpdateUndoRedoGraph();
                     IsUndoEnabled.Value = true;
+                    _shouldSave = true;
                 }
                 finally
                 {
@@ -274,6 +279,7 @@ namespace GostDOC.ViewModels
                     e.CommitEdit(DataGridEditingUnit.Row, false);
                     UpdateUndoRedoComponents();
                     IsUndoEnabled.Value = true;
+                    _shouldSave = true;
                 }
                 finally
                 {
@@ -356,8 +362,19 @@ namespace GostDOC.ViewModels
 
         private void TreeViewSelectionChanged(Node obj)
         {
+            if (_selectedItem != null)
+            {
+                // Save previous table
+                SaveComponents();
+            }
+
             _selectedItem = obj;
-            UpdateSelectedDocument();
+
+            if (_selectedItem != null)
+            {
+                // Update current table
+                UpdateSelectedDocument();
+            }
         }
 
         private void Closing(System.ComponentModel.CancelEventArgs e)
@@ -429,10 +446,8 @@ namespace GostDOC.ViewModels
             }
         }
 
-        private void SaveComponents(object obj)
+        private void SaveComponents()
         {
-            _shouldSave = true;
-
             string cfgName = ConfigurationName;
 
             // Update components properties
@@ -488,8 +503,11 @@ namespace GostDOC.ViewModels
             {
                 _project.AddGroup(_selectedItem.Parent.Name, _docType, new SubGroupInfo(_selectedItem.Name, name));
             }
+            
             // Update view
             UpdateGroups();
+            // Should save
+            _shouldSave = true;
         }
 
         private void RemoveGroup(object obj)
@@ -532,6 +550,8 @@ namespace GostDOC.ViewModels
 
             // Update view
             UpdateGroups();
+            // Should save
+            _shouldSave = true;
         }
 
         private void UpComponents(IList<object> lst)
@@ -690,6 +710,14 @@ namespace GostDOC.ViewModels
             UpdateTableContextMenu();
         }
 
+        private void AutoSortChecked(bool aChecked)
+        {
+            if (aChecked)
+            {
+                SaveComponents();
+            }
+        }
+
         #endregion Commands impl
 
         private void OnDragDropFile_FileDropped(object sender, TEventArgs<string> e)
@@ -773,14 +801,14 @@ namespace GostDOC.ViewModels
 
         private void UpdateSelectedDocument()
         {
-            if (_selectedItem == null)
-            {
-                return;
-            }
-            // Is group or subgroup selected
+             // Is group or subgroup selected
             bool isGroup = _selectedItem.NodeType == NodeType.Group || _selectedItem.NodeType == NodeType.SubGroup;
             // Is graph table visible
             IsGeneralGraphValuesVisible.Value = _selectedItem.NodeType == NodeType.Root;
+            if (IsGeneralGraphValuesVisible.Value)
+            {
+                UpdateGraphValues();
+            }
 
             if (_docType == DocType.Specification)
             {
@@ -809,6 +837,8 @@ namespace GostDOC.ViewModels
             IsSpecificationTableVisible.Value = _docType == DocType.Specification && isGroup;
             // Is bill table visible
             IsBillTableVisible.Value = _docType == DocType.Bill && isGroup;
+            // Is D27 visible
+            IsD27TableVisible.Value = _docType == DocType.D27;
 
             if (isGroup)
             {
@@ -845,6 +875,29 @@ namespace GostDOC.ViewModels
             UpdateUndoRedoComponents();
         }
 
+        private void UpdateConfiguration(Node aCollection, Group aGroup)
+        {
+            // Populate configuration tree
+            foreach (var cmp in aGroup.Components)
+            {
+                Node node = new Node() { Name = cmp.GetProperty(Constants.ComponentName), NodeType = NodeType.Component, Parent = aCollection };
+                aCollection.Nodes.Add(node);
+            }
+
+            foreach (var gp in aGroup.SubGroups.AsNotNull())
+            {
+                UpdateConfiguration(aCollection, gp.Value);
+            }
+        }
+
+        private void UpdateConfiguration(Node aCollection, string aCfgName, Group aGroup)
+        {
+            // Populate configuration tree
+            Node treeItemCfg = new Node() { Name = aCfgName, NodeType = NodeType.Configuration, Parent = aCollection, Nodes = new ObservableCollection<Node>() };
+            UpdateConfiguration(treeItemCfg, aGroup);
+            aCollection.Nodes.Add(treeItemCfg);
+        }
+
         private void UpdateConfiguration(Node aCollection, string aCfgName, IDictionary<string, Group> aGroups)
         {
             // Populate configuration tree
@@ -857,7 +910,7 @@ namespace GostDOC.ViewModels
                     groupName = Constants.DefaultGroupName;
                 }
 
-                Node treeItemGroup = new Node() { Name = groupName, NodeType = NodeType.Group, Parent = treeItemCfg, Nodes = new ObservableCollection<Node>() };              
+                Node treeItemGroup = new Node() { Name = groupName, NodeType = NodeType.Group, Parent = treeItemCfg, Nodes = new ObservableCollection<Node>() };
                 foreach (var sub in grp.Value.SubGroups.AsNotNull())
                 {
                     Node treeItemSubGroup = new Node() { Name = sub.Key, NodeType = NodeType.SubGroup, Parent = treeItemGroup };
@@ -907,6 +960,13 @@ namespace GostDOC.ViewModels
                         UpdateConfiguration(_bill, cfg.Key, cfg.Value.Bill);
                     }
                     break;
+                case DocType.D27:
+                    _bill_D27.Nodes.Clear();
+                    foreach (var cfg in _docManager.Project.Configurations)
+                    {
+                        UpdateConfiguration(_bill_D27, cfg.Key, cfg.Value.D27);
+                    }
+                    break;
             }            
         }
 
@@ -914,6 +974,8 @@ namespace GostDOC.ViewModels
         {
             IsUndoEnabled.Value = undoRedoStack.IsUndoEnabled;
             IsRedoEnabled.Value = undoRedoStack.IsRedoEnabled;
+
+            _shouldSave = undoRedoStack.IsUndoEnabled || undoRedoStack.IsRedoEnabled;
         }
 
         private void UpdateData()
@@ -1003,6 +1065,7 @@ namespace GostDOC.ViewModels
             IsSpecificationTableVisible.Value = false;
             IsBillTableVisible.Value = false;
             IsGeneralGraphValuesVisible.Value = false;
+            IsD27TableVisible.Value = false;
         }
         private void UpdateDocType(DocType aType)
         {

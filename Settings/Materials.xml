@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <groups>
+    <group name="Металлы черные">
+      <materials />
+    </group>
+    <group name="Металлы магнитоэлектрические и ферромагнитные">
+      <materials />
+    </group>
+    <group name="Металлы цветные, благородные и редкие">
+      <materials />
+    </group>
+    <group name="Кабели, провода и шнуры">
+      <materials />
+    </group>
+    <group name="Пластмассы и пресс-материалы">
+      <materials />
+    </group>
+    <group name="Бумажные и текстильные материалы">
+      <materials />
+    </group>
+    <group name="Резиновые и кожевенные материалы">
+      <materials />
+    </group>
+    <group name="Минеральные, керамические и стеклянные материалы">
+      <materials />
+    </group>
+    <group name="Лаки, краски, нефтепродукты и химикаты">
+      <materials />
+    </group>
+    <group name="Металлические, неметаллические порошки">
+      <materials />
+    </group>
+    <group name="Прочие материалы">
+      <materials />
+    </group>
+  </groups>
+</root>

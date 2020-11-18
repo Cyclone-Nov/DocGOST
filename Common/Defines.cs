@@ -12,7 +12,8 @@ namespace GostDOC.Common
         Root,
         Configuration,
         Group,
-        SubGroup
+        SubGroup,
+        Component
     }
 
     public enum SortType
