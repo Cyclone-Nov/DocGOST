@@ -77,6 +77,7 @@ namespace GostDOC.Models
             {
                 if (!_prepareDataManager.PrepareDataTable(aDocType, Project.Configurations))
                     return false;
+                dataTable = _prepareDataManager.GetDataTable(aDocType);
             }
 
             IDictionary<string, string> mainConfigGraphs = null;
