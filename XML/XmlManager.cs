@@ -367,6 +367,7 @@ namespace GostDOC.Models
 
             var id = aSrc.Properties.Find(x => x.Name == Constants.ComponentDesignatorID)?.Text ?? string.Empty;
             var name = aSrc.Properties.Find(x => x.Name == Constants.ComponentName)?.Text ?? string.Empty;
+            var included = aSrc.Properties.Find(x => x.Name == Constants.ComponentWhereIncluded)?.Text ?? string.Empty;
 
             foreach (var property in aSrc.Properties)
             {
@@ -390,7 +391,7 @@ namespace GostDOC.Models
 
             if (result[0].GroupName == Constants.GroupOthers && string.IsNullOrEmpty(result[0].SubGroupName))
             {
-                _error.Error($"Не задан Подраздел СП для {name}!");
+                _error.Error($"Не задан Подраздел СП для раздела {result[0].GroupName} в файле {included} компонента {name}!");
             }
 
             return result;
