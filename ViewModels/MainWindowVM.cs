@@ -637,6 +637,14 @@ namespace GostDOC.ViewModels
             {
                 filename = $"{Path.GetFileNameWithoutExtension(_filePath)} {Common.Converters.GetDocumentName(_docType)}" + "." + aExtension;
             }
+            else
+            {
+                var val = GeneralGraphValues.Where(k => string.Equals(k.Name.Value, "Обозначение")).ToArray();
+                if (val != null && val.Length > 0 && !string.IsNullOrEmpty(val[0].Text.Value))
+                {
+                    filename = $"{val[0].Text.Value} {Common.Converters.GetDocumentName(_docType)}" + "." + aExtension;
+                }
+            }
             return filename;
         }
 
