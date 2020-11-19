@@ -194,9 +194,14 @@
     <Compile Include="PDF\PdfSpecificationCreator.cs" />
     <Compile Include="PDF\PdfUtils.cs" />
     <Compile Include="UI\DragDropFile.cs" />
+    <Compile Include="UserControls\D27Control.xaml.cs">
+      <DependentUpon>D27Control.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\NameValueControl.xaml.cs">
       <DependentUpon>NameValueControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\ComponentDataVM.cs" />
+    <Compile Include="ViewModels\ComponentEntryVM.cs" />
     <Compile Include="ViewModels\LoadErrorsVM.cs" />
     <Compile Include="ViewModels\MaterialsVM.cs" />
     <Compile Include="ViewModels\NewFileVM.cs" />
@@ -245,6 +250,10 @@
       <DependentUpon>SelectMainFile.xaml</DependentUpon>
     </Compile>
     <Page Include="UserControls\BillControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\D27Control.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
