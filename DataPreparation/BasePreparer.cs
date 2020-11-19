@@ -89,6 +89,7 @@ public abstract class BasePreparer {
         foreach (var config in configs) {
             Dictionary<string, Component> dic = new Dictionary<string, Component>();
             Group others;
+            Group units;
             if (config.Value.Specification.TryGetValue(Constants.GroupOthers, out others)) {
                 if (others.Components.Count() > 0 || others.SubGroups.Count() > 0) {
                     // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
@@ -106,6 +107,29 @@ public abstract class BasePreparer {
                     }
 
                     result.Add(dic);
+                }
+
+                if (config.Value.Specification.TryGetValue(Constants.GroupAssemblyUnits, out units))
+                {
+                    if (units.Components.Count() > 0 || units.SubGroups.Count() > 0)
+                    {
+                        // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
+                        var mainсomponents = units.Components.Where(val =>
+                            !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
+                        foreach (var comp in mainсomponents)
+                            dic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
+
+                        foreach (var subgroup in units.SubGroups.OrderBy(key => key.Key))
+                        {
+                            // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
+                            var сomponents = subgroup.Value.Components.Where(val =>
+                                !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
+                            foreach (var comp in сomponents)
+                                dic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
+                        }
+
+                        result.Add(dic);
+                    }
                 }
             }
         }
@@ -150,6 +174,10 @@ public abstract class BasePreparer {
         if (aHasStandardDoc.ContainsKey(aKey) && aHasStandardDoc[aKey] == 1)        
         {
             return $"{component.GetProperty(Constants.ComponentName)} {component.GetProperty(Constants.ComponentDoc)}";
+        }
+        if (string.Equals(component.GetProperty(Constants.GroupNameSp), Constants.GroupAssemblyUnits))
+        {
+            return $"{component.GetProperty(Constants.ComponentName)} {component.GetProperty(Constants.ComponentSign)}";
         }
         return component.GetProperty(Constants.ComponentName);
     }
