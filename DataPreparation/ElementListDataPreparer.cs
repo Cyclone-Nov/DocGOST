@@ -34,28 +34,32 @@ internal class ElementListDataPreparer : BasePreparer {
         Group others;
         Group units;
         DataTable table = CreateTable("ElementListData");
-        if (data.TryGetValue(Constants.GroupOthers, out others)) {            
+        Dictionary<string, Tuple<string, Component, uint>> allComponentsDic = null;
+        if (data.TryGetValue(Constants.GroupOthers, out others)) {              
             if (others.Components.Count() > 0 || others.SubGroups.Count() > 0) {
-
-                // подготавливаем список из всех компонентов
-                var allComponentsDic = PrepareComponentsList(others);
-                                                
-                FillDataTable(table, allComponentsDic, otherConfigsElements, schemaDesignation);
+                allComponentsDic = PrepareComponentsList(others);
             }
         }
-        if (data.TryGetValue(Constants.GroupAssemblyUnits, out units)) {            
-            if (units.Components.Count() > 0 || units.SubGroups.Count() > 0) {
 
-                // подготавливаем список из всех компонентов
-                var allComponentsDic = PrepareComponentsList(units);
-                                                
-                FillDataTable(table, allComponentsDic, otherConfigsElements, schemaDesignation);
-            }
-        }
+        if (data.TryGetValue(Constants.GroupAssemblyUnits, out units)) {      
         
-        // удаляем пусты строки в конце
-        RemoveLastEmptyRows(table);
-        return table;        
+            if (units.Components.Count() > 0 || units.SubGroups.Count() > 0) {
+            // подготавливаем список из всех компонентов
+            if (allComponentsDic == null)                
+                allComponentsDic = PrepareComponentsList(units);
+            else
+                allComponentsDic.AddRange(PrepareComponentsList(units));
+            }
+        }
+
+        if (allComponentsDic!= null)
+        {
+            FillDataTable(table, allComponentsDic, otherConfigsElements, schemaDesignation);            
+            RemoveLastEmptyRows(table);
+            return table;
+        }
+
+        return null;
     }
 
 
