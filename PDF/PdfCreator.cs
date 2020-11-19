@@ -509,7 +509,7 @@ namespace GostDOC.PDF
             var graph1Cell = new Cell(5, 3)
                 .SetTextAlignment(TextAlignment.CENTER)
                 .SetVerticalAlignment(VerticalAlignment.MIDDLE)
-                .SetBorder(THICK_BORDER).Add(new Paragraph(GetGraph(Constants.GRAPH_1)).SetFontSize(20).SetFixedLeading(15f));
+                .SetBorder(THICK_BORDER).Add(new Paragraph(GetGraph(Constants.GRAPH_1)).SetFontSize(20).SetFixedLeading(18f));
             if (!string.IsNullOrEmpty(documentTypeGraph1)) {
                 graph1Cell.Add(new Paragraph(documentTypeGraph1).SetFontSize(12));
             }
