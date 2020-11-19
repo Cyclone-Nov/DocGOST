@@ -102,7 +102,6 @@ namespace GostDOC.ViewModels
         public ICommand RemoveComponentsCmd => new Command<IList<object>>(RemoveComponents);
         public ICommand MoveComponentsCmd => new Command<IList<object>>(MoveComponents);
         public ICommand TreeViewSelectionChangedCmd => new Command<Node>(TreeViewSelectionChanged);
-        public ICommand SaveGraphValuesCmd => new Command<GraphPageType>(SaveGraphValues);
         public ICommand AddGroupCmd => new Command(AddGroup);
         public ICommand RemoveGroupCmd => new Command(RemoveGroup);
         public ICommand UpComponentsCmd => new Command<IList<object>>(UpComponents);
@@ -364,8 +363,14 @@ namespace GostDOC.ViewModels
         {
             if (_selectedItem != null)
             {
-                // Save previous table
-                SaveComponents();
+                if (_selectedItem.NodeType == NodeType.Group || _selectedItem.NodeType == NodeType.SubGroup)
+                {
+                    SaveComponents();
+                }
+                else if (_selectedItem.NodeType == NodeType.Root)
+                {
+                    SaveGraphValues();
+                }
             }
 
             _selectedItem = obj;
@@ -471,14 +476,10 @@ namespace GostDOC.ViewModels
             var groupData = new GroupData(IsAutoSortEnabled.Value, components);
 
             _project.UpdateGroup(cfgName, _docType, groupInfo, groupData);
-
-            UpdateGroupData();
         }
 
-        private void SaveGraphValues(GraphPageType tp)
+        private void SaveGraphValues()
         {
-            _shouldSave = true;
-
             Dictionary<string, string> values = new Dictionary<string, string>();
             foreach (var value in GeneralGraphValues)
             {
@@ -868,8 +869,10 @@ namespace GostDOC.ViewModels
         private void UpdateGroupData()
         {
             var groupData = GetGroupData();
-
-            IsAutoSortEnabled.Value = groupData.AutoSort;
+            if (groupData != null)
+            {
+                IsAutoSortEnabled.Value = groupData.AutoSort;
+            }
 
             // Fill components
             Components.Clear();
