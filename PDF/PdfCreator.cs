@@ -541,7 +541,8 @@ namespace GostDOC.PDF
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4))));
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4a))));
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4b))));
-            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(titleBlockStruct.CurrentPage.ToString())));
+            string currPage = (titleBlockStruct.Pages == 1) ? string.Empty : titleBlockStruct.CurrentPage.ToString();
+            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(currPage)));
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(titleBlockStruct.Pages.ToString())));
             
             #endregion
