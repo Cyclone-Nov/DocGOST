@@ -509,7 +509,7 @@ namespace GostDOC.PDF
             var graph1Cell = new Cell(5, 3)
                 .SetTextAlignment(TextAlignment.CENTER)
                 .SetVerticalAlignment(VerticalAlignment.MIDDLE)
-                .SetBorder(THICK_BORDER).Add(new Paragraph(GetGraph(Constants.GRAPH_1)).SetFontSize(20).SetFixedLeading(15f));
+                .SetBorder(THICK_BORDER).Add(new Paragraph(GetGraph(Constants.GRAPH_1)).SetFontSize(20).SetFixedLeading(18f));
             if (!string.IsNullOrEmpty(documentTypeGraph1)) {
                 graph1Cell.Add(new Paragraph(documentTypeGraph1).SetFontSize(12));
             }
@@ -541,7 +541,8 @@ namespace GostDOC.PDF
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4))));
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4a))));
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4b))));
-            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(titleBlockStruct.CurrentPage.ToString())));
+            string currPage = (titleBlockStruct.Pages == 1) ? string.Empty : titleBlockStruct.CurrentPage.ToString();
+            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(currPage)));
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(titleBlockStruct.Pages.ToString())));
             
             #endregion

@@ -93,7 +93,7 @@ internal class PdfElementListCreator : PdfCreator {
             Pages = aCountPages, 
             AppendGraphs = true, 
             DocType = DocType.ItemsList,
-            CurrentPage = 1,
+            CurrentPage = 1
         }));
 
         // добавить таблицу с верхней дополнительной графой

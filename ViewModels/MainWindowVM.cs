@@ -623,7 +623,7 @@ namespace GostDOC.ViewModels
 
                     ComponentVM cmp = new ComponentVM();
                     cmp.Name.Value = doc.Name;
-                    cmp.Sign.Value = included + " " + doc.Code;
+                    cmp.Sign.Value = included + doc.Code;
                     cmp.WhereIncluded.Value = included;
                     cmp.Format.Value = "A4";
                     Components.Add(cmp);
