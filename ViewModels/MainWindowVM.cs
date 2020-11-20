@@ -657,6 +657,7 @@ namespace GostDOC.ViewModels
                     {
                         ComponentVM cmp = new ComponentVM();
                         cmp.Name.Value = material.Name;
+                        cmp.Note.Value = material.Note;
                         cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
                         Components.Add(cmp);
                     }
