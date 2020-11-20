@@ -595,6 +595,18 @@ namespace GostDOC.ViewModels
             }
         }
 
+        private Tuple<string, string> GetGroups(MenuNode obj)
+        {
+            if (obj.Parent?.Parent != null)
+            {
+                return new Tuple<string, string>(obj.Parent.Parent.Name, obj.Parent.Name);
+            }
+            else
+            {
+                return new Tuple<string, string>(obj.Parent.Name, null);
+            }
+        } 
+
         private void ClickMenu(MenuNode obj)
         {
             if (obj == null)
@@ -624,10 +636,10 @@ namespace GostDOC.ViewModels
                 {
                     // Add material
                     material = CommonDialogs.AddMaterial();
-
                     if (material != null)
                     {
-                        if (_materials.AddMaterial(obj.Parent.Name, material))
+                        var groups = GetGroups(obj);
+                        if (_materials.AddMaterial(groups.Item1, groups.Item2, material))
                         {
                             // Add node
                             obj.Parent.Nodes.InsertSorted(new MenuNode() { Name = material.Name, Parent = obj.Parent });
@@ -639,11 +651,13 @@ namespace GostDOC.ViewModels
                 else
                 {
                     // Find material
-                    material = _materials.GetMaterial(obj.Parent?.Name, obj.Name);
+                    var groups = GetGroups(obj);
+                    material = _materials.GetMaterial(groups.Item1, groups.Item2, obj.Name);
                     if (material != null)
                     {
                         ComponentVM cmp = new ComponentVM();
                         cmp.Name.Value = material.Name;
+                        cmp.Note.Value = material.Note;
                         cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
                         Components.Add(cmp);
                     }
@@ -1014,6 +1028,25 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
         }
 
+        private void AddMenuItem(MenuNode aNode, MaterialGroup aGroup)
+        {
+            foreach (var material in aGroup.Materials)
+            {
+                aNode.Nodes.InsertSorted(new MenuNode() { Name = material.Key, Parent = aNode });
+            }
+            aNode.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = aNode });
+
+            if (aGroup.SubGroups != null)
+            {
+                foreach (var gp in aGroup.SubGroups)
+                {
+                    MenuNode node = new MenuNode() { Name = gp.Key, Nodes = new ObservableCollection<MenuNode>() };
+                    AddMenuItem(node, gp.Value);
+                    aNode.Nodes.InsertSorted(node);
+                }
+            }
+        }
+
         private void UpdateTableContextMenu()
         {
             TableContextMenu.Clear();
@@ -1037,11 +1070,7 @@ namespace GostDOC.ViewModels
                 foreach (var kvp in _materials.Materials)
                 {
                     MenuNode node = new MenuNode() { Name = kvp.Key, Nodes = new ObservableCollection<MenuNode>() };
-                    foreach (var doc in kvp.Value)
-                    {
-                        node.Nodes.InsertSorted(new MenuNode() { Name = doc.Key, Parent = node });
-                    }
-                    node.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = node });
+                    AddMenuItem(node, kvp.Value);
                     TableContextMenu.InsertSorted(node);
                 }
                 TableContextMenuEnabled.Value = true;

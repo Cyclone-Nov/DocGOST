@@ -247,9 +247,11 @@ namespace GostDOC.Models
 
         public static void AddGroup(IDictionary<string, Group> aGroups, string aGroupName)
         {
-            if (!aGroups.ContainsKey(aGroupName))
+            Group gp;
+            if (!aGroups.TryGetValue(aGroupName, out gp))
             {
-                aGroups.Add(aGroupName, new Group() { Name = aGroupName, SubGroups = new Dictionary<string, Group>() });
+                gp = new Group() { Name = aGroupName, SubGroups = new Dictionary<string, Group>() };
+                aGroups.Add(aGroupName, gp);
             }
         }
 

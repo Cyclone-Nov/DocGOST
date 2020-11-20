@@ -42,12 +42,16 @@
                     <TextBlock Text="{Binding Name.Value}" />
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="True" />
+                </Style>
+            </TreeView.ItemContainerStyle>
         </TreeView>
 
         <DockPanel Grid.Row="3" Grid.Column="2" LastChildFill="False">
             <Button Margin="5" DockPanel.Dock="Left" Content="Добавить группу" Width="120" Height="25" Command="{Binding AddGroupCmd}" />
-            <Button Margin="5" DockPanel.Dock="Left" Content="Добавить материал" Width="120" Height="25" 
-                    IsEnabled="{Binding IsAddMaterialEnabled.Value}" Command="{Binding AddMaterialCmd}" />
+            <Button Margin="5" DockPanel.Dock="Left" Content="Добавить материал" Width="120" Height="25" Command="{Binding AddMaterialCmd}" />
             <Button Margin="5" DockPanel.Dock="Left" Content="Редактировать" Width="120" Height="25" Command="{Binding EditCmd}"/>
             <Button Margin="5" DockPanel.Dock="Right" Content="Удалить" Width="120" Height="25" Command="{Binding RemoveCmd}"/>
         </DockPanel>

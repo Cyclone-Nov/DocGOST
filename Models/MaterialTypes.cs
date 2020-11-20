@@ -17,7 +17,7 @@ namespace GostDOC.Models
         public string Note { get; set; }
     }
 
-    public class MaterialGroupsXml
+    public class MaterialGroupXml
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
@@ -25,39 +25,85 @@ namespace GostDOC.Models
         [XmlArray("materials")]
         [XmlArrayItem(typeof(Material), ElementName = "material")]
         public List<Material> Materials { get; set; } = new List<Material>();
+
+        [XmlArray("subgroups")]
+        [XmlArrayItem(typeof(MaterialGroupXml), ElementName = "subgroup", IsNullable = true)]
+        public List<MaterialGroupXml> Groups { get; set; } = new List<MaterialGroupXml>();
     }
 
     [XmlRootAttribute("root", IsNullable = false)]
     public class MaterialsXml
     {
         [XmlArray("groups")]
-        [XmlArrayItem(typeof(MaterialGroupsXml), ElementName = "group")]
-        public List<MaterialGroupsXml> MaterialGroups { get; set; } = new List<MaterialGroupsXml>();
+        [XmlArrayItem(typeof(MaterialGroupXml), ElementName = "group")]
+        public List<MaterialGroupXml> MaterialGroups { get; set; } = new List<MaterialGroupXml>();
+    }
+
+    public class MaterialGroup
+    {
+        public string Name { get; set; }
+        public IDictionary<string, Material> Materials { get; } = new Dictionary<string, Material>();
+        public IDictionary<string, MaterialGroup> SubGroups { get; set; }
+
+        public MaterialGroup(string aName)
+        {
+            Name = aName;
+        }
     }
 
     class MaterialTypes
     {        
         private string _filePath = Path.Combine(Environment.CurrentDirectory, Constants.Settings, "Materials.xml");
 
-        public IDictionary<string, IDictionary<string, Material>> Materials { get; } = new Dictionary<string, IDictionary<string, Material>>();
+        public IDictionary<string, MaterialGroup> Materials { get; } = new Dictionary<string, MaterialGroup>();
 
         public void Load()
         {
             if (!Import(_filePath))
             {
-                Materials.Add("Металлы черные", new Dictionary<string, Material>());
-                Materials.Add("Металлы магнитоэлектрические и ферромагнитные", new Dictionary<string, Material>());
-                Materials.Add("Металлы цветные, благородные и редкие", new Dictionary<string, Material>());
-                Materials.Add("Кабели, провода и шнуры", new Dictionary<string, Material>());
-                Materials.Add("Пластмассы и пресс-материалы", new Dictionary<string, Material>());
-                Materials.Add("Бумажные и текстильные материалы", new Dictionary<string, Material>());
-                Materials.Add("Резиновые и кожевенные материалы", new Dictionary<string, Material>());
-                Materials.Add("Минеральные, керамические и стеклянные материалы", new Dictionary<string, Material>());
-                Materials.Add("Лаки, краски, нефтепродукты и химикаты", new Dictionary<string, Material>());
-                Materials.Add("Металлические, неметаллические порошки", new Dictionary<string, Material>());
-                Materials.Add("Прочие материалы", new Dictionary<string, Material>());
-
+                foreach (var line in Utils.ReadCfgFileLines(Constants.MaterialGroupsCfg))
+                {
+                    Materials.Add(line, new MaterialGroup(line));
+                }
                 Save();
+            }
+        }
+
+        private void AddGroup(IDictionary<string, MaterialGroup> aGroups, MaterialGroupXml aGroup)
+        {
+            if (!aGroups.ContainsKey(aGroup.Name))
+            {
+                var gp = new MaterialGroup(aGroup.Name);
+                foreach (var material in aGroup.Materials)
+                {
+                    gp.Materials.Add(material.Name, material);
+                }
+                aGroups.Add(aGroup.Name, gp);
+
+                if (aGroup.Groups != null)
+                {
+                    gp.SubGroups = new Dictionary<string, MaterialGroup>();
+                    foreach (var subGroup in aGroup.Groups)
+                    {
+                        AddGroup(gp.SubGroups, subGroup);
+                    }
+                }
+            }
+        }
+
+        private void AddGroup(List<MaterialGroupXml> aGroups, MaterialGroup aGroup)
+        {
+            MaterialGroupXml gp = new MaterialGroupXml();
+            gp.Name = aGroup.Name;
+            gp.Materials.AddRange(aGroup.Materials.Values);
+            aGroups.Add(gp);
+
+            if (aGroup.SubGroups != null)
+            {
+                foreach (var group in aGroup.SubGroups)
+                {
+                    AddGroup(gp.Groups, group.Value);
+                }
             }
         }
 
@@ -68,20 +114,7 @@ namespace GostDOC.Models
             {
                 foreach (var group in materials.MaterialGroups)
                 {
-                    IDictionary<string, Material> dic;
-                    if (!Materials.TryGetValue(group.Name, out dic))
-                    {
-                        dic = new Dictionary<string, Material>();
-                        Materials.Add(group.Name, dic);
-                    }
-
-                    foreach (var material in group.Materials)
-                    {
-                        if (!dic.ContainsKey(material.Name))
-                        {
-                            dic.Add(material.Name, material);
-                        }
-                    }
+                    AddGroup(Materials, group);
                 }
                 return true;
             }
@@ -93,74 +126,112 @@ namespace GostDOC.Models
             MaterialsXml materials = new MaterialsXml();
             foreach (var kvp in Materials)
             {
-                MaterialGroupsXml group = new MaterialGroupsXml() { Name = kvp.Key };
-                foreach (var material in kvp.Value)
-                {
-                    group.Materials.Add(material.Value);
-                }
-                materials.MaterialGroups.Add(group);
+                AddGroup(materials.MaterialGroups, kvp.Value);
             }
             XmlSerializeHelper.SaveXmlStructFile(materials, string.IsNullOrEmpty(aFilePath) ? _filePath : aFilePath);
         }
 
-        public bool AddMaterial(string aGroup, Material aMaterial)
+        public bool AddMaterial(string aGroup, string aSubGroup, Material aMaterial)
         {
-            IDictionary<string, Material> group;
+            MaterialGroup group;
             if (Materials.TryGetValue(aGroup, out group))
             {
-                if (!group.ContainsKey(aMaterial.Name))
+                if (!string.IsNullOrEmpty(aSubGroup))
                 {
-                    group.Add(aMaterial.Name, aMaterial);
+                    if (!group.SubGroups.TryGetValue(aSubGroup, out group))
+                    {
+                        return false;
+                    }
+                }
+                group.Materials.Add(aMaterial.Name, aMaterial);
+                return true;
+            }
+            return false;
+        }
+
+        public bool RemoveMaterial(string aGroup, string aSubGroup, string aMaterialName)
+        {
+            MaterialGroup group;
+            if (Materials.TryGetValue(aGroup, out group))
+            {
+                if (!string.IsNullOrEmpty(aSubGroup))
+                {
+                    if (!group.SubGroups.TryGetValue(aSubGroup, out group))
+                    {
+                        return false;
+                    }
+                }
+                return group.Materials.Remove(aMaterialName);
+            }
+            return false;
+        }
+
+        public bool AddSubGroup(string aGroup, string aSubGroup)
+        {
+            MaterialGroup group;
+            if (Materials.TryGetValue(aGroup, out group))
+            {
+                if (group.SubGroups == null)
+                {
+                    group.SubGroups = new Dictionary<string, MaterialGroup>();
+                }
+                if (!group.SubGroups.ContainsKey(aSubGroup))
+                {
+                    group.SubGroups.Add(aSubGroup, new MaterialGroup(aSubGroup));
                     return true;
                 }
             }
             return false;
         }
 
-        public bool RemoveMaterial(string aGroup, string aMaterialName)
+        public bool RemoveSubGroup(string aGroup, string aSubGroup)
         {
-            IDictionary<string, Material> group;
+            MaterialGroup group;
             if (Materials.TryGetValue(aGroup, out group))
             {
-                return group.Remove(aMaterialName);
+                if (group.SubGroups != null)
+                {
+                    return group.SubGroups.Remove(aSubGroup);
+                }
             }
             return false;
         }
 
-        public bool AddGroup(string aGroup)
+        public bool EditSubGroup(string aGroup, string aOldName, string aNewName)
         {
-            if (!Materials.ContainsKey(aGroup))
+            MaterialGroup group;
+            if (Materials.TryGetValue(aGroup, out group))
             {
-                Materials.Add(aGroup, new Dictionary<string, Material>());
-                return true;
+                if (group.SubGroups != null)
+                {
+                    MaterialGroup subgroup;
+                    if (group.SubGroups.TryGetValue(aOldName, out subgroup))
+                    {
+                        subgroup.Name = aNewName;
+                        group.SubGroups.Remove(aOldName);
+                        group.SubGroups.Add(aNewName, subgroup);
+                        return true;
+                    }
+                }
             }
             return false;
         }
 
-        public bool RemoveGroup(string aGroup)
+        public Material GetMaterial(string aGroup, string aSubGroup, string aName)
         {
-            return Materials.Remove(aGroup);
-        }
-
-        public bool EditGroup(string aOldName, string aNewName)
-        {
-            IDictionary<string, Material> group;
-            if (Materials.TryGetValue(aOldName, out group))
+            MaterialGroup group;
+            if (Materials.TryGetValue(aGroup, out group))
             {
-                Materials.Remove(aOldName);
-                Materials.Add(aNewName, group);
-                return true;
-            }
-            return false;
-        }
+                if (!string.IsNullOrEmpty(aSubGroup))
+                {
+                    if (!group.SubGroups.TryGetValue(aSubGroup, out group))
+                    {
+                        return null;
+                    }
+                }
 
-        public Material GetMaterial(string aGroup, string aName)
-        {
-            IDictionary<string, Material> materials;
-            if (Materials.TryGetValue(aGroup, out materials))
-            {
                 Material material;
-                if (materials.TryGetValue(aName, out material))
+                if (group.Materials.TryGetValue(aName, out material))
                 {
                     return material;
                 }
