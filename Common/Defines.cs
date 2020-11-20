@@ -295,6 +295,7 @@ namespace GostDOC.Common
         /// раздел "Материалы" для спецификации
         /// </summary>
         public static readonly string GroupMaterials = "Материалы";
+
         /// <summary>
         /// раздел "Комплекты" для спецификации
         /// </summary>
@@ -540,10 +541,16 @@ namespace GostDOC.Common
 
         public static readonly string NewMaterialMenuItem = "<Добавить материал>";
 
+        #region Файлы
+
+        // Excel
         public static readonly string TemplatesFolder = "Templates";
         public static readonly string SpecificationTemplateName = "specification";
         public static readonly string BillTemplateName = "purchased_items_list";
+        // Cfgs
+        public static readonly string MaterialGroupsCfg = "MaterialGroups";
 
+        #endregion Файлы
 
         #region Шрифты
 

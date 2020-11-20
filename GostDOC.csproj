@@ -344,6 +344,7 @@
     <Content Include="Settings\Standards.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Settings\MaterialGroups.cfg" />
     <Content Include="Settings\Units.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
