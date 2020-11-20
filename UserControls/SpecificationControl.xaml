@@ -68,9 +68,9 @@
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Формат" Binding="{Binding Format.Value}"/>
-                <DataGridTextColumn Header="Позиция" Binding="{Binding Position.Value}" IsReadOnly="True" Visibility="Collapsed"/>
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Name.Value}"/>
+                <DataGridTextColumn Header="Позиция" Binding="{Binding Position.Value}" IsReadOnly="True" Visibility="Collapsed"/>                
                 <DataGridTextColumn Header="Обозначение" Binding="{Binding Sign.Value}"/>
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Name.Value}"/>
                 <DataGridTextColumn Header="Количество" Binding="{Binding CountDev.Value}"/>
                 <DataGridTextColumn Header="Примечание" Width="*" Binding="{Binding Note.Value}" />
             </DataGrid.Columns>
