@@ -31,7 +31,7 @@ internal class PdfElementListCreator : PdfCreator {
     /// <summary>
     /// Создать PDF документ
     /// </summary>
-    public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs) 
+    public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs, Dictionary<string, string> aAppParams) 
     {   
         var dataTable = aData;
         var graphs = aMainGraphs;
@@ -55,12 +55,12 @@ internal class PdfElementListCreator : PdfCreator {
         _pdfDoc.SetDefaultPageSize(_pageSize);
         _doc = new Document(_pdfDoc, _pdfDoc.GetDefaultPageSize(), true);
         int countPages = PdfUtils.GetCountPage(Type, dataTable.Rows.Count);
-        int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable, countPages);
+        int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable, countPages, aAppParams);
         
         _currentPageNumber = 1;
         while (lastProcessedRow > 0) {
             _currentPageNumber++;
-            lastProcessedRow = AddNextPage(_doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
+            lastProcessedRow = AddNextPage(_doc, graphs, dataTable, _currentPageNumber, lastProcessedRow, aAppParams);
         }
         
         if (_pdfDoc.GetNumberOfPages() > PdfDefines.MAX_PAGES_WITHOUT_CHANGELIST) {
@@ -75,7 +75,7 @@ internal class PdfElementListCreator : PdfCreator {
     /// добавить к документу первую страницу
     /// </summary>
     /// <returns>номер последней записанной строки. Если 0 - то достигнут конец таблицы данных</returns>
-    internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages) {
+    internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages, Dictionary<string, string> aAppParams) {
         SetPageMargins(aInDoc);
 
         // добавить таблицу с данными
@@ -86,6 +86,8 @@ internal class PdfElementListCreator : PdfCreator {
             TITLE_BLOCK_WIDTH);
         aInDoc.Add(dataTable);
 
+        aAppParams.TryGetValue(Constants.AppParamDocSign, out var docSign);
+
         // добавить таблицу с основной надписью для первой старницы
         aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {
             PageSize = _pageSize, 
@@ -93,7 +95,8 @@ internal class PdfElementListCreator : PdfCreator {
             Pages = aCountPages, 
             AppendGraphs = true, 
             DocType = DocType.ItemsList,
-            CurrentPage = 1
+            CurrentPage = 1,
+            DocSign = docSign
         }));
 
         // добавить таблицу с верхней дополнительной графой
@@ -127,7 +130,7 @@ internal class PdfElementListCreator : PdfCreator {
     /// </summary>
     /// <param name="aInPdfDoc">a in PDF document.</param>
     /// <returns></returns>
-    internal override int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow) {
+    internal override int AddNextPage(Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow, Dictionary<string, string> aAppParams) {
         aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
         SetPageMargins(aInPdfDoc);
@@ -140,9 +143,11 @@ internal class PdfElementListCreator : PdfCreator {
             TITLE_BLOCK_WIDTH);
         aInPdfDoc.Add(dataTable);
 
+        aAppParams.TryGetValue(Constants.AppParamDocSign, out var docSign);
+
         // добавить таблицу с основной надписью для последуюших старницы
         //aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList}));
-        var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList });
+        var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList, DocSign = docSign });
         titleBlock.SetFixedPosition(DATA_TABLE_LEFT, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH - 0.02f);
         aInPdfDoc.Add(titleBlock);
 

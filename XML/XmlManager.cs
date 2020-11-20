@@ -88,6 +88,14 @@ namespace GostDOC.Models
                 AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB);
                 AddComponents(newCfg, cfg.Components, ComponentType.Component);
 
+                if (aDocType == DocType.ItemsList)
+                {
+                    if (!HasASсhema(newCfg))
+                    {
+                        _error.Error($"Не найдена схема в разделе документации при импорте перечня элементов");
+                    }
+                }
+
                 // Move single elements to group "Прочие" and update group names
                 ProcessGroupNames(newCfg);
                 // Sort components
@@ -846,6 +854,19 @@ namespace GostDOC.Models
                     _error.Error($"Версия файла {aFilePath} меньше {MinVersion}!");
                 }
             }
+        }
+
+        private bool HasASсhema(Configuration aConfifg)
+        {
+            Group docs;
+            if (aConfifg.Specification.TryGetValue(Constants.GroupDoc, out docs))
+            {
+                var doc = docs.Components.Where(key => key.GetProperty(Constants.ComponentName).ToLower().Contains("схема"));
+                if (doc != null && doc.Count() > 0)
+                    return true;
+            }
+            
+            return false;
         }
     }
 }

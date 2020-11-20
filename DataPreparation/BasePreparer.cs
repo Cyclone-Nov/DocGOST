@@ -20,6 +20,19 @@ public abstract class BasePreparer {
     protected const int MIN_ITEMS_FOR_COMBINE_BY_STANDARD = 3;
 
     /// <summary>
+    /// обозначение документа
+    /// </summary>
+    protected Dictionary<string, string> appliedParams = new Dictionary<string, string>();
+
+    /// <summary>
+    /// получить обозначение документа
+    /// </summary>
+    public Dictionary<string, string> GetAppliedParams()
+    {
+        return appliedParams;
+    }
+
+    /// <summary>
     /// формирование таблицы данных
     /// </summary>
     /// <param name="aConfigs">a configs.</param>
@@ -38,25 +51,26 @@ public abstract class BasePreparer {
     /// </summary>
     /// <param name="aConfig"></param>
     /// <returns></returns>
-    protected static string GetSchemaDesignation(Configuration aConfig) {
+    protected static string GetSchemaDesignation(Configuration aConfig, out string outDocCode) {
         string designation = string.Empty;
         Group docs;
+        outDocCode = "ПЭ3";
         if (aConfig.Specification.TryGetValue(Constants.GroupDoc, out docs)) {
             if (docs.Components.Count() > 0 || docs.SubGroups.Count() > 0) {
                 var docсomponents = docs.Components.Where(val =>
-                    !string.Equals(val.GetProperty(Constants.ComponentName.ToLower()), Constants.DOC_SCHEMA.ToLower()));
+                    val.GetProperty(Constants.ComponentName).ToLower().Contains(Constants.DOC_SCHEMA.ToLower()));
                 if (docсomponents.Count() > 0) {
-                    // если заканчивается на c3 или э3, то берем ее.                        
+                    // если заканчивается на c3 или э3, то берем ее.
                     var shemas = docсomponents.Where(val => (
-                        string.Equals(val.GetProperty(Constants.ComponentDocCode), "С3",
-                            StringComparison.InvariantCultureIgnoreCase) ||
-                        string.Equals(val.GetProperty(Constants.ComponentDocCode), "Э3",
-                            StringComparison.InvariantCultureIgnoreCase))
+                        val.GetProperty(Constants.ComponentDocCode).EndsWith("С3") ||
+                        val.GetProperty(Constants.ComponentDocCode).EndsWith("Э3"))
                     );
 
-                    // в любом случа берем первую
+                    
+                    // в любом случае берем первую
                     if (shemas.Count() > 0) {
                         designation = shemas.First().GetProperty(Constants.ComponentSign);
+                        outDocCode = "П"+ shemas.First().GetProperty(Constants.ComponentDocCode);
                     }
                     else {
                         designation = docсomponents.First().GetProperty(Constants.ComponentSign);

@@ -30,7 +30,7 @@ namespace GostDOC.PDF
         public PdfSpecificationCreator() : base(DocType.Specification) {
         }
 
-        public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs) 
+        public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs, Dictionary<string, string> aAppParams) 
         {
             var graphs = aMainGraphs;
             if (aData == null)
@@ -76,7 +76,7 @@ namespace GostDOC.PDF
 
 
 
-        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages) {
+        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages, Dictionary<string, string> aAppParams = null) {
 
             SetPageMargins(aInDoc);
 
@@ -106,7 +106,7 @@ namespace GostDOC.PDF
             return lastProcessedRow;
         }
 
-        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNamuber, int aStartRow) {
+        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNamuber, int aStartRow, Dictionary<string, string> aAppParams = null) {
 
             SetPageMargins(aInDoc);
 

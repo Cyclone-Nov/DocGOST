@@ -157,7 +157,7 @@ namespace GostDOC.PDF
         }
 
 
-        public abstract void Create(DataTable aData, IDictionary<string, string> aMainGraphs);
+        public abstract void Create(DataTable aData, IDictionary<string, string> aMainGraphs, Dictionary<string, string> aAppParams);
 
         public byte[] GetData()
         {
@@ -294,14 +294,14 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal abstract int AddFirstPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData,int aCountPages);
+        internal abstract int AddFirstPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData,int aCountPages, Dictionary<string, string> aAppParams);
 
         /// <summary>
         /// добавить к документу последующие страницы
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal abstract int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aLastProcessedRow);
+        internal abstract int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aLastProcessedRow, Dictionary<string, string> aAppParams = null);
 
 
         public static double DegreesToRadians(double degrees)
@@ -333,6 +333,7 @@ namespace GostDOC.PDF
             public int CurrentPage;
             public bool AppendGraphs = true;
             public DocType DocType;
+            public string DocSign;
         }
 
         protected struct DataTableStruct {
@@ -439,7 +440,7 @@ namespace GostDOC.PDF
 
             #region Graph 2
             
-            var graph2 = GetGraph(Constants.GRAPH_2) + GetAdditionalGraph2(titleBlockStruct.DocType);
+            var graph2 = GetGraph(Constants.GRAPH_2) + titleBlockStruct.DocSign;
             mainTable.AddCell(new Cell(3, 8)
                 .SetBorder(THICK_BORDER).SetFontSize(20)
                 .SetTextAlignment(TextAlignment.CENTER).SetVerticalAlignment(VerticalAlignment.MIDDLE)

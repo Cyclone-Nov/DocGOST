@@ -120,5 +120,33 @@ namespace GostDOC.Models
             }
         }
 
+        /// <summary>
+        /// Получить сформированную ранее таблицу данных для выбранного типа документа
+        /// </summary>
+        /// <param name="aType">тип документа</param>
+        /// <returns>таблица данных для указанного типа документа</returns>
+        /// <exception cref="Exception">Таблица данных для типа документа {aType}</exception>
+        public Dictionary<string, string> GetAppliedParams(DocType aType)
+        {
+            switch (aType)
+            {
+                case DocType.Bill:
+                    return BillDataPreparer.GetAppliedParams();
+
+                case DocType.Specification:
+                    return SpecificationDataPreparer.GetAppliedParams();
+
+                case DocType.ItemsList:
+                    return ElementListDataPreparer.GetAppliedParams();
+
+                case DocType.D27:
+                    return EquipmentBillDataPreparer.GetAppliedParams();
+
+                default:
+                    throw new Exception($"Таблица данных для типа документа {aType} не определена");
+
+            }
+        }
+
     }
 }

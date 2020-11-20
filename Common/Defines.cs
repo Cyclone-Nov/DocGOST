@@ -591,5 +591,13 @@ namespace GostDOC.Common
         public static readonly int DefaultRowsOnNextPage = 29;
 
         #endregion Количество строк на страницах документоа
+
+        #region Коды дополнительных параметров для предачи от DataPreparation
+
+        public static readonly string AppParamDocSign = "DocSign";
+
+        #endregion
+
+
     }
 }

@@ -24,8 +24,10 @@ internal class ElementListDataPreparer : BasePreparer {
         Configuration mainConfig = null;
         if (!aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out mainConfig))
             return null;
-        var data = mainConfig.Specification;        
-        string schemaDesignation = GetSchemaDesignation(mainConfig);
+        var data = mainConfig.Specification;                
+        string schemaDesignation = GetSchemaDesignation(mainConfig, out var DocCode);
+        appliedParams.Clear();
+        appliedParams.Add(Constants.AppParamDocSign, DocCode);
 
         // из остальных конфигураций получаем список словарей с соответсвующими компонентами
         var otherConfigsElements = MakeComponentDesignatorsDictionaryOtherConfigs(aConfigs);
@@ -204,35 +206,53 @@ internal class ElementListDataPreparer : BasePreparer {
             List<string> oldGropus = new List<string>();
             var comparer = new DesignatorIDComparer();
             var component_pair_arr = aComponentsDic.OrderBy(key => key.Key, comparer).ToArray();
+            int componentsInSubgroup = 0;
             for (int i=0; i < component_pair_arr.Length;)
             {
                 var component = component_pair_arr[i].Value;
+                componentsInSubgroup++;
+
+                string subGroupName = component.Item2.GetProperty(Constants.SubGroupNameSp);
+                bool hextSubgroupIsDiffer = false;                
+                if ( i + 1 != component_pair_arr.Length)
+                {
+                    var nextcomponent = component_pair_arr[i+1].Value;
+                    string nextSubGroupName = nextcomponent.Item2.GetProperty(Constants.SubGroupNameSp);
+                    hextSubgroupIsDiffer = !string.Equals(subGroupName, nextSubGroupName);
+                }
+                
                 string key = component_pair_arr[i].Key;
                 string designator = GetDesignator(key, component.Item1, component.Item3);
+                string component_name = GetComponentName(key, StandardComponentsDic, component.Item2);
                 uint count = component.Item3;
-
-                string subGroupName = component.Item2.GetProperty(Constants.SubGroupNameSp); // GetSubgroupNameByCount(subgroup, component.Item3);
+                
                 if (!firstGroup || !string.Equals(subGroupName, lastGroupName)) // если смена группы, то 
                 {
-                    // записываем наименование группы
-                    AddEmptyRow(aTable);
-                    AddGroupName(aTable, subGroupName);
-                    AddEmptyRow(aTable);
-
-                    if (!oldGropus.Contains(subGroupName))
+                    if ((firstGroup || (componentsInSubgroup == 1)) && hextSubgroupIsDiffer)
                     {
-                        // записываем строки с гост/ту в начале группы, если они есть для данной группы
-                        if (!AddStandardDocsToTable(subGroupName, aTable, aComponentsDic, StandardDic))
+                        component_name = $"{subGroupName} {component_name}";
+                    } else
+                    {
+                        // записываем наименование группы
+                        AddEmptyRow(aTable);
+                        AddGroupName(aTable, subGroupName);
+                        AddEmptyRow(aTable);
+
+                        if (!oldGropus.Contains(subGroupName))
                         {
-                            //AddEmptyRow(aTable);
+                            // записываем строки с гост/ту в начале группы, если они есть для данной группы
+                            if (!AddStandardDocsToTable(subGroupName, aTable, aComponentsDic, StandardDic))
+                            {
+                                //AddEmptyRow(aTable);
+                            }
+                            oldGropus.Add(subGroupName);
                         }
-                        oldGropus.Add(subGroupName);
                     }
+                    componentsInSubgroup = 0;
                     firstGroup = true;
                 }
                 lastGroupName = subGroupName;
 
-                string component_name = GetComponentName(key, StandardComponentsDic, component.Item2);                
                 bool haveToChangeName = string.Equals(component.Item2.GetProperty(Constants.ComponentPresence), "0") ||
                                                       HaveToChangeComponentName(component.Item2, aOtherComponents);
 

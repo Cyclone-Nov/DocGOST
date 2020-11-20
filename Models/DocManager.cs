@@ -79,12 +79,13 @@ namespace GostDOC.Models
                     return false;
                 dataTable = _prepareDataManager.GetDataTable(aDocType);
             }
+            var appParams = _prepareDataManager.GetAppliedParams(aDocType);
 
             IDictionary<string, string> mainConfigGraphs = null;
             bool res = true;
             if (GetMainConfigurationGraphs(out mainConfigGraphs))
             {
-                 if (_pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs))
+                 if (_pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs, appParams))
                  {
                     try
                     {
@@ -107,10 +108,11 @@ namespace GostDOC.Models
         public bool PreparePDF(DocType aDocType)
         {
             DataTable dataTable = _prepareDataManager.GetDataTable(aDocType);
+            var appParams = _prepareDataManager.GetAppliedParams(aDocType);
             IDictionary<string, string> mainConfigGraphs = null;
             if (GetMainConfigurationGraphs(out mainConfigGraphs))
             {
-                return _pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs);
+                return _pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs, appParams);
             }            
             return false;
         }
