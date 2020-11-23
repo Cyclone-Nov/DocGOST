@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
              xmlns:local="clr-namespace:GostDOC.UserControls"
+             xmlns:col="clr-namespace:System.Collections;assembly=mscorlib"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:converters="clr-namespace:GostDOC.Converters"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
@@ -12,7 +14,7 @@
 
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="inverseConverter" />
-        <BooleanToVisibilityConverter x:Key="b2v" />       
+        <BooleanToVisibilityConverter x:Key="b2v" />
     </UserControl.Resources>
     
     <Grid>
@@ -67,7 +69,18 @@
             </DataGrid.ContextMenu>
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Формат" Binding="{Binding Format.Value}"/>
+                <DataGridComboBoxColumn Header="Формат" SelectedItemBinding="{Binding Path=Format.Value}">
+                    <DataGridComboBoxColumn.ItemsSource>
+                        <col:ArrayList>
+                            <sys:String>*</sys:String>
+                            <sys:String>А0</sys:String>
+                            <sys:String>А1</sys:String>
+                            <sys:String>А2</sys:String>
+                            <sys:String>А3</sys:String>
+                            <sys:String>А4</sys:String>
+                        </col:ArrayList>
+                    </DataGridComboBoxColumn.ItemsSource>
+                </DataGridComboBoxColumn>
                 <DataGridTextColumn Header="Позиция" Binding="{Binding Position.Value}" IsReadOnly="True" Visibility="Collapsed"/>                
                 <DataGridTextColumn Header="Обозначение" Binding="{Binding Sign.Value}"/>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name.Value}"/>
