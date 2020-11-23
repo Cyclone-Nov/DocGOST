@@ -319,9 +319,6 @@ namespace GostDOC.ViewModels
             {                
                 _docManager.Reset();
 
-                _shouldSave = true;
-                IsSaveEnabled.Value = true;
-
                 DocNodes.Clear();
                 DocNodes.Add(_specification);
                 
@@ -331,6 +328,9 @@ namespace GostDOC.ViewModels
                 UpdateTitle();
                 UpdateData();
                 HideTables();
+
+                _shouldSave = true;
+                IsSaveEnabled.Value = true;
             }
         }
 
