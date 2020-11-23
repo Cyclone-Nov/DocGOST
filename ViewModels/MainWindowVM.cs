@@ -632,7 +632,7 @@ namespace GostDOC.ViewModels
                     cmp.Name.Value = doc.Name;
                     cmp.Sign.Value = included + doc.Code;
                     cmp.WhereIncluded.Value = included;
-                    cmp.Format.Value = "A4";
+                    cmp.Format.Value = "А4";
                     Components.Add(cmp);
                 }        
             }
