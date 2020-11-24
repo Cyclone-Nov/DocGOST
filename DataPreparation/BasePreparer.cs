@@ -202,32 +202,28 @@ public abstract class BasePreparer {
     /// <param name="aComponent">компонент</param>
     /// <param name="aOtherInstances">список словарей всех компонентов в других исполнениях</param>
     /// <returns>true - имя компонента необходимо заменить</returns>
-    protected bool HaveToChangeComponentName(Component aComponent,
-                                             IEnumerable<Dictionary<string, Component>> aOtherInstances) 
+    protected bool DifferNameInOtherConfigs(Component aComponent,
+                                             IEnumerable<Dictionary<string, Component>> aOtherConfigurations) 
     {
         string designator = aComponent.GetProperty(Constants.ComponentDesignatorID);
         // найдем в других исполнениях компонент с таким же позиционным обозначением
         List<Component> same_components = new List<Component>();
-        foreach (var instance in aOtherInstances) {
-            if (instance.ContainsKey(designator)) {
-                same_components.Add(instance[designator]);
-            }
+        foreach (var instance in aOtherConfigurations) {
+            if (instance.ContainsKey(designator)) 
+                same_components.Add(instance[designator]);            
         }
 
-        // если в других исполнениях исходный компонент отличается по наименованию, то его наименование надо заменить
-        bool haveToChange = false;
+        // если в других исполнениях исходный компонент отличается по наименованию либо не представлен, то выведем true
         string name = aComponent.GetProperty(Constants.ComponentName);
         foreach (var comp in same_components) {
             string other_name = aComponent.GetProperty(Constants.ComponentName);
-            bool presence = string.Equals(comp.GetProperty(Constants.ComponentPresence), "1");
-            // если в других исполнениях имя компонента отличается либо он не представлен, то необходимо заменить имя
+            bool presence = string.Equals(comp.GetProperty(Constants.ComponentPresence), "1");            
             if (!string.Equals(name, other_name) || !presence) {
-                haveToChange = true;
-                break;
+                return true;
             }
         }
 
-        return haveToChange;
+        return false;
     }
 
 
