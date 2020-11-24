@@ -81,7 +81,7 @@ namespace GostDOC.Common
         FileFormatError,
         Fail
     }
-    
+   
     public static class Converters
     {
         /// <summary>

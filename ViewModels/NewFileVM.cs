@@ -22,7 +22,7 @@ namespace GostDOC.ViewModels
 
         public NewFileVM()
         {
-            foreach (var line in Utils.ReadCfgFileLines("DefaultGraphNames"))
+            foreach (var line in Utils.ReadCfgFileLines("NewSpecificationGraphNames"))
             {
                 GraphValues.Add(new GraphValueVM(line, string.Empty));
             }
@@ -46,6 +46,16 @@ namespace GostDOC.ViewModels
                     {
                         cfg.Graphs.Add(graph.Name.Value, graph.Text.Value);
                     }
+
+                    // Add other graphs
+                    foreach (var line in Utils.ReadCfgFileLines("DefaultGraphNames"))
+                    {
+                        if (!cfg.Graphs.ContainsKey(line))
+                        {
+                            cfg.Graphs.Add(line, string.Empty);
+                        }
+                    }
+
                     // Fill default groups
                     cfg.FillDefaultGraphs();
                 }

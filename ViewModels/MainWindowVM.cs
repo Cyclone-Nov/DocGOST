@@ -320,9 +320,6 @@ namespace GostDOC.ViewModels
             {                
                 _docManager.Reset();
 
-                _shouldSave = true;
-                IsSaveEnabled.Value = true;
-
                 DocNodes.Clear();
                 DocNodes.Add(_specification);
                 
@@ -332,6 +329,9 @@ namespace GostDOC.ViewModels
                 UpdateTitle();
                 UpdateData();
                 HideTables();
+
+                _shouldSave = true;
+                IsSaveEnabled.Value = true;
             }
         }
 
@@ -360,7 +360,7 @@ namespace GostDOC.ViewModels
             }
         }
 
-        private void TreeViewSelectionChanged(Node obj)
+        private void SaveData()
         {
             if (_selectedItem != null)
             {
@@ -373,6 +373,11 @@ namespace GostDOC.ViewModels
                     SaveGraphValues();
                 }
             }
+        }
+
+        private void TreeViewSelectionChanged(Node obj)
+        {
+            SaveData();
 
             _selectedItem = obj;
 
@@ -514,6 +519,8 @@ namespace GostDOC.ViewModels
 
         private void RemoveGroup(object obj)
         {
+            SaveData();
+
             bool removeComponents = false;
             if (_docType == DocType.Specification)
             {
@@ -521,7 +528,7 @@ namespace GostDOC.ViewModels
                 var groupData = GetGroupData();
                 if (groupData?.Components.Count > 0)
                 {
-                    var result = System.Windows.MessageBox.Show("Удалить компоненты?", "Удаление группы", MessageBoxButton.YesNoCancel);
+                    var result = System.Windows.MessageBox.Show("Удалить также и компоненты в выбранной группе?\r\n\r\nДа\t - компоненты будут удалены безвозвратно\r\nНет\t - компоненты будут перенесены в раздел\r\nОтмена\t - еще подумаю, ничего не делать", "Удаление группы", MessageBoxButton.YesNoCancel);
                     if (result == MessageBoxResult.Cancel)
                     {
                         return;
@@ -585,15 +592,15 @@ namespace GostDOC.ViewModels
         }
 
         private void UpdatePdf(object obj)
-        {   
-            if (IsExportPdfEnabled.Value)
+        {
+            SaveData();
+
+            if (_docManager.PrepareData(_docType))
             {
-                if (_docManager.PrepareData(_docType))
-                {
-                    _docManager.PreparePDF(_docType);
-                    CurrentPdfData.Value = _docManager.GetPdfData(_docType);
-                }
+                _docManager.PreparePDF(_docType);
+                CurrentPdfData.Value = _docManager.GetPdfData(_docType);
             }
+
         }
 
         private Tuple<string, string> GetGroups(MenuNode obj)
@@ -626,7 +633,7 @@ namespace GostDOC.ViewModels
                     cmp.Name.Value = doc.Name;
                     cmp.Sign.Value = included + doc.Code;
                     cmp.WhereIncluded.Value = included;
-                    cmp.Format.Value = "A4";
+                    cmp.Format.Value = "А4";
                     Components.Add(cmp);
                 }        
             }
