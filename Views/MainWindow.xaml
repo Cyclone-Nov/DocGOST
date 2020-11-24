@@ -94,7 +94,8 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes, Converter={StaticResource sortConverter}, ConverterParameter=Name}">
+                    <!-- <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes, Converter={StaticResource sortConverter}, ConverterParameter=Name}"> -->
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes}">
                         <TextBlock Text="{Binding Name}" />
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
