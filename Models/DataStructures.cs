@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Common;
+using SoftCircuits.Collections;
 
 namespace GostDOC.Models
 {
@@ -48,7 +49,9 @@ namespace GostDOC.Models
     {
         public string Name { get; set; }
         public IDictionary<string, string> Graphs { get; set; } = new Dictionary<string, string>();
-        public IDictionary<string, Group> Specification { get; set; } = new Dictionary<string, Group>();
+
+        public IDictionary<string, Group> Specification { get; set; } = new OrderedDictionary<string, Group>();// new Dictionary<string, Group>();
+        
         public IDictionary<string, Group> Bill { get; set; } = new Dictionary<string, Group>();
         public Group D27 { get; set; } = new Group();
 
@@ -58,6 +61,7 @@ namespace GostDOC.Models
             if (this.Graphs?.Count() > 0)
                 copy.Graphs = this.Graphs.ToDictionary(entry => entry.Key,
                                                        entry => entry.Value);
+                                                                   
             if (this.Specification?.Count() > 0)
                 copy.Specification = this.Specification.ToDictionary(entry => entry.Key,
                                                                      entry => entry.Value.DeepCopy());

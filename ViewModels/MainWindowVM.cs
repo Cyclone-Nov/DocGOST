@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SoftCircuits.Collections;
 
 namespace GostDOC.ViewModels
 {
@@ -927,16 +928,18 @@ namespace GostDOC.ViewModels
         {
             // Populate configuration tree
             Node treeItemCfg = new Node() { Name = aCfgName, NodeType = NodeType.Configuration, Parent = aCollection, Nodes = new ObservableCollection<Node>() };
-            foreach (var grp in aGroups)
+
+            var orderedGroups = aGroups as OrderedDictionary<string, Group>;
+            foreach (var grp in orderedGroups)
             {
-                string groupName = grp.Key;
+                string groupName = grp.Name;
                 if (string.IsNullOrEmpty(groupName))
                 {
                     groupName = Constants.DefaultGroupName;
                 }
 
                 Node treeItemGroup = new Node() { Name = groupName, NodeType = NodeType.Group, Parent = treeItemCfg, Nodes = new ObservableCollection<Node>() };
-                foreach (var sub in grp.Value.SubGroups.AsNotNull())
+                foreach (var sub in grp.SubGroups.AsNotNull())
                 {
                     Node treeItemSubGroup = new Node() { Name = sub.Key, NodeType = NodeType.SubGroup, Parent = treeItemGroup };
                     treeItemGroup.Nodes.Add(treeItemSubGroup);
