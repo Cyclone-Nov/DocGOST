@@ -246,6 +246,7 @@ internal class ElementListDataPreparer : BasePreparer {
                     }
                     else
                         AddEmptyRow(aTable);
+
                     componentsInSubgroup = 0;
                     firstGroup = false;
                 }                

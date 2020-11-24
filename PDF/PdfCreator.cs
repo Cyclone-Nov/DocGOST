@@ -532,16 +532,28 @@ namespace GostDOC.PDF
             for (int i = 0; i < 2; ++i) {
                 mainTable.AddCell(leftTableCell.Clone(false));
             }
-           
+
             #endregion
 
 
             #region Graph 4, 7, 8
 
             var fullyBorderCell = leftTableCell.Clone(false).SetBorder(THICK_BORDER);
-            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4))));
-            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4a))));
-            mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(GetGraph(Constants.GRAPH_4b))));
+
+            void AddLitera(string litera)
+            {
+                var split_litera = SplitLiteraToSymbAndDigit(litera);
+                var paragraph = new Paragraph().SetPaddingTop(-2f);
+                paragraph.Add(new Text(split_litera.Item1).SetFontSize(Constants.LiteraFullFontSize).SetCharacterSpacing(0.1f));
+                if (!string.IsNullOrEmpty(split_litera.Item2))
+                    paragraph.Add(new Text(split_litera.Item2).SetFontSize(Constants.LiteraSmallFontSize).SetCharacterSpacing(0.1f));
+                mainTable.AddCell(fullyBorderCell.Clone(false).Add(paragraph));
+            }
+
+            AddLitera(GetGraph(Constants.GRAPH_4));
+            AddLitera(GetGraph(Constants.GRAPH_4a));
+            AddLitera(GetGraph(Constants.GRAPH_4b));
+            
             string currPage = (titleBlockStruct.Pages == 1) ? string.Empty : titleBlockStruct.CurrentPage.ToString();
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(currPage)));
             mainTable.AddCell(fullyBorderCell.Clone(false).Add(CreatePaddingTopParagraph(titleBlockStruct.Pages.ToString())));
@@ -911,6 +923,16 @@ namespace GostDOC.PDF
             cell.SetBorderRight(aRightBorder == 0 ? Border.NO_BORDER : new SolidBorder(aRightBorder));
 
             return cell;
+        }
+
+        Tuple<string, string> SplitLiteraToSymbAndDigit(string aLitera)
+        {
+            int index = aLitera.IndexOfAny(new char[] { '1', '2', '3', '4', '5' });
+            if (index < 0)
+            {
+                return new Tuple<string, string>(aLitera, string.Empty);
+            }
+            return new Tuple<string, string>(aLitera.Substring(0, index), aLitera.Substring(index));
         }
 
         // уменьшаем размер шрифта пока не впишемся в установленный размер
