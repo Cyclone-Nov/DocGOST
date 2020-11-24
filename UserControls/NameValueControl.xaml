@@ -37,6 +37,8 @@
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Наименование графы" IsReadOnly="True" Binding="{Binding Name.Value}"/>
+                
+                <!--
                 <DataGridTextColumn  Header="Значение" Binding="{Binding Text.Value}" >
                     <DataGridTextColumn.EditingElementStyle>
                         <Style TargetType="TextBox">
@@ -45,6 +47,40 @@
                         </Style>
                     </DataGridTextColumn.EditingElementStyle>
                 </DataGridTextColumn>
+                -->
+                
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl x:Name="content" Content="{Binding}" >
+                            </ContentControl>
+                            <DataTemplate.Triggers>
+                                
+                                <DataTrigger Binding="{Binding GraphType}" Value="0">
+                                    <Setter TargetName="content" Property="ContentTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding Items}" SelectedValue="{Binding Text.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                                
+                                <DataTrigger Binding="{Binding GraphType}" Value="1">
+                                    <Setter TargetName="content" Property="ContentTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <TextBox Text="{Binding Text.Value}" TextWrapping="Wrap" AcceptsReturn="True"/>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                                
+                            </DataTemplate.Triggers>                            
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
