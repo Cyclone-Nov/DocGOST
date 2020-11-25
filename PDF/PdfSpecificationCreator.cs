@@ -116,7 +116,7 @@ namespace GostDOC.PDF
             var dataTable = CreateDataTable(new DataTableStruct{Graphs = aGraphs, Data = aData, FirstPage = false, StartRow = aStartRow}, out var lastProcessedRow);
             dataTable.SetFixedPosition(
                 DATA_TABLE_LEFT,
-                PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN),
+                PdfDefines.A4Height - (GetTableHeight(dataTable, 1) + TOP_MARGIN) + 1.5f,
                 TITLE_BLOCK_WIDTH);
             aInDoc.Add(dataTable);
             
