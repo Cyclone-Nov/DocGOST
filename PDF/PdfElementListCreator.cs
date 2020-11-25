@@ -139,14 +139,12 @@ internal class PdfElementListCreator : PdfCreator {
         var dataTable = CreateDataTable(new DataTableStruct{Data = aData, FirstPage =false, StartRow = aStartRow}, out var lastProcessedRow);
         dataTable.SetFixedPosition(
             DATA_TABLE_LEFT,
-            PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNumber) + TOP_MARGIN),
+            PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNumber) + TOP_MARGIN) - 2.5f,
             TITLE_BLOCK_WIDTH);
         aInPdfDoc.Add(dataTable);
 
         aAppParams.TryGetValue(Constants.AppParamDocSign, out var docSign);
 
-        // добавить таблицу с основной надписью для последуюших старницы
-        //aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList}));
         var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList, DocSign = docSign });
         titleBlock.SetFixedPosition(DATA_TABLE_LEFT, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH - 0.02f);
         aInPdfDoc.Add(titleBlock);
