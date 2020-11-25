@@ -145,8 +145,6 @@ internal class PdfElementListCreator : PdfCreator {
 
         aAppParams.TryGetValue(Constants.AppParamDocSign, out var docSign);
 
-        // добавить таблицу с основной надписью для последуюших старницы
-        //aInPdfDoc.Add(CreateNextTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList}));
         var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = DocType.ItemsList, DocSign = docSign });
         titleBlock.SetFixedPosition(DATA_TABLE_LEFT, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH - 0.02f);
         aInPdfDoc.Add(titleBlock);
