@@ -52,7 +52,8 @@ namespace GostDOC.ViewModels
         private ErrorHandler _loadError = ErrorHandler.Instance;
         private List<string> _loadErrors = new List<string>();
 
-        private Progress _progress = null;
+        private Progress _progress;
+        private LogView _logView = null;
 
         public ObservableProperty<string> Title { get; } = new ObservableProperty<string>();
         public ObservableProperty<Node> SelectedItem { get; } = new ObservableProperty<Node>();
@@ -120,6 +121,7 @@ namespace GostDOC.ViewModels
         public ICommand CopyCellCmd => new Command<DataGridCellInfo>(CopyCell);
         public ICommand PasteCellCmd => new Command<DataGridCellInfo>(PasteCell);
         public ICommand AutoSortCheckedCmd => new Command<bool>(AutoSortChecked);
+        public ICommand ShowLogCmd => new Command(ShowLog);
 
         public string WindowTitle
         {
@@ -758,6 +760,15 @@ namespace GostDOC.ViewModels
             if (aChecked)
             {
                 SaveComponents();
+            }
+        }
+
+        private void ShowLog(object obj)
+        {
+            if (_logView == null || _logView.IsClosed)
+            {
+                _logView = new LogView();
+                _logView.Show();
             }
         }
 
