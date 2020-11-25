@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using GostDOC.Common;
 using GostDOC.Interfaces;
+using SoftCircuits.Collections;
 
 namespace GostDOC.Models
 {
@@ -245,26 +246,40 @@ namespace GostDOC.Models
             return x.CompareTo(y);
         }
 
-        public static void AddGroup(IDictionary<string, Group> aGroups, string aGroupName)
+        public static void AddGroup(IDictionary<string, Group> aGroups, string aGroupName, int aPosition)
         {
-            Group gp;
-            if (!aGroups.TryGetValue(aGroupName, out gp))
+            //Group gp;
+            //if (!aGroups.TryGetValue(aGroupName, out gp))
+            //{
+            //    gp = new Group() { Name = aGroupName, SubGroups = new Dictionary<string, Group>() };
+            //    aGroups.Add(aGroupName, gp);
+            //}
+
+            OrderedDictionary<string, Group> collection = aGroups as OrderedDictionary<string, Group>;
+            if (collection != null)
             {
-                gp = new Group() { Name = aGroupName, SubGroups = new Dictionary<string, Group>() };
-                aGroups.Add(aGroupName, gp);
+                if (!collection.ContainsKey(aGroupName))
+                {
+                    var gp = new Group() { Name = aGroupName, SubGroups = new Dictionary<string, Group>() };
+                    collection.Insert(aPosition, aGroupName, gp);
+                }
+                else
+                {
+                    collection.ReplacePosition(aPosition, aGroupName);
+                }
             }
         }
 
         public static void FillDefaultGroups(this Configuration aCfg)
-        {
-            AddGroup(aCfg.Specification, Constants.GroupDoc);
-            AddGroup(aCfg.Specification, Constants.GroupComplex);
-            AddGroup(aCfg.Specification, Constants.GroupAssemblyUnits);
-            AddGroup(aCfg.Specification, Constants.GroupDetails);
-            AddGroup(aCfg.Specification, Constants.GroupStandard);
-            AddGroup(aCfg.Specification, Constants.GroupOthers);
-            AddGroup(aCfg.Specification, Constants.GroupMaterials);
-            AddGroup(aCfg.Specification, Constants.GroupKits);
+        {            
+            AddGroup(aCfg.Specification, Constants.GroupDoc, 0);
+            AddGroup(aCfg.Specification, Constants.GroupComplex, 1);
+            AddGroup(aCfg.Specification, Constants.GroupAssemblyUnits, 2);
+            AddGroup(aCfg.Specification, Constants.GroupDetails, 3);
+            AddGroup(aCfg.Specification, Constants.GroupStandard, 4);
+            AddGroup(aCfg.Specification, Constants.GroupOthers, 5);
+            AddGroup(aCfg.Specification, Constants.GroupMaterials, 6);
+            AddGroup(aCfg.Specification, Constants.GroupKits, 7);         
         }
 
         public static void AddGraph(IDictionary<string, string> aGraphs, string aName)

@@ -560,6 +560,17 @@ namespace GostDOC.Common
 
         public static string DesignatiorID { get; internal set; }
 
+        /// <summary>
+        /// размер шрифта для вывода символа литеры в соответсвующей графе основной надписи
+        /// </summary>
+        public static readonly float LiteraFullFontSize = 11.0f;
+        /// <summary>
+        /// размер шрифта для вывода числа рядом с символом литеры в соответсвующей графе основной надписи
+        /// </summary>
+        public static readonly float LiteraSmallFontSize = 7.0f;
+
+
+
         #endregion
 
 
