@@ -675,14 +675,16 @@ namespace GostDOC.ViewModels
                     // Find material
                     var groups = GetGroups(obj);
                     material = _materials.GetMaterial(groups.Item1, groups.Item2, obj.Name);
-                    if (material != null)
-                    {
-                        ComponentVM cmp = new ComponentVM();
-                        cmp.Name.Value = material.Name;
-                        cmp.Note.Value = material.Note;
-                        cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
-                        Components.Add(cmp);
-                    }
+                }
+
+                // Add material to components
+                if (material != null)
+                {
+                    ComponentVM cmp = new ComponentVM();
+                    cmp.Name.Value = material.Name;
+                    cmp.Note.Value = material.Note;
+                    cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
+                    Components.Add(cmp);
                 }
             }
         }
