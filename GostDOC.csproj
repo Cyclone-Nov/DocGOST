@@ -153,6 +153,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Behaviours\BindableSelectedItemBehavior.cs" />
     <Compile Include="Common\CustomOrderedDictionary\SoftCircuits\ListIndexer.cs" />
     <Compile Include="Common\CustomOrderedDictionary\SoftCircuits\OrderedDictionary.cs" />
     <Compile Include="Common\CustomOrderedDictionary\SoftCircuits\OrderedDictionaryExtensions.cs" />
