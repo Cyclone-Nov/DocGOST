@@ -1022,7 +1022,7 @@ namespace GostDOC.ViewModels
             IsUndoEnabled.Value = undoRedoStack.IsUndoEnabled;
             IsRedoEnabled.Value = undoRedoStack.IsRedoEnabled;
 
-            _shouldSave = undoRedoStack.IsUndoEnabled || undoRedoStack.IsRedoEnabled;
+            _shouldSave = _shouldSave || undoRedoStack.IsUndoEnabled || undoRedoStack.IsRedoEnabled;
         }
 
         private void UpdateData()
