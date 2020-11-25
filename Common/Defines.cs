@@ -587,7 +587,7 @@ namespace GostDOC.Common
         /// <summary>
         /// количество строк на всех листах кроме первого для перечня элементов (ПЭ3)
         /// </summary>
-        public static readonly int ItemListRowsOnNextPage = 29;
+        public static readonly int ItemListRowsOnNextPage = 30;
         /// <summary>
         /// количество строк на первом листе для документа по умолчанию
         /// </summary>

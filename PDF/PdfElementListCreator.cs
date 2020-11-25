@@ -139,7 +139,7 @@ internal class PdfElementListCreator : PdfCreator {
         var dataTable = CreateDataTable(new DataTableStruct{Data = aData, FirstPage =false, StartRow = aStartRow}, out var lastProcessedRow);
         dataTable.SetFixedPosition(
             DATA_TABLE_LEFT,
-            PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNumber) + TOP_MARGIN),
+            PdfDefines.A4Height - (GetTableHeight(dataTable, aPageNumber) + TOP_MARGIN) - 2.5f,
             TITLE_BLOCK_WIDTH);
         aInPdfDoc.Add(dataTable);
 
