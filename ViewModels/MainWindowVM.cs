@@ -29,6 +29,7 @@ namespace GostDOC.ViewModels
         private Node _specification = new Node() { Name = "Спецификация", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
         private Node _bill = new Node() { Name = "Ведомость покупных изделий", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
         private Node _bill_D27 = new Node() { Name = "Ведомость комплектации", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
+        private Node _selectedItem = null;
 
         private DocType _docType = DocType.None;
 
@@ -135,17 +136,17 @@ namespace GostDOC.ViewModels
         {
             get
             {
-                if (SelectedItem.Value?.NodeType == NodeType.Configuration)
+                if (_selectedItem?.NodeType == NodeType.Configuration)
                 {
-                    return SelectedItem.Value.Name;
+                    return _selectedItem.Name;
                 }
-                if (SelectedItem.Value?.NodeType == NodeType.Group)
+                if (_selectedItem?.NodeType == NodeType.Group)
                 {
-                    return SelectedItem.Value.Parent.Name;
+                    return _selectedItem.Parent.Name;
                 }
-                if (SelectedItem.Value?.NodeType == NodeType.SubGroup)
+                if (_selectedItem?.NodeType == NodeType.SubGroup)
                 {
-                    return SelectedItem.Value.Parent.Parent.Name;
+                    return _selectedItem.Parent.Parent.Name;
                 }
                 return string.Empty;
             }
@@ -158,13 +159,13 @@ namespace GostDOC.ViewModels
             get
             {
                 string name = string.Empty;
-                if (SelectedItem.Value?.NodeType == NodeType.Group)
+                if (_selectedItem?.NodeType == NodeType.Group)
                 {
-                    name = SelectedItem.Value.Name;
+                    name = _selectedItem.Name;
                 }
-                else if (SelectedItem.Value?.NodeType == NodeType.SubGroup)
+                else if (_selectedItem?.NodeType == NodeType.SubGroup)
                 {
-                    name = SelectedItem.Value.Parent.Name;
+                    name = _selectedItem.Parent.Name;
                 }
                 if (name.Equals(Constants.DefaultGroupName))
                 {
@@ -176,7 +177,7 @@ namespace GostDOC.ViewModels
         /// <summary>
         /// Current selected subgroup
         /// </summary>
-        public string SubGroupName => SelectedItem.Value?.NodeType == NodeType.SubGroup ? SelectedItem.Value.Name : string.Empty;
+        public string SubGroupName => _selectedItem?.NodeType == NodeType.SubGroup ? _selectedItem.Name : string.Empty;
 
         #endregion Commands
 
@@ -217,9 +218,9 @@ namespace GostDOC.ViewModels
 
         private void Undo(MenuNode obj)
         {
-            if (SelectedItem.Value != null)
+            if (_selectedItem != null)
             {
-                if (SelectedItem.Value.NodeType == NodeType.Root)
+                if (_selectedItem.NodeType == NodeType.Root)
                 {
                     GeneralGraphValues.SetMementos(_undoRedoGraphs.Undo());
                     UpdateUndoRedoMenu(_undoRedoGraphs);
@@ -234,9 +235,9 @@ namespace GostDOC.ViewModels
 
         private void Redo(MenuNode obj)
         {
-            if (SelectedItem.Value != null)
+            if (_selectedItem != null)
             {
-                if (SelectedItem.Value.NodeType == NodeType.Root)
+                if (_selectedItem.NodeType == NodeType.Root)
                 {
                     GeneralGraphValues.SetMementos(_undoRedoGraphs.Redo());
                     UpdateUndoRedoMenu(_undoRedoGraphs);
@@ -362,13 +363,13 @@ namespace GostDOC.ViewModels
 
         private void SaveData()
         {
-            if (SelectedItem.Value != null)
+            if (_selectedItem != null)
             {
-                if (SelectedItem.Value.NodeType == NodeType.Group || SelectedItem.Value.NodeType == NodeType.SubGroup)
+                if (_selectedItem.NodeType == NodeType.Group || _selectedItem.NodeType == NodeType.SubGroup)
                 {
                     SaveComponents();
                 }
-                else if (SelectedItem.Value.NodeType == NodeType.Root)
+                else if (_selectedItem.NodeType == NodeType.Root)
                 {
                     SaveGraphValues();
                 }
@@ -379,7 +380,9 @@ namespace GostDOC.ViewModels
         {
             SaveData();
 
-            if (SelectedItem.Value != null)
+            _selectedItem = obj;
+
+            if (_selectedItem != null)
             {
                 // Update current table
                 UpdateSelectedDocument();
@@ -503,15 +506,15 @@ namespace GostDOC.ViewModels
             Node newGroup = null;
 
             // Add group or subgroup
-            if (SelectedItem.Value.NodeType == NodeType.Configuration)
+            if (_selectedItem.NodeType == NodeType.Configuration)
             {
-                _project.AddGroup(SelectedItem.Value.Name, _docType, new SubGroupInfo(name, null));
-                newGroup = new Node() { Name = name, NodeType = NodeType.Group, Parent = SelectedItem.Value, Nodes = new ObservableCollection<Node>() };
+                _project.AddGroup(_selectedItem.Name, _docType, new SubGroupInfo(name, null));
+                newGroup = new Node() { Name = name, NodeType = NodeType.Group, Parent = _selectedItem, Nodes = new ObservableCollection<Node>() };
             }
-            else if (SelectedItem.Value.NodeType == NodeType.Group)
+            else if (_selectedItem.NodeType == NodeType.Group)
             {
-                _project.AddGroup(SelectedItem.Value.Parent.Name, _docType, new SubGroupInfo(SelectedItem.Value.Name, name));
-                newGroup = new Node() { Name = name, NodeType = NodeType.SubGroup, Parent = SelectedItem.Value, Nodes = new ObservableCollection<Node>() };
+                _project.AddGroup(_selectedItem.Parent.Name, _docType, new SubGroupInfo(_selectedItem.Name, name));
+                newGroup = new Node() { Name = name, NodeType = NodeType.SubGroup, Parent = _selectedItem, Nodes = new ObservableCollection<Node>() };
             }
 
             if (newGroup != null)
@@ -548,23 +551,23 @@ namespace GostDOC.ViewModels
             SubGroupInfo groupInfo = null;
             
             // Remove group or subgroup 
-            if (SelectedItem.Value.NodeType == NodeType.Group)
+            if (_selectedItem.NodeType == NodeType.Group)
             {
-                groupInfo = new SubGroupInfo(SelectedItem.Value.Name, null);
-                name = SelectedItem.Value.Parent.Name;
+                groupInfo = new SubGroupInfo(_selectedItem.Name, null);
+                name = _selectedItem.Parent.Name;
             }
-            else if (SelectedItem.Value.NodeType == NodeType.SubGroup)
+            else if (_selectedItem.NodeType == NodeType.SubGroup)
             {
-                groupInfo = new SubGroupInfo(SelectedItem.Value.Parent.Name, SelectedItem.Value.Name);
-                name = SelectedItem.Value.Parent.Parent.Name;
+                groupInfo = new SubGroupInfo(_selectedItem.Parent.Name, _selectedItem.Name);
+                name = _selectedItem.Parent.Parent.Name;
             }
 
             if (!string.IsNullOrEmpty(name) && groupInfo != null)
             {
                 _project.RemoveGroup(name, _docType, groupInfo, removeComponents);
 
-                var groupToRemove = SelectedItem.Value;
-                SelectedItem.Value = SelectedItem.Value.Parent;
+                var groupToRemove = _selectedItem;
+                SelectedItem.Value = _selectedItem.Parent;
                 SelectedItem.Value.Nodes.Remove(groupToRemove);
             }
 
@@ -842,9 +845,9 @@ namespace GostDOC.ViewModels
         private void UpdateSelectedDocument()
         {
              // Is group or subgroup selected
-            bool isGroup = SelectedItem.Value.NodeType == NodeType.Group || SelectedItem.Value.NodeType == NodeType.SubGroup;
+            bool isGroup = _selectedItem.NodeType == NodeType.Group || _selectedItem.NodeType == NodeType.SubGroup;
             // Is graph table visible
-            IsGeneralGraphValuesVisible.Value = SelectedItem.Value.NodeType == NodeType.Root;
+            IsGeneralGraphValuesVisible.Value = _selectedItem.NodeType == NodeType.Root;
             if (IsGeneralGraphValuesVisible.Value)
             {
                 UpdateGraphValues();
@@ -853,19 +856,19 @@ namespace GostDOC.ViewModels
             if (_docType == DocType.Specification)
             {
                 // Is add group button enabled
-                IsAddEnabled.Value = SelectedItem.Value.NodeType == NodeType.Group && SelectedItem.Value.Name != Constants.DefaultGroupName;
+                IsAddEnabled.Value = _selectedItem.NodeType == NodeType.Group && _selectedItem.Name != Constants.DefaultGroupName;
                 
                 // Is remove group button enabled
-                IsRemoveEnabled.Value = SelectedItem.Value.NodeType == NodeType.SubGroup && SelectedItem.Value.Name != Constants.DefaultGroupName;
+                IsRemoveEnabled.Value = _selectedItem.NodeType == NodeType.SubGroup && _selectedItem.Name != Constants.DefaultGroupName;
             }
             else if (_docType == DocType.Bill)
             {
                 // Is add group button enabled
-                IsAddEnabled.Value = (SelectedItem.Value.NodeType == NodeType.Configuration || SelectedItem.Value.NodeType == NodeType.Group) &&
-                                      SelectedItem.Value.Name != Constants.DefaultGroupName;
+                IsAddEnabled.Value = (_selectedItem.NodeType == NodeType.Configuration || _selectedItem.NodeType == NodeType.Group) &&
+                                      _selectedItem.Name != Constants.DefaultGroupName;
 
                 // Is remove group button enabled
-                IsRemoveEnabled.Value = isGroup && SelectedItem.Value.Name != Constants.DefaultGroupName;
+                IsRemoveEnabled.Value = isGroup && _selectedItem.Name != Constants.DefaultGroupName;
             }
             else
             {
