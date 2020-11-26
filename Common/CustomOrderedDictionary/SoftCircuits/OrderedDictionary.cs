@@ -304,48 +304,48 @@ namespace SoftCircuits.Collections
 
         #region
 
-        private class MyEnumerator<TKey, TValue> : IEnumerator
-        {
-            public TKey[] keys;
-            public TValue[] values;
-            int position = -1;
+        //private class MyEnumerator<TKey, TValue> : IEnumerator
+        //{
+        //    public TKey[] keys;
+        //    public TValue[] values;
+        //    int position = -1;
 
-            //constructor
-            public MyEnumerator(ICollection<TKey> aKeys, ICollection<TValue> aValues)
-            {
-                keys = aKeys.ToArray();
-                values = aValues.ToArray();
-            }
-            private IEnumerator getEnumerator()
-            {
-                return (IEnumerator)this;
-            }
-            //IEnumerator
-            public bool MoveNext()
-            {
-                position++;
-                return ((position < keys.Length) && (position < values.Length));
-            }
-            //IEnumerator
-            public void Reset()
-            {
-                position = -1;
-            }
-            //IEnumerator
-            public object Current
-            {
-                get
-                {
-                    try
-                    {
-                        return new KeyValuePair<TKey, TValue>(keys [position], values[position]);
-                    } catch (IndexOutOfRangeException)
-                    {
-                        throw new InvalidOperationException();
-                    }
-                }
-            }
-        }
+        //    //constructor
+        //    public MyEnumerator(ICollection<TKey> aKeys, ICollection<TValue> aValues)
+        //    {
+        //        keys = aKeys.ToArray();
+        //        values = aValues.ToArray();
+        //    }
+        //    private IEnumerator getEnumerator()
+        //    {
+        //        return (IEnumerator)this;
+        //    }
+        //    //IEnumerator
+        //    public bool MoveNext()
+        //    {
+        //        position++;
+        //        return ((position < keys.Length) && (position < values.Length));
+        //    }
+        //    //IEnumerator
+        //    public void Reset()
+        //    {
+        //        position = -1;
+        //    }
+        //    //IEnumerator
+        //    public object Current
+        //    {
+        //        get
+        //        {
+        //            try
+        //            {
+        //                return new KeyValuePair<TKey, TValue>(keys [position], values[position]);
+        //            } catch (IndexOutOfRangeException)
+        //            {
+        //                throw new InvalidOperationException();
+        //            }
+        //        }
+        //    }
+        //}
 
         #endregion
 
