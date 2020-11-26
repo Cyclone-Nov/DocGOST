@@ -24,8 +24,8 @@ namespace GostDOC.PDF
 {
     class PdfSpecificationCreator : PdfCreator {
 
-        private static readonly float DATA_TABLE_CELL_HEIGHT_MM = 8;
-        private new readonly float DATA_TABLE_LEFT = 19.3f * mmW() - TO_LEFT_CORRECTION;
+        //private static readonly float DATA_TABLE_CELL_HEIGHT_MM = 8;
+        //private new readonly float DATA_TABLE_LEFT = 19.3f * mmW() - TO_LEFT_CORRECTION;
 
         public PdfSpecificationCreator() : base(DocType.Specification) {
         }

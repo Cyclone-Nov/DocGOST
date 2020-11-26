@@ -526,7 +526,7 @@ namespace GostDOC.DataPreparation
         }
 
 
-        private new void AddEmptyRow(DataTable aTable) 
+        private void AddEmptyRow(DataTable aTable) 
         {
             DataRow row = aTable.NewRow();            
             aTable.Rows.Add(row);
