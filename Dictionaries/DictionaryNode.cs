@@ -7,26 +7,27 @@ using System.Threading.Tasks;
 
 namespace GostDOC.Models
 {
-    enum MaterialNodeType
+    enum DictionaryNodeType
     {
         Component,
-        Group
+        Group,
+        SubGroup
     }
 
-    class MaterialNode : IComparable<MaterialNode>
+    class DictionaryNode : IComparable<DictionaryNode>
     {
         public ObservableProperty<string> Name { get; } = new ObservableProperty<string>();
-        public MaterialNodeType Type { get; set; } = MaterialNodeType.Group;
-        public MaterialNode Parent { get; set; }
-        public ObservableCollection<MaterialNode> Nodes { get; set; }
+        public DictionaryNodeType Type { get; set; } = DictionaryNodeType.Group;
+        public DictionaryNode Parent { get; set; }
+        public ObservableCollection<DictionaryNode> Nodes { get; set; }
 
-        public MaterialNode(string aName, MaterialNodeType aType = MaterialNodeType.Group)
+        public DictionaryNode(string aName, DictionaryNodeType aType = DictionaryNodeType.Group)
         {
             Name.Value = aName;
             Type = aType;
         }
 
-        public int CompareTo(MaterialNode other)
+        public int CompareTo(DictionaryNode other)
         {
             return Name.Value.CompareTo(other.Name.Value);
         }

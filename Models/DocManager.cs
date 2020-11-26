@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GostDOC.Common;
 using GostDOC.PDF;
+using GostDOC.Dictionaries;
 
 namespace GostDOC.Models
 {
@@ -24,8 +25,9 @@ namespace GostDOC.Models
 
         public Project Project { get; private set; } = new Project();
 
-        public MaterialTypes MaterialTypes { get; } = new MaterialTypes();
-
+        public ProductTypes Materials { get; } = new ProductTypes(ProductTypesDoc.Materials);
+        public ProductTypes Others { get; } = new ProductTypes(ProductTypesDoc.Others);
+        public ProductTypes Standard { get; } = new ProductTypes(ProductTypesDoc.Standard);
         public DocumentTypes DocumentTypes { get; } = new DocumentTypes();
 
         #region Public
@@ -33,7 +35,7 @@ namespace GostDOC.Models
         public void Load()
         {
             // Load material types
-            MaterialTypes.Load();
+            Materials.Load(Constants.MaterialsXml);
             // Load document types
             DocumentTypes.Load();
         }

@@ -549,6 +549,10 @@ namespace GostDOC.Common
         public static readonly string BillTemplateName = "purchased_items_list";
         // Cfgs
         public static readonly string MaterialGroupsCfg = "MaterialGroups";
+        // Xml
+        public static readonly string MaterialsXml = "Materials.xml";
+        public static readonly string OthersXml = "Others.xml";
+        public static readonly string StandardXml = "Standard.xml";
 
         #endregion Файлы
 

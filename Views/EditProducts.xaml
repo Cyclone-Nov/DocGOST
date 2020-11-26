@@ -1,4 +1,4 @@
-﻿<Window x:Class="GostDOC.Views.EditMaterials"
+﻿<Window x:Class="GostDOC.Views.EditProducts"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,10 +9,10 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:GostDOC.Views"
         mc:Ignorable="d"
-        Title="Материалы" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+        Title="{Binding Title.Value}" Height="450" Width="800" WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
-        <viewModels:MaterialsVM x:Name="ViewModel" />
+        <viewModels:ProductTypesVM x:Name="ViewModel" />
     </Window.DataContext>
 
     <Window.Resources>
@@ -35,10 +35,10 @@
             <RowDefinition Height="35" />
         </Grid.RowDefinitions>
 
-        <TreeView x:Name="materialsTreeView" Margin="5" ItemsSource="{Binding MaterialNodes}">
+        <TreeView x:Name="dicTreeView" Margin="5" ItemsSource="{Binding DictionaryNodes}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectedItemChanged">
-                    <i:InvokeCommandAction Command="{Binding TreeViewSelectionChangedCmd}" CommandParameter="{Binding ElementName=materialsTreeView, Path=SelectedItem}"/>
+                    <i:InvokeCommandAction Command="{Binding TreeViewSelectionChangedCmd}" CommandParameter="{Binding ElementName=dicTreeView, Path=SelectedItem}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             <i:Interaction.Behaviors>
@@ -58,7 +58,7 @@
 
         <DockPanel Grid.Row="3" Grid.Column="2" LastChildFill="False">
             <Button Margin="5" DockPanel.Dock="Left" Content="Добавить группу" Width="120" Height="25" Command="{Binding AddGroupCmd}" />
-            <Button Margin="5" DockPanel.Dock="Left" Content="Добавить материал" Width="120" Height="25" Command="{Binding AddMaterialCmd}" />
+            <Button Margin="5" DockPanel.Dock="Left" Content="{Binding AddProductButton.Value}" Width="120" Height="25" Command="{Binding AddProductCmd}" />
             <Button Margin="5" DockPanel.Dock="Left" Content="Редактировать" Width="120" Height="25" Command="{Binding EditCmd}"/>
             <Button Margin="5" DockPanel.Dock="Right" Content="Удалить" Width="120" Height="25" Command="{Binding RemoveCmd}"/>
         </DockPanel>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GostDOC.Dictionaries;
 using GostDOC.Models;
 using GostDOC.Views;
 
@@ -72,15 +73,6 @@ namespace GostDOC.UI
             return false;
         }
 
-        public static void CreateEditMaterials()
-        {
-            EditMaterials dlg = new EditMaterials();
-            var result = dlg.ShowDialog();
-            if (result.HasValue && result.Value)
-            {
-            }
-        }
-
         public static string SaveFileAs(string aFilter, string aTitle, string aFilename = "")
         {
             SaveFileDialog save = new SaveFileDialog();
@@ -107,39 +99,62 @@ namespace GostDOC.UI
             return null;
         }
 
-        public static Material AddMaterial()
+        public static Product AddProduct(ProductTypesDoc aDocType)
         {
-            NewMaterial newMaterialDlg = new NewMaterial();
-            var result = newMaterialDlg.ShowDialog();
+            NewProduct newProductDlg = new NewProduct();
+            switch (aDocType)
+            {
+                case ProductTypesDoc.Materials:
+                    newProductDlg.Title = "Добавить материал";
+                    newProductDlg.MaterialName.Text = "Новый материал";
+                    break;
+                case ProductTypesDoc.Others:
+                case ProductTypesDoc.Standard:
+                    newProductDlg.Title = "Добавить изделие";
+                    newProductDlg.MaterialName.Text = "Новое изделие";
+                    break;
+            }
+
+            var result = newProductDlg.ShowDialog();
             if (result.HasValue && result.Value)
             {
-                return new Material()
+                return new Product()
                 {
-                    Name = newMaterialDlg.MaterialName.Text,
-                    Note = newMaterialDlg.MaterialNote.Text
+                    Name = newProductDlg.MaterialName.Text,
+                    Note = newProductDlg.MaterialNote.Text
                 };
             }
             return null;
         }
 
-        public static Material UpdateMaterial(Material aSource)
+        public static Product UpdateProduct(Product aSource)
         {
-            NewMaterial newMaterialDlg = new NewMaterial();
+            NewProduct NewProduct = new NewProduct();
 
-            newMaterialDlg.Title = "Изменить материал";
-            newMaterialDlg.MaterialName.Text = aSource.Name;
-            newMaterialDlg.MaterialNote.Text = aSource.Note;
+            NewProduct.Title = "Изменить изделие";
+            NewProduct.MaterialName.Text = aSource.Name;
+            NewProduct.MaterialNote.Text = aSource.Note;
 
-            var result = newMaterialDlg.ShowDialog();
+            var result = NewProduct.ShowDialog();
             if (result.HasValue && result.Value)
             {
-                return new Material()
+                return new Product()
                 {
-                    Name = newMaterialDlg.MaterialName.Text,
-                    Note = newMaterialDlg.MaterialNote.Text
+                    Name = NewProduct.MaterialName.Text,
+                    Note = NewProduct.MaterialNote.Text
                 };
             }
             return null;
+        }
+
+        public static void CreateEditProducts(ProductTypesDoc aDocType)
+        {
+            EditProducts dlg = new EditProducts();
+            dlg.ViewModel.SetDocType(aDocType);
+            var result = dlg.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+            }
         }
 
         public static void ShowLoadErrors(IList<string> aErrors)

@@ -18,6 +18,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using SoftCircuits.Collections;
+using GostDOC.Dictionaries;
 
 namespace GostDOC.ViewModels
 {
@@ -39,7 +40,7 @@ namespace GostDOC.ViewModels
         private DocManager _docManager = DocManager.Instance;
 
         private DocumentTypes _docTypes = DocManager.Instance.DocumentTypes;
-        private MaterialTypes _materials = DocManager.Instance.MaterialTypes;
+        private ProductTypes _materials = DocManager.Instance.Materials;
 
         private ProjectWrapper _project = new ProjectWrapper();
         private List<MoveInfo> _moveInfo = new List<MoveInfo>();
@@ -653,18 +654,18 @@ namespace GostDOC.ViewModels
             }
             else if (GroupName.Equals(Constants.GroupMaterials))
             {
-                Material material = null;
+                Product product = null;
                 if (obj.Name == Constants.NewMaterialMenuItem)
                 {
                     // Add material
-                    material = CommonDialogs.AddMaterial();
-                    if (material != null)
+                    product = CommonDialogs.AddProduct(ProductTypesDoc.Materials);
+                    if (product != null)
                     {
                         var groups = GetGroups(obj);
-                        if (_materials.AddMaterial(groups.Item1, groups.Item2, material))
+                        if (_materials.AddProduct(groups.Item1, groups.Item2, product))
                         {
                             // Add node
-                            obj.Parent.Nodes.InsertSorted(new MenuNode() { Name = material.Name, Parent = obj.Parent });
+                            obj.Parent.Nodes.InsertSorted(new MenuNode() { Name = product.Name, Parent = obj.Parent });
                             // Save file
                             _materials.Save();
                         }
@@ -674,15 +675,15 @@ namespace GostDOC.ViewModels
                 {
                     // Find material
                     var groups = GetGroups(obj);
-                    material = _materials.GetMaterial(groups.Item1, groups.Item2, obj.Name);
+                    product = _materials.GetProduct(groups.Item1, groups.Item2, obj.Name);
                 }
 
                 // Add material to components
-                if (material != null)
+                if (product != null)
                 {
                     ComponentVM cmp = new ComponentVM();
-                    cmp.Name.Value = material.Name;
-                    cmp.Note.Value = material.Note;
+                    cmp.Name.Value = product.Name;
+                    cmp.Note.Value = product.Note;
                     cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
                     Components.Add(cmp);
                 }
@@ -753,7 +754,7 @@ namespace GostDOC.ViewModels
 
         private void UpdateMaterials(object obj)
         {
-            CommonDialogs.CreateEditMaterials();
+            CommonDialogs.CreateEditProducts(ProductTypesDoc.Materials);
             UpdateTableContextMenu();
         }
 
@@ -1060,14 +1061,15 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentCountDev, aSrc.CountDev.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCountSet, aSrc.CountSet.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCountReg, aSrc.CountReg.Value.ToString());
+            aDst.Properties.Add(Constants.ComponentCount, aSrc.Count.Value.ToString());
             aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
         }
 
-        private void AddMenuItem(MenuNode aNode, MaterialGroup aGroup)
+        private void AddMenuItem(MenuNode aNode, ProductGroup aGroup)
         {
-            foreach (var material in aGroup.Materials)
+            foreach (var product in aGroup.ProductsList)
             {
-                aNode.Nodes.InsertSorted(new MenuNode() { Name = material.Key, Parent = aNode });
+                aNode.Nodes.InsertSorted(new MenuNode() { Name = product.Key, Parent = aNode });
             }
             aNode.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = aNode });
 
@@ -1102,7 +1104,7 @@ namespace GostDOC.ViewModels
             }
             else if (GroupName.Equals(Constants.GroupMaterials))
             {
-                foreach (var kvp in _materials.Materials)
+                foreach (var kvp in _materials.Products.Groups)
                 {
                     MenuNode node = new MenuNode() { Name = kvp.Key, Nodes = new ObservableCollection<MenuNode>() };
                     AddMenuItem(node, kvp.Value);
