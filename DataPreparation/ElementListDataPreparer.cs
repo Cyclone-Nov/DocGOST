@@ -200,7 +200,7 @@ internal class ElementListDataPreparer : BasePreparer {
                 FindComponentsWithStandardDoc(aComponentsDic, out var StandardComponentsDic);
 
             // записываем таблицу данных
-            DataRow row;
+            //DataRow row;
             string lastGroupName = string.Empty;
             bool firstGroup = true;
             List<string> oldGropus = new List<string>();
@@ -213,45 +213,11 @@ internal class ElementListDataPreparer : BasePreparer {
                 var component = component_pair_arr[i].Value;
                 string key = component_pair_arr[i].Key;
                 string designator = GetDesignator(key, component.Item1, component.Item3);
-                string component_name = GetComponentName(key, StandardComponentsDic, component.Item2);                
+                bool canOutputStandardDocs = CanOutputStandardDocs(designator);
+                string component_name = GetComponentName(key, canOutputStandardDocs, StandardComponentsDic, component.Item2);                
                 string subGroupName = component.Item2.GetProperty(Constants.SubGroupNameSp);
                 componentsInSubgroup++;
-                    
-                if (firstGroup || !string.Equals(subGroupName, lastGroupName)) // если первая группа или смена группы
-                {
-                    if (CanOutputSubgroupName(subGroupName)) // если наименование группы можно выводить
-                    {
-                        bool nextSubgroupIsDiffer = CheckEqualsNextSubgroup(i, subGroupName, component_pair_arr);
-                        // если в группе один элемент то не выводим наименование группы и пишем особое название элемента
-                        if ((componentsInSubgroup == 1) && nextSubgroupIsDiffer)
-                        {
-                            component_name = $"{subGroupName} {component_name}";
-                        } else
-                        {
-                            // записываем наименование группы
-                            AddEmptyRow(aTable);
-                            AddGroupName(aTable, subGroupName);
-                            AddEmptyRow(aTable);
-
-                            if (!oldGropus.Contains(subGroupName))
-                            {
-                                // записываем строки с гост/ту в начале группы, если они есть для данной группы
-                                if (!AddStandardDocsToTable(subGroupName, aTable, aComponentsDic, StandardDic))
-                                {
-                                    //AddEmptyRow(aTable);
-                                }
-                                oldGropus.Add(subGroupName);
-                            }
-                        }                        
-                    }
-                    else
-                        AddEmptyRow(aTable);
-
-                    componentsInSubgroup = 0;
-                    firstGroup = false;
-                }                
-                lastGroupName = subGroupName;
-
+                
                 bool haveToChangeName = string.Equals(component.Item2.GetProperty(Constants.ComponentPresence), "0") ||
                                                       DifferNameInOtherConfigs(component.Item2, aOtherComponents);
 
@@ -267,7 +233,7 @@ internal class ElementListDataPreparer : BasePreparer {
                         var componentNext = component_pair_arr[j].Value;
                         var nextKey = component_pair_arr[j].Key;
                         uint nextCount = componentNext.Item3;
-                        string componentNext_name = GetComponentName(nextKey, StandardComponentsDic, componentNext.Item2);
+                        string componentNext_name = GetComponentName(nextKey, canOutputStandardDocs, StandardComponentsDic, componentNext.Item2);
 
                         if (string.Equals(component_name, componentNext_name))
                         {
@@ -279,8 +245,47 @@ internal class ElementListDataPreparer : BasePreparer {
                             same = false;
                     } while (same && j < component_pair_arr.Length);
                 }
-
                 i = j;
+
+                // если у текущего элементы сменилось название группы
+                if (firstGroup || !string.Equals(subGroupName, lastGroupName)) 
+                {                   
+                    // если у следующего элементы название группы, отличное от текущего, то в этой группе 1 элемент
+                    bool nextSubgroupIsDiffer = CheckEqualsNextSubgroup(i - 1, subGroupName, component_pair_arr);                    
+                    if (nextSubgroupIsDiffer)//((componentsInSubgroup == 1) && nextSubgroupIsDiffer)
+                    {
+                        AddEmptyRow(aTable);
+                        if (StandardComponentsDic.ContainsKey(key) && (StandardComponentsDic[key] == 2))
+                            component_name = $"{GetGroupNameByCount(subGroupName, true)} {component_name} {component.Item2.GetProperty(Constants.ComponentDoc)}";
+                        else
+                            component_name = $"{GetGroupNameByCount(subGroupName, true)} {component_name}";
+
+                    } else
+                    {                        
+                        // записываем наименование группы
+                        AddEmptyRow(aTable);
+                        AddGroupName(aTable, GetGroupNameByCount(subGroupName, false));
+                        AddEmptyRow(aTable);
+
+                        if (canOutputStandardDocs)
+                        {
+                            if (!oldGropus.Contains(subGroupName))
+                            {
+                                // записываем строки с гост/ту в начале группы, если они есть для данной группы
+                                if (!AddStandardDocsToTable(subGroupName, aTable, aComponentsDic, StandardDic))
+                                {
+                                    //AddEmptyRow(aTable);
+                                }
+                                oldGropus.Add(subGroupName);
+                            }
+                        }
+                    }
+                 
+                    componentsInSubgroup = 0;
+                    firstGroup = false;
+                }
+                lastGroupName = subGroupName;
+
 
                 var designators = MakeComponentDesignatorsString(component_designators);
                 var name = (haveToChangeName) ? change_name : component_name;
@@ -471,7 +476,7 @@ internal class ElementListDataPreparer : BasePreparer {
         /// добавить пустую строку в таблицу данных
         /// </summary>
         /// <param name="aTable"></param>
-        private new void AddEmptyRow(DataTable aTable) {
+        private void AddEmptyRow(DataTable aTable) {
             DataRow row = aTable.NewRow();
             row[Constants.ColumnName] = string.Empty;
             row[Constants.ColumnPosition] = string.Empty;
@@ -520,7 +525,7 @@ internal class ElementListDataPreparer : BasePreparer {
 
                         row = aTable.NewRow();
                         var index = item.Value.First();
-                        string name = $"{aGroupName} {aComponentsDic[index].Item2.GetProperty(Constants.ComponentType)} {item.Key}";
+                        string name = $"{GetGroupNameByCount(aGroupName, false)} {aComponentsDic[index].Item2.GetProperty(Constants.ComponentType)} {item.Key}";
                         row[Constants.ColumnName] = name;
                         aTable.Rows.Add(row);
                         isApplied = true;
@@ -646,21 +651,47 @@ internal class ElementListDataPreparer : BasePreparer {
         }
 
         /// <summary>
-        /// Determines whether this instance [can output subgroup name] the specified a subgroup name.
+        /// Determines whether this instance [can output standard docs] the specified a designator.
         /// </summary>
-        /// <param name="aSubgroupName">Name of a subgroup.</param>
+        /// <param name="aDesignator">a designator.</param>
         /// <returns>
-        ///   <c>true</c> if this instance [can output subgroup name] the specified a subgroup name; otherwise, <c>false</c>.
+        ///   <c>true</c> if this instance [can output standard docs] the specified a designator; otherwise, <c>false</c>.
         /// </returns>
-        private bool CanOutputSubgroupName(string aSubgroupName)
+        private bool CanOutputStandardDocs(string aDesignator)
         {
-            if (string.IsNullOrEmpty(aSubgroupName))
+            if (string.IsNullOrEmpty(aDesignator))
                 return false;
 
-            if (aSubgroupName.ToLower().Contains("катушк") || aSubgroupName.ToLower().Contains("конденсатор") || aSubgroupName.ToLower().Contains("резистор"))
+            int index = aDesignator.IndexOfAny(new char[] { '0','1', '2', '3', '4', '5', '6', '7', '8', '9'});
+            string symbols = aDesignator.Substring(0, index).ToUpper();
+
+            if (string.Equals(symbols, "R") ||
+                string.Equals(symbols, "C") ||
+                string.Equals(symbols, "L") ||
+                string.Equals(symbols, "XP")||
+                string.Equals(symbols, "XS"))
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// Gets the group name by count.
+        /// </summary>
+        /// <param name="aGroupName">Name of a group.</param>
+        /// <param name="aSingle">if set to <c>true</c> [a single].</param>
+        /// <returns></returns>
+        private string GetGroupNameByCount(string aGroupName, bool aSingle)
+        {
+            if (aGroupName.Contains(@"\"))
+            {
+                string[] split = aGroupName.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                if (split.Length == 2)
+                {
+                    return aSingle ? split[0] : split[1];
+                }
+            } 
+            return aGroupName;
         }
     }
 }

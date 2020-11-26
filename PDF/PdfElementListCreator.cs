@@ -21,7 +21,7 @@ namespace GostDOC.PDF {
 internal class PdfElementListCreator : PdfCreator {
 
     private const string FileName = @"Перечень элементов.pdf";
-    private readonly float DATA_TABLE_LEFT = 19.3f * mmW() - TO_LEFT_CORRECTION;
+    //private readonly float DATA_TABLE_LEFT = 19.3f * mmW() - TO_LEFT_CORRECTION;
 
     public PdfElementListCreator() : base(DocType.ItemsList) 
     {
@@ -221,6 +221,7 @@ internal class PdfElementListCreator : PdfCreator {
 
             row = Rows[ind];
 
+
             string GetCellString(string columnName) =>(row[columnName] == DBNull.Value)
                 ? string.Empty
                 : (string) row[columnName];
@@ -232,15 +233,21 @@ internal class PdfElementListCreator : PdfCreator {
                 ? 0
                 : (int) row[Constants.ColumnQuantity];
 
+
+            string nextPosition = position;
+            if (ind+1 < Rows.Length)
+            { 
+                nextPosition = (Rows[ind+1][Constants.ColumnPosition] == DBNull.Value) ? string.Empty : (string)Rows[ind + 1][Constants.ColumnPosition];
+            }
             if (IsEmptyRow(row)) 
             {
                 AddEmptyRowToPdfTable(tbl, 1, 4, leftPaddCell, remainingPdfTableRows == 1 ? true : false);
                 remainingPdfTableRows--;
             }            
-            else if (IsGroupName(row)) 
+            else if (IsGroupName(row)) // это наименование группы
             {
-                // это наименование группы
-                if (remainingPdfTableRows > 4) 
+                
+                if (remainingPdfTableRows > 4 || ((remainingPdfTableRows > 1) && !string.IsNullOrEmpty(nextPosition)))
                 {
                     // если есть место для записи более 4 строк то записываем группу, иначе выходим
                     tbl.AddCell(centrAlignCell.Clone(false));

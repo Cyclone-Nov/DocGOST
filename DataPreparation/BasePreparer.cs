@@ -183,16 +183,16 @@ public abstract class BasePreparer {
     /// <param name="aHasStandardDoc">признак наличия ГОСТ/ТУ символов в документе на поставку</param>
     /// <param name="component">компонент</param>
     /// <returns></returns>
-    protected string GetComponentName(string aKey, Dictionary<string, int> aHasStandardDoc, Models.Component component)
+    protected string GetComponentName(string aKey, bool aWithStandardDoc, Dictionary<string, int> aHasStandardDoc, Models.Component component)
     {        
-        if (aHasStandardDoc.ContainsKey(aKey) && aHasStandardDoc[aKey] == 1)        
+        if (aHasStandardDoc.ContainsKey(aKey) && (aHasStandardDoc[aKey] == 1 || !aWithStandardDoc))        
         {
             return $"{component.GetProperty(Constants.ComponentName)} {component.GetProperty(Constants.ComponentDoc)}";
         }
         if (string.Equals(component.GetProperty(Constants.GroupNameSp), Constants.GroupAssemblyUnits))
         {
             return $"{component.GetProperty(Constants.ComponentName)} {component.GetProperty(Constants.ComponentSign)}";
-        }
+        }        
         return component.GetProperty(Constants.ComponentName);
     }
 
