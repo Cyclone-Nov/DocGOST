@@ -226,6 +226,11 @@
     <Compile Include="ViewModels\LoadErrorsVM.cs" />
     <Compile Include="ViewModels\ProductTypesVM.cs" />
     <Compile Include="ViewModels\NewFileVM.cs" />
+    <Compile Include="ViewModels\SupplierDepartmentProfileVM.cs" />
+    <Compile Include="ViewModels\SupplierPropertiesVM.cs" />
+    <Compile Include="ViewModels\SupplierVM.cs" />
+    <Compile Include="ViewModels\WarehouseAcceptanceVM.cs" />
+    <Compile Include="ViewModels\WarehouseDeliveryVM.cs" />
     <Compile Include="Views\EditProducts.xaml.cs">
       <DependentUpon>EditProducts.xaml</DependentUpon>
     </Compile>

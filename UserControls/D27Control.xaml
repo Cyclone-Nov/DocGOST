@@ -9,30 +9,158 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:col="clr-namespace:System.Collections;assembly=mscorlib"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignWidth="800">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="2*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="2" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="30" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="2" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="2" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <GroupBox Margin="5" Header="Свойства компонента">        
-            <DataGrid Margin="5" SelectionMode="Single"  SelectionUnit="FullRow" 
-                      AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False"
-                      ItemsSource="{Binding ComponentsData}">            
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Свойство" Binding="{Binding Name.Value}"/>
-                    <DataGridTextColumn Header="Значение" Binding="{Binding Data.Value}"/>
-                </DataGrid.Columns>
-            </DataGrid>
+        <GroupBox Margin="5" Header="{Binding ComponentPropertiesHeader.Value}" Padding="25,5,5,5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Производитель" VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" VerticalAlignment="Center" Text="{Binding ComponentSupplierProfile.Properties.Manufacturer.Value}" IsReadOnly="True"/>
+
+                <TextBlock Grid.Row="1" Text="Количество" VerticalAlignment="Center" />
+                <TextBox x:Name ="ComponentCount" Grid.Row="1" Grid.Column="1" Text="{Binding ComponentSupplierProfile.Properties.Quantity.Value}" VerticalAlignment="Center" IsReadOnly="True"/>
+
+                <TextBlock Grid.Row="2" Text="Количество на 2 комплекта" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ComponentSupplierProfile.Properties.Quantity.Value}" VerticalAlignment="Center" IsReadOnly="True"/>
+
+                <TextBlock Grid.Row="3" Text="Отечественный производитель" VerticalAlignment="Center"/>
+                <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding ComponentSupplierProfile.Properties.DomesticManufacturer.Value}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+                <TextBlock Grid.Row="4" Text="Итоговый поставщик" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ComponentSupplierProfile.Properties.FinalSupplier.Value}" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Row="5" Text="Итоговая цена, руб" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding ComponentSupplierProfile.Properties.FinelPrice.Value}" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Row="6" Text="Тип НДС" VerticalAlignment="Center"/>
+                <ComboBox Grid.Row="6" Grid.Column="1" SelectedIndex="{Binding ComponentSupplierProfile.Properties.TaxType.Value}" VerticalAlignment="Center">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding UpdateComponentTaxEvent}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <ComboBoxItem>Без НДС</ComboBoxItem>
+                    <ComboBoxItem>НДС 10%</ComboBoxItem>
+                    <ComboBoxItem>НДС 20%</ComboBoxItem>                    
+                </ComboBox>
+
+                <TextBlock Grid.Row="7" Text="Итоговая стоимость с учетом НДС, руб" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding ComponentSupplierProfile.Properties.FinalPriceWithTax.Value}" VerticalAlignment="Center" IsReadOnly="True"/>
+
+                <GridSplitter Grid.Row="8" Grid.ColumnSpan="2" Height="2" Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+
+                <TextBlock Grid.Row="9" Text="Заказано" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="9" Grid.Column="1" Text="{Binding ComponentSupplierProfile.Properties.CountOrdered.Value}" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Row="10" Text="Поступило на склад" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="10" Grid.Column="1" Text="{Binding ComponentSupplierProfile.Properties.CountWarehouse.Value}" VerticalAlignment="Center" IsReadOnly="True"/>
+
+                <TextBlock Grid.Row="11" Text="Дефицит" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="11" Grid.Column="1" Text="{Binding ComponentSupplierProfile.Properties.CountDeficit.Value}" VerticalAlignment="Center" IsReadOnly="True"/>
+
+                <TextBlock Grid.Row="12" Text="Выдано" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="12" Grid.Column="1" Text="{Binding ComponentSupplierProfile.Properties.CountIssued.Value}" VerticalAlignment="Center" IsReadOnly="True"/>
+
+                <TextBlock Grid.Row="13" Text="Остаток" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="13" Grid.Column="1" Text="{Binding ComponentSupplierProfile.Properties.CountBalance.Value}" VerticalAlignment="Center" IsReadOnly="True"/>
+
+            </Grid>
         </GroupBox>
 
-        <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ResizeDirection="Rows" />
+        <GroupBox Grid.Row="1" Margin="5" Header="Поставщики">
+            <StackPanel Orientation="Vertical">
+                <DataGrid Margin="5" SelectionMode="Single"  SelectionUnit="FullRow" 
+                          AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False"
+                          ItemsSource="{Binding ComponentSupplierProfile.Suppliers}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Наименование поставщика" Binding="{Binding Name.Value}"/>
+                        <DataGridTextColumn Header="Количество" Binding="{Binding Quantity.Value}"/>
+                        <DataGridTextColumn Header="Цена, руб" Binding="{Binding Price.Value}"/>
+                        <DataGridComboBoxColumn Header="Тип НДС" ItemsSource="{Binding TaxTypes}" SelectedItemBinding="{Binding TaxType.Value}"/>
+                        <DataGridTextColumn Header="Стоимость с НДС, руб" Binding="{Binding PriceWithTax.Value}" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="+" Width="50" Margin="10"/>
+                    <Button Content="-" Width="50" Margin="10"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
 
-        <GroupBox Grid.Row="2" Margin="5" Header="Входимость">
+        <GridSplitter Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ResizeDirection="Rows" />
+
+        <GroupBox Grid.Row="3" Margin="5" Header="Поступления">
+            <StackPanel Orientation="Vertical">
+                <DataGrid Margin="5" SelectionMode="Single"  SelectionUnit="FullRow" 
+                      AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False"
+                      ItemsSource="{Binding ComponentSupplierProfile.WarehouseAcceptances}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Дата приема" Binding="{Binding AcceptanceDate.Value}"/>
+                    <DataGridTextColumn Header="Количество" Binding="{Binding Quantity.Value}"/>                    
+                </DataGrid.Columns>
+            </DataGrid>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="+" Width="50" Margin="10"/>
+                    <Button Content="-" Width="50" Margin="10"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <GridSplitter Grid.Row="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ResizeDirection="Rows" />
+
+        <GroupBox Grid.Row="5" Margin="5" Header="Выдача со склада">
+            <StackPanel Orientation="Vertical">
+                <DataGrid Margin="5" SelectionMode="Single"  SelectionUnit="FullRow" 
+                      AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False"
+                      ItemsSource="{Binding ComponentSupplierProfile.WarehouseDeliveries}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Дата выдачи" Binding="{Binding DeliveryDate.Value}"/>
+                    <DataGridTextColumn Header="Количество" Binding="{Binding Quantity.Value}"/>
+                    <DataGridTextColumn Header="Кому выдано" Binding="{Binding WhomWereIssued.Value}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="+" Width="50" Margin="10"/>
+                    <Button Content="-" Width="50" Margin="10"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <GridSplitter Grid.Row="6" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ResizeDirection="Rows" />
+
+        <GroupBox Grid.Row="7" Margin="5" Header="Входимость">
             <Grid Margin="5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -41,21 +169,20 @@
                 
                 <DataGrid SelectionMode="Single" SelectionUnit="FullRow" 
                       AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*"  CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False"
-                      ItemsSource="{Binding ComponentsEntry}">
+                      ItemsSource="{Binding ComponentSupplierProfile.ComponentsEntry}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Куда входит" Binding="{Binding Entry.Value}"/>
                         <DataGridTextColumn Header="Количество" Binding="{Binding Count.Value}"/>
                     </DataGrid.Columns>
                 </DataGrid>
-                
+                <!--
                 <DockPanel Grid.Row="1" LastChildFill="False">
                     <TextBlock DockPanel.Dock="Right" Margin="5" Text="3"></TextBlock>
                     <TextBlock DockPanel.Dock="Right" Margin="5" Text="Итого"></TextBlock>
                 </DockPanel>
+                -->
             </Grid>
         </GroupBox>
-
-        <DockPanel Grid.Row="3" LastChildFill="False">
-        </DockPanel>
+        
     </Grid>
 </UserControl>

@@ -188,11 +188,11 @@ namespace GostDOC.PDF
             aDoc.SetRightMargin(0);
             aDoc.SetTopMargin(0);
             aDoc.SetBottomMargin(0);
-            return;
-            aDoc.SetLeftMargin(LEFT_MARGIN);
-            aDoc.SetRightMargin(RIGHT_MARGIN);
-            aDoc.SetTopMargin(TOP_MARGIN);
-            aDoc.SetBottomMargin(BOTTOM_MARGIN);
+            //aDoc.SetLeftMargin(LEFT_MARGIN);
+            //aDoc.SetRightMargin(RIGHT_MARGIN);
+            //aDoc.SetTopMargin(TOP_MARGIN);
+            //aDoc.SetBottomMargin(BOTTOM_MARGIN);
+            return;            
         }
 
         /// <summary>

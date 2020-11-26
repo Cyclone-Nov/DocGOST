@@ -66,8 +66,13 @@ namespace GostDOC.ViewModels
         // Graphs
         public ObservableProperty<bool> IsGeneralGraphValuesVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableCollection<GraphValueVM> GeneralGraphValues { get; } = new ObservableCollection<GraphValueVM>();
-        public ObservableCollection<ComponentDataVM> ComponentsData { get; } = new ObservableCollection<ComponentDataVM>();
-        public ObservableCollection<ComponentEntryVM> ComponentsEntry { get; } = new ObservableCollection<ComponentEntryVM>();
+
+        public SupplierDepartmentProfileVM ComponentSupplierProfile { get; set; } = new SupplierDepartmentProfileVM();
+
+        private ObservableCollection<SupplierDepartmentProfileVM> ComponentsSupplierProfiles { get; } = new ObservableCollection<SupplierDepartmentProfileVM>();
+
+        public ObservableProperty<string> ComponentPropertiesHeader { get; } = new ObservableProperty<string>("Свойства компонента");
+
         // Doc tree
         public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
         // Context menu
@@ -87,6 +92,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsSaveAsEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsExportExcelEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsExportPdfEnabled { get; } = new ObservableProperty<bool>(false);
+                
 
         // Drag / drop
         public DragDropFile DragDropFile { get; } = new DragDropFile();
@@ -896,6 +902,7 @@ namespace GostDOC.ViewModels
             IsBillTableVisible.Value = _docType == DocType.Bill && isGroup;
             // Is D27 visible
             IsD27TableVisible.Value = _docType == DocType.D27;
+                       
 
             if (isGroup)
             {

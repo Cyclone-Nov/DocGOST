@@ -203,8 +203,8 @@ namespace GostDOC.PDF
                 string GetCellString(string columnName) =>
                     (row[columnName] == DBNull.Value) ? string.Empty : ((BasePreparer.FormattedString)row[columnName]).Value;
 
-                BasePreparer.FormattedString GetCellStringFormatted(string columnName) =>
-                    (row[columnName] == DBNull.Value) ? null : ((BasePreparer.FormattedString) row[columnName]);
+                //BasePreparer.FormattedString GetCellStringFormatted(string columnName) =>
+                //    (row[columnName] == DBNull.Value) ? null : ((BasePreparer.FormattedString) row[columnName]);
                                     
                 string name               = GetCellString(Constants.ColumnName).Truncate(35);
                 string productCode        = GetCellString(Constants.ColumnProductCode).Truncate(24);

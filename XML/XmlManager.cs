@@ -735,13 +735,13 @@ namespace GostDOC.Models
             aGroup.Name = aNewName;
             aGroups.Add(aNewName, aGroup);
 
-            if (_docType == DocType.ItemsList)
-            {
-                foreach (var cmp in aGroup.Components)
-                {
-                    cmp.Properties[Constants.SubGroupNameSp] = aGroup.Name;
-                }
-            }
+            //if (_docType == DocType.ItemsList)
+            //{
+            //    foreach (var cmp in aGroup.Components)
+            //    {
+            //        cmp.Properties[Constants.SubGroupNameSp] = aGroup.Name;
+            //    }
+            //}
         }
 
         private void UpdateGroupNames(IDictionary<string, Group> aGroups, Group aGroup) 

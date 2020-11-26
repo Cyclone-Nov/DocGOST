@@ -86,7 +86,7 @@
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>
 
-            <TreeView x:Name="myTreeView" Margin="5" ItemsSource="{Binding DocNodes}" 
+            <TreeView x:Name="myTreeView" Margin="5" ItemsSource="{Binding DocNodes}"
                       dd:DragDrop.IsDragSource="True"
                       dd:DragDrop.IsDropTarget="True"
                       dd:DragDrop.DropHandler="{Binding DragDropFile}">

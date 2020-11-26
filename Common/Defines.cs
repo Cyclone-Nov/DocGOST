@@ -81,7 +81,46 @@ namespace GostDOC.Common
         FileFormatError,
         Fail
     }
-   
+
+    /// <summary>
+    /// Типы НДС
+    /// </summary>
+    public enum TaxTypes
+    {
+        /// <summary>
+        /// Без НДС
+        /// </summary>
+        Tax0,
+        /// <summary>
+        /// НДС 10%
+        /// </summary>
+        Tax10,
+        /// <summary>
+        /// НДС 20%
+        /// </summary>
+        Tax20
+    }
+
+    /// <summary>
+    /// Типы приемки
+    /// </summary>
+    public enum AcceptanceTypes
+    {
+        /// <summary>
+        /// Без приемки
+        /// </summary>
+        No,
+        /// <summary>
+        /// Приемка ОТК
+        /// </summary>
+        TCD,
+        /// <summary>
+        /// Преимка ВП
+        /// </summary>
+        MA
+    }
+
+
     public static class Converters
     {
         /// <summary>
@@ -144,6 +183,17 @@ namespace GostDOC.Common
             }
 
             return new Tuple<string, int>(val, dig);
+        }
+
+        public static float GetPriceWithTax(float aPurePrice, TaxTypes aTax)
+        {
+            if (aTax == TaxTypes.Tax10)
+                return aPurePrice * 1.1f;
+
+            if (aTax == TaxTypes.Tax20)
+                return aPurePrice * 1.2f;
+
+            return aPurePrice;
         }
 
     }
