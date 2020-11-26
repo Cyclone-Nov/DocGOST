@@ -209,7 +209,7 @@ namespace GostDOC.PDF
             var regTable = CreateRegisterTable();
             regTable.SetFixedPosition(
                 DATA_TABLE_LEFT,
-                PdfDefines.A4Height - (GetTableHeight(regTable, 1) + TOP_MARGIN) /*+ 5.51f*/,
+                PdfDefines.A4Height - (GetTableHeight(regTable, 1) + TOP_MARGIN) + 1.9f,
                 TITLE_BLOCK_WIDTH - 0.02f);
             aInPdfDoc.Add(regTable);
 
@@ -277,7 +277,7 @@ namespace GostDOC.PDF
             tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("анну-\nлированных")));
 
 
-            for (int i = 0; i < (RowNumberOnNextPage-6) * 10; ++i) {
+            for (int i = 0; i < (RowNumberOnNextPage-3) * 10; ++i) {
                 tbl.AddCell(new Cell().SetHeight(8*mmH()).SetPadding(0).SetBorderLeft(THICK_BORDER)).SetBorderRight(THICK_BORDER);
             }
             for (int i = 0; i < 10; ++i) {

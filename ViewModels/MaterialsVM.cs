@@ -14,12 +14,12 @@ namespace GostDOC.ViewModels
     class MaterialsVM
     {
         private MaterialTypes _materials = DocManager.Instance.MaterialTypes;
-        private MaterialNode _selectedItem = null;
 
         public ObservableCollection<MaterialNode> MaterialNodes { get; } = new ObservableCollection<MaterialNode>();
         public ObservableProperty<bool> IsAddMaterialEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsRemoveEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsEditEnabled { get; } = new ObservableProperty<bool>(false);
+        public ObservableProperty<MaterialNode> SelectedItem { get; } = new ObservableProperty<MaterialNode>();
 
         public ICommand TreeViewSelectionChangedCmd => new Command<MaterialNode>(TreeViewSelectionChanged);
         public ICommand AddGroupCmd => new Command(AddGroup);
@@ -27,6 +27,7 @@ namespace GostDOC.ViewModels
         public ICommand EditCmd => new Command(Edit, IsEditEnabled);
         public ICommand RemoveCmd => new Command(Remove, IsRemoveEnabled);
         public ICommand ClosingCmd => new Command(Closing);
+        public ICommand LoadedCmd => new Command(Loaded);
 
         public MaterialsVM()
         {
@@ -35,7 +36,7 @@ namespace GostDOC.ViewModels
                 MaterialNode node = new MaterialNode(kvp.Key) { Nodes = new ObservableCollection<MaterialNode>() };
                 AddNode(node, kvp.Value);
                 MaterialNodes.InsertSorted(node);
-            }
+            }            
         }
 
         private void AddNode(MaterialNode aNode, MaterialGroup aGroup)
@@ -59,47 +60,47 @@ namespace GostDOC.ViewModels
 
         private void AddGroup(object obj)
         {
-            if (_selectedItem == null)
+            if (SelectedItem == null)
             {
                 return;
             }
 
             var group = CommonDialogs.GetGroupName();
-            if (!string.IsNullOrEmpty(group) && _materials.AddSubGroup(_selectedItem.Name.Value, group))
+            if (!string.IsNullOrEmpty(group) && _materials.AddSubGroup(SelectedItem.Value.Name.Value, group))
             {
                 // Create new group node
-                var node = new MaterialNode(group) { Parent = _selectedItem, Nodes = new ObservableCollection<MaterialNode>() };
+                var node = new MaterialNode(group) { Parent = SelectedItem.Value, Nodes = new ObservableCollection<MaterialNode>() };
                 // Add new group to collection
-                _selectedItem.Nodes.InsertSorted(node);
+                SelectedItem.Value.Nodes.InsertSorted(node);
             }
         }
 
         private Tuple<string, string> GetMaterialGroups()
         {
-            if (_selectedItem.Parent?.Parent != null)
+            if (SelectedItem.Value.Parent?.Parent != null)
             {
-                return new Tuple<string, string>(_selectedItem.Parent.Parent.Name.Value, _selectedItem.Parent.Name.Value);
+                return new Tuple<string, string>(SelectedItem.Value.Parent.Parent.Name.Value, SelectedItem.Value.Parent.Name.Value);
             }
             else 
             {
-                return new Tuple<string, string>(_selectedItem.Parent.Name.Value, null);
+                return new Tuple<string, string>(SelectedItem.Value.Parent.Name.Value, null);
             }
         }
         private Tuple<string, string> GetGroups()
         {
-            if (_selectedItem.Parent != null)
+            if (SelectedItem.Value.Parent != null)
             {
-                return new Tuple<string, string>(_selectedItem.Parent.Name.Value, _selectedItem.Name.Value);
+                return new Tuple<string, string>(SelectedItem.Value.Parent.Name.Value, SelectedItem.Value.Name.Value);
             }
             else
             {
-                return new Tuple<string, string>(_selectedItem.Name.Value, null);
+                return new Tuple<string, string>(SelectedItem.Value.Name.Value, null);
             }
         }
 
         private void AddMaterial(object obj)
         {
-            if (_selectedItem == null)
+            if (SelectedItem == null)
             {
                 return;
             }
@@ -110,28 +111,28 @@ namespace GostDOC.ViewModels
                 var groups = GetGroups();                
                 if (_materials.AddMaterial(groups.Item1, groups.Item2, material))
                 {
-                    _selectedItem.Nodes.InsertSorted(new MaterialNode(material.Name, MaterialNodeType.Component) { Parent = _selectedItem });
+                    SelectedItem.Value.Nodes.InsertSorted(new MaterialNode(material.Name, MaterialNodeType.Component) { Parent = SelectedItem.Value });
                 }
             }
         }
 
         private void Edit(object obj)
         {
-            if (_selectedItem == null)
+            if (SelectedItem == null)
             {
                 return;
             }
 
-            if (_selectedItem.Type == MaterialNodeType.Group)
+            if (SelectedItem.Value.Type == MaterialNodeType.Group)
             {
-                if (_selectedItem.Parent != null)
+                if (SelectedItem.Value.Parent != null)
                 {
-                    var group = CommonDialogs.EditGroupName(_selectedItem.Name.Value);
-                    if (!string.IsNullOrEmpty(group) && group != _selectedItem.Name.Value)
+                    var group = CommonDialogs.EditGroupName(SelectedItem.Value.Name.Value);
+                    if (!string.IsNullOrEmpty(group) && group != SelectedItem.Value.Name.Value)
                     {
-                        if (_materials.EditSubGroup(_selectedItem.Parent.Name.Value, _selectedItem.Name.Value, group))
+                        if (_materials.EditSubGroup(SelectedItem.Value.Parent.Name.Value, SelectedItem.Value.Name.Value, group))
                         {
-                            _selectedItem.Name.Value = group;
+                            SelectedItem.Value.Name.Value = group;
                         }
                     }
                 }
@@ -139,7 +140,7 @@ namespace GostDOC.ViewModels
             else
             {
                 var groups = GetMaterialGroups();
-                var src = _materials.GetMaterial(groups.Item1, groups.Item2, _selectedItem.Name.Value);
+                var src = _materials.GetMaterial(groups.Item1, groups.Item2, SelectedItem.Value.Name.Value);
                 if (src != null)
                 {
                     var material = CommonDialogs.UpdateMaterial(src);
@@ -149,7 +150,7 @@ namespace GostDOC.ViewModels
                         {
                             if (_materials.AddMaterial(groups.Item1, groups.Item2, material))
                             {
-                                _selectedItem.Name.Value = material.Name;
+                                SelectedItem.Value.Name.Value = material.Name;
                             }
                         }
                     }
@@ -159,43 +160,48 @@ namespace GostDOC.ViewModels
 
         private void Remove(object obj)
         {
-            if (_selectedItem == null)
+            if (SelectedItem == null)
             {
                 return;
             }
 
-            if (_selectedItem.Type == MaterialNodeType.Group)
+            if (SelectedItem.Value.Type == MaterialNodeType.Group)
             {
-                if (_selectedItem.Parent != null)
+                if (SelectedItem.Value.Parent != null)
                 {
-                    _materials.RemoveSubGroup(_selectedItem.Parent.Name.Value, _selectedItem.Name.Value);
-                    _selectedItem.Parent.Nodes.Remove(_selectedItem);
+                    _materials.RemoveSubGroup(SelectedItem.Value.Parent.Name.Value, SelectedItem.Value.Name.Value);
+                    SelectedItem.Value.Parent.Nodes.Remove(SelectedItem.Value);
                 }
             }
             else
             {
                 var groups = GetMaterialGroups();
-                var src = _materials.GetMaterial(groups.Item1, groups.Item2, _selectedItem.Name.Value);
+                var src = _materials.GetMaterial(groups.Item1, groups.Item2, SelectedItem.Value.Name.Value);
                 if (src != null)
                 {
-                    _materials.RemoveMaterial(groups.Item1, groups.Item2, _selectedItem.Name.Value);
-                    _selectedItem.Parent.Nodes.Remove(_selectedItem);
+                    _materials.RemoveMaterial(groups.Item1, groups.Item2, SelectedItem.Value.Name.Value);
+                    SelectedItem.Value.Parent.Nodes.Remove(SelectedItem.Value);
                 }
             }
         }
 
         private void TreeViewSelectionChanged(MaterialNode aItem)
         {
-            _selectedItem = aItem;
+            SelectedItem.Value = aItem;
 
-            IsAddMaterialEnabled.Value = _selectedItem?.Type == MaterialNodeType.Group;
-            IsRemoveEnabled.Value = _selectedItem?.Parent != null;
-            IsEditEnabled.Value = _selectedItem?.Parent != null;
+            IsAddMaterialEnabled.Value = SelectedItem.Value?.Type == MaterialNodeType.Group;
+            IsRemoveEnabled.Value = SelectedItem.Value?.Parent != null;
+            IsEditEnabled.Value = SelectedItem.Value?.Parent != null;
         }
 
         private void Closing(object obj)
         {
             _materials.Save();
+        }
+
+        private void Loaded(object obj)
+        {
+            SelectedItem.Value = MaterialNodes.FirstOrDefault();
         }
     }
 }

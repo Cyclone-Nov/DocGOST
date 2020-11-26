@@ -28,7 +28,7 @@ namespace GostDOC.Models
                 if (string.IsNullOrEmpty(line))
                     continue;
 
-                string[] split = line.Split(new char[] { '\t' });
+                string[] split = line.Split(new char[] { '/' });
 
                 if (split.Length == 1)
                 {

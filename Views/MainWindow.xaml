@@ -6,6 +6,7 @@
         xmlns:common="clr-namespace:GostDOC.Common"
         xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
         xmlns:converters="clr-namespace:GostDOC.Converters"
+        xmlns:behaviours="clr-namespace:GostDOC.Behaviours"
         xmlns:uc="clr-namespace:GostDOC.UserControls"
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
@@ -76,6 +77,7 @@
                 <MenuItem Header="Отменить" InputGestureText="Ctrl+Z" Command="{Binding UndoCmd}" IsEnabled="{Binding IsUndoEnabled.Value}" />
                 <MenuItem Header="Вернуть" InputGestureText="Ctrl+Y" Command="{Binding RedoCmd}" IsEnabled="{Binding IsRedoEnabled.Value}" />
             </MenuItem>
+            <MenuItem Header="Лог" Command="{Binding ShowLogCmd}"/>
         </Menu>
 
         <Grid Grid.Row="1">
@@ -93,6 +95,9 @@
                         <i:InvokeCommandAction Command="{Binding TreeViewSelectionChangedCmd}" CommandParameter="{Binding ElementName=myTreeView, Path=SelectedItem}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
+                <i:Interaction.Behaviors>
+                    <behaviours:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem.Value, Mode=TwoWay}" />
+                </i:Interaction.Behaviors>
                 <TreeView.ItemTemplate>
                     <!-- <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes, Converter={StaticResource sortConverter}, ConverterParameter=Name}"> -->
                     <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes}">

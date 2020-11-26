@@ -29,10 +29,10 @@ namespace GostDOC.ViewModels
         private Node _specification = new Node() { Name = "Спецификация", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
         private Node _bill = new Node() { Name = "Ведомость покупных изделий", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
         private Node _bill_D27 = new Node() { Name = "Ведомость комплектации", NodeType = NodeType.Root, Nodes = new ObservableCollection<Node>() };
+        private Node _selectedItem = null;
 
         private DocType _docType = DocType.None;
 
-        private Node _selectedItem = null;
         private string _filePath = null;
         private bool _shouldSave = false;
 
@@ -52,9 +52,11 @@ namespace GostDOC.ViewModels
         private ErrorHandler _loadError = ErrorHandler.Instance;
         private List<string> _loadErrors = new List<string>();
 
-        private Progress _progress = null;
+        private Progress _progress;
+        private LogView _logView = null;
 
         public ObservableProperty<string> Title { get; } = new ObservableProperty<string>();
+        public ObservableProperty<Node> SelectedItem { get; } = new ObservableProperty<Node>();
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsD27TableVisible { get; } = new ObservableProperty<bool>(false);
@@ -125,6 +127,7 @@ namespace GostDOC.ViewModels
         public ICommand CopyCellCmd => new Command<DataGridCellInfo>(CopyCell);
         public ICommand PasteCellCmd => new Command<DataGridCellInfo>(PasteCell);
         public ICommand AutoSortCheckedCmd => new Command<bool>(AutoSortChecked);
+        public ICommand ShowLogCmd => new Command(ShowLog);
 
         public string WindowTitle
         {
@@ -507,18 +510,27 @@ namespace GostDOC.ViewModels
             {
                 return;
             }
+
+            Node newGroup = null;
+
             // Add group or subgroup
             if (_selectedItem.NodeType == NodeType.Configuration)
             {
                 _project.AddGroup(_selectedItem.Name, _docType, new SubGroupInfo(name, null));
+                newGroup = new Node() { Name = name, NodeType = NodeType.Group, Parent = _selectedItem, Nodes = new ObservableCollection<Node>() };
             }
             else if (_selectedItem.NodeType == NodeType.Group)
             {
                 _project.AddGroup(_selectedItem.Parent.Name, _docType, new SubGroupInfo(_selectedItem.Name, name));
+                newGroup = new Node() { Name = name, NodeType = NodeType.SubGroup, Parent = _selectedItem, Nodes = new ObservableCollection<Node>() };
             }
-            
-            // Update view
-            UpdateGroups();
+
+            if (newGroup != null)
+            {
+                SelectedItem.Value.Nodes.Add(newGroup);
+                SelectedItem.Value = newGroup;
+            }
+
             // Should save
             _shouldSave = true;
         }
@@ -561,10 +573,12 @@ namespace GostDOC.ViewModels
             if (!string.IsNullOrEmpty(name) && groupInfo != null)
             {
                 _project.RemoveGroup(name, _docType, groupInfo, removeComponents);
+
+                var groupToRemove = _selectedItem;
+                SelectedItem.Value = _selectedItem.Parent;
+                SelectedItem.Value.Nodes.Remove(groupToRemove);
             }
 
-            // Update view
-            UpdateGroups();
             // Should save
             _shouldSave = true;
         }
@@ -667,14 +681,16 @@ namespace GostDOC.ViewModels
                     // Find material
                     var groups = GetGroups(obj);
                     material = _materials.GetMaterial(groups.Item1, groups.Item2, obj.Name);
-                    if (material != null)
-                    {
-                        ComponentVM cmp = new ComponentVM();
-                        cmp.Name.Value = material.Name;
-                        cmp.Note.Value = material.Note;
-                        cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
-                        Components.Add(cmp);
-                    }
+                }
+
+                // Add material to components
+                if (material != null)
+                {
+                    ComponentVM cmp = new ComponentVM();
+                    cmp.Name.Value = material.Name;
+                    cmp.Note.Value = material.Note;
+                    cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
+                    Components.Add(cmp);
                 }
             }
         }
@@ -752,6 +768,15 @@ namespace GostDOC.ViewModels
             if (aChecked)
             {
                 SaveComponents();
+            }
+        }
+
+        private void ShowLog(object obj)
+        {
+            if (_logView == null || _logView.IsClosed)
+            {
+                _logView = new LogView();
+                _logView.Show();
             }
         }
 
@@ -1017,7 +1042,7 @@ namespace GostDOC.ViewModels
             IsUndoEnabled.Value = undoRedoStack.IsUndoEnabled;
             IsRedoEnabled.Value = undoRedoStack.IsRedoEnabled;
 
-            _shouldSave = undoRedoStack.IsUndoEnabled || undoRedoStack.IsRedoEnabled;
+            _shouldSave = _shouldSave || undoRedoStack.IsUndoEnabled || undoRedoStack.IsRedoEnabled;
         }
 
         private void UpdateData()
