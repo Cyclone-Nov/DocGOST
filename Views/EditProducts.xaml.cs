@@ -15,19 +15,13 @@ using System.Windows.Shapes;
 namespace GostDOC.Views
 {
     /// <summary>
-    /// Interaction logic for NewMaterial.xaml
+    /// Interaction logic for EditProducts.xaml
     /// </summary>
-    public partial class NewMaterial : Window
+    public partial class EditProducts : Window
     {
-        public NewMaterial()
+        public EditProducts()
         {
             InitializeComponent();
-        }
-
-        private void OkButton_Click(object sender, RoutedEventArgs e)
-        {
-            DialogResult = true;
-            this.Close();
         }
     }
 }

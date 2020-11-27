@@ -188,6 +188,7 @@
     <Compile Include="DataPreparation\ElementListDataPreparer.cs" />
     <Compile Include="DataPreparation\EquipmentBillDataPreparer.cs" />
     <Compile Include="DataPreparation\SpecificationDataPreparer.cs" />
+    <Compile Include="Dictionaries\ProductTypes.cs" />
     <Compile Include="Events\TEventArgs.cs" />
     <Compile Include="ExcelExport\ExcelStructuresD27.cs" />
     <Compile Include="ExcelExport\ExcelExportFactory.cs" />
@@ -200,12 +201,13 @@
     <Compile Include="Models\CombineProperties.cs" />
     <Compile Include="DataPreparation\PrepareManager.cs" />
     <Compile Include="Models\DeliveryInterval.cs" />
+    <Compile Include="Dictionaries\DocumentTypes.cs" />
     <Compile Include="Models\DocumentTypes.cs" />
     <Compile Include="ExcelExport\ExcelManager.cs" />
     <Compile Include="Models\ErrorHandler.cs" />
     <Compile Include="Models\GroupData.cs" />
     <Compile Include="Models\GroupNames.cs" />
-    <Compile Include="Models\MaterialNode.cs" />
+    <Compile Include="Dictionaries\DictionaryNode.cs" />
     <Compile Include="Models\MenuNode.cs" />
     <Compile Include="Models\MoveInfo.cs" />
     <Compile Include="Models\ProjectWrapper.cs" />
@@ -232,7 +234,7 @@
     <Compile Include="ViewModels\ComponentDataVM.cs" />
     <Compile Include="ViewModels\ComponentEntryVM.cs" />
     <Compile Include="ViewModels\LoadErrorsVM.cs" />
-    <Compile Include="ViewModels\MaterialsVM.cs" />
+    <Compile Include="ViewModels\ProductTypesVM.cs" />
     <Compile Include="ViewModels\NewFileVM.cs" />
     <Compile Include="ViewModels\ComponentSupplierProfileVM.cs" />
     <Compile Include="ViewModels\ProductSupplierProfileVM.cs" />
@@ -240,8 +242,8 @@
     <Compile Include="ViewModels\SupplierVM.cs" />
     <Compile Include="ViewModels\WarehouseAcceptanceVM.cs" />
     <Compile Include="ViewModels\WarehouseDeliveryVM.cs" />
-    <Compile Include="Views\EditMaterials.xaml.cs">
-      <DependentUpon>EditMaterials.xaml</DependentUpon>
+    <Compile Include="Views\EditProducts.xaml.cs">
+      <DependentUpon>EditProducts.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\LoadErrors.xaml.cs">
       <DependentUpon>LoadErrors.xaml</DependentUpon>
@@ -252,9 +254,8 @@
     <Compile Include="Views\NewFile.xaml.cs">
       <DependentUpon>NewFile.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\MaterialTypes.cs" />
-    <Compile Include="Views\NewMaterial.xaml.cs">
-      <DependentUpon>NewMaterial.xaml</DependentUpon>
+    <Compile Include="Views\NewProduct.xaml.cs">
+      <DependentUpon>NewProduct.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Progress.xaml.cs">
       <DependentUpon>Progress.xaml</DependentUpon>
@@ -307,7 +308,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\EditMaterials.xaml">
+    <Page Include="Views\EditProducts.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -350,7 +351,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\NewMaterial.xaml">
+    <Page Include="Views\NewProduct.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
