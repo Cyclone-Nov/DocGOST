@@ -168,6 +168,10 @@ namespace GostDOC.Models
                 {
                     return cfg.Bill;
                 }
+                else if (aDocType == DocType.D27)
+                {                    
+                    return new Dictionary<string, Group>() { { "", cfg.D27 } };
+                }
             }
             return null;
         }

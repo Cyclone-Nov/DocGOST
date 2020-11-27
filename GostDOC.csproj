@@ -176,6 +176,11 @@
     <Compile Include="Common\HttpStreamToBrowser.cs" />
     <Compile Include="Common\WebBrowserUtility.cs" />
     <Compile Include="Common\XmlSerializerHelper.cs" />
+    <Compile Include="Converters\DeliveryIntervalConverter.cs" />
+    <Compile Include="Converters\EnumDescriptionConverter.cs" />
+    <Compile Include="Converters\EnumToItemsSource.cs" />
+    <Compile Include="Converters\FloatToStringConverter.cs" />
+    <Compile Include="Converters\IntToStringConverter.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\TreeViewSortConverter.cs" />
     <Compile Include="DataPreparation\BasePreparer.cs" />
@@ -194,6 +199,7 @@
     <Compile Include="Interfaces\IMemento.cs" />
     <Compile Include="Models\CombineProperties.cs" />
     <Compile Include="DataPreparation\PrepareManager.cs" />
+    <Compile Include="Models\DeliveryInterval.cs" />
     <Compile Include="Models\DocumentTypes.cs" />
     <Compile Include="ExcelExport\ExcelManager.cs" />
     <Compile Include="Models\ErrorHandler.cs" />
@@ -214,8 +220,11 @@
     <Compile Include="PDF\PdfSpecificationCreator.cs" />
     <Compile Include="PDF\PdfUtils.cs" />
     <Compile Include="UI\DragDropFile.cs" />
-    <Compile Include="UserControls\D27Control.xaml.cs">
-      <DependentUpon>D27Control.xaml</DependentUpon>
+    <Compile Include="UserControls\D27ProfileControl.xaml.cs">
+      <DependentUpon>D27ProfileControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\D27TableControl.xaml.cs">
+      <DependentUpon>D27TableControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\NameValueControl.xaml.cs">
       <DependentUpon>NameValueControl.xaml</DependentUpon>
@@ -225,7 +234,8 @@
     <Compile Include="ViewModels\LoadErrorsVM.cs" />
     <Compile Include="ViewModels\MaterialsVM.cs" />
     <Compile Include="ViewModels\NewFileVM.cs" />
-    <Compile Include="ViewModels\SupplierDepartmentProfileVM.cs" />
+    <Compile Include="ViewModels\ComponentSupplierProfileVM.cs" />
+    <Compile Include="ViewModels\ProductSupplierProfileVM.cs" />
     <Compile Include="ViewModels\SupplierPropertiesVM.cs" />
     <Compile Include="ViewModels\SupplierVM.cs" />
     <Compile Include="ViewModels\WarehouseAcceptanceVM.cs" />
@@ -281,7 +291,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControls\D27Control.xaml">
+    <Page Include="UserControls\D27ProfileControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\D27TableControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

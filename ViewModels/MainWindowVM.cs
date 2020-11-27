@@ -60,17 +60,21 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsBillTableVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsD27TableVisible { get; } = new ObservableProperty<bool>(false);
+
+        public ObservableProperty<bool> IsD27ProfileVisible { get; } = new ObservableProperty<bool>(false);        
         public ObservableProperty<ComponentVM> ComponentsSelectedItem { get; } = new ObservableProperty<ComponentVM>();
         public ObservableCollection<ComponentVM> Components { get; } = new ObservableCollection<ComponentVM>();
         // Graphs
         public ObservableProperty<bool> IsGeneralGraphValuesVisible { get; } = new ObservableProperty<bool>(false);
         public ObservableCollection<GraphValueVM> GeneralGraphValues { get; } = new ObservableCollection<GraphValueVM>();
 
-        public SupplierDepartmentProfileVM ComponentSupplierProfile { get; set; } = new SupplierDepartmentProfileVM();
+        public ComponentSupplierProfileVM ComponentSupplierProfile { get; set; } = new ComponentSupplierProfileVM();
 
-        private ObservableCollection<SupplierDepartmentProfileVM> ComponentsSupplierProfiles { get; } = new ObservableCollection<SupplierDepartmentProfileVM>();
+        public ProductSupplierProfileVM ProductSupplierProfile { get; set; } = new ProductSupplierProfileVM();
 
-        public ObservableProperty<string> ComponentPropertiesHeader { get; } = new ObservableProperty<string>("Свойства компонента");
+        private ObservableCollection<ComponentSupplierProfileVM> ComponentsSupplierProfiles { get; } = new ObservableCollection<ComponentSupplierProfileVM>();
+
+        public ObservableProperty<string> ComponentPropertiesHeader { get; } = new ObservableProperty<string>();
 
         // Doc tree
         public ObservableCollection<Node> DocNodes { get; } = new ObservableCollection<Node>();
@@ -144,18 +148,24 @@ namespace GostDOC.ViewModels
         {
             get
             {
-                if (_selectedItem?.NodeType == NodeType.Configuration)
+                var item = _selectedItem;
+                if (_selectedItem?.NodeType == NodeType.Component)
                 {
-                    return _selectedItem.Name;
+                    item = _selectedItem.Parent;
                 }
-                if (_selectedItem?.NodeType == NodeType.Group)
+                if (item?.NodeType == NodeType.Configuration)
                 {
-                    return _selectedItem.Parent.Name;
+                    return item.Name;
                 }
-                if (_selectedItem?.NodeType == NodeType.SubGroup)
+                if (item?.NodeType == NodeType.Group)
                 {
-                    return _selectedItem.Parent.Parent.Name;
+                    return item.Parent.Name;
                 }
+                if (item?.NodeType == NodeType.SubGroup)
+                {
+                    return item.Parent.Parent.Name;
+                }
+                
                 return string.Empty;
             }
         }
@@ -899,9 +909,27 @@ namespace GostDOC.ViewModels
             IsSpecificationTableVisible.Value = _docType == DocType.Specification && isGroup;
             // Is bill table visible
             IsBillTableVisible.Value = _docType == DocType.Bill && isGroup;
-            // Is D27 visible
-            IsD27TableVisible.Value = _docType == DocType.D27;
-                       
+            
+            if (_docType == DocType.D27)
+            {
+                if (_selectedItem.NodeType == NodeType.Component)
+                {
+                    // Is D27 visible                    
+                    IsD27ProfileVisible.Value = false;
+                    IsD27TableVisible.Value = true;
+                    UpdateComponentSuppliersProfile(SelectedItem.Value.Name);
+                } else
+                {                    
+                    IsD27TableVisible.Value = false;
+                    IsD27ProfileVisible.Value = true;
+                    UpdateProductSupplierProfile();
+                }
+            }  
+            else
+            {
+                IsD27TableVisible.Value = false;
+                IsD27ProfileVisible.Value = false;
+            }
 
             if (isGroup)
             {
@@ -1177,6 +1205,44 @@ namespace GostDOC.ViewModels
                     _progress = null;
                 }
             }); 
+        }
+
+        private void UpdateComponentSuppliersProfile(string aComponentName)
+        {            
+            var groupData = GetGroupData();            
+            var components = groupData?.Components.Where(cmp => string.Equals(cmp.GetProperty(Constants.ComponentName), aComponentName));
+            string doc = string.Empty;
+            if (components?.Count() > 0)
+            {
+                var component = components.First();
+                doc = component.GetProperty(Constants.ComponentDoc);
+                if (string.Equals(aComponentName, doc))
+                    doc = string.Empty;
+                FillComponentSupplierProfile(component);
+            }
+            ComponentPropertiesHeader.Value = $"Свойства компонента {aComponentName} {doc}";
+            
+        }
+
+        private void UpdateProductSupplierProfile()
+        {
+            ProductSupplierProfile.Quantity.Value = 2;
+            ProductSupplierProfile.Note.Value = "Какое-то описание";
+        }
+
+        private void FillComponentSupplierProfile(Component aComponent)
+        {
+
+            var manufacturer = aComponent.GetProperty(Constants.ComponentSupplier);
+            var quantity = aComponent.Count;// .GetProperty(Constants.ComponentSupplier);
+            var quantity2 = aComponent.GetProperty(Constants.ComponentCount);
+            var allQuantity = quantity* ProductSupplierProfile.Quantity.Value;
+
+            ComponentSupplierProfile.Properties.Manufacturer.Value = manufacturer;
+            ComponentSupplierProfile.Properties.Quantity.Value = (int)quantity;
+            ComponentSupplierProfile.Properties.AllQuantity.Value = (int)allQuantity;
+
+            //ComponentSupplierProfile.ComponentsEntry
         }
     }
 }

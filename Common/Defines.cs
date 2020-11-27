@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -90,14 +91,17 @@ namespace GostDOC.Common
         /// <summary>
         /// Без НДС
         /// </summary>
+        [Description("Нет")]
         Tax0,
         /// <summary>
         /// НДС 10%
         /// </summary>
+        [Description("10%")]
         Tax10,
         /// <summary>
         /// НДС 20%
         /// </summary>
+        [Description("20%")]
         Tax20
     }
 
@@ -109,14 +113,17 @@ namespace GostDOC.Common
         /// <summary>
         /// Без приемки
         /// </summary>
+        [Description("Нет")]
         No,
         /// <summary>
         /// Приемка ОТК
         /// </summary>
+        [Description("ОТК")]
         TCD,
         /// <summary>
         /// Преимка ВП
         /// </summary>
+        [Description("ВП")]
         MA
     }
 

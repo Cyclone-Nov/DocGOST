@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using GostDOC.Common;
+using GostDOC.Models;
 
 namespace GostDOC.ViewModels
 {
-    class SupplierDepartmentProfileVM
+    class ComponentSupplierProfileVM
     {
         /// <summary>
         /// Gets the supplier properties.
@@ -51,10 +52,10 @@ namespace GostDOC.ViewModels
         public ObservableCollection<ComponentEntryVM> ComponentsEntry { get; } = new ObservableCollection<ComponentEntryVM>();
 
 
-        public SupplierDepartmentProfileVM()
+        public ComponentSupplierProfileVM()
         {
-            Suppliers.Add(new SupplierVM("дядя вася", 50, 1000.0f, TaxTypes.Tax20));
-            Suppliers.Add(new SupplierVM("рога и копыта", 50, 999.0f, TaxTypes.Tax20));
+            Suppliers.Add(new SupplierVM("дядя вася", 50, 1000.0f, TaxTypes.Tax20, AcceptanceTypes.TCD, new DeliveryInterval() { DeliveryTimeMin = 2, DeliveryTimeMax = 4},"О", "примечание"));
+            Suppliers.Add(new SupplierVM("рога и копыта", 50, 999.0f, TaxTypes.Tax20, AcceptanceTypes.MA, new DeliveryInterval() { DeliveryTimeMin = 6, DeliveryTimeMax = 8 }, "Н", "примечание"));
 
             WarehouseAcceptances.Add(new WarehouseAcceptanceVM("11.12.2020", 50));
             WarehouseAcceptances.Add(new WarehouseAcceptanceVM("21.12.2020", 40));
