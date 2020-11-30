@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Common;
+using GostDOC.Models;
 
 namespace GostDOC.ViewModels
 {
@@ -49,14 +50,49 @@ namespace GostDOC.ViewModels
         /// </value>
         public ObservableProperty<float> PriceWithTax { get; set; } = new ObservableProperty<float>(0);
 
-        public SupplierVM(string aName, int aQuantity, float aPrice, TaxTypes aTax)
+        /// <summary>
+        /// категория приемки изделия
+        /// </summary>
+        /// <value>
+        /// The type of the acceptance.
+        /// </value>
+        public ObservableProperty<AcceptanceTypes> AcceptanceType { get; } = new ObservableProperty<AcceptanceTypes>(AcceptanceTypes.No);
+
+        /// <summary>
+        /// Интервал поставки в неделях
+        /// </summary>
+        /// <value>
+        /// The price with tax.
+        /// </value>
+        public ObservableProperty<DeliveryInterval> Delivery { get; set; } = new ObservableProperty<DeliveryInterval>();
+
+        /// <summary>
+        /// норма упаковки
+        /// </summary>
+        /// <value>
+        /// The supplier.
+        /// </value>
+        public ObservableProperty<string> Packing { get; set; } = new ObservableProperty<string>();
+
+        /// <summary>
+        /// примечание
+        /// </summary>
+        /// <value>
+        /// The supplier.
+        /// </value>
+        public ObservableProperty<string> Note { get; set; } = new ObservableProperty<string>();
+
+        public SupplierVM(string aName, int aQuantity, float aPrice, TaxTypes aTax, AcceptanceTypes aAcceptance, DeliveryInterval aDelivery, string aPacking, string aNote = "")
         {
             Name.Value = aName;
             Quantity.Value = aQuantity;
             Price.Value = aPrice;
             TaxType.Value = aTax;
             PriceWithTax.Value = Common.Converters.GetPriceWithTax(aPrice, aTax);
-
+            AcceptanceType.Value = aAcceptance;
+            Delivery.Value = aDelivery;
+            Packing.Value = aPacking;
+            Note.Value = aNote;
         }
     }
 }

@@ -196,36 +196,36 @@ internal class ElementListDataPreparer : BasePreparer {
             string change_name = $"см. табл. {aSchemaDesignation}";
 
             //ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем позиционные обозначения компонентов с совпадающим значением                
-            Dictionary< string/* group*/ , Dictionary<string/* GOST/TY string*/, List<string> /* array indexes */>> StandardDic =
-                FindComponentsWithStandardDoc(aComponentsDic, out var StandardComponentsDic);
+            //Dictionary< string/* group*/ , Dictionary<string/* GOST/TY string*/, List<string> /* array indexes */>> StandardDic =
+            //    FindComponentsWithStandardDoc(aComponentsDic, out var StandardComponentsDic);
 
-            // записываем таблицу данных
-            //DataRow row;
-            string lastGroupName = string.Empty;
-            bool firstGroup = true;
-            List<string> oldGropus = new List<string>();
+            // записываем таблицу данных                        
             var comparer = new DesignatorIDComparer(); 
-            int componentsInSubgroup = 0;
-
             var component_pair_arr = aComponentsDic.OrderBy(key => key.Key, comparer).ToArray();
+
+            var groupNames = MakeGroupNamesDic(component_pair_arr);
+
+            bool addGroupName = true;
+            int countDifferentComponents = 0;
+            bool singleGroupName = true;
             for (int i=0; i < component_pair_arr.Length;)
             {
                 var component = component_pair_arr[i].Value;
                 string key = component_pair_arr[i].Key;
                 string designator = GetDesignator(key, component.Item1, component.Item3);
-                bool canOutputStandardDocs = CanOutputStandardDocs(designator);
-                string component_name = GetComponentName(key, canOutputStandardDocs, StandardComponentsDic, component.Item2);                
-                string subGroupName = component.Item2.GetProperty(Constants.SubGroupNameSp);
-                componentsInSubgroup++;
-                
+                string doc = component.Item2.GetProperty(Constants.ComponentDoc);                
+                string component_name = component.Item2.GetProperty(Constants.ComponentName);                
+
                 bool haveToChangeName = string.Equals(component.Item2.GetProperty(Constants.ComponentPresence), "0") ||
                                                       DifferNameInOtherConfigs(component.Item2, aOtherComponents);
 
                 List<string> component_designators = new List<string> { designator };
+                countDifferentComponents++;
 
                 bool same;
                 int j = i + 1;
                 var component_count = component.Item3;
+                int sameComponents = 1;
                 if (j < component_pair_arr.Length && !haveToChangeName)
                 {
                     do
@@ -233,12 +233,13 @@ internal class ElementListDataPreparer : BasePreparer {
                         var componentNext = component_pair_arr[j].Value;
                         var nextKey = component_pair_arr[j].Key;
                         uint nextCount = componentNext.Item3;
-                        string componentNext_name = GetComponentName(nextKey, canOutputStandardDocs, StandardComponentsDic, componentNext.Item2);
+                        string componentNext_name = componentNext.Item2.GetProperty(Constants.ComponentName);// GetComponentName(nextKey, canOutputStandardDocs, StandardComponentsDic, componentNext.Item2);
 
                         if (string.Equals(component_name, componentNext_name))
                         {
                             same = true;
                             component_count+= nextCount;
+                            sameComponents++;
                             j++;
                             component_designators.Add(GetDesignator(nextKey, componentNext.Item1, nextCount));
                         } else
@@ -247,48 +248,41 @@ internal class ElementListDataPreparer : BasePreparer {
                 }
                 i = j;
 
-                // если у текущего элементы сменилось название группы
-                if (firstGroup || !string.Equals(subGroupName, lastGroupName)) 
-                {                   
-                    // если у следующего элементы название группы, отличное от текущего, то в этой группе 1 элемент
-                    bool nextSubgroupIsDiffer = CheckEqualsNextSubgroup(i - 1, subGroupName, component_pair_arr);                    
-                    if (nextSubgroupIsDiffer)//((componentsInSubgroup == 1) && nextSubgroupIsDiffer)
-                    {
-                        AddEmptyRow(aTable);
-                        if (StandardComponentsDic.ContainsKey(key) && (StandardComponentsDic[key] == 2))
-                            component_name = $"{GetGroupNameByCount(subGroupName, true)} {component_name} {component.Item2.GetProperty(Constants.ComponentDoc)}";
-                        else
-                            component_name = $"{GetGroupNameByCount(subGroupName, true)} {component_name}";
+                // если позиционное обозначение есть в словаре имен групп, то запишем наименование группы еслди оно есть                
+                if (groupNames.ContainsKey(designator)) 
+                {                    
+                    AddEmptyRow(aTable);
 
-                    } else
+                    string groupName = groupNames[designator].Item1;
+                    int count = groupNames[designator].Item2;
+                    if (!string.IsNullOrEmpty(groupName) && (count != sameComponents))
                     {                        
-                        // записываем наименование группы
+                        singleGroupName = true;
+                        addGroupName = false;
+                        AddGroupName(aTable, GetGroupNameByCount(groupName, false));
                         AddEmptyRow(aTable);
-                        AddGroupName(aTable, GetGroupNameByCount(subGroupName, false));
-                        AddEmptyRow(aTable);
-
-                        if (canOutputStandardDocs)
-                        {
-                            if (!oldGropus.Contains(subGroupName))
-                            {
-                                // записываем строки с гост/ту в начале группы, если они есть для данной группы
-                                if (!AddStandardDocsToTable(subGroupName, aTable, aComponentsDic, StandardDic))
-                                {
-                                    //AddEmptyRow(aTable);
-                                }
-                                oldGropus.Add(subGroupName);
-                            }
-                        }
+                    } else
+                    {
+                        singleGroupName = false;
+                        addGroupName = true;
                     }
-                 
-                    componentsInSubgroup = 0;
-                    firstGroup = false;
+                    countDifferentComponents = 0;
                 }
-                lastGroupName = subGroupName;
-
 
                 var designators = MakeComponentDesignatorsString(component_designators);
-                var name = (haveToChangeName) ? change_name : component_name;
+                if (string.Equals(doc, component_name))
+                    doc = string.Empty;
+                string name = string.Empty;
+                if (haveToChangeName)
+                {
+                    name = change_name;
+                }
+                else
+                {
+                    string groupName = component.Item2.GetProperty(Constants.SubGroupNameSp);
+                    name = (addGroupName) ? $"{GetGroupNameByCount(groupName, sameComponents == 1)} {component_name} {doc}" : $"{component_name} {doc}";
+                }
+                
                 var note = component.Item2.GetProperty(Constants.ComponentNote);
                 AddNewRow(aTable, designators, name, component_count, note);
             }
@@ -693,5 +687,60 @@ internal class ElementListDataPreparer : BasePreparer {
             } 
             return aGroupName;
         }
+
+        /// <summary>
+        /// Makes the group names dic.
+        /// </summary>
+        /// <param name="aSortedComponents">a sorted components.</param>
+        /// <returns> dictionary with key = desigantor of first component of group, value = group name </returns>
+        private IDictionary<string, Tuple<string,int>> MakeGroupNamesDic(KeyValuePair<string, Tuple<string, Component, uint>>[] aSortedComponents)
+        {
+            var groupNamesDic = new Dictionary<string, Tuple<string, int>>();
+            if (aSortedComponents.Length > 1)
+            {
+                //string addGroupName = string.Empty;
+                string lastGroupName = aSortedComponents[0].Value.Item2.GetProperty(Constants.SubGroupNameSp);
+                string lastDesignatorType = GetDesignatorType(aSortedComponents[0].Key);
+                string firstDesignator = aSortedComponents[0].Key;
+                int countSubGroupCanges = 0;
+                int countComponents = 0;
+                for (int i = 1; i < aSortedComponents.Length; i++)
+                {
+                    var component = aSortedComponents[i].Value.Item2;
+                    string currDesignatorType = GetDesignatorType(aSortedComponents[i].Key);
+                    string currGroupName = component.GetProperty(Constants.SubGroupNameSp);
+                    countComponents++;
+
+                    // если происходит смена типа позиционного обозначения, то создадим новую группу
+                    if (!string.Equals(lastDesignatorType, currDesignatorType))
+                    {
+                        groupNamesDic.Add(firstDesignator, new Tuple<string, int>(countSubGroupCanges > 0 ? "" : lastGroupName, countComponents));
+                        firstDesignator = aSortedComponents[i].Key;
+                        countSubGroupCanges = 0;
+                        countComponents = 0;
+                        lastGroupName = currGroupName;
+                        lastDesignatorType = currDesignatorType;
+                    }
+
+                    // увеличим количество смен имени группы при одном и том же  типе позиционного обозначения
+                    if (!string.Equals(lastGroupName, currGroupName))
+                    {
+                        countSubGroupCanges++;
+                        lastGroupName = currGroupName;
+                    }
+
+                }
+                groupNamesDic.Add(firstDesignator, new Tuple<string, int>(lastGroupName, countComponents));
+            }
+
+            return groupNamesDic;
+        }
+
+        private string GetDesignatorType(string aFullDesignator)
+        {
+            int index = aFullDesignator.IndexOfAny(new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' });
+            return aFullDesignator.Substring(0, index);
+        }
+
     }
 }

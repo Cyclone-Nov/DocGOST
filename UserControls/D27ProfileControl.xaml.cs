@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace GostDOC.UserControls
 {
     /// <summary>
-    /// Interaction logic for D27Control.xaml
+    /// Interaction logic for D27ProfileControl.xaml
     /// </summary>
-    public partial class D27Control : UserControl
+    public partial class D27ProfileControl : UserControl
     {
-        public D27Control()
+        public D27ProfileControl()
         {
             InitializeComponent();
         }

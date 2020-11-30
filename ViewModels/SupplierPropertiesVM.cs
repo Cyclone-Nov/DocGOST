@@ -25,6 +25,14 @@ namespace GostDOC.ViewModels
         /// </value>
         public ObservableProperty<int> Quantity { get; } = new ObservableProperty<int>(100);
         /// <summary>
+        /// количество
+        /// </summary>
+        /// <value>
+        /// The quantity.
+        /// </value>
+        public ObservableProperty<int> AllQuantity { get; } = new ObservableProperty<int>(100);
+        
+        /// <summary>
         /// Отечественный производитель
         /// </summary>
         /// <value>
@@ -59,6 +67,15 @@ namespace GostDOC.ViewModels
         /// The final price with tax.
         /// </value>
         public ObservableProperty<float> FinalPriceWithTax { get; } = new ObservableProperty<float>(120000.2f);
+
+        /// <summary>
+        /// категория приемки изделия
+        /// </summary>
+        /// <value>
+        /// The type of the acceptance.
+        /// </value>
+        public ObservableProperty<AcceptanceTypes> AcceptanceType { get; } = new ObservableProperty<AcceptanceTypes>(AcceptanceTypes.No);
+        
         /// <summary>
         /// заказанное количество
         /// </summary>

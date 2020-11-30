@@ -126,7 +126,8 @@
         <Grid Grid.Row="1" Grid.Column="2">
             <uc:SpecificationControl Visibility="{Binding IsSpecificationTableVisible.Value, Converter={StaticResource b2v}}" />
             <uc:BillControl Visibility="{Binding IsBillTableVisible.Value, Converter={StaticResource b2v}}" />
-            <uc:D27Control Visibility="{Binding IsD27TableVisible.Value, Converter={StaticResource b2v}}" />
+            <uc:D27TableControl Visibility="{Binding IsD27TableVisible.Value, Converter={StaticResource b2v}}" />
+            <uc:D27ProfileControl Visibility="{Binding IsD27ProfileVisible.Value, Converter={StaticResource b2v}}" />
             <uc:GraphValuesControl GraphType="General" ItemsSource="{Binding GeneralGraphValues}" Visibility="{Binding IsGeneralGraphValuesVisible.Value, Converter={StaticResource b2v}}"/>
         </Grid>
 
