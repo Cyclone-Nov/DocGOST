@@ -996,26 +996,61 @@ namespace GostDOC.ViewModels
         {
             // Populate configuration tree
             Node treeItemCfg = new Node() { Name = aCfgName, NodeType = NodeType.Configuration, Parent = aCollection, Nodes = new ObservableCollection<Node>() };
-
-            var orderedGroups = aGroups as OrderedDictionary<string, Group>;
-            foreach (var grp in orderedGroups)
+            if (aGroups is OrderedDictionary<string, Group>)
             {
-                string groupName = grp.Name;
+                UpdateGroups(treeItemCfg, aGroups as OrderedDictionary<string, Group>);
+            }
+            else
+            {
+                UpdateGroups(treeItemCfg, aGroups as Dictionary<string, Group>);
+            }
+            
+            aCollection.Nodes.Add(treeItemCfg);
+        }
+
+        private void UpdateGroups(Node aTreeItemCfg, Dictionary<string, Group> aGroups)
+        {
+            // Populate configuration tree            
+            foreach (var grp in aGroups)
+            {
+                //string groupName = grp.Name;
+                string groupName = grp.Key;
                 if (string.IsNullOrEmpty(groupName))
                 {
                     groupName = Constants.DefaultGroupName;
                 }
 
-                Node treeItemGroup = new Node() { Name = groupName, NodeType = NodeType.Group, Parent = treeItemCfg, Nodes = new ObservableCollection<Node>() };
+                Node treeItemGroup = new Node() { Name = groupName, NodeType = NodeType.Group, Parent = aTreeItemCfg, Nodes = new ObservableCollection<Node>() };
+                foreach (var sub in grp.Value.SubGroups.AsNotNull())
+                {
+                    Node treeItemSubGroup = new Node() { Name = sub.Key, NodeType = NodeType.SubGroup, Parent = treeItemGroup };
+                    treeItemGroup.Nodes.Add(treeItemSubGroup);
+                }
+                aTreeItemCfg.Nodes.Add(treeItemGroup);
+            }            
+        }
+
+        private void UpdateGroups(Node aTreeItemCfg, OrderedDictionary<string, Group> aGroups)
+        {
+            // Populate configuration tree            
+            foreach (var grp in aGroups)
+            {
+                string groupName = grp.Name;                
+                if (string.IsNullOrEmpty(groupName))
+                {
+                    groupName = Constants.DefaultGroupName;
+                }
+
+                Node treeItemGroup = new Node() { Name = groupName, NodeType = NodeType.Group, Parent = aTreeItemCfg, Nodes = new ObservableCollection<Node>() };
                 foreach (var sub in grp.SubGroups.AsNotNull())
                 {
                     Node treeItemSubGroup = new Node() { Name = sub.Key, NodeType = NodeType.SubGroup, Parent = treeItemGroup };
                     treeItemGroup.Nodes.Add(treeItemSubGroup);
                 }
-                treeItemCfg.Nodes.Add(treeItemGroup);
+                aTreeItemCfg.Nodes.Add(treeItemGroup);
             }
-            aCollection.Nodes.Add(treeItemCfg);
         }
+
 
         private void UpdateGraphValues()
         {
