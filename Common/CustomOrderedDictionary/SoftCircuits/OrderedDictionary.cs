@@ -126,12 +126,9 @@ namespace SoftCircuits.Collections
 
             var value = Items.ElementAt(rindex);
             Items.RemoveAt(rindex);
-
-            Items.Insert(nindex, value);            
-            var keys = IndexLookup.Where(item => item.Value == nindex).ToArray();
-            if (keys.Length == 1)
-                IndexLookup[keys[0].Key] = rindex;
-            IndexLookup[key] = nindex;
+            RemoveIndexLookupItem(rindex);
+            Items.Insert(nindex, value);
+            InsertIndexLookupItem(key, nindex);
         }
 
         /// <summary>
