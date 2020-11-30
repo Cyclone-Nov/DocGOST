@@ -271,10 +271,10 @@ namespace GostDOC.PDF
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Подп.")));
             tbl.AddCell(CreateCell(2,1).Add(CreateParagraph("Дата")));
 
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("измененных")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("заменяемых")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("изменённых")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("заменённых")));
             tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("новых")));
-            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("анну-\nлированных")));
+            tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("аннули-\nрованных")));
 
 
             for (int i = 0; i < (RowNumberOnNextPage-3) * 10; ++i) {
