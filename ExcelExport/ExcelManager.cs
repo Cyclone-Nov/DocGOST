@@ -17,7 +17,7 @@ namespace GostDOC.ExcelExport
 
         public bool CanExport(DocType aDocType)
         {
-            return aDocType == DocType.D27 || aDocType == DocType.Specification || aDocType == DocType.Bill;
+            return aDocType == DocType.D27 || aDocType == DocType.Specification || aDocType == DocType.Bill || aDocType == DocType.ItemsList;
         }
 
         public void Export(DocType aDocType, string aFilePath)

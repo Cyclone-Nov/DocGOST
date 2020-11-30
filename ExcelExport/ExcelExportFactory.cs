@@ -20,6 +20,8 @@ namespace GostDOC.ExcelExport
                     return new ExportBill();
                 case DocType.Specification:
                     return new ExportSp();
+                case DocType.ItemsList:
+                    return new ExportList();
             }
             return null;
         }

@@ -952,10 +952,11 @@ namespace GostDOC.ViewModels
         private void UpdateGroupData()
         {
             var groupData = GetGroupData();
-            if (groupData != null)
+            if (groupData == null)
             {
-                IsAutoSortEnabled.Value = groupData.AutoSort;
+                return;
             }
+            IsAutoSortEnabled.Value = groupData.AutoSort;
 
             // Fill components
             Components.Clear();

@@ -195,6 +195,7 @@
     <Compile Include="ExcelExport\ExcelExtensions.cs" />
     <Compile Include="ExcelExport\ExportD27.cs" />
     <Compile Include="ExcelExport\ExportBill.cs" />
+    <Compile Include="ExcelExport\ExportList.cs" />
     <Compile Include="ExcelExport\ExportSp.cs" />
     <Compile Include="Interfaces\IExcelExport.cs" />
     <Compile Include="Interfaces\IMemento.cs" />
@@ -381,6 +382,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="ExcelExport\Templates\ElementsList.xlsx" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>

@@ -280,7 +280,7 @@ internal class ElementListDataPreparer : BasePreparer {
                 else
                 {
                     string groupName = component.Item2.GetProperty(Constants.SubGroupNameSp);
-                    name = (addGroupName) ? $"{GetGroupNameByCount(groupName, sameComponents == 1)} {component_name} {doc}" : $"{component_name} {doc}";
+                    name = (addGroupName) ? $"{GetGroupNameByCount(groupName, true)} {component_name} {doc}" : $"{component_name} {doc}";
                 }
                 
                 var note = component.Item2.GetProperty(Constants.ComponentNote);
