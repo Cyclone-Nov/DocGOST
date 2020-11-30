@@ -34,8 +34,11 @@ namespace GostDOC.Models
 
         public void Load()
         {
-            // Load material types
+            // Load all dictionaries
             Materials.Load(Constants.MaterialsXml);
+            Others.Load(Constants.OthersXml);
+            Standard.Load(Constants.StandardXml);
+
             // Load document types
             DocumentTypes.Load();
         }

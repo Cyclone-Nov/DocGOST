@@ -7,7 +7,7 @@
         xmlns:w="clr-namespace:GostDOC.UI"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
-        Title="Подождите..." Height="100" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="Подождите..." Icon="pack://application:,,/Resources/ghost.png" Height="100" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     
     <Grid Margin="20">
         <ProgressBar Grid.Row="1" Minimum="0" Maximum="100" IsIndeterminate="True" Height="20" />

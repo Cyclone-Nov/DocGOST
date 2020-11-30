@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 using GostDOC.Common;
 using GostDOC.Dictionaries;
@@ -14,7 +15,9 @@ namespace GostDOC.ViewModels
 {
     class ProductTypesVM
     {
-        private ProductTypes _products = DocManager.Instance.Materials;
+        private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
+
+        private ProductTypes _products;
 
         public ProductTypesDoc DocType { get; private set; } = ProductTypesDoc.Materials;
 
@@ -29,6 +32,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<string> AddProductButton { get; } = new ObservableProperty<string>();
 
         public ICommand TreeViewSelectionChangedCmd => new Command<DictionaryNode>(TreeViewSelectionChanged);
+        public ICommand TreeViewMouseButtonDownCmd => new Command<DictionaryNode>(TreeViewMouseButtonDown);
         public ICommand AddGroupCmd => new Command(AddGroup, IsAddGroupEnabled);
         public ICommand AddProductCmd => new Command(AddProduct, IsAddEnabled);
         public ICommand EditCmd => new Command(Edit, IsEditEnabled);
@@ -37,18 +41,7 @@ namespace GostDOC.ViewModels
         public ICommand LoadedCmd => new Command(Loaded);
 
         public ProductTypesVM()
-        {
-            foreach (var kvp in _products.Products.Groups)
-            {
-                DictionaryNode node = new DictionaryNode(kvp.Key) { Nodes = new ObservableCollection<DictionaryNode>() };
-                AddNode(node, kvp.Value);
-                DictionaryNodes.InsertSorted(node);
-            }   
-
-            foreach (var kvp in _products.Products.ProductsList)
-            {
-                DictionaryNodes.InsertSorted(new DictionaryNode(kvp.Key, DictionaryNodeType.Component));
-            }            
+        {        
         }
 
         public void SetDocType(ProductTypesDoc aDocType)
@@ -60,15 +53,38 @@ namespace GostDOC.ViewModels
                 case ProductTypesDoc.Materials:
                     Title.Value = "Материалы";
                     AddProductButton.Value = "Добавить материал";
+                    _products = DocManager.Instance.Materials;
                     break;
                 case ProductTypesDoc.Others:
                     Title.Value = "Прочие изделия";
                     AddProductButton.Value = "Добавить изделие";
+                    _products = DocManager.Instance.Others;
                     break;
                 case ProductTypesDoc.Standard:
                     Title.Value = "Стандартные изделия";
                     AddProductButton.Value = "Добавить изделие";
+                    _products = DocManager.Instance.Standard;
                     break;
+                default:
+                    _log.Error($"Неизвестный тип документа {aDocType}!");
+                    return;
+            }
+
+            Init();
+        }
+
+        private void Init()
+        {
+            foreach (var kvp in _products.Products.Groups)
+            {
+                DictionaryNode node = new DictionaryNode(kvp.Key) { Nodes = new ObservableCollection<DictionaryNode>() };
+                AddNode(node, kvp.Value);
+                DictionaryNodes.InsertSorted(node);
+            }
+
+            foreach (var kvp in _products.Products.ProductsList)
+            {
+                DictionaryNodes.InsertSorted(new DictionaryNode(kvp.Key, DictionaryNodeType.Component));
             }
         }
 
@@ -220,12 +236,30 @@ namespace GostDOC.ViewModels
         {
             var type = SelectedItem.Value?.Type;
 
-            if (DocType == ProductTypesDoc.Materials)
+            switch (DocType)
             {
-                IsAddGroupEnabled.Value = type == DictionaryNodeType.Group;
-                IsAddEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup;
-                IsRemoveEnabled.Value = type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
-                IsEditEnabled.Value = type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                case ProductTypesDoc.Materials:
+                    IsAddGroupEnabled.Value = type == DictionaryNodeType.Group;
+                    IsAddEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup;
+                    IsRemoveEnabled.Value = type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    IsEditEnabled.Value = type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    break;
+                case ProductTypesDoc.Others:
+                    IsRemoveEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    IsEditEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    break;
+                case ProductTypesDoc.Standard:
+                    IsRemoveEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    IsEditEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    break;
+            }         
+        }
+
+        private void TreeViewMouseButtonDown(DictionaryNode aItem)
+        {
+            if (aItem != null)
+            {
+                aItem.IsSelected.Value = false;
             }
         }
 
