@@ -75,15 +75,14 @@ namespace GostDOC.Dictionaries
     class ProductTypes
     {
         private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
-
-        private ProductTypesDoc _docType;
-
         private string _filePath;
+
+        public ProductTypesDoc DocType { get; private set; }
         public Products Products { get; } = new Products();
 
         public ProductTypes(ProductTypesDoc aDocType)
         {
-            _docType = aDocType;
+            DocType = aDocType;
         }
 
         public void Load(string aFileName)
@@ -92,7 +91,7 @@ namespace GostDOC.Dictionaries
             
             if (!Import(_filePath))
             {
-                if (_docType == ProductTypesDoc.Materials)
+                if (DocType == ProductTypesDoc.Materials)
                 {
                     foreach (var line in Utils.ReadCfgFileLines(Constants.MaterialGroupsCfg))
                     {
@@ -108,9 +107,9 @@ namespace GostDOC.Dictionaries
             ProductsXml products = null;
             if (XmlSerializeHelper.LoadXmlStructFile(ref products, aFilePath))
             {
-                if (products.DocType != _docType)
+                if (products.DocType != DocType)
                 {
-                    _log.Error($"Ошибка загрузки файла {aFilePath}! Тип файла {products.DocType} не соответствует типу {_docType}!");
+                    _log.Error($"Ошибка загрузки файла {aFilePath}! Тип файла {products.DocType} не соответствует типу {DocType}!");
                     return false;
                 }
 

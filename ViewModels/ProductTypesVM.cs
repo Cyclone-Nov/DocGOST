@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 using GostDOC.Common;
 using GostDOC.Dictionaries;
@@ -31,6 +32,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<string> AddProductButton { get; } = new ObservableProperty<string>();
 
         public ICommand TreeViewSelectionChangedCmd => new Command<DictionaryNode>(TreeViewSelectionChanged);
+        public ICommand TreeViewMouseButtonDownCmd => new Command<DictionaryNode>(TreeViewMouseButtonDown);
         public ICommand AddGroupCmd => new Command(AddGroup, IsAddGroupEnabled);
         public ICommand AddProductCmd => new Command(AddProduct, IsAddEnabled);
         public ICommand EditCmd => new Command(Edit, IsEditEnabled);
@@ -234,12 +236,30 @@ namespace GostDOC.ViewModels
         {
             var type = SelectedItem.Value?.Type;
 
-            if (DocType == ProductTypesDoc.Materials)
+            switch (DocType)
             {
-                IsAddGroupEnabled.Value = type == DictionaryNodeType.Group;
-                IsAddEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup;
-                IsRemoveEnabled.Value = type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
-                IsEditEnabled.Value = type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                case ProductTypesDoc.Materials:
+                    IsAddGroupEnabled.Value = type == DictionaryNodeType.Group;
+                    IsAddEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup;
+                    IsRemoveEnabled.Value = type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    IsEditEnabled.Value = type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    break;
+                case ProductTypesDoc.Others:
+                    IsRemoveEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    IsEditEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    break;
+                case ProductTypesDoc.Standard:
+                    IsRemoveEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    IsEditEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
+                    break;
+            }         
+        }
+
+        private void TreeViewMouseButtonDown(DictionaryNode aItem)
+        {
+            if (aItem != null)
+            {
+                aItem.IsSelected.Value = false;
             }
         }
 

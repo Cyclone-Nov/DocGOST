@@ -17,6 +17,7 @@ namespace GostDOC.Models
     class DictionaryNode : IComparable<DictionaryNode>
     {
         public ObservableProperty<string> Name { get; } = new ObservableProperty<string>();
+        public ObservableProperty<bool> IsSelected { get; } = new ObservableProperty<bool>();
         public DictionaryNodeType Type { get; set; } = DictionaryNodeType.Group;
         public DictionaryNode Parent { get; set; }
         public ObservableCollection<DictionaryNode> Nodes { get; set; }

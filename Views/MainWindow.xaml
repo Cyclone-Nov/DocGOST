@@ -67,11 +67,25 @@
                 <MenuItem Header="Импорт ведомости комплектации" Command="{Binding OpenFileD27Cmd}"/>
                 <MenuItem Header="Импорт перечня элементов" Command="{Binding OpenFileElCmd}"/>
             </MenuItem>
-            <MenuItem Header="Материалы">
-                <MenuItem Header="Редактировать" Command="{Binding UpdateMaterialsCmd}"/>
-                <Separator />
-                <MenuItem Header="Экспорт в файл" Command="{Binding SaveMaterialsCmd}"/>
-                <MenuItem Header="Импорт из файла" Command="{Binding ImportMaterialsCmd}"/>
+            <MenuItem Header="Словари">
+                <MenuItem Header="Материалы">
+                    <MenuItem Header="Редактировать" Command="{Binding UpdateMaterialsCmd}"/>
+                    <Separator />
+                    <MenuItem Header="Экспорт в файл" Command="{Binding SaveMaterialsCmd}"/>
+                    <MenuItem Header="Импорт из файла" Command="{Binding ImportMaterialsCmd}"/>
+                </MenuItem>
+                <MenuItem Header="Прочие изделия">
+                    <MenuItem Header="Редактировать" Command="{Binding UpdateOthersCmd}"/>
+                    <Separator />
+                    <MenuItem Header="Экспорт в файл" Command="{Binding SaveOthersCmd}"/>
+                    <MenuItem Header="Импорт из файла" Command="{Binding ImportOthersCmd}"/>
+                </MenuItem>
+                <MenuItem Header="Стандартные изделия">
+                    <MenuItem Header="Редактировать" Command="{Binding UpdateStandardCmd}"/>
+                    <Separator />
+                    <MenuItem Header="Экспорт в файл" Command="{Binding SaveStandardCmd}"/>
+                    <MenuItem Header="Импорт из файла" Command="{Binding ImportStandardCmd}"/>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="Правка">
                 <MenuItem Header="Отменить" InputGestureText="Ctrl+Z" Command="{Binding UndoCmd}" IsEnabled="{Binding IsUndoEnabled.Value}" />
