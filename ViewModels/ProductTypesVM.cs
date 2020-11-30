@@ -14,7 +14,9 @@ namespace GostDOC.ViewModels
 {
     class ProductTypesVM
     {
-        private ProductTypes _products = DocManager.Instance.Materials;
+        private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
+
+        private ProductTypes _products;
 
         public ProductTypesDoc DocType { get; private set; } = ProductTypesDoc.Materials;
 
@@ -37,18 +39,7 @@ namespace GostDOC.ViewModels
         public ICommand LoadedCmd => new Command(Loaded);
 
         public ProductTypesVM()
-        {
-            foreach (var kvp in _products.Products.Groups)
-            {
-                DictionaryNode node = new DictionaryNode(kvp.Key) { Nodes = new ObservableCollection<DictionaryNode>() };
-                AddNode(node, kvp.Value);
-                DictionaryNodes.InsertSorted(node);
-            }   
-
-            foreach (var kvp in _products.Products.ProductsList)
-            {
-                DictionaryNodes.InsertSorted(new DictionaryNode(kvp.Key, DictionaryNodeType.Component));
-            }            
+        {        
         }
 
         public void SetDocType(ProductTypesDoc aDocType)
@@ -60,15 +51,38 @@ namespace GostDOC.ViewModels
                 case ProductTypesDoc.Materials:
                     Title.Value = "Материалы";
                     AddProductButton.Value = "Добавить материал";
+                    _products = DocManager.Instance.Materials;
                     break;
                 case ProductTypesDoc.Others:
                     Title.Value = "Прочие изделия";
                     AddProductButton.Value = "Добавить изделие";
+                    _products = DocManager.Instance.Others;
                     break;
                 case ProductTypesDoc.Standard:
                     Title.Value = "Стандартные изделия";
                     AddProductButton.Value = "Добавить изделие";
+                    _products = DocManager.Instance.Standard;
                     break;
+                default:
+                    _log.Error($"Неизвестный тип документа {aDocType}!");
+                    return;
+            }
+
+            Init();
+        }
+
+        private void Init()
+        {
+            foreach (var kvp in _products.Products.Groups)
+            {
+                DictionaryNode node = new DictionaryNode(kvp.Key) { Nodes = new ObservableCollection<DictionaryNode>() };
+                AddNode(node, kvp.Value);
+                DictionaryNodes.InsertSorted(node);
+            }
+
+            foreach (var kvp in _products.Products.ProductsList)
+            {
+                DictionaryNodes.InsertSorted(new DictionaryNode(kvp.Key, DictionaryNodeType.Component));
             }
         }
 

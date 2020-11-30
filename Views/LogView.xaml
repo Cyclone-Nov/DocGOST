@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:GostDOC.Views"
         xmlns:dj="clr-namespace:DJ;assembly=NLogViewer"
         mc:Ignorable="d"
-        Title="Просмотр лога" Height="600" Width="800" WindowStartupLocation="CenterScreen">
+        Title="Просмотр лога" Icon="pack://application:,,/Resources/ghost.png" Height="600" Width="800" WindowStartupLocation="CenterScreen">
     <Grid>
         <dj:NLogViewer x:Name="logCtrl"/>
     </Grid>

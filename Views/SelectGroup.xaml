@@ -7,7 +7,7 @@
         xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
-        Title="Выбор группы для переноса" Height="400" Width="400" WindowStartupLocation="CenterScreen">
+        Title="Выбор группы для переноса" Icon="pack://application:,,/Resources/ghost.png" Height="400" Width="400" WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
         <viewModels:SelectGroupVM x:Name="ViewModel" />

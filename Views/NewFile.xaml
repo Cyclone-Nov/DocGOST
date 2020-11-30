@@ -8,7 +8,7 @@
         xmlns:uc="clr-namespace:GostDOC.UserControls"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Создать спецификацию" Height="450" Width="600" WindowStartupLocation="CenterScreen">
+        Title="Создать спецификацию" Icon="pack://application:,,/Resources/ghost.png" Height="450" Width="600" WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
         <viewModels:NewFileVM x:Name="ViewModel" />

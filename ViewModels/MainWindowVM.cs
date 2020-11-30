@@ -40,7 +40,7 @@ namespace GostDOC.ViewModels
         private DocManager _docManager = DocManager.Instance;
 
         private DocumentTypes _docTypes = DocManager.Instance.DocumentTypes;
-        private ProductTypes _materials = DocManager.Instance.Materials;
+        private ProductTypes _products;
 
         private ProjectWrapper _project = new ProjectWrapper();
         private List<MoveInfo> _moveInfo = new List<MoveInfo>();
@@ -395,7 +395,7 @@ namespace GostDOC.ViewModels
             {
                 // Update current table
                 UpdateSelectedDocument();
-            }
+            }            
         }
 
         private void Closing(System.ComponentModel.CancelEventArgs e)
@@ -668,12 +668,12 @@ namespace GostDOC.ViewModels
                     if (product != null)
                     {
                         var groups = GetGroups(obj);
-                        if (_materials.AddProduct(groups.Item1, groups.Item2, product))
+                        if (_products.AddProduct(groups.Item1, groups.Item2, product))
                         {
                             // Add node
                             obj.Parent.Nodes.InsertSorted(new MenuNode() { Name = product.Name, Parent = obj.Parent });
                             // Save file
-                            _materials.Save();
+                            _products.Save();
                         }
                     }
                 }
@@ -681,7 +681,7 @@ namespace GostDOC.ViewModels
                 {
                     // Find material
                     var groups = GetGroups(obj);
-                    product = _materials.GetProduct(groups.Item1, groups.Item2, obj.Name);
+                    product = _products.GetProduct(groups.Item1, groups.Item2, obj.Name);
                 }
 
                 // Add material to components
@@ -745,7 +745,7 @@ namespace GostDOC.ViewModels
             var path = CommonDialogs.OpenFile("Material Files *.xml | *.xml", "Открыть файл материалов");
             if (!string.IsNullOrEmpty(path))
             {
-                _materials.Import(path);
+                _products.Import(path);
             }
         }
 
@@ -754,7 +754,7 @@ namespace GostDOC.ViewModels
             var path = CommonDialogs.SaveFileAs("Material Files *.xml | *.xml", "Сохранить файл материалов");
             if (!string.IsNullOrEmpty(path))
             {
-                _materials.Save(path);
+                _products.Save(path);
             }
         }
 
@@ -911,6 +911,8 @@ namespace GostDOC.ViewModels
             }
             // Clear move components info
             _moveInfo.Clear();
+
+            UpdateProductTypes(); 
 
             UpdateTableContextMenu();
         }
@@ -1072,20 +1074,20 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
         }
 
-        private void AddMenuItem(MenuNode aNode, ProductGroup aGroup)
+        private void AddMenuItem(MenuNode aNode, ProductGroup aGroup, string aNewElement)
         {
             foreach (var product in aGroup.ProductsList)
             {
                 aNode.Nodes.InsertSorted(new MenuNode() { Name = product.Key, Parent = aNode });
             }
-            aNode.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewMaterialMenuItem, Parent = aNode });
+            aNode.Nodes.InsertSorted(new MenuNode() { Name = aNewElement, Parent = aNode });
 
             if (aGroup.SubGroups != null)
             {
                 foreach (var gp in aGroup.SubGroups)
                 {
                     MenuNode node = new MenuNode() { Name = gp.Key, Nodes = new ObservableCollection<MenuNode>() };
-                    AddMenuItem(node, gp.Value);
+                    AddMenuItem(node, gp.Value, aNewElement);
                     aNode.Nodes.InsertSorted(node);
                 }
             }
@@ -1111,12 +1113,31 @@ namespace GostDOC.ViewModels
             }
             else if (GroupName.Equals(Constants.GroupMaterials))
             {
-                foreach (var kvp in _materials.Products.Groups)
+                // Add groups only
+                foreach (var kvp in _products.Products.Groups)
                 {
                     MenuNode node = new MenuNode() { Name = kvp.Key, Nodes = new ObservableCollection<MenuNode>() };
-                    AddMenuItem(node, kvp.Value);
+                    AddMenuItem(node, kvp.Value, Constants.NewMaterialMenuItem);
                     TableContextMenu.InsertSorted(node);
                 }
+                TableContextMenuEnabled.Value = true;
+            }
+            else if (GroupName.Equals(Constants.GroupOthers) || GroupName.Equals(Constants.GroupStandard))
+            {
+                // Add groups
+                foreach (var kvp in _products.Products.Groups)
+                {
+                    MenuNode node = new MenuNode() { Name = kvp.Key, Nodes = new ObservableCollection<MenuNode>() };
+                    AddMenuItem(node, kvp.Value, Constants.NewProductMenuItem);
+                    TableContextMenu.InsertSorted(node);
+                }
+                // Add products
+                foreach (var product in _products.Products.ProductsList)
+                {
+                    TableContextMenu.InsertSorted(new MenuNode() { Name = product.Key });
+                }
+                // Add "new product" button
+                TableContextMenu.InsertSorted(new MenuNode() { Name = Constants.NewProductMenuItem });
                 TableContextMenuEnabled.Value = true;
             }
         }
@@ -1179,6 +1200,26 @@ namespace GostDOC.ViewModels
                     _progress = null;
                 }
             }); 
+        }
+
+        private void UpdateProductTypes()
+        {
+            if (GroupName.Equals(Constants.GroupMaterials))
+            {
+                _products = _docManager.Materials;
+            }
+            else if (GroupName.Equals(Constants.GroupOthers))
+            {
+                _products = _docManager.Others;
+            }
+            else if (GroupName.Equals(Constants.GroupStandard))
+            {
+                _products = _docManager.Standard;
+            }
+            else
+            {
+                _products = null;
+            }
         }
     }
 }

@@ -115,6 +115,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Reactive, Version=5.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>packages\System.Reactive.5.0.0\lib\net472\System.Reactive.dll</HintPath>
@@ -371,6 +372,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Settings\NewSpecificationGraphNames.cfg" />
+    <Resource Include="Resources\ghost.png" />
     <Content Include="Settings\PhysicalDesignators.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -415,9 +417,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (powershell Compress-Archive -Path '$(TargetDir)*' -DestinationPath '$(SolutionDir)\gostdoc.zip' -Force)
