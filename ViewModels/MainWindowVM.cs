@@ -309,7 +309,7 @@ namespace GostDOC.ViewModels
         private void DataGridMouseButtonDown(DataGrid obj)
         {
             obj.UnselectAllCells();
-            obj.Items.Refresh();
+            //obj.Items.Refresh();
         }
 
         private void OpenFileSp(object obj)
