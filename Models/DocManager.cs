@@ -77,32 +77,22 @@ namespace GostDOC.Models
         /// <returns></returns>        
         public bool SavePDF(DocType aDocType, string aFilePath)
         {
-            DataTable dataTable = _prepareDataManager.GetDataTable(aDocType);
-            if (dataTable == null)
-            {
-                if (!_prepareDataManager.PrepareDataTable(aDocType, Project.Configurations))
-                    return false;
-                dataTable = _prepareDataManager.GetDataTable(aDocType);
-            }
-            var appParams = _prepareDataManager.GetAppliedParams(aDocType);
-
-            IDictionary<string, string> mainConfigGraphs = null;
-            bool res = true;
-            if (GetMainConfigurationGraphs(out mainConfigGraphs))
-            {
-                if (_pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs, appParams))
+            if (PrepareData(aDocType))
+            {                
+                if (PreparePDF(aDocType))
                 {
                     try
                     {
                         var data = _pdfManager.GetPDFData(aDocType);
                         System.IO.File.WriteAllBytes(aFilePath, data);
+                        return true;
                     } catch (Exception ex)
                     {
-                        res = false;
+                        //res = false;
                     }
                 }
             }
-            return res;
+            return false;
         }
 
         /// <summary>
