@@ -15,6 +15,11 @@ namespace GostDOC.DataPreparation
     internal class SpecificationDataPreparer : BasePreparer
     {
 
+        public override string GetDocSign(Configuration aMainConfig)
+        {
+            return "СП";
+        }
+
         /// <summary>
         /// формирование таблицы данных
         /// </summary>
@@ -333,8 +338,7 @@ namespace GostDOC.DataPreparation
 
                     for (int ln = 1; ln < max; ln++)
                     {
-                        row = aTable.NewRow();
-                        row[Constants.ColumnZone] = new FormattedString { Value = "1" }; // используем данную колонку для установки признака переноса строки ????
+                        row = aTable.NewRow();                        
                         row[Constants.ColumnName] = (ln_name > ln) ? new FormattedString { Value = namearr[ln] } : null;
                         row[Constants.ColumnFootnote] = (ln_note > ln) ? new FormattedString { Value = notearr[ln] } : null;
                         aTable.Rows.Add(row);

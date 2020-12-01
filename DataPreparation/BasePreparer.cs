@@ -40,6 +40,13 @@ public abstract class BasePreparer {
     public abstract DataTable CreateDataTable(IDictionary<string, Configuration> aConfigs);
 
     /// <summary>
+    /// Gets the document sign.
+    /// </summary>
+    /// <param name="aMainConfig">a main configuration.</param>
+    /// <returns></returns>
+    public abstract string GetDocSign(Configuration aMainConfig);
+
+    /// <summary>
     /// создать таблицу данных
     /// </summary>
     /// <param name="aDataTableName">Name of a data table.</param>

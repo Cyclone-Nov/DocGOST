@@ -151,30 +151,6 @@ namespace GostDOC.Common
             return string.Empty;
         }
 
-        /// <summary>
-        /// Получить строку с кодом документа по типу документа
-        /// </summary>
-        /// <param name="aDocType">Type of a document.</param>
-        /// <returns></returns>
-        public static string GetDocumentName(DocType aDocType, bool aFullName = false)
-        {
-            switch (aDocType)
-            {
-                case DocType.Bill:
-                    return aFullName ? "Ведомость покупных изделий" : "ВП";
-                case DocType.ItemsList:
-                    return aFullName ? "Перечень элементов": "ПЭ3";
-                case DocType.Specification:
-                    return aFullName ? "Спецификация" : "СП";
-                case DocType.D27:
-                    return aFullName ? "Ведомость комплектации" : "ВК";
-                case DocType.None:
-                    return string.Empty;
-            }
-            return string.Empty;
-        }
-
-
         public static Tuple<string, int> SplitDesignatorToStringAndNumber(string s)
         {
             string val = string.Empty;
@@ -598,13 +574,14 @@ namespace GostDOC.Common
 
         public static readonly string NewMaterialMenuItem = "<Добавить материал>";
         public static readonly string NewProductMenuItem = "<Добавить изделие>";
+
         #region Файлы
 
         // Excel
         public static readonly string TemplatesFolder = "Templates";
         public static readonly string SpecificationTemplateName = "specification";
         public static readonly string BillTemplateName = "purchased_items_list";
-        public static readonly string ItemsListTemplateName = "ElementsList";
+        public static readonly string ItemsListTemplateName = "elements_list";
         // Cfgs
         public static readonly string MaterialGroupsCfg = "MaterialGroups";
         // Xml

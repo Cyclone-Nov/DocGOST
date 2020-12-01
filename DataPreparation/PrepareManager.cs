@@ -148,5 +148,26 @@ namespace GostDOC.Models
             }
         }
 
+        public string GetDocSign(DocType aDocType, Configuration mainConfig)
+        {
+            switch (aDocType)
+            {
+                case DocType.Bill:
+                    return BillDataPreparer.GetDocSign(mainConfig);
+
+                case DocType.Specification:
+                    return SpecificationDataPreparer.GetDocSign(mainConfig);
+
+                case DocType.ItemsList:
+                    return ElementListDataPreparer.GetDocSign(mainConfig);
+
+                case DocType.D27:
+                    return EquipmentBillDataPreparer.GetDocSign(mainConfig);
+
+                default:
+                    return string.Empty;
+            }
+        }
+
     }
 }
