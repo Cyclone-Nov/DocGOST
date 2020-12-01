@@ -75,7 +75,7 @@
                 <DataGridComboBoxColumn Header="Формат" SelectedItemBinding="{Binding Path=Format.Value}">
                     <DataGridComboBoxColumn.ItemsSource>
                         <col:ArrayList>
-                            <sys:String>*</sys:String>
+                            <sys:String>*)</sys:String>
                             <sys:String>А0</sys:String>
                             <sys:String>А1</sys:String>
                             <sys:String>А2</sys:String>
