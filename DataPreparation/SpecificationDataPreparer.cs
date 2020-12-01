@@ -175,11 +175,10 @@ namespace GostDOC.DataPreparation
                 if (string.Equals(aConfigName, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))                
                     configName = aSign; // "Обозначение"
                  else                
-                    configName = $"{aSign}{aConfigName}"; // "Обозначение"-"aConfigName"
+                    configName = $"{aSign}{aConfigName}"; // "Обозначение""aConfigName"
 
                 var row = aTable.NewRow();
-                row[Constants.ColumnSign] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };
-                //row[Constants.ColumnTextFormat] = new FormattedString { Value = "1" };
+                row[Constants.ColumnSign] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };                
                 aTable.Rows.Add(row);
                 AddEmptyRow(aTable);
             }
