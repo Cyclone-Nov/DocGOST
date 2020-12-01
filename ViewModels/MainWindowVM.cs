@@ -122,8 +122,9 @@ namespace GostDOC.ViewModels
         public ICommand DownComponentsCmd => new Command<IList<object>>(DownComponents);
         public ICommand UpdatePdfCmd => new Command(UpdatePdf, IsExportPdfEnabled);
         public ICommand ClickMenuCmd => new Command<MenuNode>(ClickMenu);
-        public ICommand EditNameValueCmd => new Command<DataGrid>(EditNameValue);
+        public ICommand EditNameValueCmd => new Command(EditNameValue);
         public ICommand EditComponentsCmd => new Command<DataGrid>(EditComponents);
+        public ICommand DataGridMouseButtonDownCmd => new Command<DataGrid>(DataGridMouseButtonDown);
         public ICommand ExportPDFCmd => new Command(ExportPDF, IsExportPdfEnabled);
         public ICommand ExportExcelCmd => new Command(ExportExcel, IsExportExcelEnabled);
 
@@ -278,27 +279,14 @@ namespace GostDOC.ViewModels
                 }
             }
         }
-
-        private bool locker = true;
-        private void EditNameValue(System.Windows.Controls.DataGrid e)
+        private void EditNameValue(object obj)
         {
-            if (locker)
-            {
-                try
-                {
-                    locker = false;
-                    e.CommitEdit(DataGridEditingUnit.Row, false);
-                    UpdateUndoRedoGraph();
-                    IsUndoEnabled.Value = true;
-                    _shouldSave = true;
-                }
-                finally
-                {
-                    locker = true;
-                }
-            }
+            UpdateUndoRedoGraph();
+            IsUndoEnabled.Value = true;
+            _shouldSave = true;
         }
 
+        private bool locker = true;
         private void EditComponents(System.Windows.Controls.DataGrid e)
         {
             if (locker)
@@ -316,6 +304,12 @@ namespace GostDOC.ViewModels
                     locker = true;
                 }
             }
+        }
+
+        private void DataGridMouseButtonDown(DataGrid obj)
+        {
+            obj.UnselectAllCells();
+            obj.Items.Refresh();
         }
 
         private void OpenFileSp(object obj)

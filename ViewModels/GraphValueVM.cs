@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Interfaces;
+using GostDOC.Models;
 
 namespace GostDOC.ViewModels
 {
@@ -20,6 +21,7 @@ namespace GostDOC.ViewModels
         {
             public string Name { get; set; }
             public string Text { get; set; }
+            public List<string> Items { get; } = new List<string>();
             public ItemType GraphType { get; set; }
         }
 
@@ -27,12 +29,14 @@ namespace GostDOC.ViewModels
         {
             get
             {
-                return new GraphValueMemento()
+                var result = new GraphValueMemento()
                 {
                     Name = Name.Value,
                     Text = Text.Value,
                     GraphType = GraphType
                 };
+                result.Items.AddRange(Items);
+                return result;
             }
 
             set
@@ -41,6 +45,7 @@ namespace GostDOC.ViewModels
                 Name.Value = memento.Name;
                 Text.Value = memento.Text;
                 GraphType = memento.GraphType;
+                Items.AddRange(memento.Items);
             }
         }
 
