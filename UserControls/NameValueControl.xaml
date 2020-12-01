@@ -13,8 +13,8 @@
                   AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False"
                   ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType={x:Type local:NameValueControl}}}">
             <i:Interaction.Triggers>
-                <i:EventTrigger EventName="CellEditEnding">
-                    <i:InvokeCommandAction Command="{Binding EditNameValueCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}}"  />
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction Command="{Binding DataGridMouseButtonDownCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
 
@@ -37,7 +37,7 @@
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Наименование графы" IsReadOnly="True" Binding="{Binding Name.Value}"/>
-                
+
                 <!--
                 <DataGridTextColumn  Header="Значение" Binding="{Binding Text.Value}" >
                     <DataGridTextColumn.EditingElementStyle>
@@ -48,39 +48,51 @@
                     </DataGridTextColumn.EditingElementStyle>
                 </DataGridTextColumn>
                 -->
-                
+
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl x:Name="content" Content="{Binding}" >
                             </ContentControl>
                             <DataTemplate.Triggers>
-                                
+
                                 <DataTrigger Binding="{Binding GraphType}" Value="0">
                                     <Setter TargetName="content" Property="ContentTemplate">
                                         <Setter.Value>
                                             <DataTemplate>
-                                                <ComboBox ItemsSource="{Binding Items}" SelectedValue="{Binding Text.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <ComboBox ItemsSource="{Binding Items}" SelectedValue="{Binding Text.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="SelectionChanged">
+                                                            <i:InvokeCommandAction Command="{Binding DataContext.EditNameValueCmd, RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </ComboBox>
                                             </DataTemplate>
                                         </Setter.Value>
                                     </Setter>
                                 </DataTrigger>
-                                
+
                                 <DataTrigger Binding="{Binding GraphType}" Value="1">
                                     <Setter TargetName="content" Property="ContentTemplate">
                                         <Setter.Value>
                                             <DataTemplate>
-                                                <TextBox Text="{Binding Text.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" AcceptsReturn="True"/>
+                                                <TextBox Text="{Binding Text.Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" TextWrapping="Wrap" AcceptsReturn="True">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="TextChanged">
+                                                            <i:InvokeCommandAction Command="{Binding DataContext.EditNameValueCmd, RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </TextBox>
                                             </DataTemplate>
                                         </Setter.Value>
                                     </Setter>
                                 </DataTrigger>
-                                
-                            </DataTemplate.Triggers>                            
+
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

@@ -29,6 +29,9 @@
                 <i:EventTrigger EventName="CellEditEnding">
                     <i:InvokeCommandAction Command="{Binding EditComponentsCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}}"  />
                 </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction Command="{Binding DataGridMouseButtonDownCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                </i:EventTrigger>
             </i:Interaction.Triggers>
 
             <DataGrid.InputBindings>

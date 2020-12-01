@@ -104,6 +104,12 @@ namespace GostDOC.Dictionaries
 
         public bool Import(string aFilePath)
         {
+            if (!File.Exists(aFilePath))
+            {
+                // No file, quiet return
+                return false;
+            }
+
             ProductsXml products = null;
             if (XmlSerializeHelper.LoadXmlStructFile(ref products, aFilePath))
             {
@@ -123,6 +129,7 @@ namespace GostDOC.Dictionaries
                 }
                 return true;
             }
+
             _log.Error($"Ошибка загрузки файла {aFilePath}! Формат файла не соответствует ожиданиям.");
             return false;
         }

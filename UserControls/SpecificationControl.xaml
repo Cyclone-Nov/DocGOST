@@ -23,7 +23,7 @@
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
 
-        <DataGrid x:Name="specificationDataGrid" Margin="5" SelectionMode="Extended" SelectionUnit="FullRow" 
+        <DataGrid x:Name="specificationDataGrid" Margin="5" SelectionMode="Extended"  SelectionUnit="FullRow"
                   AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="Auto" CanUserSortColumns="False" CanUserDeleteRows="False" CanUserReorderColumns="False"
                   SelectedItem="{Binding ComponentsSelectedItem.Value}"
                   ItemsSource="{Binding Components}" ContextMenuService.IsEnabled="{Binding TableContextMenuEnabled.Value}">
@@ -31,6 +31,9 @@
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="CellEditEnding">
                     <i:InvokeCommandAction Command="{Binding EditComponentsCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}}"  />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction Command="{Binding DataGridMouseButtonDownCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
 
