@@ -117,7 +117,7 @@ namespace GostDOC.PDF
                     if (index < 0)
                     {
                         name_strings.Add(partName);
-                        fullName = fullName.Substring(symbOnMaxLength + 1);
+                        fullName = fullName.Substring(symbOnMaxLength);
                     } else
                     {
                         name_strings.Add(fullName.Substring(0, index+1).TrimEnd());
