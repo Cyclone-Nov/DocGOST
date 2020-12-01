@@ -308,7 +308,12 @@ namespace GostDOC.DataPreparation
                 uint component_count = component.Count;
                 int count2 = GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
                 if (count2 > component_count)
-                    component_count = (uint)count2;                
+                    component_count = (uint)count2;
+                string groupSp = component.GetProperty(Constants.GroupNameSp);
+                if (string.Equals(groupSp, Constants.GroupDoc))
+                {
+                    component_count = 0;
+                }
 
                 string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize, true).ToArray();
                 var desigantor_id = component.GetProperty(Constants.ComponentDesignatorID);
