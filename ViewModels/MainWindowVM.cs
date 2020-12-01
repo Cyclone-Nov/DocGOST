@@ -379,7 +379,7 @@ namespace GostDOC.ViewModels
 
         private void SaveFileAs(object obj = null)
         {
-            var path = CommonDialogs.SaveFileAs("xml Files *.xml | *.xml", "Сохранить файл", GetDefaultFileName("xml"));
+            var path = CommonDialogs.SaveFileAs("xml Files *.xml | *.xml", "Сохранить файл", GetDefaultFileName("xml", false));
             if (!string.IsNullOrEmpty(path))
             {
                 _filePath = path;
@@ -744,7 +744,7 @@ namespace GostDOC.ViewModels
         {
             if (IsExportPdfEnabled.Value)
             {
-                var path = CommonDialogs.SaveFileAs("PDF files (*.pdf) | *.pdf", "Сохранить файл", GetDefaultFileName("pdf"));
+                var path = CommonDialogs.SaveFileAs("PDF files (*.pdf) | *.pdf", "Сохранить файл", GetDefaultFileName("pdf", true));
                 if (!string.IsNullOrEmpty(path))
                 {
                     _docManager.SavePDF(_docType, path);
@@ -756,7 +756,7 @@ namespace GostDOC.ViewModels
         {
             if (_excelManager.CanExport(_docType))
             {
-                var path = CommonDialogs.SaveFileAs("Excel Files *.xlsx | *.xlsx", "Сохранить файл", GetDefaultFileName("xlsx"));
+                var path = CommonDialogs.SaveFileAs("Excel Files *.xlsx | *.xlsx", "Сохранить файл", GetDefaultFileName("xlsx", true));
                 if (!string.IsNullOrEmpty(path))
                 {
                     _progress = new Progress();
@@ -1383,19 +1383,25 @@ namespace GostDOC.ViewModels
             //ComponentSupplierProfile.ComponentsEntry
         }
 
-        private string GetDefaultFileName(string aExtension)
+        private string GetDefaultFileName(string aExtension, bool aForExport)
         {
             string filename = string.Empty;
             if (!string.IsNullOrEmpty(_filePath))
             {
-                filename = $"{Path.GetFileNameWithoutExtension(_filePath)} {Common.Converters.GetDocumentName(_docType)}" + "." + aExtension;
+                if(aForExport)
+                    filename = $"{Path.GetFileNameWithoutExtension(_filePath)}{_docManager.GetDocumentName(_docType)}.{aExtension}";
+                else
+                    filename = $"{Path.GetFileNameWithoutExtension(_filePath)}.{aExtension}";
             }
             else
             {
                 var val = GeneralGraphValues.Where(k => string.Equals(k.Name.Value, "Обозначение")).ToArray();
                 if (val != null && val.Length > 0 && !string.IsNullOrEmpty(val[0].Text.Value))
                 {
-                    filename = $"{val[0].Text.Value}" + "." + aExtension;
+                    if (aForExport)
+                        filename = $"{val[0].Text.Value}{_docManager.GetDocumentName(_docType)}.{aExtension}";
+                    else
+                        filename = $"{val[0].Text.Value}.{aExtension}";
                 }
             }
             return filename;
