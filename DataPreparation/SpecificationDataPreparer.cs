@@ -305,7 +305,10 @@ namespace GostDOC.DataPreparation
             foreach (var component in aSortComponents)
             {   
                 string component_name = component.GetProperty(Constants.ComponentName);
-                uint component_count = component.Count;// GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
+                uint component_count = component.Count;
+                int count2 = GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
+                if (count2 > component_count)
+                    component_count = (uint)count2;                
 
                 string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize, true).ToArray();
                 var desigantor_id = component.GetProperty(Constants.ComponentDesignatorID);
