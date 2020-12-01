@@ -103,19 +103,19 @@ namespace GostDOC.ExcelExport
             if (_graphs != null)
             {
                 // Fill main title
-                sheet.Cells[33, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1);
-                sheet.Cells[30, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
-                sheet.Cells[34, 15] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4);
+                sheet.Cells[33, 10] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1);
+                sheet.Cells[30, 10] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+                sheet.Cells[34, 14] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4);
                 sheet.Cells[34, 16] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a);
                 sheet.Cells[34, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b);
 
-                sheet.Cells[33, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_dev);
-                sheet.Cells[34, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_chk);
-                sheet.Cells[36, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11norm);
-                sheet.Cells[37, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
+                sheet.Cells[33, 6] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_dev);
+                sheet.Cells[34, 6] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_chk);
+                sheet.Cells[36, 6] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11norm);
+                sheet.Cells[37, 6] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
             }
             // Set pages count
-            sheet.Cells[34, 20] = Pages + 1;
+            sheet.Cells[34, 19] = Pages + 1;
             // Fill data
             FillRows(sheet, MaxRowIndexFirst, true);
         }
@@ -123,11 +123,11 @@ namespace GostDOC.ExcelExport
         public void FillSheet(Excel._Worksheet sheet)
         {
             // Set page number
-            sheet.Cells[37, 22] = sheet.Name;
+            sheet.Cells[37, 16] = sheet.Name;
             if (_graphs != null)
             {
                 // Set title
-                sheet.Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+                sheet.Cells[34, 10] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
             }
             // Fill data
             FillRows(sheet, MaxRowIndexSecond);
@@ -142,16 +142,18 @@ namespace GostDOC.ExcelExport
             while (row <= maxRows && _tableRow < _tbl.Rows.Count)
             {
                 sheet.SetFormattedValue(row, 4, _tbl.GetTableValueFS(_tableRow, 1));
-                sheet.SetFormattedValue(row, 6, _tbl.GetTableValueFS(_tableRow, 2));
-                sheet.SetFormattedValue(row, 7, _tbl.GetTableValueFS(_tableRow, 3));
-                sheet.SetFormattedValue(row, 9, _tbl.GetTableValueFS(_tableRow, 4));
-                sheet.SetFormattedValue(row, 14, _tbl.GetTableValueFS(_tableRow, 5));
+                //sheet.Cells[row, 4] = _tbl.GetTableValue(_tableRow, 1);                
+                sheet.SetFormattedValue(row, 7, _tbl.GetTableValueFS(_tableRow, 2));
+                //sheet.Cells[row, 7] = _tbl.GetTableValue(_tableRow, 2);
 
-                int count = _tbl.GetTableValue<int>(_tableRow, 6);
+                int count = _tbl.GetTableValue<int>(_tableRow, 3);
                 if (count > 0)
-                    sheet.Cells[row, aFirst ? 19 : 20] = count;
+                {
+                    sheet.Cells[row, 11] = count;
+                }
 
-                sheet.SetFormattedValue(row, 21, _tbl.GetTableValueFS(_tableRow, 7));
+                sheet.SetFormattedValue(row, 13, _tbl.GetTableValueFS(_tableRow, 4));
+                //sheet.Cells[row, 13] = _tbl.GetTableValue(_tableRow, 4);
 
                 row++;
                 _tableRow++;
