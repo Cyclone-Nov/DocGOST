@@ -13,18 +13,13 @@ using iText.Layout.Properties;
 namespace GostDOC.DataPreparation
 {
 internal class ElementListDataPreparer : BasePreparer {
-
-    private string OutDocSign = string.Empty;
+    
     private string SchemaDesignation = string.Empty;
 
     public override string GetDocSign(Configuration aMainConfig)
-    {
-        if (string.IsNullOrEmpty(OutDocSign))
-        {
-            SchemaDesignation = GetSchemaDesignation(aMainConfig, out var DocCode);
-            OutDocSign = DocCode;
-        }
-        return OutDocSign;
+    {        
+        SchemaDesignation = GetSchemaDesignation(aMainConfig, out var DocCode);
+        return DocCode;
     }
 
     /// <summary>
@@ -37,15 +32,12 @@ internal class ElementListDataPreparer : BasePreparer {
         // выбираем основную конфигурацию        
         if (!aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))
             return null;
-        var data = mainConfig.Specification;                
+        var data = mainConfig.Specification;
 
-        if (string.IsNullOrEmpty(SchemaDesignation))
-        { 
-            SchemaDesignation = GetSchemaDesignation(mainConfig, out var DocCode);
-            OutDocSign = DocCode;
-        }
+        SchemaDesignation = GetSchemaDesignation(mainConfig, out var DocCode);        
+        
         appliedParams.Clear();
-        appliedParams.Add(Constants.AppParamDocSign, OutDocSign);
+        appliedParams.Add(Constants.AppParamDocSign, DocCode);
 
         // из остальных конфигураций получаем список словарей с соответсвующими компонентами
         var otherConfigsElements = MakeComponentDesignatorsDictionaryOtherConfigs(aConfigs);
@@ -232,7 +224,8 @@ internal class ElementListDataPreparer : BasePreparer {
                 string key = component_pair_arr[i].Key;
                 string designator = GetDesignator(key, component.Item1, component.Item3);
                 string doc = component.Item2.GetProperty(Constants.ComponentDoc);                
-                string component_name = component.Item2.GetProperty(Constants.ComponentName);                
+                string component_name = component.Item2.GetProperty(Constants.ComponentName);
+                string subGroupName = component.Item2.GetProperty(Constants.SubGroupNameSp);
 
                 bool haveToChangeName = string.Equals(component.Item2.GetProperty(Constants.ComponentPresence), "0") ||
                                                       DifferNameInOtherConfigs(component.Item2, aOtherComponents);
@@ -248,12 +241,13 @@ internal class ElementListDataPreparer : BasePreparer {
                 {
                     do
                     {
-                        var componentNext = component_pair_arr[j].Value;
+                        var componentNext = component_pair_arr[j].Value;                        
                         var nextKey = component_pair_arr[j].Key;
                         uint nextCount = componentNext.Item3;
                         string componentNext_name = componentNext.Item2.GetProperty(Constants.ComponentName);// GetComponentName(nextKey, canOutputStandardDocs, StandardComponentsDic, componentNext.Item2);
+                        string nextSubGroupName = componentNext.Item2.GetProperty(Constants.SubGroupNameSp);
 
-                        if (string.Equals(component_name, componentNext_name))
+                        if (string.Equals(component_name, componentNext_name) && string.Equals(subGroupName, nextSubGroupName))
                         {
                             same = true;
                             component_count+= nextCount;
@@ -296,17 +290,16 @@ internal class ElementListDataPreparer : BasePreparer {
                     name = change_name;
                 }
                 else
-                {
-                    string groupName = component.Item2.GetProperty(Constants.SubGroupNameSp);
+                {                    
                     string mainGroupName = component.Item2.GetProperty(Constants.GroupNameSp);
                     if (string.Equals(mainGroupName, Constants.GroupAssemblyUnits) ||
                         string.Equals(mainGroupName, Constants.GroupDetails))
                     {
-                        name = $"{component_name} {component.Item2.GetProperty(Constants.ComponentSign)}";
+                        name = $"{component_name.Trim()} {component.Item2.GetProperty(Constants.ComponentSign)}";
                     }
                     else
                     {
-                        name = (addGroupName) ? $"{GetGroupNameByCount(groupName, true)} {component_name} {doc}" : $"{component_name} {doc}";
+                        name = (addGroupName) ? $"{GetGroupNameByCount(subGroupName, true)} {component_name} {doc}" : $"{component_name} {doc}";
                     }
                 }
                 

@@ -648,7 +648,8 @@ namespace GostDOC.PDF
                 tbl.AddCell(CreateCell().SetBorderTop(THICK_BORDER).SetBorderLeft(THICK_BORDER));
             }
 
-            var graph2 = GetGraphByName(aGraphs, Constants.GRAPH_2) + GetAdditionalGraph2(titleBlockStruct.DocType);            
+            //var graph2 = GetGraphByName(aGraphs, Constants.GRAPH_2) + GetAdditionalGraph2(titleBlockStruct.DocType);            
+            var graph2 = GetGraphByName(aGraphs, Constants.GRAPH_2) + titleBlockStruct.DocSign;
             tbl.AddCell(new Cell(3, 1).
                 Add(new Paragraph(graph2).SetFont(f1).SetItalic().SetFontSize(20).SetTextAlignment(TextAlignment.CENTER)).
                 SetVerticalAlignment(VerticalAlignment.MIDDLE).
