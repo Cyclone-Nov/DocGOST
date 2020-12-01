@@ -389,6 +389,7 @@
     </None>
     <None Include="Settings\NewSpecificationGraphNames.cfg" />
     <Resource Include="Resources\ghost.png" />
+    <Resource Include="Resources\icon.jpg" />
     <Content Include="Settings\PhysicalDesignators.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
