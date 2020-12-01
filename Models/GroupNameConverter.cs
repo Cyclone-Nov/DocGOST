@@ -57,7 +57,7 @@ namespace GostDOC.Models
         {
             foreach (var line in Utils.ReadCfgFileLines("PhysicalDesignators"))
             {
-                string[] split = line.Split(new char[] { '\t' });
+                string[] split = line.Split(new char[] { '\t', '/' });
                 if (split.Length == 3)
                 {
                     _groupNames.Add(split[0], new Tuple<string, string>(split[1], split[2]));
