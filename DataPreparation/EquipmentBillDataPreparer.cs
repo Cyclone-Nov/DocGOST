@@ -13,7 +13,12 @@ namespace GostDOC.DataPreparation
     internal class EquipmentBillDataPreparer : BasePreparer
     {
 
-       /// <summary>
+        public override string GetDocSign(Configuration aMainConfig)
+        {
+            return "ВК";
+        }
+
+        /// <summary>
         /// формирование таблицы данных
         /// </summary>
         /// <param name="aConfigs"></param>

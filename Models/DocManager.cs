@@ -77,32 +77,22 @@ namespace GostDOC.Models
         /// <returns></returns>        
         public bool SavePDF(DocType aDocType, string aFilePath)
         {
-            DataTable dataTable = _prepareDataManager.GetDataTable(aDocType);
-            if (dataTable == null)
-            {
-                if (!_prepareDataManager.PrepareDataTable(aDocType, Project.Configurations))
-                    return false;
-                dataTable = _prepareDataManager.GetDataTable(aDocType);
-            }
-            var appParams = _prepareDataManager.GetAppliedParams(aDocType);
-
-            IDictionary<string, string> mainConfigGraphs = null;
-            bool res = true;
-            if (GetMainConfigurationGraphs(out mainConfigGraphs))
-            {
-                 if (_pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs, appParams))
-                 {
+            if (PrepareData(aDocType))
+            {                
+                if (PreparePDF(aDocType))
+                {
                     try
                     {
                         var data = _pdfManager.GetPDFData(aDocType);
                         System.IO.File.WriteAllBytes(aFilePath, data);
+                        return true;
                     } catch (Exception ex)
                     {
-                        res = false;
+                        //res = false;
                     }
-                 }
+                }
             }
-            return res;
+            return false;
         }
 
         /// <summary>
@@ -113,12 +103,11 @@ namespace GostDOC.Models
         public bool PreparePDF(DocType aDocType)
         {
             DataTable dataTable = _prepareDataManager.GetDataTable(aDocType);
-            var appParams = _prepareDataManager.GetAppliedParams(aDocType);
-            IDictionary<string, string> mainConfigGraphs = null;
-            if (GetMainConfigurationGraphs(out mainConfigGraphs))
+            var appParams = _prepareDataManager.GetAppliedParams(aDocType);            
+            if (GetMainConfigurationGraphs(out var mainConfigGraphs))
             {
                 return _pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs, appParams);
-            }            
+            }
             return false;
         }
 
@@ -143,6 +132,34 @@ namespace GostDOC.Models
             return _pdfManager.GetFileName(aDocType);
         }
 
+        /// <summary>
+        /// Получить строку с кодом документа по типу документа
+        /// </summary>
+        /// <param name="aDocType">Type of a document.</param>
+        /// <returns></returns>
+        public string GetDocumentName(DocType aDocType, bool aFullName = false)
+        {
+            if (aFullName)
+            {
+                switch (aDocType)
+                {
+                    case DocType.Bill:
+                        return "Ведомость покупных изделий";
+                    case DocType.ItemsList:
+                        return "Перечень элементов";
+                    case DocType.Specification:
+                        return "Спецификация";
+                    case DocType.D27:
+                        return "Ведомость комплектации";
+                    case DocType.None:
+                        return string.Empty;
+                }
+            }
+            else            
+                return GetDocSign(aDocType);
+            return string.Empty;
+        }
+
         #endregion Public
 
         /// <summary>
@@ -152,14 +169,21 @@ namespace GostDOC.Models
         /// <returns>true - словарь графов извлечен успешно</returns>
         private bool GetMainConfigurationGraphs(out IDictionary<string, string> mainGraphs)
         {
-            mainGraphs = null;
-            Configuration mainConfig = null;
-            if (Project.Configurations.TryGetValue(Constants.MAIN_CONFIG_INDEX, out mainConfig))
+            mainGraphs = null;            
+            if (Project.Configurations.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))
             {
                 mainGraphs = mainConfig.Graphs;
                 return true;
             }
             return false;
         }
+
+        private string GetDocSign(DocType aDocType)
+        {   
+            if (!Project.Configurations.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))
+                return string.Empty;
+            return _prepareDataManager.GetDocSign(aDocType, mainConfig);            
+        }
+
     }
 }

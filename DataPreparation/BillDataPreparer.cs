@@ -14,6 +14,12 @@ namespace GostDOC.DataPreparation
 {
     internal class BillDataPreparer : BasePreparer
     {
+
+        public override string GetDocSign(Configuration aMainConfig)
+        {
+            return "ВП";
+        }
+
         /// <summary>
         /// формирование таблицы данных
         /// </summary>

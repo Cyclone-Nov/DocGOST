@@ -280,14 +280,28 @@ namespace SoftCircuits.Collections
 
         public IEnumerator<TValue> GetEnumerator() => Items.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => Enumerate().GetEnumerator();// Items.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => Enumerate().GetEnumerator();
 
         private IEnumerable<KeyValuePair<TKey, TValue>> Enumerate()
         {
-            foreach (var key in IndexLookup.Keys)
+            //foreach (var key in IndexLookup.Keys)
+            //{
+            //    var value = Items[IndexLookup[key]];
+            //    yield return new KeyValuePair<TKey, TValue>(key, value);
+            //}
+
+            //foreach (var val in Items)
+            //{                
+            //    int index = Items.IndexOf(val);
+            //    var key = IndexLookup.Where(kl => kl.Value == index).First();
+            //    yield return new KeyValuePair<TKey, TValue>(key.Key, val);
+            //}
+
+            for (int ind = 0; ind < Items.Count; ind++)
             {
-                var value = Items[IndexLookup[key]];
-                yield return new KeyValuePair<TKey, TValue>(key, value);
+                var val = Items[ind];
+                var key = IndexLookup.Where(kl => kl.Value == ind).First();
+                yield return new KeyValuePair<TKey, TValue>(key.Key, val);
             }
         }
 

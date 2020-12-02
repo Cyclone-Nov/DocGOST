@@ -15,6 +15,11 @@ namespace GostDOC.DataPreparation
     internal class SpecificationDataPreparer : BasePreparer
     {
 
+        public override string GetDocSign(Configuration aMainConfig)
+        {
+            return "СП";
+        }
+
         /// <summary>
         /// формирование таблицы данных
         /// </summary>
@@ -170,11 +175,10 @@ namespace GostDOC.DataPreparation
                 if (string.Equals(aConfigName, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))                
                     configName = aSign; // "Обозначение"
                  else                
-                    configName = $"{aSign}{aConfigName}"; // "Обозначение"-"aConfigName"
+                    configName = $"{aSign}{aConfigName}"; // "Обозначение""aConfigName"
 
                 var row = aTable.NewRow();
-                row[Constants.ColumnSign] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };
-                //row[Constants.ColumnTextFormat] = new FormattedString { Value = "1" };
+                row[Constants.ColumnSign] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };                
                 aTable.Rows.Add(row);
                 AddEmptyRow(aTable);
             }
@@ -300,7 +304,15 @@ namespace GostDOC.DataPreparation
             foreach (var component in aSortComponents)
             {   
                 string component_name = component.GetProperty(Constants.ComponentName);
-                uint component_count = component.Count;// GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
+                uint component_count = component.Count;
+                int count2 = GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
+                if (count2 > component_count)
+                    component_count = (uint)count2;
+                string groupSp = component.GetProperty(Constants.GroupNameSp);
+                if (string.Equals(groupSp, Constants.GroupDoc))
+                {
+                    component_count = 0;
+                }
 
                 string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize, true).ToArray();
                 var desigantor_id = component.GetProperty(Constants.ComponentDesignatorID);
@@ -333,8 +345,7 @@ namespace GostDOC.DataPreparation
 
                     for (int ln = 1; ln < max; ln++)
                     {
-                        row = aTable.NewRow();
-                        row[Constants.ColumnZone] = new FormattedString { Value = "1" }; // используем данную колонку для установки признака переноса строки ????
+                        row = aTable.NewRow();                        
                         row[Constants.ColumnName] = (ln_name > ln) ? new FormattedString { Value = namearr[ln] } : null;
                         row[Constants.ColumnFootnote] = (ln_note > ln) ? new FormattedString { Value = notearr[ln] } : null;
                         aTable.Rows.Add(row);

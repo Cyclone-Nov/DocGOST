@@ -30,7 +30,7 @@ namespace GostDOC.Models
         {
             foreach (var line in Utils.ReadCfgFileLines("GroupNames"))
             {
-                string[] split = line.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] split = line.Split(new char[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
                 if (split.Length == 2)
                 {
                     _groupNames.Add(split[0], split[1]);

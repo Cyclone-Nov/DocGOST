@@ -12,6 +12,7 @@ using iText.Kernel.Pdf.Canvas.Draw;
 using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Properties;
+using GostDOC.DataPreparation;
 
 namespace GostDOC.PDF {
 /// <summary>
@@ -219,37 +220,34 @@ internal class PdfElementListCreator : PdfCreator {
 
             row = Rows[ind];
 
+            string GetCellString(string columnName) =>(row[columnName] == DBNull.Value) ? string.Empty : ((BasePreparer.FormattedString)row[columnName]).Value;
 
-            string GetCellString(string columnName) =>(row[columnName] == DBNull.Value)
-                ? string.Empty
-                : (string) row[columnName];
+            BasePreparer.FormattedString GetCellStringFormatted(string columnName) => (row[columnName] == System.DBNull.Value) ? null : ((BasePreparer.FormattedString)row[columnName]);
 
             string position = GetCellString(Constants.ColumnPosition);
-            string name = GetCellString(Constants.ColumnName);
+            var name = GetCellStringFormatted(Constants.ColumnName);
             string note = GetCellString(Constants.ColumnFootnote);
-            int quantity = (row[Constants.ColumnQuantity] == DBNull.Value)
-                ? 0
-                : (int) row[Constants.ColumnQuantity];
+            int quantity = (row[Constants.ColumnQuantity] == DBNull.Value) ? 0 : (int) row[Constants.ColumnQuantity];
 
 
             string nextPosition = position;
             if (ind+1 < Rows.Length)
             { 
-                nextPosition = (Rows[ind+1][Constants.ColumnPosition] == DBNull.Value) ? string.Empty : (string)Rows[ind + 1][Constants.ColumnPosition];
+                nextPosition = (Rows[ind+1][Constants.ColumnPosition] == DBNull.Value) ? string.Empty : ((BasePreparer.FormattedString)Rows[ind + 1][Constants.ColumnPosition]).Value;
             }
+
             if (IsEmptyRow(row)) 
             {
                 AddEmptyRowToPdfTable(tbl, 1, 4, leftPaddCell, remainingPdfTableRows == 1 ? true : false);
                 remainingPdfTableRows--;
             }            
             else if (IsGroupName(row)) // это наименование группы
-            {
-                
+            {                
                 if (remainingPdfTableRows > 4 || ((remainingPdfTableRows > 1) && !string.IsNullOrEmpty(nextPosition)))
                 {
                     // если есть место для записи более 4 строк то записываем группу, иначе выходим
                     tbl.AddCell(centrAlignCell.Clone(false));
-                    tbl.AddCell(centrAlignCell.Clone(true).Add(new Paragraph(name)));
+                    tbl.AddCell(centrAlignCell.Clone(true).Add(new Paragraph(name.Value)));
                     tbl.AddCell(centrAlignCell.Clone(false));
                     tbl.AddCell(leftPaddCell.Clone(false));
                     remainingPdfTableRows--;
@@ -267,15 +265,14 @@ internal class PdfElementListCreator : PdfCreator {
 
                 // просто запишем строку
                 tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
-                tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(name)));
+                tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(name.Value)));
 
-                if(string.IsNullOrEmpty(name))
+                if (string.IsNullOrEmpty(name.Value))
                     tbl.AddCell(centrAlignCell.Clone(false));
                 else
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity.ToString())));
 
                 tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(note)));
-
 
                 remainingPdfTableRows--; 
             }
@@ -320,14 +317,13 @@ internal class PdfElementListCreator : PdfCreator {
     ///   <c>true</c> if [is empty row] [the specified a row]; otherwise, <c>false</c>.
     /// </returns>
     bool IsGroupName(DataRow aRow)
-    {
-            //string.IsNullOrEmpty(position) && quantity == 0
-            //int quantity = (row[Constants.ColumnQuantity] == DBNull.Value)
-            //    ? 0
-            //    : (int)row[Constants.ColumnQuantity];
+    {       
+        var name = ((BasePreparer.FormattedString)aRow[Constants.ColumnName]);
 
-        if (string.IsNullOrEmpty(aRow[Constants.ColumnPosition].ToString()) &&
-            string.IsNullOrEmpty(aRow[Constants.ColumnQuantity].ToString()))
+        //if (string.IsNullOrEmpty(aRow[Constants.ColumnPosition].ToString()) &&
+        //    string.IsNullOrEmpty(aRow[Constants.ColumnQuantity].ToString()) &&
+        //    name.TextAlignment == TextAlignment.CENTER)
+        if (name.TextAlignment == TextAlignment.CENTER)
         {
             return true;
         }

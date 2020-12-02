@@ -383,12 +383,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="ExcelExport\Templates\ElementsList.xlsx" />
+    <None Include="ExcelExport\Templates\elements_list.xlsx" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Settings\NewSpecificationGraphNames.cfg" />
     <Resource Include="Resources\ghost.png" />
+    <Resource Include="Resources\icon.jpg" />
     <Content Include="Settings\PhysicalDesignators.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

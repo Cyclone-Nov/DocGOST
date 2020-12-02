@@ -8,10 +8,19 @@ using System.Threading.Tasks;
 using GostDOC.Common;
 using GostDOC.Models;
 using GostDOC.PDF;
+using iText.Layout.Properties;
 
 namespace GostDOC.DataPreparation
 {
 internal class ElementListDataPreparer : BasePreparer {
+    
+    private string SchemaDesignation = string.Empty;
+
+    public override string GetDocSign(Configuration aMainConfig)
+    {        
+        SchemaDesignation = GetSchemaDesignation(aMainConfig, out var DocCode);
+        return DocCode;
+    }
 
     /// <summary>
     /// формирование таблицы данных
@@ -20,12 +29,13 @@ internal class ElementListDataPreparer : BasePreparer {
     /// <returns></returns>    
     public override DataTable CreateDataTable(IDictionary<string, Configuration> aConfigs)
     {
-        // выбираем основную конфигурацию
-        Configuration mainConfig = null;
-        if (!aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out mainConfig))
+        // выбираем основную конфигурацию        
+        if (!aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))
             return null;
-        var data = mainConfig.Specification;                
-        string schemaDesignation = GetSchemaDesignation(mainConfig, out var DocCode);
+        var data = mainConfig.Specification;
+
+        SchemaDesignation = GetSchemaDesignation(mainConfig, out var DocCode);        
+        
         appliedParams.Clear();
         appliedParams.Add(Constants.AppParamDocSign, DocCode);
 
@@ -56,7 +66,7 @@ internal class ElementListDataPreparer : BasePreparer {
 
         if (allComponentsDic!= null)
         {
-            FillDataTable(table, allComponentsDic, otherConfigsElements, schemaDesignation);            
+            FillDataTable(table, allComponentsDic, otherConfigsElements, SchemaDesignation);            
             RemoveLastEmptyRows(table);
             return table;
         }
@@ -207,14 +217,15 @@ internal class ElementListDataPreparer : BasePreparer {
 
             bool addGroupName = true;
             int countDifferentComponents = 0;
-            bool singleGroupName = true;
+            //bool singleGroupName = true;
             for (int i=0; i < component_pair_arr.Length;)
             {
                 var component = component_pair_arr[i].Value;
                 string key = component_pair_arr[i].Key;
                 string designator = GetDesignator(key, component.Item1, component.Item3);
                 string doc = component.Item2.GetProperty(Constants.ComponentDoc);                
-                string component_name = component.Item2.GetProperty(Constants.ComponentName);                
+                string component_name = component.Item2.GetProperty(Constants.ComponentName);
+                string subGroupName = component.Item2.GetProperty(Constants.SubGroupNameSp);
 
                 bool haveToChangeName = string.Equals(component.Item2.GetProperty(Constants.ComponentPresence), "0") ||
                                                       DifferNameInOtherConfigs(component.Item2, aOtherComponents);
@@ -230,12 +241,13 @@ internal class ElementListDataPreparer : BasePreparer {
                 {
                     do
                     {
-                        var componentNext = component_pair_arr[j].Value;
+                        var componentNext = component_pair_arr[j].Value;                        
                         var nextKey = component_pair_arr[j].Key;
                         uint nextCount = componentNext.Item3;
                         string componentNext_name = componentNext.Item2.GetProperty(Constants.ComponentName);// GetComponentName(nextKey, canOutputStandardDocs, StandardComponentsDic, componentNext.Item2);
+                        string nextSubGroupName = componentNext.Item2.GetProperty(Constants.SubGroupNameSp);
 
-                        if (string.Equals(component_name, componentNext_name))
+                        if (string.Equals(component_name, componentNext_name) && string.Equals(subGroupName, nextSubGroupName))
                         {
                             same = true;
                             component_count+= nextCount;
@@ -257,13 +269,13 @@ internal class ElementListDataPreparer : BasePreparer {
                     int count = groupNames[designator].Item2;
                     if (!string.IsNullOrEmpty(groupName) && (count != sameComponents))
                     {                        
-                        singleGroupName = true;
+                        //singleGroupName = true;
                         addGroupName = false;
                         AddGroupName(aTable, GetGroupNameByCount(groupName, false));
                         AddEmptyRow(aTable);
                     } else
                     {
-                        singleGroupName = false;
+                        //singleGroupName = false;
                         addGroupName = true;
                     }
                     countDifferentComponents = 0;
@@ -278,9 +290,17 @@ internal class ElementListDataPreparer : BasePreparer {
                     name = change_name;
                 }
                 else
-                {
-                    string groupName = component.Item2.GetProperty(Constants.SubGroupNameSp);
-                    name = (addGroupName) ? $"{GetGroupNameByCount(groupName, true)} {component_name} {doc}" : $"{component_name} {doc}";
+                {                    
+                    string mainGroupName = component.Item2.GetProperty(Constants.GroupNameSp);
+                    if (string.Equals(mainGroupName, Constants.GroupAssemblyUnits) ||
+                        string.Equals(mainGroupName, Constants.GroupDetails))
+                    {
+                        name = $"{component_name.Trim()} {component.Item2.GetProperty(Constants.ComponentSign)}";
+                    }
+                    else
+                    {
+                        name = (addGroupName) ? $"{GetGroupNameByCount(subGroupName, true)} {component_name} {doc}" : $"{component_name} {doc}";
+                    }
                 }
                 
                 var note = component.Item2.GetProperty(Constants.ComponentNote);
@@ -417,10 +437,10 @@ internal class ElementListDataPreparer : BasePreparer {
             void AddColumn(string aColumnName, string aCaption, Type aType) =>
                 this.AddColumn(table, aColumnName, aCaption, aType);
 
-            AddColumn(Constants.ColumnPosition, "Поз. обозначение", typeof(string));
-            AddColumn(Constants.ColumnName, "Наименование", typeof(string));
+            AddColumn(Constants.ColumnPosition, "Поз. обозначение", typeof(FormattedString));
+            AddColumn(Constants.ColumnName, "Наименование", typeof(FormattedString));
             AddColumn(Constants.ColumnQuantity, "Кол.", typeof(Int32));
-            AddColumn(Constants.ColumnFootnote, "Примечание", typeof(string));
+            AddColumn(Constants.ColumnFootnote, "Примечание", typeof(FormattedString));
 
             return table;
         }
@@ -435,31 +455,31 @@ internal class ElementListDataPreparer : BasePreparer {
         /// <param name="aNote">a note.</param>
         private void AddNewRow(DataTable aTable, string aDesignators, string aName, uint aCount, string aNote)
         {
-            string[] desigantorarr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn1PositionWidth, aDesignators, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
+            string[] designatorarr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn1PositionWidth, aDesignators, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
             string[] namearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn2NameWidth, aName, new char[] { '.', ' ' }, Constants.ItemListFontSize, true).ToArray();
             string[] notearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn4FootnoteWidth, aNote, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
 
             var row = aTable.NewRow();
-            row[Constants.ColumnPosition] = desigantorarr.First();
-            row[Constants.ColumnName] = namearr.First();
+            row[Constants.ColumnPosition] = new FormattedString { Value = designatorarr.First() };
+            row[Constants.ColumnName] = new FormattedString { Value = namearr.First() };
             row[Constants.ColumnQuantity] = aCount;
-            row[Constants.ColumnFootnote] = notearr.First();
+            row[Constants.ColumnFootnote] = new FormattedString { Value = notearr.First() };
             aTable.Rows.Add(row);
 
             int max = Math.Max(namearr.Length, notearr.Length);
-            max = Math.Max(max, desigantorarr.Length);
+            max = Math.Max(max, designatorarr.Length);
             if (max > 1)
             {
                 int ln_name = namearr.Length;
                 int ln_note = notearr.Length;
-                int ln_designator = desigantorarr.Length;
+                int ln_designator = designatorarr.Length;
 
                 for (int ln = 1; ln < max; ln++)
                 {
                     row = aTable.NewRow();
-                    row[Constants.ColumnPosition] = (ln_designator > ln) ? desigantorarr[ln] : string.Empty;
-                    row[Constants.ColumnName] = (ln_name > ln) ? namearr[ln] : string.Empty;
-                    row[Constants.ColumnFootnote] = (ln_note > ln) ? notearr[ln] : string.Empty;
+                    row[Constants.ColumnPosition] = new FormattedString { Value = (ln_designator > ln) ? designatorarr[ln] : string.Empty };
+                    row[Constants.ColumnName] = new FormattedString { Value = (ln_name > ln) ? namearr[ln] : string.Empty };
+                    row[Constants.ColumnFootnote] = new FormattedString { Value = (ln_note > ln) ? notearr[ln] : string.Empty };
                     aTable.Rows.Add(row);
                 }
             }
@@ -472,10 +492,10 @@ internal class ElementListDataPreparer : BasePreparer {
         /// <param name="aTable"></param>
         private void AddEmptyRow(DataTable aTable) {
             DataRow row = aTable.NewRow();
-            row[Constants.ColumnName] = string.Empty;
-            row[Constants.ColumnPosition] = string.Empty;
-            row[Constants.ColumnQuantity] = 0;
-            row[Constants.ColumnFootnote] = string.Empty;
+            //row[Constants.ColumnName] = string.Empty;
+            //row[Constants.ColumnPosition] = string.Empty;
+            //row[Constants.ColumnQuantity] = 0;
+            //row[Constants.ColumnFootnote] = string.Empty;
             aTable.Rows.Add(row);
         }
 
@@ -487,7 +507,7 @@ internal class ElementListDataPreparer : BasePreparer {
         private void AddGroupName(DataTable aTable, string aGroupName) {
             if (string.IsNullOrEmpty(aGroupName)) return;
             DataRow row = aTable.NewRow();
-            row[Constants.ColumnName] = aGroupName;
+            row[Constants.ColumnName] = new FormattedString { Value = aGroupName, TextAlignment = TextAlignment.CENTER };
             aTable.Rows.Add(row);
         }
 
@@ -613,7 +633,7 @@ internal class ElementListDataPreparer : BasePreparer {
                     var arr = table.Rows[last_index].ItemArray;
                     if (string.IsNullOrEmpty(arr[1].ToString()) &&
                         string.IsNullOrEmpty(arr[2].ToString()) &&
-                        (int)arr[3] == 0                        &&
+                        string.IsNullOrEmpty(arr[3].ToString()) &&
                         string.IsNullOrEmpty(arr[4].ToString()))
                     {
                         empty_str = true;                        

@@ -40,6 +40,13 @@ public abstract class BasePreparer {
     public abstract DataTable CreateDataTable(IDictionary<string, Configuration> aConfigs);
 
     /// <summary>
+    /// Gets the document sign.
+    /// </summary>
+    /// <param name="aMainConfig">a main configuration.</param>
+    /// <returns></returns>
+    public abstract string GetDocSign(Configuration aMainConfig);
+
+    /// <summary>
     /// создать таблицу данных
     /// </summary>
     /// <param name="aDataTableName">Name of a data table.</param>
@@ -61,16 +68,16 @@ public abstract class BasePreparer {
                     val.GetProperty(Constants.ComponentName).ToLower().Contains(Constants.DOC_SCHEMA.ToLower()));
                 if (docсomponents.Count() > 0) {
                     // если заканчивается на c3 или э3, то берем ее.
-                    var shemas = docсomponents.Where(val => (
-                        val.GetProperty(Constants.ComponentDocCode).EndsWith("С3") ||
-                        val.GetProperty(Constants.ComponentDocCode).EndsWith("Э3"))
-                    );
+                    //var shemas = docсomponents.Where(val => (
+                    //    val.GetProperty(Constants.ComponentDocCode).EndsWith("С3") ||
+                    //    val.GetProperty(Constants.ComponentDocCode).EndsWith("Э3"))
+                    //);
 
                     
                     // в любом случае берем первую
-                    if (shemas.Count() > 0) {
-                        designation = shemas.First().GetProperty(Constants.ComponentSign);
-                        outDocCode = "П"+ shemas.First().GetProperty(Constants.ComponentDocCode);
+                    if (docсomponents.Count() > 0) {
+                        designation = docсomponents.First().GetProperty(Constants.ComponentSign);
+                        outDocCode = "П"+ docсomponents.First().GetProperty(Constants.ComponentDocCode);
                     }
                     else {
                         designation = docсomponents.First().GetProperty(Constants.ComponentSign);

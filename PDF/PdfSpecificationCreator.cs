@@ -259,7 +259,7 @@ namespace GostDOC.PDF
                 if (name == null && sign == null && string.IsNullOrEmpty(note) ) {                    
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS, leftPaddCell, remainingPdfTableRows == 1 ? true : false);
                     remainingPdfTableRows--;
-                } else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(zone) && string.IsNullOrEmpty(note))  {
+                } else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(zone) && string.IsNullOrEmpty(note) && string.IsNullOrEmpty(format))  {
                     // наименование группы
                     if (remainingPdfTableRows > 4)  {
                         // если есть место для записи более 4 строк то записываем группу, иначе выходим
@@ -284,7 +284,7 @@ namespace GostDOC.PDF
                         leftPaddCell.SetBorderBottom(THICK_BORDER);
                     }
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(format))); // формат
-                    tbl.AddCell(centrAlignCell.Clone(false)); // зона
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(zone))); // зона
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
                     AddCellFormatted(sign); // обозначение
                     AddCellFormatted(name);
@@ -310,7 +310,7 @@ namespace GostDOC.PDF
         private void DrawLines(int pageNumber) {
             var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
             DrawVerticalLine(pageNumber, fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 200);
-        }
+        }                
 
     }
 }
