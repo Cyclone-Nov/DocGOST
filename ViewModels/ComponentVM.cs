@@ -26,6 +26,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<string> Note { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> Sign { get; } = new ObservableProperty<string>();
         public ObservableProperty<string> WhereIncluded { get; } = new ObservableProperty<string>();
+        public bool IsReadOnly { get; set; } = false;
 
         private class ComponentMemento
         {

@@ -177,6 +177,7 @@
     <Compile Include="Common\HttpStreamToBrowser.cs" />
     <Compile Include="Common\WebBrowserUtility.cs" />
     <Compile Include="Common\XmlSerializerHelper.cs" />
+    <Compile Include="Converters\CountConverter.cs" />
     <Compile Include="Converters\DeliveryIntervalConverter.cs" />
     <Compile Include="Converters\EnumDescriptionConverter.cs" />
     <Compile Include="Converters\EnumToItemsSource.cs" />
