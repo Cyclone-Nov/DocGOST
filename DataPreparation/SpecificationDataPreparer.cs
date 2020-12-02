@@ -88,6 +88,7 @@ namespace GostDOC.DataPreparation
             deltaMainConfig.Graphs = mainConfig.Graphs;
             var mainData = mainConfig.Specification;
 
+            // выберем неглавные конфигурации
             Dictionary<string, Configuration> otherConfigs = new Dictionary<string, Configuration>();
             foreach (var config in aConfigs)
             {
@@ -97,8 +98,10 @@ namespace GostDOC.DataPreparation
                 }
             }
 
-            foreach (var group in mainData.OrderBy(key => key.Key))
+            //foreach (var group in mainData.OrderBy(key => key.Key))
+            foreach (var group in mainData)
             {
+                // для списка компонентов из корня каждого раздела
                 foreach (var component in group.Value.Components)
                 {
                     if (CheckComponent(otherConfigs, component, group.Key))
@@ -120,7 +123,9 @@ namespace GostDOC.DataPreparation
                     }
                 }
 
-                foreach (var subgroup in group.Value.SubGroups.OrderBy(key2 => key2.Key))
+                // для списка компонентов из корня каждого раздела
+                //foreach (var subgroup in group.Value.SubGroups.OrderBy(key2 => key2.Key))
+                foreach (var subgroup in group.Value.SubGroups)
                 {
                     foreach (var component in subgroup.Value.Components)
                     {
@@ -178,7 +183,7 @@ namespace GostDOC.DataPreparation
                     configName = $"{aSign}{aConfigName}"; // "Обозначение""aConfigName"
 
                 var row = aTable.NewRow();
-                row[Constants.ColumnSign] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };                
+                row[Constants.ColumnName] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };                
                 aTable.Rows.Add(row);
                 AddEmptyRow(aTable);
             }
@@ -221,28 +226,9 @@ namespace GostDOC.DataPreparation
             // наименование раздела
             AddEmptyRow(aTable);
             if (AddGroupName(aTable, aGroupName))
-                AddEmptyRow(aTable);
+                AddEmptyRow(aTable);           
 
-            var sortType = SortType.None;
-            if (aGroupName == Constants.GroupDoc)
-            {
-                sortType = SortType.None;
-            } else if (aGroupName == Constants.GroupComplex || aGroupName == Constants.GroupAssemblyUnits || aGroupName == Constants.GroupDetails)
-            {
-                sortType = SortType.SpComplex;
-            } else if (aGroupName == Constants.GroupStandard)
-            {
-                sortType = SortType.SpStandard;
-            } else if (aGroupName == Constants.GroupOthers)
-            {
-                sortType = SortType.SpOthers;
-            } else if (aGroupName == Constants.GroupKits)
-            {
-                sortType = SortType.SpKits;
-            }
-            var sort = SortFactory.GetSort(sortType);
-
-            var сomponents = sort.Sort(group.Components.ToList());
+            var сomponents = group.Components;
             AddComponents(aTable, сomponents, ref aPos, !string.Equals(aGroupName, Constants.GroupDoc));
             
             if (сomponents.Count > 0 && group.SubGroups.Count > 0)
@@ -255,9 +241,8 @@ namespace GostDOC.DataPreparation
             {
                 if (subgroup.Value.Components.Count > 0)
                 {
-                    string subGroupName = GetSubgroupNameByCount(subgroup);
-                    var mainсomponents = sort.Sort(subgroup.Value.Components.ToList());
-                    AddSubgroup(aTable, subGroupName, mainсomponents, ref aPos);
+                    string subGroupName = GetSubgroupNameByCount(subgroup);                    
+                    AddSubgroup(aTable, subGroupName, subgroup.Value.Components, ref aPos);
                 }
             }
 
@@ -265,9 +250,8 @@ namespace GostDOC.DataPreparation
             if (group.SubGroups.TryGetValue(Constants.SUBGROUPFORSINGLE, out var subgroup_other))
             {
                 if (subgroup_other.Components.Count > 0)
-                {   
-                    var mainсomponents = sort.Sort(subgroup_other.Components.ToList());
-                    AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, mainсomponents, ref aPos);
+                {                       
+                    AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, subgroup_other.Components, ref aPos);
                 }
             }
 
@@ -314,7 +298,7 @@ namespace GostDOC.DataPreparation
                     component_count = 0;
                 }
 
-                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize, true).ToArray();
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize).ToArray();
                 var desigantor_id = component.GetProperty(Constants.ComponentDesignatorID);
 
                 var note = component.GetProperty(Constants.ComponentNote);
@@ -523,11 +507,11 @@ namespace GostDOC.DataPreparation
             string name1 = aFirstComponent.GetProperty(Constants.ComponentName);
             string name2 = aSecondComponent.GetProperty(Constants.ComponentName);
 
-            //string entry1 = aFirstComponent.GetProperty(Constants.ComponentWhereIncluded);
-            //string entry2 = aSecondComponent.GetProperty(Constants.ComponentWhereIncluded);
+            string sign1 = aFirstComponent.GetProperty(Constants.ComponentSign);
+            string sign2 = aSecondComponent.GetProperty(Constants.ComponentSign);
 
             if (string.Equals(name1, name2) &&
-                //string.Equals(entry1, entry2) &&
+                string.Equals(sign1, sign2) &&
                 aFirstComponent.Count == aSecondComponent.Count)
             {
                 return true;

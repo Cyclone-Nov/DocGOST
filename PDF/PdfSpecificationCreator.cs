@@ -197,6 +197,14 @@ namespace GostDOC.PDF
                 .SetBorderLeft(THICK_BORDER)
                 .SetBorderRight(THICK_BORDER)
                 .SetFontSize(Constants.SpecificationFontSize);
+            Cell rightPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 2, 0, 0)
+                .SetHeight(8 * PdfDefines.mmAXh)
+                .SetTextAlignment(TextAlignment.RIGHT)
+                .SetItalic()
+                .SetFont(f1)
+                .SetBorderLeft(THICK_BORDER)
+                .SetBorderRight(THICK_BORDER)
+                .SetFontSize(Constants.SpecificationFontSize);
 
             int remainingPdfTableRows = (aDataTableStruct.FirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
             outLastProcessedRow = aStartRow;
@@ -233,15 +241,18 @@ namespace GostDOC.PDF
                 var name = GetCellStringFormatted(Constants.ColumnName);
 
                 void AddCellFormatted(BasePreparer.FormattedString fs) {
-                    Cell c = centrAlignCell.Clone(false);
+                    Cell c;
                     if (fs != null)
                     {                        
                         if (fs.TextAlignment == TextAlignment.CENTER)
                         {
-                            c = (centrAlignCell.Clone(false).Add(new Paragraph(fs.Value))); // наименование
+                            c = (centrAlignCell.Clone(false).Add(new Paragraph(fs.Value)));
                         } else if (fs.TextAlignment == TextAlignment.LEFT)
                         {
-                            c = (leftPaddCell.Clone(false).Add(new Paragraph(fs.Value))); // наименование
+                            c = (leftPaddCell.Clone(false).Add(new Paragraph(fs.Value)));
+                        }
+                        else{
+                            c = (rightPaddCell.Clone(false).Add(new Paragraph(fs.Value)));
                         }
                         if (fs.IsUnderlined) c.SetUnderline(0.5f, -1);
                     }
@@ -265,11 +276,8 @@ namespace GostDOC.PDF
                         // если есть место для записи более 4 строк то записываем группу, иначе выходим
                         tbl.AddCell(centrAlignCell.Clone(false)); // формат
                         tbl.AddCell(centrAlignCell.Clone(false)); // зона
-                        tbl.AddCell(centrAlignCell.Clone(false)); // поз
-                        if (sign == null)
-                            tbl.AddCell(centrAlignCell.Clone(false)); // обозначение
-                        else
-                            AddCellFormatted(sign);
+                        tbl.AddCell(centrAlignCell.Clone(false)); // поз                        
+                        AddCellFormatted(sign); 
                         AddCellFormatted(name);
                         tbl.AddCell(centrAlignCell.Clone(false)); // кол
                         tbl.AddCell(centrAlignCell.Clone(false)); // примеч.
