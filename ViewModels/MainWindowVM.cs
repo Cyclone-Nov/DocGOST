@@ -294,7 +294,7 @@ namespace GostDOC.ViewModels
                 try
                 {
                     locker = false;
-                    e.CommitEdit(DataGridEditingUnit.Row, false);
+                    e.CommitEdit(DataGridEditingUnit.Row, true);
                     UpdateUndoRedoComponents();
                     IsUndoEnabled.Value = true;
                     _shouldSave = true;
