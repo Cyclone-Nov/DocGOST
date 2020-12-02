@@ -294,7 +294,7 @@ namespace GostDOC.ViewModels
                 try
                 {
                     locker = false;
-                    e.CommitEdit(DataGridEditingUnit.Row, true);
+                    e.CommitEdit(DataGridEditingUnit.Row, false);
                     UpdateUndoRedoComponents();
                     IsUndoEnabled.Value = true;
                     _shouldSave = true;
@@ -308,8 +308,16 @@ namespace GostDOC.ViewModels
 
         private void DataGridMouseButtonDown(DataGrid obj)
         {
-            obj.UnselectAllCells();
-            //obj.Items.Refresh();
+            bool commit = obj.CommitEdit(DataGridEditingUnit.Row, true);
+            if (!commit)
+            {
+                commit = obj.CancelEdit(DataGridEditingUnit.Row);
+            }
+            if (commit)
+            {
+                obj.UnselectAllCells();
+                obj.Items.Refresh();
+            }
         }
 
         private void OpenFileSp(object obj)
