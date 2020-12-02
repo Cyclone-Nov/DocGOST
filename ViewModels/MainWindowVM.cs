@@ -96,8 +96,7 @@ namespace GostDOC.ViewModels
         public ObservableProperty<bool> IsSaveAsEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsExportExcelEnabled { get; } = new ObservableProperty<bool>(false);
         public ObservableProperty<bool> IsExportPdfEnabled { get; } = new ObservableProperty<bool>(false);
-                
-
+        public ObservableProperty<bool> IsAddComponentEnabled { get; } = new ObservableProperty<bool>(true);
         // Drag / drop
         public DragDropFile DragDropFile { get; } = new DragDropFile();
 
@@ -112,7 +111,8 @@ namespace GostDOC.ViewModels
         public ICommand SaveFileCmd => new Command(SaveFile, IsSaveEnabled);
         public ICommand SaveFileAsCmd => new Command(SaveFileAs, IsSaveEnabled);
         public ICommand ClosingCmd => new Command<System.ComponentModel.CancelEventArgs>(Closing);
-        public ICommand AddComponentCmd => new Command(AddComponent);
+        public ICommand AddComponentCmd => new Command(AddComponent, IsAddComponentEnabled);
+        public ICommand AddEmptyRowCmd => new Command(AddEmptyRow);
         public ICommand RemoveComponentsCmd => new Command<IList<object>>(RemoveComponents);
         public ICommand MoveComponentsCmd => new Command<IList<object>>(MoveComponents);
         public ICommand TreeViewSelectionChangedCmd => new Command<Node>(TreeViewSelectionChanged);
@@ -125,6 +125,7 @@ namespace GostDOC.ViewModels
         public ICommand EditNameValueCmd => new Command(EditNameValue);
         public ICommand EditComponentsCmd => new Command<DataGrid>(EditComponents);
         public ICommand DataGridMouseButtonDownCmd => new Command<DataGrid>(DataGridMouseButtonDown);
+        public ICommand DataGridBeginningEditCmd => new Command<DataGridBeginningEditEventArgs>(DataGridBeginningEdit);
         public ICommand ExportPDFCmd => new Command(ExportPDF, IsExportPdfEnabled);
         public ICommand ExportExcelCmd => new Command(ExportExcel, IsExportExcelEnabled);
 
@@ -308,8 +309,24 @@ namespace GostDOC.ViewModels
 
         private void DataGridMouseButtonDown(DataGrid obj)
         {
-            obj.UnselectAllCells();
-            //obj.Items.Refresh();
+            bool commit = obj.CommitEdit(DataGridEditingUnit.Row, true);
+            if (!commit)
+            {
+                commit = obj.CancelEdit(DataGridEditingUnit.Row);
+            }
+            if (commit)
+            {
+                obj.UnselectAllCells();
+                obj.Items.Refresh();
+            }
+        }
+
+        private void DataGridBeginningEdit(DataGridBeginningEditEventArgs e)
+        {
+            if (ComponentsSelectedItem?.Value.IsReadOnly == true)
+            {
+                e.Cancel = true;
+            }
         }
 
         private void OpenFileSp(object obj)
@@ -437,9 +454,18 @@ namespace GostDOC.ViewModels
         private void AddComponent(object obj)
         {
             var cmp = new ComponentVM();
+            cmp.Name.Value = Constants.ComponentName;
             cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
             Components.Add(cmp);
+            UpdateUndoRedoComponents();
+        }
 
+        private void AddEmptyRow(object obj)
+        {
+            var cmp = new ComponentVM();
+            cmp.CountDev.Value = 0;
+            cmp.IsReadOnly = true;
+            Components.Add(cmp);
             UpdateUndoRedoComponents();
         }
 
@@ -941,6 +967,7 @@ namespace GostDOC.ViewModels
 
         private void UpdateSelectedDocument()
         {
+            bool isAddComponentEnabled = true;
              // Is group or subgroup selected
             bool isGroup = _selectedItem.NodeType == NodeType.Group || _selectedItem.NodeType == NodeType.SubGroup;
             // Is graph table visible
@@ -954,7 +981,8 @@ namespace GostDOC.ViewModels
             {
                 // Is add group button enabled
                 IsAddEnabled.Value = _selectedItem.NodeType == NodeType.Group && _selectedItem.Name != Constants.DefaultGroupName;
-                
+                // Is add component enabled
+                isAddComponentEnabled = GroupName != Constants.GroupMaterials;
                 // Is remove group button enabled
                 IsRemoveEnabled.Value = _selectedItem.NodeType == NodeType.SubGroup && _selectedItem.Name != Constants.DefaultGroupName;
             }
@@ -977,7 +1005,9 @@ namespace GostDOC.ViewModels
             IsSpecificationTableVisible.Value = _docType == DocType.Specification && isGroup;
             // Is bill table visible
             IsBillTableVisible.Value = _docType == DocType.Bill && isGroup;
-            
+            // Is add component enabled
+            IsAddComponentEnabled.Value = isAddComponentEnabled;
+
             if (_docType == DocType.D27)
             {
                 if (_selectedItem.NodeType == NodeType.Component)
