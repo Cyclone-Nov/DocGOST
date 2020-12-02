@@ -441,6 +441,7 @@ namespace GostDOC.DataPreparation
 
             foreach (var config in aOtherConfigs)
             {
+                removeList = null;
                 if (string.IsNullOrEmpty(aSubGroupName))
                 {
                     bRemoveGroup = false;
@@ -452,7 +453,7 @@ namespace GostDOC.DataPreparation
                             {
                                 removeList = config.Value.Specification[aGroupName].Components;
                                 removeComponent = othercomp;
-                                bRemoveGroup = (removeList.Count() == 1);
+                                bRemoveGroup = (removeList.Count() == 1 && config.Value.Specification[aGroupName].SubGroups.Count == 0);
                                 break;
                             }
                         }
