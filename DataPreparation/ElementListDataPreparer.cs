@@ -750,7 +750,8 @@ internal class ElementListDataPreparer : BasePreparer {
                     }
 
                 }
-                groupNamesDic.Add(firstDesignator, new Tuple<string, int>(lastGroupName, countComponents));
+
+                groupNamesDic.Add(firstDesignator, new Tuple<string, int>(countSubGroupCanges > 0 ? "" : lastGroupName, countComponents));
             }
 
             return groupNamesDic;
