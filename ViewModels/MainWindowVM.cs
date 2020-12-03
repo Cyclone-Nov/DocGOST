@@ -361,6 +361,8 @@ namespace GostDOC.ViewModels
             {                
                 _docManager.Reset();
 
+                ClearVisible();
+
                 DocNodes.Clear();
                 DocNodes.Add(_specification);
                 
@@ -928,8 +930,7 @@ namespace GostDOC.ViewModels
             // Save file path to title
             UpdateTitle();
 
-            Components.Clear();
-            GeneralGraphValues.Clear();
+            ClearVisible();
 
             // Parse xml files
             switch (_docManager.LoadData(_filePath, _docType))
@@ -1399,6 +1400,12 @@ namespace GostDOC.ViewModels
                 }
             }
             return filename;
+        }
+
+        private void ClearVisible()
+        {
+            GeneralGraphValues.Clear();
+            Components.Clear();
         }
     }
 }
