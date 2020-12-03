@@ -41,8 +41,11 @@ namespace GostDOC.DataPreparation
             // получим обозначение изделия
             string sign = GetDeviceSign(aConfigs);
 
+            // позиция должна быть сквозной для всего документа
+            int position = 0;
+
             // заполнение данных из основного исполнения
-            FillConfiguration(table, mainConfig, sign);
+            FillConfiguration(table, mainConfig, ref position, sign);
 
             // заполним переменные данные исполнений, если они есть
             if (listPreparedConfigs != null && listPreparedConfigs.Count() > 0)
@@ -51,7 +54,7 @@ namespace GostDOC.DataPreparation
 
                 foreach (var config in listPreparedConfigs.OrderBy(key => key.Key))
                 {
-                    FillConfiguration(table, config.Value, sign, config.Key, false);
+                    FillConfiguration(table, config.Value, ref position, sign, config.Key, false);
                 }
             }
 
@@ -168,15 +171,15 @@ namespace GostDOC.DataPreparation
         /// <param name="aTable">итоговая таблица с данными</param>
         /// <param name="aConfig">конфигурация</param>
         /// <param name="aManyConfigs">признак наличия нескольких конфигураций: если <c>true</c> то несколько конфигураций</param>
-        private void FillConfiguration(DataTable aTable, Configuration aConfig, string aSign, string aConfigName = "", bool aMainConfig = true)
+        private void FillConfiguration(DataTable aTable, Configuration aConfig, ref int aPosition, string aSign, string aConfigName = "", bool aMainConfig = true)
         {
             var data = aConfig.Specification;
             if (data.Count == 0)
                 return;
 
-            string configName = "";
             if (!aMainConfig)
-            {                
+            {
+                string configName;
                 if (string.Equals(aConfigName, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))                
                     configName = aSign; // "Обозначение"
                  else                
@@ -185,19 +188,17 @@ namespace GostDOC.DataPreparation
                 var row = aTable.NewRow();
                 row[Constants.ColumnName] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };                
                 aTable.Rows.Add(row);
-                AddEmptyRow(aTable);
+                //AddEmptyRow(aTable);
             }
-            
-            int position = 0;
 
-            AddGroup(aTable, Constants.GroupDoc, data, ref position);
-            AddGroup(aTable, Constants.GroupComplex, data, ref position);
-            AddGroup(aTable, Constants.GroupAssemblyUnits, data, ref position);
-            AddGroup(aTable, Constants.GroupDetails, data, ref position);
-            AddGroup(aTable, Constants.GroupStandard, data, ref position);
-            AddGroup(aTable, Constants.GroupOthers, data, ref position);
-            AddGroup(aTable, Constants.GroupMaterials, data, ref position);
-            AddGroup(aTable, Constants.GroupKits, data, ref position);
+            AddGroup(aTable, Constants.GroupDoc, data, ref aPosition);
+            AddGroup(aTable, Constants.GroupComplex, data, ref aPosition);
+            AddGroup(aTable, Constants.GroupAssemblyUnits, data, ref aPosition);
+            AddGroup(aTable, Constants.GroupDetails, data, ref aPosition);
+            AddGroup(aTable, Constants.GroupStandard, data, ref aPosition);
+            AddGroup(aTable, Constants.GroupOthers, data, ref aPosition);
+            AddGroup(aTable, Constants.GroupMaterials, data, ref aPosition);
+            AddGroup(aTable, Constants.GroupKits, data, ref aPosition);
 
             aTable.AcceptChanges();
         }
@@ -403,7 +404,7 @@ namespace GostDOC.DataPreparation
             AddEmptyRow(aTable);
             var row = aTable.NewRow();
             row[Constants.ColumnSign] = new FormattedString { Value = "Переменные данные", IsUnderlined = true, TextAlignment = TextAlignment.RIGHT };
-            row[Constants.ColumnName] = new FormattedString { Value = "исполнений", IsUnderlined = true, TextAlignment = TextAlignment.LEFT };            
+            row[Constants.ColumnName] = new FormattedString { Value = "для исполнений", IsUnderlined = true, TextAlignment = TextAlignment.LEFT };            
             aTable.Rows.Add(row);
             AddEmptyRow(aTable);
         }
