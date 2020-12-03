@@ -491,11 +491,7 @@ internal class ElementListDataPreparer : BasePreparer {
         /// </summary>
         /// <param name="aTable"></param>
         private void AddEmptyRow(DataTable aTable) {
-            DataRow row = aTable.NewRow();
-            //row[Constants.ColumnName] = string.Empty;
-            //row[Constants.ColumnPosition] = string.Empty;
-            //row[Constants.ColumnQuantity] = 0;
-            //row[Constants.ColumnFootnote] = string.Empty;
+            DataRow row = aTable.NewRow();            
             aTable.Rows.Add(row);
         }
 

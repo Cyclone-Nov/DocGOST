@@ -45,7 +45,7 @@ namespace GostDOC.ExcelExport
 
         public void Export(Excel.Application aApp, string aFilePath)
         {
-            _tbl = DataTableExtensions.GetDataTable(DocType.ItemsList);
+            _tbl = DataTableUtils.GetDataTable(DocType.ItemsList);
 
             var wb = aApp.Workbooks.Open(Utils.GetTemplatePath(Constants.ItemsListTemplateName));
 
