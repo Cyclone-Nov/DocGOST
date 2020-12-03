@@ -40,7 +40,6 @@ namespace GostDOC.ViewModels
         private DocManager _docManager = DocManager.Instance;
 
         private DocumentTypes _docTypes = DocManager.Instance.DocumentTypes;
-        private ProductTypes _materials = DocManager.Instance.Materials;
 
         private ProjectWrapper _project = new ProjectWrapper();
         private List<MoveInfo> _moveInfo = new List<MoveInfo>();
@@ -458,8 +457,7 @@ namespace GostDOC.ViewModels
             var cmp = new ComponentVM();
             cmp.Name.Value = Constants.ComponentName;
             cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
-            Components.Add(cmp);
-            UpdateUndoRedoComponents();
+            AddComponent(cmp);
         }
 
         private void AddEmptyRow(object obj)
@@ -701,7 +699,7 @@ namespace GostDOC.ViewModels
                     cmp.Sign.Value = included + doc.Code;
                     cmp.WhereIncluded.Value = included;
                     cmp.Format.Value = "А4";
-                    Components.Add(cmp);
+                    AddComponent(cmp);
                 }        
             }
             else if (GroupName.Equals(Constants.GroupMaterials))
@@ -740,8 +738,6 @@ namespace GostDOC.ViewModels
                         {
                             TableContextMenu.InsertSorted(node);
                         }
-                        // Save file
-                        aProductTypes.Save();
                     }
                 }
             }
@@ -768,6 +764,8 @@ namespace GostDOC.ViewModels
                         aNode.Parent.Nodes.InsertSorted(node);
                     }
                 }
+                // Save file
+                aProductTypes.Save();
                 return;
             }
             else
@@ -783,8 +781,15 @@ namespace GostDOC.ViewModels
                 cmp.Name.Value = product.Name;
                 cmp.Note.Value = product.Note;
                 cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
-                Components.Add(cmp);
+                if (GroupName == Constants.GroupMaterials)
+                {
+                    cmp.MaterialGroup = groups.Item1;
+                }
+                AddComponent(cmp);
             }
+
+            // Save file
+            aProductTypes.Save();
         }
 
         private void ExportPDF(object obj)
@@ -899,6 +904,7 @@ namespace GostDOC.ViewModels
             if (aChecked)
             {
                 SaveComponents();
+                UpdateGroup();
             }
         }
 
@@ -1072,7 +1078,7 @@ namespace GostDOC.ViewModels
             return _project.GetGroupData(ConfigurationName, _docType, groupInfo);
         }
 
-        private void UpdateGroupData()
+        private void UpdateGroup()
         {
             var groupData = GetGroupData();
             if (groupData == null)
@@ -1087,6 +1093,11 @@ namespace GostDOC.ViewModels
             {
                 Components.Add(new ComponentVM(component));
             }
+        }
+
+        private void UpdateGroupData()
+        {
+            UpdateGroup();
 
             // Add initial value to undo / redo stack
             _undoRedoComponents.Clear();
@@ -1227,6 +1238,11 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentCountReg, aSrc.CountReg.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCount, aSrc.Count.Value.ToString());
             aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
+
+            if (!string.IsNullOrEmpty(aSrc.MaterialGroup))
+            {
+                aDst.Properties.Add(Constants.ComponentMaterialGroup, aSrc.MaterialGroup);
+            }
         }
 
         private void AddMenuItem(MenuNode aNode, ProductGroup aGroup, string aNewElement)
@@ -1439,6 +1455,18 @@ namespace GostDOC.ViewModels
         {
             GeneralGraphValues.Clear();
             Components.Clear();
+        }
+
+        private void AddComponent(ComponentVM aComponent)
+        {
+            Components.Add(aComponent);
+            UpdateUndoRedoComponents();
+
+            if (IsAutoSortEnabled.Value)
+            {
+                SaveComponents();
+                UpdateGroup();
+            }
         }
     }
 }
