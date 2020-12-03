@@ -574,6 +574,7 @@ namespace GostDOC.Common
 
         public static readonly string NewMaterialMenuItem = "<Добавить материал>";
         public static readonly string NewProductMenuItem = "<Добавить изделие>";
+        public static readonly string NewGroupMenuItem = "<Добавить группу>";
 
         #region Файлы
 

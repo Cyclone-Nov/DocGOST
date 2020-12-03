@@ -745,6 +745,31 @@ namespace GostDOC.ViewModels
                     }
                 }
             }
+            else if (aNode.Name == Constants.NewGroupMenuItem)
+            {
+                var name = CommonDialogs.GetGroupName();
+                if (!string.IsNullOrEmpty(name))
+                {
+                    // Cerate new menu item
+                    var node = new MenuNode() { Name = name, Parent = aNode.Parent, Nodes = new ObservableCollection<MenuNode>() };
+                    // Add new product menu item
+                    node.Nodes.InsertSorted(new MenuNode() { Name = aNewItemName, Parent = node });
+
+                    if (string.IsNullOrEmpty(groups.Item1))
+                    {
+                        aProductTypes.AddGroup(name);
+                        // Add new group menu item
+                        node.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewGroupMenuItem, Parent = node });
+                        TableContextMenu.InsertSorted(node);
+                    } 
+                    else
+                    {
+                        aProductTypes.AddSubGroup(groups.Item1, name);
+                        aNode.Parent.Nodes.InsertSorted(node);
+                    }
+                }
+                return;
+            }
             else
             {
                 // Find material
@@ -1210,13 +1235,20 @@ namespace GostDOC.ViewModels
             {
                 aNode.Nodes.InsertSorted(new MenuNode() { Name = product.Key, Parent = aNode });
             }
+            // Add product item
             aNode.Nodes.InsertSorted(new MenuNode() { Name = aNewElement, Parent = aNode });
+
+            if (aNode.Parent == null)
+            {
+                // Add group button, only to groups
+                aNode.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewGroupMenuItem, Parent = aNode });
+            }
 
             if (aGroup.SubGroups != null)
             {
                 foreach (var gp in aGroup.SubGroups)
                 {
-                    MenuNode node = new MenuNode() { Name = gp.Key, Nodes = new ObservableCollection<MenuNode>() };
+                    MenuNode node = new MenuNode() { Name = gp.Key, Parent = aNode, Nodes = new ObservableCollection<MenuNode>() };
                     AddMenuItem(node, gp.Value, aNewElement);
                     aNode.Nodes.InsertSorted(node);
                 }
@@ -1239,6 +1271,7 @@ namespace GostDOC.ViewModels
             }
             // Add "new product" button
             TableContextMenu.InsertSorted(new MenuNode() { Name = Constants.NewProductMenuItem });
+            TableContextMenu.InsertSorted(new MenuNode() { Name = Constants.NewGroupMenuItem });
             TableContextMenuEnabled.Value = true;
         }
 
