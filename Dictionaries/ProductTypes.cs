@@ -137,6 +137,8 @@ namespace GostDOC.Dictionaries
         public void Save(string aFilePath = null)
         {
             ProductsXml products = new ProductsXml();
+            products.DocType = DocType;
+
             foreach (var product in Products.ProductsList)
             {
                 products.Products.Add(product.Value);
