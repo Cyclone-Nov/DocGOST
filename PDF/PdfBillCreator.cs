@@ -373,8 +373,8 @@ namespace GostDOC.PDF
         }
 
         void DrawLines(int aPageNumber) {
-            var pageWidth =  _pdfDoc.GetPage(aPageNumber).GetPageSize().GetWidth();
-            var leftVertLineHeight = PdfDefines.A3Width - BOTTOM_MARGIN * 2;
+            //var pageWidth =  _pdfDoc.GetPage(aPageNumber).GetPageSize().GetWidth();
+            //var leftVertLineHeight = PdfDefines.A3Width - BOTTOM_MARGIN * 2;
             var x = APPEND_GRAPHS_LEFT + APPEND_GRAPHS_WIDTH - 2f;
             var y = BOTTOM_MARGIN;
             

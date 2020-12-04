@@ -213,6 +213,7 @@
     <Compile Include="Models\MenuNode.cs" />
     <Compile Include="Models\MoveInfo.cs" />
     <Compile Include="Models\ProjectWrapper.cs" />
+    <Compile Include="Models\PurchaseDeprtment\PurchaseDepartment.cs" />
     <Compile Include="Models\SortFactory.cs" />
     <Compile Include="Models\SubGroupInfo.cs" />
     <Compile Include="Models\UndoRedoStack.cs" />

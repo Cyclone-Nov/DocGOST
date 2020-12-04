@@ -112,8 +112,12 @@ namespace GostDOC.ExcelExport
                 return val as BasePreparer.FormattedString;
             }
             return null;
-        }
+        }        
+    }
 
+
+    static class DataTableUtils
+    {
         public static DataTable GetDataTable(DocType aDocType)
         {
             if (PrepareManager.Instance.PrepareDataTable(aDocType, DocManager.Instance.Project.Configurations))
@@ -123,6 +127,7 @@ namespace GostDOC.ExcelExport
             return null;
         }
     }
+
 
     static class ExcelUtils
     {

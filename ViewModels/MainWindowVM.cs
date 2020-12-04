@@ -1390,6 +1390,8 @@ namespace GostDOC.ViewModels
             }); 
         }
 
+        #region  ========= PURCHASE DEPARTMENT ====================
+
         private void UpdateComponentSuppliersProfile(string aComponentName)
         {            
             var groupData = GetGroupData();            
@@ -1401,9 +1403,10 @@ namespace GostDOC.ViewModels
                 doc = component.GetProperty(Constants.ComponentDoc);
                 if (string.Equals(aComponentName, doc))
                     doc = string.Empty;
+
                 FillComponentSupplierProfile(component);
             }
-            ComponentPropertiesHeader.Value = $"Свойства компонента {aComponentName} {doc}";            
+            ComponentPropertiesHeader.Value = $"Свойства компонента {aComponentName} {doc}";
         }
 
         private void UpdateProductSupplierProfile()
@@ -1426,6 +1429,9 @@ namespace GostDOC.ViewModels
 
             //ComponentSupplierProfile.ComponentsEntry
         }
+
+        #endregion PURCHASE DEPARTMENT
+
 
         private string GetDefaultFileName(string aExtension, bool aForExport)
         {
