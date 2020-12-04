@@ -187,10 +187,12 @@ namespace GostDOC.ViewModels
                 {
                     var product = CommonDialogs.UpdateProduct(src);
                     if (product != null)
-                    {
-                        if (_products.RemoveProduct(group, subgroup, src.Name))
+                    { 
+                        // Add new product
+                        if (_products.AddProduct(group, subgroup, product))
                         {
-                            if (_products.AddProduct(group, subgroup, product))
+                            // Remove current product
+                            if (_products.RemoveProduct(group, subgroup, src.Name))
                             {
                                 SelectedItem.Value.Name.Value = product.Name;
                             }

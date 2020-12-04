@@ -245,8 +245,12 @@ namespace GostDOC.Dictionaries
                             return false;
                         }
                     }
-                    gp.ProductsList.Add(aProduct.Name, aProduct);
-                    return true;
+
+                    if (!gp.ProductsList.ContainsKey(aProduct.Name))
+                    {
+                        gp.ProductsList.Add(aProduct.Name, aProduct);
+                        return true;
+                    }
                 }
             }
             return false;
