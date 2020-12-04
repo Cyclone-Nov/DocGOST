@@ -23,6 +23,7 @@ namespace GostDOC.Common
         SpStandard,             // Спецификация: "Стандартные изделия"
         SpOthers,               // Спецификация: "Прочие изделия"
         SpKits,                 // Спецификация: "Комплекты"
+        SpMaterials,            // Спецификация: "Материалы"
         Name,                   // По алфавиту по тегу "Наименование"
         DesignatorID,           // Перечень элементов: сортировка по значению "Позиционное обозначение"
         None
@@ -372,7 +373,8 @@ namespace GostDOC.Common
         public static readonly string ComponentSign = "Обозначение";
         public static readonly string ComponentWhereIncluded = "Куда входит";
         public static readonly string ComponentDesignatorID = "Позиционное обозначение";
-        
+        public static readonly string ComponentMaterialGroup = "Группа материала";
+
         #endregion
 
 

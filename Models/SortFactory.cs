@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GostDOC.Common;
+using SoftCircuits.Collections;
 
 namespace GostDOC.Models
 {
@@ -93,7 +94,7 @@ namespace GostDOC.Models
 
             if (result == 0)
             {
-                return dX.Item2 - dY.Item2;
+                return dX.Item2.CompareTo(dY.Item2);
             }
 
             return result;
@@ -244,6 +245,51 @@ namespace GostDOC.Models
         }
     }
 
+    public class MaterialsSort : ISort<Component>
+    {
+        private List<string> _groups = new List<string>();
+
+        #region Singleton
+        private static readonly Lazy<MaterialsSort> _instance = new Lazy<MaterialsSort>(() => new MaterialsSort(), true);
+        public static MaterialsSort Instance => _instance.Value;
+        #endregion
+
+        private MaterialsSort()
+        {
+            foreach (var line in Utils.ReadCfgFileLines(Constants.MaterialGroupsCfg))
+            {
+                _groups.Add(line);
+            }
+        }
+
+        public List<Component> Sort(List<Component> aItems)
+        {
+            aItems.Sort((x, y) =>
+            {
+                string gpX = x.GetProperty(Constants.ComponentMaterialGroup);
+                string gpY = y.GetProperty(Constants.ComponentMaterialGroup);
+
+                if (string.IsNullOrEmpty(gpX))
+                {
+                    return 1;
+                }
+                if (string.IsNullOrEmpty(gpY))
+                {
+                    return -1;
+                }
+
+                int result = _groups.IndexOf(gpX).CompareTo(_groups.IndexOf(gpY));
+                if (result == 0)
+                {
+                    result = x.CompareTo(y, Constants.ComponentName);
+                }
+                return result;
+
+            });
+            return aItems;
+        }
+    }
+
     static class SortFactory
     {        
         public static ISort<Component> GetSort(SortType aSortType)
@@ -258,6 +304,8 @@ namespace GostDOC.Models
                     return NameSortRegex.Instance;
                 case SortType.SpKits:
                     return new NameSignSort();
+                case SortType.SpMaterials:
+                    return MaterialsSort.Instance;
                 case SortType.Name:
                     return new NameSort();
                 case SortType.DesignatorID:

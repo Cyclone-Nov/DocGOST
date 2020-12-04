@@ -145,7 +145,7 @@ namespace GostDOC.Models
                     }
                     if (aGroupName.Equals(Constants.GroupMaterials))
                     {
-                        return SortType.Name;
+                        return SortType.SpMaterials;
                     }
                     if (aGroupName.Equals(Constants.GroupKits))
                     {
