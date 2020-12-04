@@ -206,7 +206,7 @@ namespace GostDOC.Common
         /// <summary>
         /// название графы №4 Обозначение Литеры А изделия в структуре xml
         /// </summary>
-        public static readonly string GRAPH_4 = "Литера";
+        public static readonly string GRAPH_4 = "Литера1";
         /// название графы №4а Обозначение Литеры О изделия в структуре xml
         /// </summary>
         public static readonly string GRAPH_4a = "Литера2";
@@ -358,10 +358,11 @@ namespace GostDOC.Common
         public static readonly string ComponentProductCode = "Код продукции";
         public static readonly string ComponentFormat = "Формат";
         public static readonly string ComponentZone = "Зона";
+        public static readonly string ComponentPosiiton = "Позиция";
         public static readonly string ComponentDoc = "Документ на поставку";
         public static readonly string ComponentDocCode = "Код документа";
         public static readonly string ComponentType = "Тип";
-        public static readonly string ComponentSupplier = "Поставщик";
+        public static readonly string ComponentSupplier = "Производитель";
         public static readonly string ComponentCount = "Количество";
         public static readonly string ComponentCountDev = "Количество на изд.";
         public static readonly string ComponentCountSet = "Количество в комп.";

@@ -14,7 +14,7 @@ namespace GostDOC.Models
 {
     class XmlManager
     {
-        private Version MinVersion = new Version(1, 1);
+        private Version MinVersion = new Version(1, 2);
 
         private RootXml _xml = null;
         private DocType _docType = DocType.None;
