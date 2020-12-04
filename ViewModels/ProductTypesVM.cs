@@ -172,12 +172,12 @@ namespace GostDOC.ViewModels
                 string group = null;
                 string subgroup = null;
 
-                if (SelectedItem.Value.Parent.Type == DictionaryNodeType.SubGroup)
+                if (SelectedItem.Value.Parent?.Type == DictionaryNodeType.SubGroup)
                 {
                     group = SelectedItem.Value.Parent.Parent.Name.Value;
                     subgroup = SelectedItem.Value.Parent.Name.Value;
                 }
-                else if (SelectedItem.Value.Parent.Type == DictionaryNodeType.Group)
+                else if (SelectedItem.Value.Parent?.Type == DictionaryNodeType.Group)
                 {
                     group = SelectedItem.Value.Parent.Name.Value;
                 }
