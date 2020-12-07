@@ -495,7 +495,7 @@ namespace GostDOC.ViewModels
                     foreach (var cmp in lst.Cast<ComponentVM>().ToList())
                     {
                         // Add component to move list
-                        Component component = new Component(cmp.Guid);
+                        Component component = new Component(cmp.Guid, cmp.Count.Value);
                         UpdateComponent(cmp, component);
                         moveInfo.Components.Add(component);
                         // Remove component from view
@@ -515,7 +515,7 @@ namespace GostDOC.ViewModels
             List<Component> components = new List<Component>();
             foreach (var cmp in Components)
             {
-                Component component = new Component(cmp.Guid);
+                Component component = new Component(cmp.Guid, cmp.Count.Value);
                 UpdateComponent(cmp, component);
                 components.Add(component);
             }
