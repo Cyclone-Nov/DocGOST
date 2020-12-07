@@ -77,7 +77,7 @@ namespace GostDOC.ViewModels
         {
             foreach (var kvp in _products.Products.Groups)
             {
-                DictionaryNode node = new DictionaryNode(kvp.Key) { Nodes = new ObservableCollection<DictionaryNode>() };
+                DictionaryNode node = new DictionaryNode(kvp.Key) { Nodes = new ObservableCollection<DictionaryNode>()};
                 AddNode(node, kvp.Value);
                 DictionaryNodes.InsertSorted(node);
             }
@@ -247,10 +247,12 @@ namespace GostDOC.ViewModels
                     IsEditEnabled.Value = type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
                     break;
                 case ProductTypesDoc.Others:
+                    IsAddEnabled.Value = !type.HasValue || type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup;
                     IsRemoveEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
                     IsEditEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
                     break;
                 case ProductTypesDoc.Standard:
+                    IsAddEnabled.Value = !type.HasValue || type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup;
                     IsRemoveEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
                     IsEditEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
                     break;
@@ -272,7 +274,10 @@ namespace GostDOC.ViewModels
 
         private void Loaded(object obj)
         {
-            SelectedItem.Value = DictionaryNodes.FirstOrDefault();
+            if (DocType == ProductTypesDoc.Materials)
+            {
+                SelectedItem.Value = DictionaryNodes.FirstOrDefault();
+            }
         }
 
         private void AddNode(DictionaryNode aNode, ProductGroup aGroup)

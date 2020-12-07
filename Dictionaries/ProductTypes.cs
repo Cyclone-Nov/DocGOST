@@ -232,8 +232,11 @@ namespace GostDOC.Dictionaries
         {
             if (string.IsNullOrEmpty(aGroup))
             {
-                Products.ProductsList.Add(aProduct.Name, aProduct);
-                return true;
+                if (!Products.ProductsList.ContainsKey(aProduct.Name))
+                {
+                    Products.ProductsList.Add(aProduct.Name, aProduct);
+                    return true;
+                }
             }
             else
             {
@@ -319,10 +322,13 @@ namespace GostDOC.Dictionaries
             ProductGroup gp;
             if (Products.Groups.TryGetValue(aOldName, out gp))
             {
-                gp.Name = aNewName;
-                Products.Groups.Remove(aOldName);
-                Products.Groups.Add(aNewName, gp);
-                return true;
+                if (!Products.Groups.ContainsKey(aNewName))
+                {
+                    gp.Name = aNewName;
+                    Products.Groups.Remove(aOldName);
+                    Products.Groups.Add(aNewName, gp);
+                    return true;
+                }
             }
             return false;
         }
@@ -337,10 +343,13 @@ namespace GostDOC.Dictionaries
                     ProductGroup subgroup;
                     if (gp.SubGroups.TryGetValue(aOldName, out subgroup))
                     {
-                        subgroup.Name = aNewName;
-                        gp.SubGroups.Remove(aOldName);
-                        gp.SubGroups.Add(aNewName, subgroup);
-                        return true;
+                        if (!gp.SubGroups.ContainsKey(aNewName))
+                        {
+                            subgroup.Name = aNewName;
+                            gp.SubGroups.Remove(aOldName);
+                            gp.SubGroups.Add(aNewName, subgroup);
+                            return true;
+                        }
                     }
                 }
             }
