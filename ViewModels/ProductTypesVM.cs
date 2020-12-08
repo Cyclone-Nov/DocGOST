@@ -286,7 +286,7 @@ namespace GostDOC.ViewModels
             {
                 foreach (var sub in aGroup.SubGroups)
                 {
-                    DictionaryNode gp = new DictionaryNode(sub.Key, DictionaryNodeType.SubGroup) { Parent = aNode };
+                    DictionaryNode gp = new DictionaryNode(sub.Key, DictionaryNodeType.SubGroup) { Parent = aNode, Nodes = new ObservableCollection<DictionaryNode>() };
                     AddNode(gp, sub.Value);
                     aNode.Nodes.InsertSorted(gp);
                 }

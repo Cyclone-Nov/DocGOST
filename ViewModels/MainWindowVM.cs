@@ -753,15 +753,19 @@ namespace GostDOC.ViewModels
 
                     if (string.IsNullOrEmpty(groups.Item1))
                     {
-                        aProductTypes.AddGroup(name);
-                        // Add new group menu item
-                        node.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewGroupMenuItem, Parent = node });
-                        TableContextMenu.InsertSorted(node);
+                        if (aProductTypes.AddGroup(name))
+                        {
+                            // Add new group menu item
+                            node.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewGroupMenuItem, Parent = node });
+                            TableContextMenu.InsertSorted(node);
+                        }
                     } 
                     else
                     {
-                        aProductTypes.AddSubGroup(groups.Item1, name);
-                        aNode.Parent.Nodes.InsertSorted(node);
+                        if (aProductTypes.AddSubGroup(groups.Item1, name))
+                        {
+                            aNode.Parent.Nodes.InsertSorted(node);
+                        }
                     }
                 }
                 // Save file
