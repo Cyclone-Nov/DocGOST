@@ -247,11 +247,8 @@ namespace GostDOC.ViewModels
                     IsEditEnabled.Value = type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
                     break;
                 case ProductTypesDoc.Others:
-                    IsAddEnabled.Value = !type.HasValue || type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup;
-                    IsRemoveEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
-                    IsEditEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
-                    break;
                 case ProductTypesDoc.Standard:
+                    IsAddGroupEnabled.Value = !type.HasValue || type == DictionaryNodeType.Group;
                     IsAddEnabled.Value = !type.HasValue || type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup;
                     IsRemoveEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
                     IsEditEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
