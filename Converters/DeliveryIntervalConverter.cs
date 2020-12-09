@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using GostDOC.Context;
 using GostDOC.Models;
 
 namespace GostDOC.Converters

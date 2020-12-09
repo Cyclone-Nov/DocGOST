@@ -277,7 +277,13 @@
     <Compile Include="Common\HttpStreamToBrowser.cs" />
     <Compile Include="Common\WebBrowserUtility.cs" />
     <Compile Include="Common\XmlSerializerHelper.cs" />
+    <Compile Include="Context\ComponentEntry.cs" />
+    <Compile Include="Context\ComponentSupplierProfile.cs" />
     <Compile Include="Context\DatabaseContext.cs" />
+    <Compile Include="Context\Supplier.cs" />
+    <Compile Include="Context\SupplierProperties.cs" />
+    <Compile Include="Context\WarehouseAcceptance.cs" />
+    <Compile Include="Context\WarehouseDelivery.cs" />
     <Compile Include="Converters\CountConverter.cs" />
     <Compile Include="Converters\DeliveryIntervalConverter.cs" />
     <Compile Include="Converters\EnumDescriptionConverter.cs" />
@@ -304,7 +310,7 @@
     <Compile Include="Interfaces\IMemento.cs" />
     <Compile Include="Models\CombineProperties.cs" />
     <Compile Include="DataPreparation\PrepareManager.cs" />
-    <Compile Include="Models\DeliveryInterval.cs" />
+    <Compile Include="Context\DeliveryInterval.cs" />
     <Compile Include="Dictionaries\DocumentTypes.cs" />
     <Compile Include="ExcelExport\ExcelManager.cs" />
     <Compile Include="Models\ErrorHandler.cs" />

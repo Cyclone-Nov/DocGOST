@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using GostDOC.Common;
 using GostDOC.Models;
+using GostDOC.Context;
 
 namespace GostDOC.ViewModels
 {

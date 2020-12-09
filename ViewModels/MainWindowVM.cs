@@ -19,6 +19,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using SoftCircuits.Collections;
 using GostDOC.Dictionaries;
+using GostDOC.Context;
 
 namespace GostDOC.ViewModels
 {
