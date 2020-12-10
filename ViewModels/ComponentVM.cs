@@ -12,19 +12,118 @@ namespace GostDOC.ViewModels
     class ComponentVM : IMemento<object>
     {
         public Guid Guid { get; private set; } = Guid.NewGuid();
+
+        /// <summary>
+        /// Наименование компонента
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
         public ObservableProperty<string> Name { get; } = new ObservableProperty<string>();
+        /// <summary>
+        /// Наименование компонента
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
+        public ObservableProperty<string> Zone { get; } = new ObservableProperty<string>();
+        /// <summary>
+        /// Код продукции
+        /// </summary>
+        /// <value>
+        /// The code.
+        /// </value>
         public ObservableProperty<string> Code { get; } = new ObservableProperty<string>();
+        /// <summary>
+        /// Формат документа (если компонента является документом)
+        /// </summary>
+        /// <value>
+        /// The format.
+        /// </value>
         public ObservableProperty<string> Format { get; } = new ObservableProperty<string>();
+        /// <summary>
+        /// Наличиен данного компонента в сборке
+        /// </summary>
+        /// <value>
+        /// The entry.
+        /// </value>
         public ObservableProperty<string> Entry { get; } = new ObservableProperty<string>();
+        /// <summary>
+        /// производитель компонента
+        /// </summary>
+        /// <value>
+        /// The manufacturer.
+        /// </value>
         public ObservableProperty<string> Manufacturer { get; } = new ObservableProperty<string>();
-        public ObservableProperty<int> Position { get; } = new ObservableProperty<int>();
+        /// <summary>
+        /// Поставщик компонента
+        /// </summary>
+        /// <value>
+        /// The supplier.
+        /// </value>
+        public ObservableProperty<string> Supplier { get; } = new ObservableProperty<string>();
+        /// <summary>
+        /// Позиция компонента на чертеже и в документе спецификация
+        /// </summary>
+        /// <value>
+        /// The position.
+        /// </value>
+        public ObservableProperty<int> Position { get; } = new ObservableProperty<int>(0);
+        /// <summary>
+        /// Количество на изделие
+        /// </summary>
+        /// <value>
+        /// The count dev.
+        /// </value>
         public ObservableProperty<uint> CountDev { get; } = new ObservableProperty<uint>(1);
+        /// <summary>
+        /// Количество на комплект
+        /// </summary>
+        /// <value>
+        /// The count set.
+        /// </value>
         public ObservableProperty<uint> CountSet { get; } = new ObservableProperty<uint>(0);
+        /// <summary>
+        /// Количество на регулир.
+        /// </summary>
+        /// <value>
+        /// The count reg.
+        /// </value>
         public ObservableProperty<uint> CountReg { get; } = new ObservableProperty<uint>(0);
+        /// <summary>
+        /// Количество
+        /// </summary>
+        /// <value>
+        /// The count.
+        /// </value>
         public ObservableProperty<uint> Count { get; } = new ObservableProperty<uint>(0);
+        /// <summary>
+        /// позиционное обозначение (для радиокомпонентов, узлови и деталей)
+        /// </summary>
+        /// <value>
+        /// The designator identifier.
+        /// </value>
         public ObservableProperty<string> DesignatorID { get; } = new ObservableProperty<string>();
+        /// <summary>
+        /// Примечание
+        /// </summary>
+        /// <value>
+        /// The note.
+        /// </value>
         public ObservableProperty<string> Note { get; } = new ObservableProperty<string>();
+        /// <summary>
+        /// Обозначение
+        /// </summary>
+        /// <value>
+        /// The sign.
+        /// </value>
         public ObservableProperty<string> Sign { get; } = new ObservableProperty<string>();
+        /// <summary>
+        /// Децимальный номер узла или сборки, куда входит компонент
+        /// </summary>
+        /// <value>
+        /// The where included.
+        /// </value>
         public ObservableProperty<string> WhereIncluded { get; } = new ObservableProperty<string>();
         public bool IsReadOnly { get; set; } = false;
         public string MaterialGroup { get; set; }
@@ -45,6 +144,7 @@ namespace GostDOC.ViewModels
             public string Note { get; set; }
             public string Sign { get; set; }
             public string WhereIncluded { get; set; }
+            public string Zone { get; set; }            
         }
 
         public object Memento
@@ -66,7 +166,8 @@ namespace GostDOC.ViewModels
                     DesignatorID = DesignatorID.Value,
                     Note = Note.Value,
                     Sign = Sign.Value,
-                    WhereIncluded = WhereIncluded.Value
+                    WhereIncluded = WhereIncluded.Value,
+                    Zone = Zone.Value
                 };
             }
 
@@ -87,6 +188,7 @@ namespace GostDOC.ViewModels
                 Note.Value = memento.Note;
                 Sign.Value = memento.Sign;
                 WhereIncluded.Value = memento.WhereIncluded;
+                Zone.Value = memento.Zone;
             }
         }
 
@@ -116,6 +218,9 @@ namespace GostDOC.ViewModels
 
             DesignatorID.Value = GetValue(Constants.ComponentDesignatorID, aComponent);
             WhereIncluded.Value = GetValue(Constants.ComponentWhereIncluded, aComponent);
+
+            Position.Value = (int)Convert(GetValue(Constants.ComponentPosition, aComponent));
+            Zone.Value = GetValue(Constants.ComponentZone, aComponent);
 
             if (CountDev.Value == 0)
             {

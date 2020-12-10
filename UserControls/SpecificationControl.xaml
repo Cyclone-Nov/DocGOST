@@ -89,7 +89,8 @@
                         </col:ArrayList>
                     </DataGridComboBoxColumn.ItemsSource>
                 </DataGridComboBoxColumn>
-                <DataGridTextColumn Header="Позиция" Binding="{Binding Position.Value}" IsReadOnly="True" Visibility="Collapsed"/>                
+                <DataGridTextColumn Header="Зона" Binding="{Binding Zone.Value}"/>
+                <DataGridTextColumn Header="Поз." Binding="{Binding Position.Value}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Обозначение" Binding="{Binding Sign.Value}"/>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name.Value}"/>
                 <DataGridTextColumn Header="Количество" Binding="{Binding CountDev.Value, Converter={StaticResource countConverter}}"/>
@@ -98,21 +99,23 @@
         </DataGrid>
 
         <DockPanel Grid.Row="1" LastChildFill="False">
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Компонент" Command="{Binding AddComponentCmd}"/>
+            <Button DockPanel.Dock="Left" Width="110" Margin="5" Content="Обновить позиции"                    
+                    Command="{Binding SpecPositionRecalcCmd}"/>
+            <Button DockPanel.Dock="Left" Width="80" Margin="5" Content="Компонент" Command="{Binding AddComponentCmd}"/>
             <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Пустая строка" Command="{Binding AddEmptyRowCmd}"/>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Удалить" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding RemoveComponentsCmd}"/>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Перенести" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding MoveComponentsCmd}"/>
+            <Button DockPanel.Dock="Left" Width="80" Margin="5" Content="Удалить" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding RemoveComponentsCmd}"/>
+            <Button DockPanel.Dock="Left" Width="80" Margin="5" Content="Перенести" CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding MoveComponentsCmd}"/>
 
             <CheckBox x:Name="autoSortEnabled" DockPanel.Dock="Left" Margin="5,7,5,3" Content="Авто сортировка"
                       IsChecked="{Binding IsAutoSortEnabled.Value}"
                       Command="{Binding AutoSortCheckedCmd}"
                       CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"/>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Вверх" 
+            <Button DockPanel.Dock="Left" Width="78" Margin="5" Content="Вверх" 
                     IsEnabled="{Binding ElementName=autoSortEnabled, Path=IsChecked, Converter={StaticResource inverseConverter}}"
                     CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding UpComponentsCmd}"/>
-            <Button DockPanel.Dock="Left" Width="100" Margin="5" Content="Вниз"
+            <Button DockPanel.Dock="Left" Width="78" Margin="5" Content="Вниз"
                     IsEnabled="{Binding ElementName=autoSortEnabled, Path=IsChecked, Converter={StaticResource inverseConverter}}"
-                    CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding DownComponentsCmd}"/>
+                    CommandParameter="{Binding ElementName=specificationDataGrid, Path=SelectedItems}" Command="{Binding DownComponentsCmd}"/>            
         </DockPanel>
         
     </Grid>

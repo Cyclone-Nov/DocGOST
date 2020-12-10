@@ -37,6 +37,8 @@ namespace GostDOC.ViewModels
         private string _filePath = null;
         private bool _shouldSave = false;
 
+        private Dictionary<string, List<Tuple<string, int>>> _specifiactionPositionsDic = null;
+
         private DocManager _docManager = DocManager.Instance;
 
         private DocumentTypes _docTypes = DocManager.Instance.DocumentTypes;
@@ -127,6 +129,9 @@ namespace GostDOC.ViewModels
         public ICommand DataGridBeginningEditCmd => new Command<DataGridBeginningEditEventArgs>(DataGridBeginningEdit);
         public ICommand ExportPDFCmd => new Command(ExportPDF, IsExportPdfEnabled);
         public ICommand ExportExcelCmd => new Command(ExportExcel, IsExportExcelEnabled);
+
+        public ICommand SpecPositionRecalcCmd => new Command(SpecificationPositionRecalc);
+        
 
         #region Dictionaries
         public ICommand ImportMaterialsCmd => new Command(ImportMaterials);
@@ -1089,8 +1094,14 @@ namespace GostDOC.ViewModels
 
             // Fill components
             Components.Clear();
+                        
+            var positions = GetSpecificationPositions();
+
             foreach (var component in groupData.Components)
-            {
+            {   
+                SetSpecificationPosition(positions, component);
+
+                //add position here
                 Components.Add(new ComponentVM(component));
             }
         }
@@ -1390,6 +1401,30 @@ namespace GostDOC.ViewModels
             }); 
         }
 
+        /// <summary>
+        /// пересчитать позицию для спецификации
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        private void SpecificationPositionRecalc(object sender)
+        {
+            if(_docType == DocType.Specification)
+            {
+                if (_docManager.PrepareData(_docType))
+                {
+                    var dataProperties = _docManager.GetPreparedDataProperties(_docType);
+                    if (dataProperties.TryGetValue(Constants.AppDataSpecPositions, out var positions))
+                    {
+                        if (positions != null && positions is Dictionary<string, List<Tuple<string, int>>>)
+                        {
+                            _specifiactionPositionsDic = ((Dictionary<string, List<Tuple<string, int>>>)positions);
+                            UpdateGroup();
+                        }
+                    }
+                }
+            }
+        }
+
+
         #region  ========= PURCHASE DEPARTMENT ====================
 
         private void UpdateComponentSuppliersProfile(string aComponentName)
@@ -1431,6 +1466,75 @@ namespace GostDOC.ViewModels
         }
 
         #endregion PURCHASE DEPARTMENT
+
+        private Tuple<string, string> GetSpecificationPositionDicKey()
+        {
+            //string subgroup_name = string.Empty;
+            string group_name = string.Empty;
+            string config_name = string.Empty;
+            var item = _selectedItem;
+            if (item.NodeType == NodeType.Component)
+            {
+                item = _selectedItem.Parent;
+            }
+
+            if (item.NodeType == NodeType.SubGroup)
+            {
+                //subgroup_name = item.Name;
+                item = item.Parent;
+            }
+
+            if (item.NodeType == NodeType.Group)
+            {
+                group_name = item.Name;
+                item = item.Parent;
+            }
+
+            if (item.NodeType == NodeType.Configuration)
+            {
+                config_name = item.Name;                
+            }
+
+            //return ($"{config_name} {group_name} {subgroup_name}").Trim();
+            return new Tuple<string, string>(($"{config_name} {group_name}").Trim(), group_name);
+        }
+
+        /// <summary>
+        /// получить список позиций для компонентов для документа спецификация
+        /// </summary>
+        /// <returns></returns>
+        private List<Tuple<string, int>> GetSpecificationPositions()
+        {
+            if (_specifiactionPositionsDic != null)
+            {
+                List<Tuple<string, int>> positions = null;
+                var key = GetSpecificationPositionDicKey();
+                if (_specifiactionPositionsDic.ContainsKey(key.Item1))
+                    positions = _specifiactionPositionsDic[key.Item1];                
+                return positions;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// записать позицию в свойство Позиция для данного компонента
+        /// </summary>
+        /// <param name="aPositions"></param>
+        /// <param name="aComponent"></param>
+        private void SetSpecificationPosition(List<Tuple<string, int>> aPositions, Component aComponent)
+        {
+            if (aPositions != null)
+            {
+                string name = aComponent.GetProperty(Constants.ComponentName);
+                string designator = aComponent.GetProperty(Constants.ComponentSign);
+                string val = ($"{name} {designator}").Trim();
+                var position = aPositions.Where(item => string.Equals(item.Item1, val));
+                if (position != null && position.Count() > 0)
+                    aComponent.SetPropertyValue(Constants.ComponentPosition, position.First().Item2.ToString());
+            }
+        }
+
+
 
 
         private string GetDefaultFileName(string aExtension, bool aForExport)
