@@ -10,7 +10,7 @@ namespace GostDOC.ExcelExport
     class ComponentD27
     {
         public string Name { get; set; }
-        public string Manufacturer { get; set; }
+        public string Supplier { get; set; }
         public int Column { get; set; }
         public uint Count { get; set; } = 1;
     }

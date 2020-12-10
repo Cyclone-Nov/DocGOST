@@ -125,7 +125,7 @@ namespace GostDOC.ExcelExport
                     aWs.Cells[row, 1] = component.Name;
                     aWs.Cells[row, component.Column] = component.Count;
                     aWs.Cells[row, lastCol] = $"=SUM(R{row}C{2}:R{row}C{lastCol - 1})";
-                    aWs.Cells[row, suplier] = component.Manufacturer;
+                    aWs.Cells[row, suplier] = component.Supplier;
                 }
             }
             // Merge general name cells
@@ -195,12 +195,15 @@ namespace GostDOC.ExcelExport
                     name += " " + doc;
                 }
 
+                string supplier = cmp.GetProperty(Constants.ComponentSupplier);
+                if(string.IsNullOrEmpty(supplier))
+                    supplier = cmp.GetProperty(Constants.ComponentManufacturer);
                 ComponentD27 component = new ComponentD27()
                 {
                     Name = name,
                     Count = cmp.Count,
                     Column = _complexColumn,
-                    Manufacturer = cmp.GetProperty(Constants.ComponentSupplier)
+                    Supplier = supplier
                 };
 
                 AddComponent(cmp.GetProperty(Constants.GroupNameSp), component);
