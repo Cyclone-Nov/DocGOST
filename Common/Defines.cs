@@ -359,11 +359,12 @@ namespace GostDOC.Common
         public static readonly string ComponentProductCode = "Код продукции";
         public static readonly string ComponentFormat = "Формат";
         public static readonly string ComponentZone = "Зона";
-        public static readonly string ComponentPosiiton = "Позиция";
+        public static readonly string ComponentPosition = "Позиция";
         public static readonly string ComponentDoc = "Документ на поставку";
         public static readonly string ComponentDocCode = "Код документа";
         public static readonly string ComponentType = "Тип";
-        public static readonly string ComponentSupplier = "Производитель";
+        public static readonly string ComponentManufacturer = "Производитель";
+        public static readonly string ComponentSupplier = "Поставщик";
         public static readonly string ComponentCount = "Количество";
         public static readonly string ComponentCountDev = "Количество на изд.";
         public static readonly string ComponentCountSet = "Количество в комп.";
@@ -655,7 +656,14 @@ namespace GostDOC.Common
 
         #region Коды дополнительных параметров для предачи от DataPreparation
 
+        /// <summary>
+        /// обозначение документа для перечня элементов
+        /// </summary>
         public static readonly string AppParamDocSign = "DocSign";
+        /// <summary>
+        /// список позиций компонетов для спецификации типа List<Tuple<string ComponentName,int Position>>
+        /// </summary>
+        public static readonly string AppDataSpecPositions = "SpecPositions";
 
         #endregion
 
