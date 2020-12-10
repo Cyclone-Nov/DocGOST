@@ -22,12 +22,12 @@ public abstract class BasePreparer {
     /// <summary>
     /// обозначение документа
     /// </summary>
-    protected Dictionary<string, string> appliedParams = new Dictionary<string, string>();
+    protected Dictionary<string, object> appliedParams = new Dictionary<string, object>();
 
     /// <summary>
     /// получить обозначение документа
     /// </summary>
-    public Dictionary<string, string> GetAppliedParams()
+    public Dictionary<string, object> GetAppliedParams()
     {
         return appliedParams;
     }
@@ -174,14 +174,8 @@ public abstract class BasePreparer {
     /// <returns></returns>
     protected string GetSubgroupNameByCount(KeyValuePair<string, Group> aSubgroup)
     {        
-        var subgroupNamesArr = aSubgroup.Key.Split(new char[] { '\\' });
-        string subGroupName = string.Empty;
-        if (subgroupNamesArr.Length == 2 && aSubgroup.Value.Components.Count > 1)
-            subGroupName = subgroupNamesArr[1];
-        else
-            subGroupName = subgroupNamesArr[0];
-
-        return subGroupName;
+        var subgroupNamesArr = aSubgroup.Key.Split(new char[] { '\\', '/' });
+        return (subgroupNamesArr.Length == 2 && aSubgroup.Value.Components.Count > 1) ? subgroupNamesArr[1] : subgroupNamesArr[0];
     }
 
     /// <summary>
