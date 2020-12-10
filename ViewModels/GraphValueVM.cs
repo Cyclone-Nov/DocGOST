@@ -81,7 +81,7 @@ namespace GostDOC.ViewModels
                 Items.Add("РО1");
                 Items.Add("РО2");
                 Items.Add("РА");
-                Items.Add("РА");
+                Items.Add("РБ");
                 Items.Add("РИ");
             }
             else

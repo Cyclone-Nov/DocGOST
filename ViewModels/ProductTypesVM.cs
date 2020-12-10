@@ -77,7 +77,7 @@ namespace GostDOC.ViewModels
         {
             foreach (var kvp in _products.Products.Groups)
             {
-                DictionaryNode node = new DictionaryNode(kvp.Key) { Nodes = new ObservableCollection<DictionaryNode>() };
+                DictionaryNode node = new DictionaryNode(kvp.Key) { Nodes = new ObservableCollection<DictionaryNode>()};
                 AddNode(node, kvp.Value);
                 DictionaryNodes.InsertSorted(node);
             }
@@ -172,12 +172,12 @@ namespace GostDOC.ViewModels
                 string group = null;
                 string subgroup = null;
 
-                if (SelectedItem.Value.Parent.Type == DictionaryNodeType.SubGroup)
+                if (SelectedItem.Value.Parent?.Type == DictionaryNodeType.SubGroup)
                 {
                     group = SelectedItem.Value.Parent.Parent.Name.Value;
                     subgroup = SelectedItem.Value.Parent.Name.Value;
                 }
-                else if (SelectedItem.Value.Parent.Type == DictionaryNodeType.Group)
+                else if (SelectedItem.Value.Parent?.Type == DictionaryNodeType.Group)
                 {
                     group = SelectedItem.Value.Parent.Name.Value;
                 }
@@ -187,10 +187,12 @@ namespace GostDOC.ViewModels
                 {
                     var product = CommonDialogs.UpdateProduct(src);
                     if (product != null)
-                    {
-                        if (_products.RemoveProduct(group, subgroup, src.Name))
+                    { 
+                        // Add new product
+                        if (_products.AddProduct(group, subgroup, product))
                         {
-                            if (_products.AddProduct(group, subgroup, product))
+                            // Remove current product
+                            if (_products.RemoveProduct(group, subgroup, src.Name))
                             {
                                 SelectedItem.Value.Name.Value = product.Name;
                             }
@@ -245,10 +247,9 @@ namespace GostDOC.ViewModels
                     IsEditEnabled.Value = type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
                     break;
                 case ProductTypesDoc.Others:
-                    IsRemoveEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
-                    IsEditEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
-                    break;
                 case ProductTypesDoc.Standard:
+                    IsAddGroupEnabled.Value = !type.HasValue || type == DictionaryNodeType.Group;
+                    IsAddEnabled.Value = !type.HasValue || type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup;
                     IsRemoveEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
                     IsEditEnabled.Value = type == DictionaryNodeType.Group || type == DictionaryNodeType.SubGroup || type == DictionaryNodeType.Component;
                     break;
@@ -270,7 +271,10 @@ namespace GostDOC.ViewModels
 
         private void Loaded(object obj)
         {
-            SelectedItem.Value = DictionaryNodes.FirstOrDefault();
+            if (DocType == ProductTypesDoc.Materials)
+            {
+                SelectedItem.Value = DictionaryNodes.FirstOrDefault();
+            }
         }
 
         private void AddNode(DictionaryNode aNode, ProductGroup aGroup)
@@ -279,7 +283,7 @@ namespace GostDOC.ViewModels
             {
                 foreach (var sub in aGroup.SubGroups)
                 {
-                    DictionaryNode gp = new DictionaryNode(sub.Key, DictionaryNodeType.SubGroup) { Parent = aNode };
+                    DictionaryNode gp = new DictionaryNode(sub.Key, DictionaryNodeType.SubGroup) { Parent = aNode, Nodes = new ObservableCollection<DictionaryNode>() };
                     AddNode(gp, sub.Value);
                     aNode.Nodes.InsertSorted(gp);
                 }

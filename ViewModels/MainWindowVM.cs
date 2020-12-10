@@ -19,6 +19,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using SoftCircuits.Collections;
 using GostDOC.Dictionaries;
+using GostDOC.Context;
 
 namespace GostDOC.ViewModels
 {
@@ -500,7 +501,7 @@ namespace GostDOC.ViewModels
                     foreach (var cmp in lst.Cast<ComponentVM>().ToList())
                     {
                         // Add component to move list
-                        Component component = new Component(cmp.Guid);
+                        Component component = new Component(cmp.Guid, cmp.Count.Value);
                         UpdateComponent(cmp, component);
                         moveInfo.Components.Add(component);
                         // Remove component from view
@@ -520,7 +521,7 @@ namespace GostDOC.ViewModels
             List<Component> components = new List<Component>();
             foreach (var cmp in Components)
             {
-                Component component = new Component(cmp.Guid);
+                Component component = new Component(cmp.Guid, cmp.Count.Value);
                 UpdateComponent(cmp, component);
                 components.Add(component);
             }
@@ -758,15 +759,19 @@ namespace GostDOC.ViewModels
 
                     if (string.IsNullOrEmpty(groups.Item1))
                     {
-                        aProductTypes.AddGroup(name);
-                        // Add new group menu item
-                        node.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewGroupMenuItem, Parent = node });
-                        TableContextMenu.InsertSorted(node);
+                        if (aProductTypes.AddGroup(name))
+                        {
+                            // Add new group menu item
+                            node.Nodes.InsertSorted(new MenuNode() { Name = Constants.NewGroupMenuItem, Parent = node });
+                            TableContextMenu.InsertSorted(node);
+                        }
                     } 
                     else
                     {
-                        aProductTypes.AddSubGroup(groups.Item1, name);
-                        aNode.Parent.Nodes.InsertSorted(node);
+                        if (aProductTypes.AddSubGroup(groups.Item1, name))
+                        {
+                            aNode.Parent.Nodes.InsertSorted(node);
+                        }
                     }
                 }
                 // Save file

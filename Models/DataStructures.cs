@@ -20,6 +20,13 @@ namespace GostDOC.Models
         {
             Guid = aGuid;
         }
+
+        public Component(Guid aGuid, uint aCount)
+        {
+            Guid = aGuid;
+            Count = aCount;
+        }
+
         public Component(ComponentXml aComponent)
         {
             Properties.AddRange(aComponent.Properties);
