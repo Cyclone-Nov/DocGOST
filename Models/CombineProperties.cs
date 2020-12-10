@@ -19,10 +19,10 @@ namespace GostDOC.Models
         public string Name { get; set; }
 
         /// <summary>
-        /// куда входит
+        /// обозначение
         /// </summary>
         /// <value>
-        /// The included.
+        /// The sign
         /// </value>
         public string Sign { get; set; }
 
@@ -30,9 +30,9 @@ namespace GostDOC.Models
         /// позиционное обозначение
         /// </summary>
         /// <value>
-        /// The position.
+        /// reference desigantion
         /// </value>
-        public string Position { get; set; }
+        public string RefDesignation { get; set; }
 
         public CombineProperties(bool aCombinePosition)
         {
@@ -50,7 +50,7 @@ namespace GostDOC.Models
             {
                 return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign);
             }
-            return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign) && string.Equals(other.Position, Position);
+            return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign) && string.Equals(other.RefDesignation, RefDesignation);
         }
         public override bool Equals(object other)
         {
@@ -62,7 +62,7 @@ namespace GostDOC.Models
             {
                 return (Name?.GetHashCode() ?? 0) ^ (Sign?.GetHashCode() ?? 0);
             }
-            return (Name?.GetHashCode() ?? 0) ^ (Sign?.GetHashCode() ?? 0) ^ (Position?.GetHashCode() ?? 0);
+            return (Name?.GetHashCode() ?? 0) ^ (Sign?.GetHashCode() ?? 0) ^ (RefDesignation?.GetHashCode() ?? 0);
         }
     }
 }

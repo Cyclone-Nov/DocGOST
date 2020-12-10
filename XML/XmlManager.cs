@@ -242,7 +242,7 @@ namespace GostDOC.Models
             {
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
                 var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
-                var position = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatorID);
+                var designator = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatorID);
 
                 if (name == null)
                 {
@@ -260,18 +260,18 @@ namespace GostDOC.Models
                 {
                     Name = name.Text,
                     Sign = sign.Text,
-                    Position = position?.Text ?? string.Empty
+                    RefDesignation = designator?.Text ?? string.Empty
                 };
 
-                if (!string.IsNullOrEmpty(combine.Position))
+                if (!string.IsNullOrEmpty(combine.RefDesignation))
                 {
-                    if (positions.Contains(combine.Position))
+                    if (positions.Contains(combine.RefDesignation))
                     {
-                        _error.Error($"Найдено дублирующееся позиционное обозначение {combine.Position}!");
+                        _error.Error($"Найдено дублирующееся позиционное обозначение {combine.RefDesignation}!");
                     }
                     else
                     {
-                        positions.Add(combine.Position);
+                        positions.Add(combine.RefDesignation);
                     }
                 }
 
@@ -317,8 +317,7 @@ namespace GostDOC.Models
                     }
 
                     if (IsD27Component(groups[0]))
-                    {
-                        // Add to D27
+                    {                        
                         groupD27.Components.Add(component);
                     }
 
@@ -473,14 +472,14 @@ namespace GostDOC.Models
                 {
                     // Update pos
                     string currentPos;
-                    if (!string.IsNullOrEmpty(aCombine.Position) && existing.Properties.TryGetValue(Constants.ComponentDesignatorID, out currentPos))
+                    if (!string.IsNullOrEmpty(aCombine.RefDesignation) && existing.Properties.TryGetValue(Constants.ComponentDesignatorID, out currentPos))
                     {
-                        if (!string.IsNullOrEmpty(currentPos) && currentPos == aCombine.Position)
+                        if (!string.IsNullOrEmpty(currentPos) && currentPos == aCombine.RefDesignation)
                         {
                             _error.Error($"Компонент {aCombine.Name}: повторяющееся позиционное обозначение!");
                             return true;
                         }
-                        existing.Properties[Constants.ComponentDesignatorID] = currentPos + "," + aCombine.Position;
+                        existing.Properties[Constants.ComponentDesignatorID] = currentPos + "," + aCombine.RefDesignation;
                     }
 
                     // If already added - increase count
