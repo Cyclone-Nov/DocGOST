@@ -111,6 +111,11 @@ namespace GostDOC.Models
             return false;
         }
 
+        public IDictionary<string, object> GetPreparedDataProperties(DocType aDocType)
+        {
+            return _prepareDataManager.GetAppliedParams(aDocType);
+        }
+
         /// <summary>
         /// Получить данные для PDF
         /// </summary>

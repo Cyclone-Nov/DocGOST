@@ -157,7 +157,7 @@ namespace GostDOC.PDF
         }
 
 
-        public abstract void Create(DataTable aData, IDictionary<string, string> aMainGraphs, Dictionary<string, string> aAppParams);
+        public abstract void Create(DataTable aData, IDictionary<string, string> aMainGraphs, Dictionary<string, object> aAppParams);
 
         public byte[] GetData()
         {
@@ -294,14 +294,14 @@ namespace GostDOC.PDF
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal abstract int AddFirstPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData,int aCountPages, Dictionary<string, string> aAppParams);
+        internal abstract int AddFirstPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData,int aCountPages, Dictionary<string, object> aAppParams);
 
         /// <summary>
         /// добавить к документу последующие страницы
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
         /// <returns></returns>
-        internal abstract int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aLastProcessedRow, Dictionary<string, string> aAppParams = null);
+        internal abstract int AddNextPage(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aLastProcessedRow, Dictionary<string, object> aAppParams = null);
 
 
         public static double DegreesToRadians(double degrees)

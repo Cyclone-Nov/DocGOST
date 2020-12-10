@@ -126,7 +126,7 @@ namespace GostDOC.Models
         /// <param name="aType">тип документа</param>
         /// <returns>таблица данных для указанного типа документа</returns>
         /// <exception cref="Exception">Таблица данных для типа документа {aType}</exception>
-        public Dictionary<string, string> GetAppliedParams(DocType aType)
+        public Dictionary<string, object> GetAppliedParams(DocType aType)
         {
             switch (aType)
             {

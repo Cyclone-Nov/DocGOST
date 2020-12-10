@@ -56,7 +56,7 @@ namespace GostDOC.PDF
         /// <param name="aData">подготовленная к выводу таблица данных</param>
         /// <param name="aMainGraphs"></param>
         /// <returns></returns>
-        public bool PreparePDF(DocType aDocType, DataTable aData, IDictionary<string,string> aMainGraphs, Dictionary<string, string> aAppParams)
+        public bool PreparePDF(DocType aDocType, DataTable aData, IDictionary<string,string> aMainGraphs, Dictionary<string, object> aAppParams)
         {
             GetCreator(aDocType).Create(aData, aMainGraphs, aAppParams);
             return true;

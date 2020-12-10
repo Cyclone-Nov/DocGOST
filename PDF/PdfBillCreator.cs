@@ -52,7 +52,7 @@ namespace GostDOC.PDF
             return PdfDefines.mmAXh;
         }
 
-        public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs, Dictionary<string, string> aAppParams) 
+        public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs, Dictionary<string, object> aAppParams) 
         {
             var dataTable = aData;
             var graphs = aMainGraphs;
@@ -94,7 +94,7 @@ namespace GostDOC.PDF
             _doc.Close();            
         }
 
-        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages, Dictionary<string, string> aAppParams = null) {
+        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages, Dictionary<string, object> aAppParams = null) {
             SetPageMargins(aInDoc);
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
@@ -127,7 +127,7 @@ namespace GostDOC.PDF
         }
 
 
-        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow, Dictionary<string, string> aAppParams = null) {
+        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow, Dictionary<string, object> aAppParams = null) {
             aInDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
             SetPageMargins(aInDoc);
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));

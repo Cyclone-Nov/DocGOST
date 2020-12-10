@@ -30,7 +30,7 @@ namespace GostDOC.PDF
         public PdfSpecificationCreator() : base(DocType.Specification) {
         }
 
-        public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs, Dictionary<string, string> aAppParams) 
+        public override void Create(DataTable aData, IDictionary<string, string> aMainGraphs, Dictionary<string, object> aAppParams) 
         {
             var graphs = aMainGraphs;
             if (aData == null)
@@ -76,7 +76,7 @@ namespace GostDOC.PDF
 
 
 
-        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages, Dictionary<string, string> aAppParams = null) {
+        internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages, Dictionary<string, object> aAppParams = null) {
 
             SetPageMargins(aInDoc);
 
@@ -106,7 +106,7 @@ namespace GostDOC.PDF
             return lastProcessedRow;
         }
 
-        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNamuber, int aStartRow, Dictionary<string, string> aAppParams = null) {
+        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNamuber, int aStartRow, Dictionary<string, object> aAppParams = null) {
 
             SetPageMargins(aInDoc);
 
@@ -267,10 +267,10 @@ namespace GostDOC.PDF
                     ? 0
                     : (int) row[Constants.ColumnQuantity];
 
-                if (name == null && sign == null && string.IsNullOrEmpty(note) ) {                    
+                if (name == null && sign == null && string.IsNullOrEmpty(note) && string.IsNullOrEmpty(position)) {                    
                     AddEmptyRowToPdfTable(tbl, 1, COLUMNS, leftPaddCell, remainingPdfTableRows == 1 ? true : false);
                     remainingPdfTableRows--;
-                } else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(zone) && string.IsNullOrEmpty(note) && string.IsNullOrEmpty(format))  {
+                } else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(note) && string.IsNullOrEmpty(format))  {
                     // наименование группы
                     if (remainingPdfTableRows > 4)  {
                         // если есть место для записи более 4 строк то записываем группу, иначе выходим

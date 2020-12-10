@@ -36,6 +36,12 @@ namespace GostDOC.DataPreparation
                 // todo: add to log
                 return null;
             }
+
+            bool appliedConfigs = (listPreparedConfigs != null && listPreparedConfigs.Count() > 0);                        
+
+            appliedParams.Clear();
+            IDictionary<string, List<Tuple<string, int>>> Positions = new Dictionary<string, List<Tuple<string, int>>>();
+
             DataTable table = CreateTable("SpecificationData");
 
             // получим обозначение изделия
@@ -44,21 +50,32 @@ namespace GostDOC.DataPreparation
             // позиция должна быть сквозной для всего документа
             int position = 0;
 
-            // заполнение данных из основного исполнения
-            FillConfiguration(table, mainConfig, ref position, sign);
+            // если есть остальные исполнения то составим имя для общих данных
+            if (appliedConfigs)
+            {
+                // будем передавать имя конфигурации через название таблицы
+                table.TableName = String.Join(",", aConfigs.Keys); // aConfigs.Keys.Aggregate((a, b) => a + "," + b)
+            }
+            else
+                table.TableName = mainConfig.Name; 
+
+            // заполнение данных из основного исполнения или общих данных при наличии нескольких исполнений
+            FillConfiguration(table, mainConfig, ref position, Positions, sign);
 
             // заполним переменные данные исполнений, если они есть
-            if (listPreparedConfigs != null && listPreparedConfigs.Count() > 0)
+            if (appliedConfigs)
             {
-                AddAppDataSign(table);
+                AddConfigsVariableDataSign(table);
 
                 foreach (var config in listPreparedConfigs.OrderBy(key => key.Key))
                 {
-                    FillConfiguration(table, config.Value, ref position, sign, config.Key, false);
+                    table.TableName = config.Key; // будем передавать имя конфигурации через название таблицы
+                    FillConfiguration(table, config.Value, ref position, Positions, sign, false);
                 }
             }
-
-            RemoveLastEmptyRows(table);
+            RemoveEmptyRowsAtEnd(table);
+                        
+            appliedParams.Add(Constants.AppDataSpecPositions, Positions);
 
             return table;           
         }
@@ -107,7 +124,7 @@ namespace GostDOC.DataPreparation
                 // для списка компонентов из корня каждого раздела
                 foreach (var component in group.Value.Components)
                 {
-                    if (CheckComponent(otherConfigs, component, group.Key))
+                    if (CheckComponentInOtherConfigs(otherConfigs, component, group.Key))
                     {
                         if (!aMainConfig.Specification.ContainsKey(group.Key))
                         {
@@ -132,7 +149,7 @@ namespace GostDOC.DataPreparation
                 {
                     foreach (var component in subgroup.Value.Components)
                     {
-                        if (CheckComponent(otherConfigs, component, group.Key, subgroup.Key))
+                        if (CheckComponentInOtherConfigs(otherConfigs, component, group.Key, subgroup.Key))
                         {
                             if (!aMainConfig.Specification.ContainsKey(group.Key))
                             {
@@ -171,19 +188,19 @@ namespace GostDOC.DataPreparation
         /// <param name="aTable">итоговая таблица с данными</param>
         /// <param name="aConfig">конфигурация</param>
         /// <param name="aManyConfigs">признак наличия нескольких конфигураций: если <c>true</c> то несколько конфигураций</param>
-        private void FillConfiguration(DataTable aTable, Configuration aConfig, ref int aPosition, string aSign, string aConfigName = "", bool aMainConfig = true)
+        private void FillConfiguration(DataTable aTable, Configuration aConfig, ref int aPosition, IDictionary<string, List<Tuple<string, int>>> aPositions, string aSign, bool aСommonConfig = true)
         {
-            var data = aConfig.Specification;
+            var data = aConfig.Specification;            
             if (data.Count == 0)
                 return;
 
-            if (!aMainConfig)
+            if (!aСommonConfig)
             {
                 string configName;
-                if (string.Equals(aConfigName, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))                
+                if (string.Equals(aConfig.Name, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))                
                     configName = aSign; // "Обозначение"
                  else                
-                    configName = $"{aSign}{aConfigName}"; // "Обозначение""aConfigName"
+                    configName = $"{aSign}{aConfig.Name}"; // "Обозначение""aConfigName"
 
                 var row = aTable.NewRow();
                 row[Constants.ColumnName] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };                
@@ -191,14 +208,14 @@ namespace GostDOC.DataPreparation
                 //AddEmptyRow(aTable);
             }
 
-            AddGroup(aTable, Constants.GroupDoc, data, ref aPosition);
-            AddGroup(aTable, Constants.GroupComplex, data, ref aPosition);
-            AddGroup(aTable, Constants.GroupAssemblyUnits, data, ref aPosition);
-            AddGroup(aTable, Constants.GroupDetails, data, ref aPosition);
-            AddGroup(aTable, Constants.GroupStandard, data, ref aPosition);
-            AddGroup(aTable, Constants.GroupOthers, data, ref aPosition);
-            AddGroup(aTable, Constants.GroupMaterials, data, ref aPosition);
-            AddGroup(aTable, Constants.GroupKits, data, ref aPosition);
+            AddGroup(aTable, Constants.GroupDoc, data, ref aPosition, aPositions);
+            AddGroup(aTable, Constants.GroupComplex, data, ref aPosition, aPositions);
+            AddGroup(aTable, Constants.GroupAssemblyUnits, data, ref aPosition, aPositions);
+            AddGroup(aTable, Constants.GroupDetails, data, ref aPosition, aPositions);
+            AddGroup(aTable, Constants.GroupStandard, data, ref aPosition, aPositions);
+            AddGroup(aTable, Constants.GroupOthers, data, ref aPosition, aPositions);
+            AddGroup(aTable, Constants.GroupMaterials, data, ref aPosition, aPositions);
+            AddGroup(aTable, Constants.GroupKits, data, ref aPosition, aPositions);
 
             aTable.AcceptChanges();
         }
@@ -211,7 +228,7 @@ namespace GostDOC.DataPreparation
         /// <param name="aComponents"></param>
         /// <param name="aOtherComponents"></param>
         /// <param name="aSchemaDesignation"></param>
-        private void AddGroup(DataTable aTable, string aGroupName, IDictionary<string, Group> aGroupDic, ref int aPos)
+        private void AddGroup(DataTable aTable, string aGroupName, IDictionary<string, Group> aGroupDic, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions)
         {
             if (aGroupDic == null || !aGroupDic.ContainsKey(aGroupName))
                 return;
@@ -219,10 +236,8 @@ namespace GostDOC.DataPreparation
             if (!aGroupDic.TryGetValue(aGroupName, out var group))
                 return;
 
-            if(group.Components.Count == 0 && group.SubGroups.Count == 0)
-            {
-                return;
-            }
+            if(group.Components?.Count == 0 && group.SubGroups?.Count == 0)            
+                return;            
 
             // наименование раздела
             AddEmptyRow(aTable);
@@ -230,7 +245,7 @@ namespace GostDOC.DataPreparation
                 AddEmptyRow(aTable);           
 
             var сomponents = group.Components;
-            AddComponents(aTable, сomponents, ref aPos, !string.Equals(aGroupName, Constants.GroupDoc));
+            AddComponents(aTable, сomponents, ref aPos, aPositions, !string.Equals(aGroupName, Constants.GroupDoc));
             
             if (сomponents.Count > 0 && group.SubGroups.Count > 0)
             {
@@ -243,7 +258,7 @@ namespace GostDOC.DataPreparation
                 if (subgroup.Value.Components.Count > 0)
                 {
                     string subGroupName = GetSubgroupNameByCount(subgroup);                    
-                    AddSubgroup(aTable, subGroupName, subgroup.Value.Components, ref aPos);
+                    AddSubgroup(aTable, subGroupName, subgroup.Value.Components, ref aPos, aPositions);
                 }
             }
 
@@ -252,19 +267,13 @@ namespace GostDOC.DataPreparation
             {
                 if (subgroup_other.Components.Count > 0)
                 {                       
-                    AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, subgroup_other.Components, ref aPos);
+                    AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, subgroup_other.Components, ref aPos, aPositions);
                 }
-            }
-
-            if (aGroupName != Constants.GroupDoc)
-            {
-                AddEmptyRow(aTable);
-                AddEmptyRow(aTable);
-                aPos += 2;
             }
         }
 
-        private bool AddSubgroup(DataTable aTable, string aGroupName, List<Component> aSortComponents, ref int aPos)
+
+        private bool AddSubgroup(DataTable aTable, string aGroupName, List<Component> aSortComponents, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions)
         {
             if (!aSortComponents.Any())
             {
@@ -274,7 +283,7 @@ namespace GostDOC.DataPreparation
             if (AddGroupName(aTable, aGroupName))
                 AddEmptyRow(aTable);
 
-            AddComponents(aTable, aSortComponents, ref aPos);
+            AddComponents(aTable, aSortComponents, ref aPos, aPositions);
 
             AddEmptyRow(aTable);
             aTable.AcceptChanges();
@@ -283,28 +292,26 @@ namespace GostDOC.DataPreparation
         }
 
 
-        private void AddComponents(DataTable aTable, List<Component> aSortComponents, ref int aPos, bool aSetPos = true)
+        private void AddComponents(DataTable aTable, List<Component> aSortComponents, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions, bool aSetPos = true)
         {
             DataRow row;
             foreach (var component in aSortComponents)
             {   
                 string component_name = component.GetProperty(Constants.ComponentName);
                 uint component_count = component.Count;
-                int count2 = GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
-                if (count2 > component_count)
-                    component_count = (uint)count2;
-                string groupSp = component.GetProperty(Constants.GroupNameSp);
+                int count_property = GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
+                if (count_property > component_count)
+                    component_count = (uint)count_property;
+                string groupSp = component.GetProperty(Constants.GroupNameSp);                
                 if (string.Equals(groupSp, Constants.GroupDoc))
                 {
                     component_count = 0;
                 }
 
-                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize).ToArray();
-                var desigantor_id = component.GetProperty(Constants.ComponentDesignatorID);
-
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize).ToArray();                
                 var note = component.GetProperty(Constants.ComponentNote);
-
                 string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth - 3, note, new char[] {'-', ',' }, Constants.SpecificationFontSize).ToArray();
+                string designation = component.GetProperty(Constants.ComponentSign);
 
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString { Value = component.GetProperty(Constants.ComponentFormat) };
@@ -313,9 +320,19 @@ namespace GostDOC.DataPreparation
                 {
                     ++aPos;
                     row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString() };
-                }
 
-                string designation = component.GetProperty(Constants.ComponentSign);                
+                    string val = ($"{component_name} {designation}").Trim();
+                    var configNames = aTable.TableName.Split(',');
+                    foreach (var name in configNames)
+                    {
+                        string key = ($"{name} {groupSp}").Trim();                        
+                        if (!aPositions.ContainsKey(key))
+                            aPositions.Add(key, new List<Tuple<string, int>>() { new Tuple<string, int>(val, aPos) });
+                        else
+                            aPositions[key].Add(new Tuple<string, int>(val, aPos));
+                    }
+                }
+                                                
                 row[Constants.ColumnSign] = new FormattedString { Value = designation };
                 row[Constants.ColumnName] = new FormattedString { Value = namearr.First() };
                 row[Constants.ColumnQuantity] = component_count;
@@ -347,7 +364,8 @@ namespace GostDOC.DataPreparation
         /// <param name="aGroupName"></param>
         private bool AddGroupName(DataTable aTable, string aGroupName) 
         {
-            if (string.IsNullOrEmpty(aGroupName)) return false;
+            if (string.IsNullOrEmpty(aGroupName)) 
+                return false;
             DataRow row = aTable.NewRow();
             row[Constants.ColumnName] = new FormattedString {Value = aGroupName, IsUnderlined = true, TextAlignment = TextAlignment.CENTER};
             aTable.Rows.Add(row);
@@ -363,25 +381,24 @@ namespace GostDOC.DataPreparation
         protected override DataTable CreateTable(string aDataTableName)
         {
             DataTable table = new DataTable(aDataTableName);
-            DataColumn column = new DataColumn("id", System.Type.GetType("System.Int32"));
-            column.Unique = true;
-            column.AutoIncrement = true;
-            column.Caption = "id";
+            DataColumn column = new DataColumn("id", typeof(Int32)) { 
+                Caption = "id", Unique = true, AutoIncrement = true, AllowDBNull = false
+            };
+            
             table.Columns.Add(column);
             table.PrimaryKey = new DataColumn[] { column };
-
-            void AddColumn(string aColumnName, string aCaption, Type aType) => this.AddColumn(table,aColumnName,aCaption,aType);
-
-            AddColumn(Constants.ColumnFormat, "Формат", typeof(FormattedString));
-            AddColumn(Constants.ColumnZone, "Зона", typeof(FormattedString) );
-            AddColumn(Constants.ColumnPosition, "Поз.", typeof(FormattedString));
-            AddColumn(Constants.ColumnSign, "Обозначение", typeof(FormattedString));
-            AddColumn(Constants.ColumnName, "Наименование", typeof(FormattedString));
-            AddColumn(Constants.ColumnQuantity, "Кол.", typeof(Int32));
-            AddColumn(Constants.ColumnFootnote, "Примечание", typeof(FormattedString));
+            
+            AddColumn(table, Constants.ColumnFormat,   "Формат",       typeof(FormattedString));
+            AddColumn(table, Constants.ColumnZone,     "Зона",         typeof(FormattedString));
+            AddColumn(table, Constants.ColumnPosition, "Поз.",         typeof(FormattedString));
+            AddColumn(table, Constants.ColumnSign,     "Обозначение",  typeof(FormattedString));
+            AddColumn(table, Constants.ColumnName,     "Наименование", typeof(FormattedString));
+            AddColumn(table, Constants.ColumnQuantity, "Кол.",         typeof(Int32));
+            AddColumn(table, Constants.ColumnFootnote, "Примечание",   typeof(FormattedString));
 
             return table;
         }
+
 
         private string GetDeviceSign(IDictionary<string, Configuration> aConfigs)
         {
@@ -399,7 +416,7 @@ namespace GostDOC.DataPreparation
         /// добавить в таблицу данны надписи "Переменные данные исполнений"
         /// </summary>
         /// <param name="table">The table.</param>
-        private void AddAppDataSign(DataTable aTable)
+        private void AddConfigsVariableDataSign(DataTable aTable)
         {
             AddEmptyRow(aTable);
             var row = aTable.NewRow();
@@ -433,7 +450,7 @@ namespace GostDOC.DataPreparation
         /// <param name="aGroupName">Name of a group.</param>
         /// <param name="aOtherConfigs">a other configs.</param>
         /// <returns></returns>
-        private bool CheckComponent(Dictionary<string, Configuration> aOtherConfigs, Component aComponent, string aGroupName, string aSubGroupName = "")
+        private bool CheckComponentInOtherConfigs(Dictionary<string, Configuration> aOtherConfigs, Component aComponent, string aGroupName, string aSubGroupName = "")
         {
             List<Component> removeList = null;
             bool bRemoveGroup = false;
@@ -450,7 +467,7 @@ namespace GostDOC.DataPreparation
                     {
                         foreach (var othercomp in config.Value.Specification[aGroupName].Components)
                         {
-                            if (EquealsSpecComponents(othercomp, aComponent))
+                            if (EqualsSpecComponents(othercomp, aComponent))
                             {
                                 removeList = config.Value.Specification[aGroupName].Components;
                                 removeComponent = othercomp;
@@ -478,7 +495,7 @@ namespace GostDOC.DataPreparation
                         {
                             foreach (var othercomp in config.Value.Specification[aGroupName].SubGroups[aSubGroupName].Components)
                             {
-                                if (EquealsSpecComponents(othercomp, aComponent))
+                                if (EqualsSpecComponents(othercomp, aComponent))
                                 {
                                     removeList = config.Value.Specification[aGroupName].SubGroups[aSubGroupName].Components;
                                     removeComponent = othercomp;
@@ -504,7 +521,7 @@ namespace GostDOC.DataPreparation
         }
 
 
-        private bool EquealsSpecComponents(Component aFirstComponent, Component aSecondComponent)
+        private bool EqualsSpecComponents(Component aFirstComponent, Component aSecondComponent)
         {
             string name1 = aFirstComponent.GetProperty(Constants.ComponentName);
             string name2 = aSecondComponent.GetProperty(Constants.ComponentName);
@@ -520,6 +537,8 @@ namespace GostDOC.DataPreparation
             }
 
             return false;
+
+            //return aFirstComponent.Equals(aSecondComponent); //TODO: override Equals
         }
 
 
@@ -529,31 +548,29 @@ namespace GostDOC.DataPreparation
             aTable.Rows.Add(row);
         }
 
-        private void RemoveLastEmptyRows(DataTable table)
+        private void RemoveEmptyRowsAtEnd(DataTable table)
         {
             if (table.Rows.Count > 1)
-            {
-                bool empty_str = false;
+            {                
                 int last_index = table.Rows.Count - 1;
-                do
-                {
-                    empty_str = false;
-                    var arr = table.Rows[last_index].ItemArray;
-                    if (string.IsNullOrEmpty(arr[1].ToString()) &&
-                        string.IsNullOrEmpty(arr[2].ToString()) &&
-                        string.IsNullOrEmpty(arr[3].ToString()) &&
-                        string.IsNullOrEmpty(arr[4].ToString()) &&
-                        string.IsNullOrEmpty(arr[5].ToString()) &&
-                        string.IsNullOrEmpty(arr[6].ToString()) &&
-                        string.IsNullOrEmpty(arr[7].ToString()))
-                    {
-                        empty_str = true;
-                        table.Rows.RemoveAt(last_index);
-                        last_index = table.Rows.Count - 1;
-                    }
-                }
-                while (empty_str);
+                while (IsEmptyRow(table, last_index))
+                {                                
+                    table.Rows.RemoveAt(last_index);
+                    last_index--;
+                }                
             }
+        }
+
+
+        private bool IsEmptyRow(DataTable aTable, int aIndex)
+        {
+            var arr = aTable.Rows[aIndex].ItemArray;
+            for (int i = 1; i < arr.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(arr[i].ToString()))
+                    return false;
+            }
+            return true;           
         }
 
     }
