@@ -103,10 +103,13 @@ namespace GostDOC.Models
         public bool PreparePDF(DocType aDocType)
         {
             DataTable dataTable = _prepareDataManager.GetDataTable(aDocType);
-            var appParams = _prepareDataManager.GetAppliedParams(aDocType);            
-            if (GetMainConfigurationGraphs(out var mainConfigGraphs))
+            if (dataTable != null)
             {
-                return _pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs, appParams);
+                var appParams = _prepareDataManager.GetAppliedParams(aDocType);
+                if (GetMainConfigurationGraphs(out var mainConfigGraphs))
+                {
+                    return _pdfManager.PreparePDF(aDocType, dataTable, mainConfigGraphs, appParams);
+                }
             }
             return false;
         }

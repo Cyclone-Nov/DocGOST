@@ -32,6 +32,7 @@ internal class ElementListDataPreparer : BasePreparer {
         // выбираем основную конфигурацию        
         if (!aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))
             return null;
+
         var data = mainConfig.Specification;
 
         SchemaDesignation = GetSchemaDesignation(mainConfig, out var DocCode);        
@@ -67,11 +68,10 @@ internal class ElementListDataPreparer : BasePreparer {
         if (allComponentsDic!= null)
         {
             FillDataTable(table, allComponentsDic, otherConfigsElements, SchemaDesignation);            
-            RemoveLastEmptyRows(table);
-            return table;
+            RemoveLastEmptyRows(table);            
         }
 
-        return null;
+        return table;
     }
 
 
