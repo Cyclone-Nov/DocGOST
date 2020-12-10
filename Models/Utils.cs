@@ -225,9 +225,16 @@ namespace GostDOC.Models
 
         public static void SetPropertyValue(this Component current, string aPropertyName, string aValue)
         {
-            if (!string.IsNullOrEmpty(aPropertyName) && current.Properties.ContainsKey(aPropertyName))
+            if (!string.IsNullOrEmpty(aPropertyName))
             {
-                current.Properties[aPropertyName] = aValue;
+                if (current.Properties.ContainsKey(aPropertyName))
+                {
+                    current.Properties[aPropertyName] = aValue;
+                }
+                else
+                {
+                    current.Properties.Add(aPropertyName, aValue);
+                }
             }
         }
 
