@@ -267,10 +267,15 @@ namespace GostDOC.PDF
                     ? 0
                     : (int) row[Constants.ColumnQuantity];
 
-                if (name == null && sign == null && string.IsNullOrEmpty(note) && string.IsNullOrEmpty(position)) {                    
-                    AddEmptyRowToPdfTable(tbl, 1, COLUMNS, leftPaddCell, remainingPdfTableRows == 1 ? true : false);
+                // если пустая строка или строка с резервированием номера позиции
+                if ((name == null || string.IsNullOrEmpty(name.Value)) &&
+                    (sign == null || string.IsNullOrEmpty(sign.Value)) && 
+                     string.IsNullOrEmpty(note))
+                {                    
+                    AddEmptyRowToPdfTable(tbl, 1, COLUMNS, leftPaddCell, remainingPdfTableRows == 1 ? true : false);                    
                     remainingPdfTableRows--;
-                } else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(note) && string.IsNullOrEmpty(format))  {
+                } 
+                else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(note) && string.IsNullOrEmpty(format))  {
                     // наименование группы
                     if (remainingPdfTableRows > 4)  {
                         // если есть место для записи более 4 строк то записываем группу, иначе выходим
