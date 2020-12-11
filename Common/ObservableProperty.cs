@@ -12,8 +12,11 @@ namespace GostDOC
             get { return _value; }
             set
             {
-                _value = value;
-                NotifyPropertyChanged("Value");
+                if (_value == null || !_value.Equals(value))                
+                {
+                    _value = value;
+                    NotifyPropertyChanged("Value");
+                }                
             }
         }
 
