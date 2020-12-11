@@ -1101,10 +1101,10 @@ namespace GostDOC.ViewModels
             Components.Clear();
                         
             var positions = GetSpecificationPositions();
-
+            int lastPosition = 0;
             foreach (var component in groupData.Components)
-            {   
-                SetSpecificationPosition(positions, component);
+            {
+                lastPosition = SetSpecificationPosition(positions, component, lastPosition);
 
                 //add position here
                 Components.Add(new ComponentVM(component));
@@ -1499,8 +1499,7 @@ namespace GostDOC.ViewModels
             {
                 config_name = item.Name;                
             }
-
-            //return ($"{config_name} {group_name} {subgroup_name}").Trim();
+                        
             return new Tuple<string, string>(($"{config_name} {group_name}").Trim(), group_name);
         }
 
@@ -1526,20 +1525,37 @@ namespace GostDOC.ViewModels
         /// </summary>
         /// <param name="aPositions"></param>
         /// <param name="aComponent"></param>
-        private void SetSpecificationPosition(List<Tuple<string, int>> aPositions, Component aComponent)
+        private int SetSpecificationPosition(List<Tuple<string, int>> aPositions, Component aComponent, int aPrevPosition)
         {
+            int retposition = 0;
             if (aPositions != null)
             {
                 string name = aComponent.GetProperty(Constants.ComponentName);
                 string designator = aComponent.GetProperty(Constants.ComponentSign);
                 string val = ($"{name} {designator}").Trim();
-                var position = aPositions.Where(item => string.Equals(item.Item1, val));
-                if (position != null && position.Count() > 0)
-                    aComponent.SetPropertyValue(Constants.ComponentPosition, position.First().Item2.ToString());
+                var positions = aPositions.Where(item => string.Equals(item.Item1, val));
+                if (positions != null && positions.Count() > 0)
+                {                    
+                    if (positions.Count() == 1)
+                    {
+                        retposition = positions.First().Item2;
+                        aComponent.SetPropertyValue(Constants.ComponentPosition, retposition.ToString());
+                    } else
+                    {
+                        foreach (var pos in positions)
+                        {
+                            retposition = pos.Item2;
+                            if (retposition != 0 && (retposition - aPrevPosition == 1))
+                            {
+                                aComponent.SetPropertyValue(Constants.ComponentPosition, retposition.ToString());
+                                return retposition;
+                            }
+                        }
+                    }
+                }
             }
+            return retposition;
         }
-
-
 
 
         private string GetDefaultFileName(string aExtension, bool aForExport)
