@@ -9,7 +9,7 @@ using GostDOC.Models;
 
 namespace GostDOC.ViewModels
 {
-    class SupplierVM
+    class SupplierVM : BaseChanged
     {
         /// <summary>
         /// имя поставщика
@@ -86,14 +86,36 @@ namespace GostDOC.ViewModels
         public SupplierVM(string aName, int aQuantity, float aPrice, TaxTypes aTax, AcceptanceTypes aAcceptance, DeliveryInterval aDelivery, string aPacking, string aNote = "")
         {
             Name.Value = aName;
+            Name.PropertyChanged += PropertyChanged;
             Quantity.Value = aQuantity;
+            Quantity.PropertyChanged += PropertyChanged;
             Price.Value = aPrice;
+            Price.PropertyChanged += PropertyChanged;
             TaxType.Value = aTax;
+            TaxType.PropertyChanged += PropertyChanged;
             PriceWithTax.Value = Common.Converters.GetPriceWithTax(aPrice, aTax);
             AcceptanceType.Value = aAcceptance;
+            AcceptanceType.PropertyChanged += PropertyChanged;
             Delivery.Value = aDelivery;
+            Delivery.PropertyChanged += PropertyChanged;
             Packing.Value = aPacking;
+            Packing.PropertyChanged += PropertyChanged;
             Note.Value = aNote;
+            Note.PropertyChanged += PropertyChanged;
+
         }
+
+        ~SupplierVM()
+        {
+            Name.PropertyChanged -= PropertyChanged;            
+            Quantity.PropertyChanged -= PropertyChanged;            
+            Price.PropertyChanged -= PropertyChanged;            
+            TaxType.PropertyChanged -= PropertyChanged;                        
+            AcceptanceType.PropertyChanged -= PropertyChanged;            
+            Delivery.PropertyChanged -= PropertyChanged;            
+            Packing.PropertyChanged -= PropertyChanged;            
+            Note.PropertyChanged -= PropertyChanged;
+        }
+
     }
 }

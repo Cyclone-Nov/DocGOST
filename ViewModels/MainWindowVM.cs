@@ -58,6 +58,8 @@ namespace GostDOC.ViewModels
         private Progress _progress;
         private LogView _logView = null;
 
+        private PurchaseDepartment _purchaseDepartment;
+
         public ObservableProperty<string> Title { get; } = new ObservableProperty<string>();
         public ObservableProperty<Node> SelectedItem { get; } = new ObservableProperty<Node>();
         public ObservableProperty<bool> IsSpecificationTableVisible { get; } = new ObservableProperty<bool>(false);
@@ -75,7 +77,7 @@ namespace GostDOC.ViewModels
 
         public ProductSupplierProfileVM ProductSupplierProfile { get; set; } = new ProductSupplierProfileVM();
 
-        private ObservableCollection<ComponentSupplierProfileVM> ComponentsSupplierProfiles { get; } = new ObservableCollection<ComponentSupplierProfileVM>();
+        //private ObservableCollection<ComponentSupplierProfileVM> ComponentsSupplierProfiles { get; } = new ObservableCollection<ComponentSupplierProfileVM>();
 
         public ObservableProperty<string> ComponentPropertiesHeader { get; } = new ObservableProperty<string>();
 
@@ -1444,7 +1446,7 @@ namespace GostDOC.ViewModels
                 if (string.Equals(aComponentName, doc))
                     doc = string.Empty;
 
-                FillComponentSupplierProfile(component);
+                FillComponentSupplierProfile(component, aComponentName);
             }
             ComponentPropertiesHeader.Value = $"Свойства компонента {aComponentName} {doc}";
         }
@@ -1455,9 +1457,8 @@ namespace GostDOC.ViewModels
             ProductSupplierProfile.Note.Value = "Какое-то описание";
         }
 
-        private void FillComponentSupplierProfile(Component aComponent)
-        {
-
+        private void FillComponentSupplierProfile(Component aComponent, string aComponentName)
+        {            
             var manufacturer = aComponent.GetProperty(Constants.ComponentSupplier);
             var quantity = aComponent.Count;// .GetProperty(Constants.ComponentSupplier);
             var quantity2 = aComponent.GetProperty(Constants.ComponentCount);
@@ -1467,7 +1468,9 @@ namespace GostDOC.ViewModels
             ComponentSupplierProfile.Properties.Quantity.Value = (int)quantity;
             ComponentSupplierProfile.Properties.AllQuantity.Value = (int)allQuantity;
 
-            //ComponentSupplierProfile.ComponentsEntry
+            _purchaseDepartment.ChangeThisComponent(GetConfigurationName(), aComponentName);
+            _purchaseDepartment.GetComponentSupplierProfile();
+
         }
 
         #endregion PURCHASE DEPARTMENT
@@ -1502,6 +1505,16 @@ namespace GostDOC.ViewModels
                         
             return new Tuple<string, string>(($"{config_name} {group_name}").Trim(), group_name);
         }
+
+
+        private string GetConfigurationName()
+        {               
+            var item = _selectedItem;
+            while (item.NodeType != NodeType.Configuration)            
+                item = item.Parent;
+            return item.Name;
+        }
+
 
         /// <summary>
         /// получить список позиций для компонентов для документа спецификация

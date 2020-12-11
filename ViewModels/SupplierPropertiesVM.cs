@@ -7,7 +7,7 @@ using GostDOC.Common;
 
 namespace GostDOC.ViewModels
 {
-    class SupplierPropertiesVM
+    class SupplierPropertiesVM : BaseChanged
     {
 
         /// <summary>
@@ -16,21 +16,21 @@ namespace GostDOC.ViewModels
         /// <value>
         /// The manufacturer.
         /// </value>
-        public ObservableProperty<string> Manufacturer { get; } = new ObservableProperty<string>("XXX");
+        public ObservableProperty<string> Manufacturer { get; } = new ObservableProperty<string>();
         /// <summary>
         /// количество
         /// </summary>
         /// <value>
         /// The quantity.
         /// </value>
-        public ObservableProperty<int> Quantity { get; } = new ObservableProperty<int>(100);
+        public ObservableProperty<int> Quantity { get; } = new ObservableProperty<int>(0);
         /// <summary>
         /// количество
         /// </summary>
         /// <value>
         /// The quantity.
         /// </value>
-        public ObservableProperty<int> AllQuantity { get; } = new ObservableProperty<int>(100);
+        public ObservableProperty<int> AllQuantity { get; } = new ObservableProperty<int>(0);
         
         /// <summary>
         /// Отечественный производитель
@@ -45,14 +45,14 @@ namespace GostDOC.ViewModels
         /// <value>
         /// The final supplier.
         /// </value>
-        public ObservableProperty<string> FinalSupplier { get; } = new ObservableProperty<string>("дядя вася");
+        public ObservableProperty<string> FinalSupplier { get; } = new ObservableProperty<string>();
         /// <summary>
         /// Итоговая цена, руб
         /// </summary>
         /// <value>
         /// The finel price.
         /// </value>
-        public ObservableProperty<float> FinelPrice { get; } = new ObservableProperty<float>(100000.1f);
+        public ObservableProperty<float> FinalPrice { get; } = new ObservableProperty<float>(0);
         /// <summary>
         /// Тип НДС
         /// </summary>
@@ -66,7 +66,7 @@ namespace GostDOC.ViewModels
         /// <value>
         /// The final price with tax.
         /// </value>
-        public ObservableProperty<float> FinalPriceWithTax { get; } = new ObservableProperty<float>(120000.2f);
+        public ObservableProperty<float> FinalPriceWithTax { get; } = new ObservableProperty<float>(0);
 
         /// <summary>
         /// категория приемки изделия
@@ -82,38 +82,54 @@ namespace GostDOC.ViewModels
         /// <value>
         /// The ordered count.
         /// </value>
-        public ObservableProperty<uint> CountOrdered { get; } = new ObservableProperty<uint>(100);
+        public ObservableProperty<uint> CountOrdered { get; } = new ObservableProperty<uint>(0);
         /// <summary>
         /// Поступило на склад
         /// </summary>
         /// <value>
         /// The count reg.
         /// </value>
-        public ObservableProperty<uint> CountWarehouse { get; } = new ObservableProperty<uint>(99);
+        public ObservableProperty<uint> CountWarehouse { get; } = new ObservableProperty<uint>(0);
         /// <summary>
         /// дефицит
         /// </summary>
         /// <value>
         /// The count.
         /// </value>
-        public ObservableProperty<int> CountDeficit { get; } = new ObservableProperty<int>(1);
+        public ObservableProperty<int> CountDeficit { get; } = new ObservableProperty<int>(0);
         /// <summary>
         /// выдано со склада
         /// </summary>
         /// <value>
         /// The count issued.
         /// </value>
-        public ObservableProperty<int> CountIssued{ get; } = new ObservableProperty<int>(88);
+        public ObservableProperty<int> CountIssued{ get; } = new ObservableProperty<int>(0);
         /// <summary>
         /// Остаток на складе
         /// </summary>
         /// <value>
         /// The count balance.
         /// </value>
-        public ObservableProperty<int> CountBalance { get; } = new ObservableProperty<int>(11);
+        public ObservableProperty<int> CountBalance { get; } = new ObservableProperty<int>(0);
 
         public SupplierPropertiesVM()
-        {            
+        {
+            DomesticManufacturer.PropertyChanged += PropertyChanged;
+            FinalSupplier.PropertyChanged += PropertyChanged;
+            FinalPrice.PropertyChanged += PropertyChanged;
+            TaxType.PropertyChanged += PropertyChanged;
+            AcceptanceType.PropertyChanged += PropertyChanged;
+            CountOrdered.PropertyChanged += PropertyChanged;
+        }
+
+        ~SupplierPropertiesVM()
+        {
+            DomesticManufacturer.PropertyChanged -= PropertyChanged;
+            FinalSupplier.PropertyChanged -= PropertyChanged;
+            FinalPrice.PropertyChanged -= PropertyChanged;
+            TaxType.PropertyChanged -= PropertyChanged;
+            AcceptanceType.PropertyChanged -= PropertyChanged;
+            CountOrdered.PropertyChanged -= PropertyChanged;
         }
     }
 }

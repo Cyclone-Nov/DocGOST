@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GostDOC.ViewModels
 {
-    class WarehouseDeliveryVM
+    class WarehouseDeliveryVM : BaseChanged
     {
         /// <summary>
         /// дата выачи со склада
@@ -35,8 +35,18 @@ namespace GostDOC.ViewModels
         public WarehouseDeliveryVM(string aDate, int aQuantity, string WhomIssued)
         {
             DeliveryDate.Value = aDate;
+            DeliveryDate.PropertyChanged += PropertyChanged;
             Quantity.Value = aQuantity;
+            Quantity.PropertyChanged += PropertyChanged;
             WhomWereIssued.Value = WhomIssued;
+            WhomWereIssued.PropertyChanged += PropertyChanged;
+        }
+
+        ~WarehouseDeliveryVM()
+        {
+            DeliveryDate.PropertyChanged -= PropertyChanged;
+            Quantity.PropertyChanged -= PropertyChanged;
+            WhomWereIssued.PropertyChanged -= PropertyChanged;
         }
     }
 }

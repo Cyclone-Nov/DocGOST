@@ -341,6 +341,7 @@
     <Compile Include="UserControls\NameValueControl.xaml.cs">
       <DependentUpon>NameValueControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\BaseChanged.cs" />
     <Compile Include="ViewModels\ComponentDataVM.cs" />
     <Compile Include="ViewModels\ComponentEntryVM.cs" />
     <Compile Include="ViewModels\LoadErrorsVM.cs" />
