@@ -456,7 +456,7 @@ internal class ElementListDataPreparer : BasePreparer {
         private void AddNewRow(DataTable aTable, string aDesignators, string aName, uint aCount, string aNote)
         {
             string[] designatorarr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn1PositionWidth, aDesignators, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
-            string[] namearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn2NameWidth, aName, new char[] { '.', ' ' }, Constants.ItemListFontSize, true).ToArray();
+            string[] namearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn2NameWidth, aName, new char[] { '.', ' ', '-' }, Constants.ItemListFontSize, true).ToArray();
             string[] notearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn4FootnoteWidth, aNote, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
 
             var row = aTable.NewRow();

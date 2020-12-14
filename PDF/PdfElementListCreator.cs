@@ -267,7 +267,7 @@ internal class PdfElementListCreator : PdfCreator {
                 tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(position)));
                 tbl.AddCell(leftPaddCell.Clone(false).Add(new Paragraph(name.Value)));
 
-                if (string.IsNullOrEmpty(name.Value))
+                if (string.IsNullOrEmpty(name.Value) || quantity == 0)
                     tbl.AddCell(centrAlignCell.Clone(false));
                 else
                     tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(quantity.ToString())));
