@@ -104,6 +104,9 @@ namespace GostDOC.Models
                 newCfg.FillDefaultGraphs();
                 // Fill default groups
                 newCfg.FillDefaultGroups();
+                // add two empty components for every group in specification
+                if (aDocType == DocType.Specification && _projectType == ProjectType.Other)
+                    AddEmptyComponentsToSpecificationGroups(newCfg);
 
                 aResult.Configurations.Add(newCfg.Name, newCfg);
             }
@@ -331,7 +334,7 @@ namespace GostDOC.Models
 
             if (_docType == DocType.Specification)
             {
-                UpdatePositions(components);
+                UpdateDesignators(components);
             }
         }
 
@@ -600,7 +603,7 @@ namespace GostDOC.Models
             return new Tuple<string, int>(string.Empty, 0);
         }
 
-        private void ProcessItems(Dictionary<string, Tuple<string, int>> aItems, StringBuilder aBulder)
+        private void ProcessItems(Dictionary<string, Tuple<string, int>> aItems, StringBuilder aBuilder)
         {
             if (aItems.Count == 0)
             {
@@ -611,11 +614,11 @@ namespace GostDOC.Models
                 // Add ids with ","
                 foreach (var item in aItems)
                 {
-                    if (aBulder.Length > 0 && !aBulder.EndsWith(","))
+                    if (aBuilder.Length > 0 && !aBuilder.EndsWith(","))
                     {
-                        aBulder.Append(", ");
+                        aBuilder.Append(", ");
                     }
-                    aBulder.Append(item.Key);
+                    aBuilder.Append(item.Key);
                 }
             }
             else
@@ -624,11 +627,11 @@ namespace GostDOC.Models
                 var f = aItems.First();
                 var l = aItems.Last();
 
-                if (aBulder.Length > 0)
+                if (aBuilder.Length > 0)
                 {
-                    aBulder.Append(", ");
+                    aBuilder.Append(", ");
                 }
-                aBulder.Append(f.Key + "-" + l.Key);
+                aBuilder.Append(f.Key + "-" + l.Key);
             }
         }
 
@@ -637,7 +640,7 @@ namespace GostDOC.Models
             aCmp.Properties[Constants.ComponentNote] = aNote;
         }
 
-        private void UpdatePositions(IDictionary<CombineProperties, Component> aComponents)
+        private void UpdateDesignators(IDictionary<CombineProperties, Component> aComponents)
         {
             foreach (var cmp in aComponents.Values)
             {
@@ -859,13 +862,37 @@ namespace GostDOC.Models
         {
             Group docs;
             if (aConfifg.Specification.TryGetValue(Constants.GroupDoc, out docs))
-            {
+            {                
                 var doc = docs.Components.Where(key => key.GetProperty(Constants.ComponentName).ToLower().Contains("схема"));
                 if (doc != null && doc.Count() > 0)
                     return true;
-            }
-            
+            }            
             return false;
+        }
+
+        /// <summary>
+        /// добавить по два пустых компонента (пустых строки) в каждый раздел спецификации
+        /// </summary>
+        /// <param name="aConfig">a configuration.</param>
+        private void AddEmptyComponentsToSpecificationGroups(Configuration aConfig)
+        {
+            foreach (var gp in aConfig.Specification)
+            {
+                if (gp.Value.SubGroups.Count == 0)
+                {
+                    if (gp.Value.Components.Count > 0)
+                    {
+                        gp.Value.Components.Add(new Component(Guid.NewGuid(), 0));
+                        gp.Value.Components.Add(new Component(Guid.NewGuid(), 0));
+                    }
+                }
+                else
+                {
+                    var componenets = gp.Value.SubGroups.Last().Value.Components;
+                    componenets.Add(new Component(Guid.NewGuid(), 0));
+                    componenets.Add(new Component(Guid.NewGuid(), 0));
+                }            
+            }
         }
     }
 }
