@@ -196,7 +196,7 @@ namespace GostDOC.Models
         {
             string searchCfg = "-00";
 
-            Regex regex = new Regex(@"\w*(-\d{2})");
+            Regex regex = new Regex(@"-\d{2}");
             Match match = regex.Match(aUnitName);
             if (match.Success && match.Groups.Count > 0)
             {
@@ -302,7 +302,11 @@ namespace GostDOC.Models
                         string val;
                         if (component.Properties.TryGetValue(Constants.ComponentSign, out val) && !string.IsNullOrEmpty(val))
                         {
-                            ParseAssemblyUnit(aNewCfg, val, component.Count);
+                            val = val.Trim(new char[] { ' ' });
+                            if (!ParseAssemblyUnit(aNewCfg, val, component.Count))
+                            {
+                                _error.Error($"Файл {val}.xml не найден!");
+                            }
                         }
                     }                    
 
