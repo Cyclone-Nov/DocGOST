@@ -618,7 +618,7 @@ namespace GostDOC.Common
         /// <summary>
         /// Ширина столбца "Наименование" перечня элементов
         /// </summary>
-        public static readonly float ItemsListColumn2NameWidth     = 105.0f;
+        public static readonly float ItemsListColumn2NameWidth     = 106.0f;
         /// <summary>
         /// Ширина столбца "Кол." перечня элементов
         /// </summary>
