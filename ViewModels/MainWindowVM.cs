@@ -230,6 +230,32 @@ namespace GostDOC.ViewModels
             _excelManager.ExportComplete += OnExportComplete;
             // Update title
             UpdateTitle();
+
+            /*
+            using (DatabaseContext db = new DatabaseContext())
+            {
+                db.Profiles.Add(new ComponentSupplierProfile()
+                {
+                    Properties = new SupplierProperties()
+                    {
+                        Manufacturer = "MS",
+                        AllQuantity = 100
+                    },
+                    Suppliers = new List<Supplier>()
+                    {
+                        new Supplier() { Name = "goga"},
+                        new Supplier() { Name = "vasya"}
+                    }                    
+                });
+
+                db.SaveChanges();
+
+                var first = db.Profiles.First();
+                db.Profiles.Remove(first);
+
+                db.SaveChanges();
+            }
+            */
         }
 
         #region Commands impl

@@ -199,17 +199,19 @@ namespace GostDOC.Models
         {
             string searchCfg = "-00";
 
-            Regex regex = new Regex(@"\w*(-\d{2})");
+            Regex regex = new Regex(@"-\d{2}");
             Match match = regex.Match(aUnitName);
             if (match.Success && match.Groups.Count > 0)
             {
                 searchCfg = match.Groups[0].Value;
+                aUnitName = aUnitName.Remove(match.Groups[0].Index);
             }
 
             RootXml xml = new RootXml();
             string filePath = Path.Combine(_dir, aUnitName + ".xml");            
             if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref xml, filePath))
             {
+                _error.Error($"Ошибка загрузки файла {aUnitName}.xml!");
                 return false;
             }
 
@@ -305,7 +307,7 @@ namespace GostDOC.Models
                         string val;
                         if (component.Properties.TryGetValue(Constants.ComponentSign, out val) && !string.IsNullOrEmpty(val))
                         {
-                            ParseAssemblyUnit(aNewCfg, val, component.Count);
+                            ParseAssemblyUnit(aNewCfg, val.Trim(new char[] { ' ' }), component.Count);
                         }
                     }                    
 
