@@ -20,6 +20,36 @@ namespace GostDOC.Context
             optionsBuilder.UseSqlite("Filename=Database.db");
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ComponentSupplierProfile>()
+            .HasOne(x => x.Properties)
+            .WithOne()
+            .HasForeignKey<SupplierProperties>();
+
+            modelBuilder.Entity<ComponentSupplierProfile>()
+            .HasMany(x => x.Suppliers)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ComponentSupplierProfile>()
+            .HasMany(x => x.WarehouseAcceptances)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ComponentSupplierProfile>()
+            .HasMany(x => x.WarehouseDeliveries)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ComponentSupplierProfile>()
+            .HasMany(x => x.ComponentsEntry)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
+
+            base.OnModelCreating(modelBuilder);
+        }
+
         public DbSet<ComponentSupplierProfile> Profiles { get; set; }
 
         public DbSet<ComponentEntry> Entries { get; set; }
