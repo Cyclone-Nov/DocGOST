@@ -201,12 +201,14 @@ namespace GostDOC.Models
             if (match.Success && match.Groups.Count > 0)
             {
                 searchCfg = match.Groups[0].Value;
+                aUnitName = aUnitName.Remove(match.Groups[0].Index);
             }
 
             RootXml xml = new RootXml();
             string filePath = Path.Combine(_dir, aUnitName + ".xml");            
             if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref xml, filePath))
             {
+                _error.Error($"Ошибка загрузки файла {aUnitName}.xml!");
                 return false;
             }
 
@@ -302,11 +304,7 @@ namespace GostDOC.Models
                         string val;
                         if (component.Properties.TryGetValue(Constants.ComponentSign, out val) && !string.IsNullOrEmpty(val))
                         {
-                            val = val.Trim(new char[] { ' ' });
-                            if (!ParseAssemblyUnit(aNewCfg, val, component.Count))
-                            {
-                                _error.Error($"Файл {val}.xml не найден!");
-                            }
+                            ParseAssemblyUnit(aNewCfg, val.Trim(new char[] { ' ' }), component.Count);
                         }
                     }                    
 
