@@ -263,13 +263,13 @@ internal class ElementListDataPreparer : BasePreparer {
                 // если позиционное обозначение есть в словаре имен групп, то запишем наименование группы еслди оно есть                
                 if (groupNames.ContainsKey(designator)) 
                 {                    
-                    AddEmptyRow(aTable);
+                    //AddEmptyRow(aTable);
 
                     string groupName = groupNames[designator].Item1;
                     int count = groupNames[designator].Item2;
                     if (!string.IsNullOrEmpty(groupName) && (count != sameComponents))
-                    {                        
-                        //singleGroupName = true;
+                    {
+                        AddEmptyRow(aTable);
                         addGroupName = false;
                         AddGroupName(aTable, GetGroupNameByCount(groupName, false));
                         AddEmptyRow(aTable);
