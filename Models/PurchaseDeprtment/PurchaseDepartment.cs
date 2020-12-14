@@ -154,7 +154,7 @@ namespace GostDOC.Models
             });
 
 
-            SupplierFromDBEvent?.BeginInvoke(this, new TEventArgs<ICollection<Supplier>>(collection), null, null);
+            SupplierFromDBEvent?.BeginInvoke(this, new TEventArgs<ICollection<Supplier>>(collection), null, null);            
 
             return true;
         }

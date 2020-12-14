@@ -300,7 +300,7 @@ namespace SoftCircuits.Collections
             for (int ind = 0; ind < Items.Count; ind++)
             {
                 var val = Items[ind];
-                var key = IndexLookup.Where(kl => kl.Value == ind).First();
+                var key = IndexLookup.First(kl => kl.Value == ind);
                 yield return new KeyValuePair<TKey, TValue>(key.Key, val);
             }
         }

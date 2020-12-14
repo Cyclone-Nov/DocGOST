@@ -70,10 +70,22 @@ namespace GostDOC.Common
         ComponentPCB
     }
 
+    /// <summary>
+    /// тип проекта
+    /// </summary>
     public enum ProjectType
     {
+        /// <summary>
+        /// файл проекта сфоримрован программой GostDOC в режиме спецификации/перечня элементов
+        /// </summary>
         GostDoc,
+        /// <summary>
+        /// файл проекта сфоримрован программой GostDOC в режиме ведомости
+        /// </summary>
         GostDocB,
+        /// <summary>
+        /// файл проекта сфоримрован скриптами из программ AltuimDesigner или SolidWorks
+        /// </summary>
         Other
     }
 
@@ -353,27 +365,86 @@ namespace GostDOC.Common
         public static readonly string GroupNameB = "Раздел ВП";
         public static readonly string SubGroupNameB = "Подраздел ВП";
 
-        #region Компоненты
-
+        #region Компоненты        
+        /// <summary>
+        /// свйоство "Наименование"
+        /// </summary>
         public static readonly string ComponentName = "Наименование";
+        /// <summary>
+        /// свйоство "Код продукции"
+        /// </summary>
         public static readonly string ComponentProductCode = "Код продукции";
+        /// <summary>
+        /// свйоство компонента "Формат"
+        /// </summary>
         public static readonly string ComponentFormat = "Формат";
+        /// <summary>
+        /// свйоство компонента "Зона"
+        /// </summary>
         public static readonly string ComponentZone = "Зона";
+        /// <summary>
+        /// свйоство компонента "Позиция"
+        /// </summary>
         public static readonly string ComponentPosition = "Позиция";
+        /// <summary>
+        /// свйоство компонента "Документ на поставку"
+        /// </summary>
         public static readonly string ComponentDoc = "Документ на поставку";
+        /// <summary>
+        /// свйоство компонента "Код документа"
+        /// </summary>
         public static readonly string ComponentDocCode = "Код документа";
+        /// <summary>
+        /// свйоство компонента "Тип"
+        /// </summary>
         public static readonly string ComponentType = "Тип";
+        /// <summary>
+        /// свйоство компонента "Производитель"
+        /// </summary>
         public static readonly string ComponentManufacturer = "Производитель";
+        /// <summary>
+        /// свйоство компонента "Поставщик"
+        /// </summary>
         public static readonly string ComponentSupplier = "Поставщик";
+        /// <summary>
+        /// свйоство компонента "Количество"
+        /// </summary>
         public static readonly string ComponentCount = "Количество";
+        /// <summary>
+        /// свйоство компонента "Количество на изд."
+        /// </summary>
         public static readonly string ComponentCountDev = "Количество на изд.";
+        /// <summary>
+        /// свйоство компонента "Количество в комп."
+        /// </summary>
         public static readonly string ComponentCountSet = "Количество в комп.";
+        /// <summary>
+        /// свйоство компонента "Количество на рег."
+        /// </summary>
         public static readonly string ComponentCountReg = "Количество на рег.";
+        /// <summary>
+        /// свйоство компонента "Примечание"
+        /// </summary>
         public static readonly string ComponentNote = "Примечание";
+        /// <summary>
+        /// свйоство компонента "Наличие компонента"
+        /// </summary>
         public static readonly string ComponentPresence = "Наличие компонента";
+        /// <summary>
+        /// свйоство компонента "Обозначение"
+        /// </summary>
         public static readonly string ComponentSign = "Обозначение";
+        /// <summary>
+        /// свйоство компонента "Куда входит"
+        /// </summary>
         public static readonly string ComponentWhereIncluded = "Куда входит";
+        /// <summary>
+        /// свйоство компонента "Позиционное обозначение"
+        /// </summary>
         public static readonly string ComponentDesignatorID = "Позиционное обозначение";
+        /// <summary>
+        /// свйоство 
+        /// </summary>
         public static readonly string ComponentMaterialGroup = "Группа материала";
 
         #endregion
@@ -547,7 +618,7 @@ namespace GostDOC.Common
         /// <summary>
         /// Ширина столбца "Наименование" перечня элементов
         /// </summary>
-        public static readonly float ItemsListColumn2NameWidth     = 110.0f;
+        public static readonly float ItemsListColumn2NameWidth     = 105.0f;
         /// <summary>
         /// Ширина столбца "Кол." перечня элементов
         /// </summary>

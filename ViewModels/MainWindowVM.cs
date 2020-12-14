@@ -1583,13 +1583,15 @@ namespace GostDOC.ViewModels
             }
             else
             {
-                var val = GeneralGraphValues.Where(k => string.Equals(k.Name.Value, "Обозначение")).ToArray();
-                if (val != null && val.Length > 0 && !string.IsNullOrEmpty(val[0].Text.Value))
+                //FirstOrDefault
+                //var val = GeneralGraphValues.Where(k => string.Equals(k.Name.Value, "Обозначение")).ToArray();
+                var val = GeneralGraphValues.First(k => string.Equals(k.Name.Value, "Обозначение"));
+                if (val != null && !string.IsNullOrEmpty(val.Text.Value))
                 {
                     if (aForExport)
-                        filename = $"{val[0].Text.Value}{_docManager.GetDocumentName(_docType)}.{aExtension}";
+                        filename = $"{val.Text.Value}{_docManager.GetDocumentName(_docType)}.{aExtension}";
                     else
-                        filename = $"{val[0].Text.Value}.{aExtension}";
+                        filename = $"{val.Text.Value}.{aExtension}";
                 }
             }
             return filename;
