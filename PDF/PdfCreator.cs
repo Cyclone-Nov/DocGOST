@@ -736,6 +736,7 @@ namespace GostDOC.PDF
                         .SetRotationAngle(DegreesToRadians(90))
                         .SetFixedLeading(10)
                         .SetPadding(0)
+                        .SetPaddingTop(2)
                         .SetPaddingRight(-10)
                         .SetPaddingLeft(-10)
                         .SetMargin(0)
@@ -817,7 +818,7 @@ namespace GostDOC.PDF
             tbl.AddCell(CreateAppendGraphCell(25 * mmW(), "Взам. инв. №"));
             tbl.AddCell(CreateAppendGraphCell(25 * mmW()));
 
-            tbl.AddCell(CreateAppendGraphCell(35 * mmW(), "Подп. и дата").SetHeight(35 * mmW()));
+            tbl.AddCell(CreateAppendGraphCell(35 * mmW(), "Подп. и дата"));
             tbl.AddCell(CreateAppendGraphCell(35 * mmW()));
 
             tbl.AddCell(CreateAppendGraphCell(25 * mmW(), "Инв № подл."));

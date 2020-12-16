@@ -397,7 +397,7 @@ namespace GostDOC.PDF
 
             PdfPage page = _pdfDoc.GetPage(1);
             Canvas canvas = new Canvas(new PdfCanvas(page), page.GetMediaBox());
-            canvas.ShowTextAligned(paragraph, 657, 170, TextAlignment.LEFT);
+            canvas.ShowTextAligned(paragraph, 655, 170, TextAlignment.LEFT);
         }
 
         /// <summary>
