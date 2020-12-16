@@ -205,14 +205,14 @@ namespace GostDOC.PDF
 
                 //BasePreparer.FormattedString GetCellStringFormatted(string columnName) =>
                 //    (row[columnName] == DBNull.Value) ? null : ((BasePreparer.FormattedString) row[columnName]);
-                                    
-                string name               = GetCellString(Constants.ColumnName).Truncate(35);
-                string productCode        = GetCellString(Constants.ColumnProductCode).Truncate(24);
-                string deliveryDocSign    = GetCellString(Constants.ColumnDeliveryDocSign).Truncate(32);
-                string supplier           = GetCellString(Constants.ColumnSupplier).Truncate(35);
-                string entry              = GetCellString(Constants.ColumnEntry).Truncate(42);                
+
+                string name               = GetCellString(Constants.ColumnName);//.Truncate(35);
+                string productCode        = GetCellString(Constants.ColumnProductCode); // .Truncate(24);
+                string deliveryDocSign    = GetCellString(Constants.ColumnDeliveryDocSign);//.Truncate(32);
+                string supplier           = GetCellString(Constants.ColumnSupplier);//.Truncate(35);
+                string entry              = GetCellString(Constants.ColumnEntry);//.Truncate(42);                
                 string strQuantityDev     = string.Empty, strQuantityComplex = string.Empty, strQuantityReg = string.Empty;
-                string strQuantityTotal   = GetCellString(Constants.ColumnQuantityTotal).Truncate(5);
+                string strQuantityTotal   = GetCellString(Constants.ColumnQuantityTotal);//.Truncate(5);
                 int quantityTotal = 0;
                 if (!string.IsNullOrEmpty(strQuantityTotal))
                     quantityTotal = Int32.Parse(strQuantityTotal);

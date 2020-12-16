@@ -296,11 +296,23 @@ namespace GostDOC.DataPreparation
         /// <param name="aTable"></param>
         /// <param name="aGroupName"></param>
         private bool AddGroupName(DataTable aTable, string aGroupName) {
-            if (string.IsNullOrEmpty(aGroupName)) return false;
-            DataRow row = aTable.NewRow();
-            row[Constants.ColumnName] = new FormattedString { Value = aGroupName, IsUnderlined = true };
-            row[Constants.ColumnTextFormat] = new FormattedString { Value = "1"};
-            aTable.Rows.Add(row);
+            if (string.IsNullOrEmpty(aGroupName)) 
+                return false;
+            
+            string[] aGroupNameArr = PdfUtils.SplitStringByWidth(Constants.BillColumn2NameWidth - 2, aGroupName, new char[] { ' ', '.', '-' }, Constants.BillFontSize).ToArray();
+
+            if(aGroupNameArr.Length > 1)
+            {
+                DataRow row;
+                int ln = aGroupNameArr.Length;
+                for (int i = 0; i < ln; i++)
+                {
+                    row = aTable.NewRow();
+                    row[Constants.ColumnName] = new FormattedString { Value = aGroupNameArr[i], IsUnderlined = true };
+                    row[Constants.ColumnTextFormat] = new FormattedString { Value = "1" };
+                    aTable.Rows.Add(row);
+                }
+            }
             return true;
         }
 
@@ -388,11 +400,11 @@ namespace GostDOC.DataPreparation
 
                 // вчисляем длины полей и переносим на следующую строку при необходимости 
                 // разобьем наименование на несколько строк исходя из длины текста
-                string[] namearr = PdfUtils.SplitStringByWidth(Constants.BillColumn2NameWidth, name, new char[] { ' ','.','-'} ,Constants.BillFontSize).ToArray();
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.BillColumn2NameWidth - 2, name, new char[] { ' ','.','-'} ,Constants.BillFontSize).ToArray();
                 var supplier = component.GetProperty(Constants.ComponentSupplier);                 
-                string[] supplierarr = PdfUtils.SplitStringByWidth(Constants.BillColumn5SupplierWidth, supplier, new char[] { ' ', '.', '-' }, Constants.BillFontSize).ToArray();
+                string[] supplierarr = PdfUtils.SplitStringByWidth(Constants.BillColumn5SupplierWidth - 2, supplier, new char[] { ' ', '.', '-' }, Constants.BillFontSize).ToArray();
                 var note = component.GetProperty(Constants.ComponentNote);
-                string[] notearr = PdfUtils.SplitStringByWidth(Constants.BillColumn11FootnoteWidth, note, new char[] { ' ', '.', '-' }, Constants.BillFontSize).ToArray();
+                string[] notearr = PdfUtils.SplitStringByWidth(Constants.BillColumn11FootnoteWidth - 2, note, new char[] { ' ', '.', '-' }, Constants.BillFontSize).ToArray();
 
                 row = aTable.NewRow();
                 row[Constants.ColumnName] = new FormattedString { Value = namearr.First() };
