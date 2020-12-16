@@ -299,20 +299,16 @@ namespace GostDOC.DataPreparation
             if (string.IsNullOrEmpty(aGroupName)) 
                 return false;
             
-            string[] aGroupNameArr = PdfUtils.SplitStringByWidth(Constants.BillColumn2NameWidth - 2, aGroupName, new char[] { ' ', '.', '-' }, Constants.BillFontSize).ToArray();
-
-            if(aGroupNameArr.Length > 1)
+            string[] aGroupNameArr = PdfUtils.SplitStringByWidth(Constants.BillColumn2NameWidth - 2, aGroupName, new char[] { ' ', '.', '-' }, Constants.BillFontSize).ToArray();            
+            DataRow row;
+            int ln = aGroupNameArr.Length;
+            for (int i = 0; i < ln; i++)
             {
-                DataRow row;
-                int ln = aGroupNameArr.Length;
-                for (int i = 0; i < ln; i++)
-                {
-                    row = aTable.NewRow();
-                    row[Constants.ColumnName] = new FormattedString { Value = aGroupNameArr[i], IsUnderlined = true };
-                    row[Constants.ColumnTextFormat] = new FormattedString { Value = "1" };
-                    aTable.Rows.Add(row);
-                }
-            }
+                row = aTable.NewRow();
+                row[Constants.ColumnName] = new FormattedString { Value = aGroupNameArr[i], IsUnderlined = true };
+                row[Constants.ColumnTextFormat] = new FormattedString { Value = "1" };
+                aTable.Rows.Add(row);
+            }            
             return true;
         }
 
