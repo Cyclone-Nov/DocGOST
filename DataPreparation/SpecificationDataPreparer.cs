@@ -245,9 +245,9 @@ namespace GostDOC.DataPreparation
                 AddEmptyRow(aTable);           
 
             var сomponents = group.Components;
-            AddComponents(aTable, сomponents, ref aPos, aPositions, !string.Equals(aGroupName, Constants.GroupDoc));
+            AddComponents(aTable, сomponents, ref aPos, aPositions, !string.Equals(aGroupName, Constants.GroupDoc) && !string.Equals(aGroupName, Constants.GroupComplex));
             
-            if (сomponents.Count > 0 && group.SubGroups.Count > 0)
+            if (сomponents.Count > 0 || group.SubGroups?.Count > 0)
             {
                 AddEmptyRow(aTable);
             }

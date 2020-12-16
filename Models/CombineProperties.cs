@@ -34,6 +34,14 @@ namespace GostDOC.Models
         /// </value>
         public string RefDesignation { get; set; }
 
+        /// <summary>
+        /// позиция компонента
+        /// </summary>
+        /// <value>
+        /// reference desigantion
+        /// </value>
+        public string Position { get; set; }
+
         public CombineProperties(bool aCombinePosition)
         {
             _combinePosition = aCombinePosition;
@@ -50,7 +58,7 @@ namespace GostDOC.Models
             {
                 return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign);
             }
-            return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign) && string.Equals(other.RefDesignation, RefDesignation);
+            return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign) && string.Equals(other.RefDesignation, RefDesignation) && string.Equals(other.Position, Position);
         }
         public override bool Equals(object other)
         {
@@ -62,7 +70,7 @@ namespace GostDOC.Models
             {
                 return (Name?.GetHashCode() ?? 0) ^ (Sign?.GetHashCode() ?? 0);
             }
-            return (Name?.GetHashCode() ?? 0) ^ (Sign?.GetHashCode() ?? 0) ^ (RefDesignation?.GetHashCode() ?? 0);
+            return (Name?.GetHashCode() ?? 0) ^ (Sign?.GetHashCode() ?? 0) ^ (RefDesignation?.GetHashCode() ?? 0) ^ (Position?.GetHashCode() ?? 0);
         }
     }
 }

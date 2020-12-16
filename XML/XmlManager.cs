@@ -242,14 +242,16 @@ namespace GostDOC.Models
             var groupD27 = _currentAssemblyD27;
             Dictionary<CombineProperties, Component> components = new Dictionary<CombineProperties, Component>();
             HashSet<string> positions = new HashSet<string>();
+            bool enableAutoSort = true;
 
             foreach (var cmp in aComponents)
             {
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
                 var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
                 var designator = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatorID);
+                var position = cmp.Properties.Find(x => x.Name == Constants.ColumnPosition);
 
-                if (name == null)
+                if (name == null && position == null)
                 {
                     _error.Error($"Имя компонента не задано!");
                     continue;
@@ -265,7 +267,8 @@ namespace GostDOC.Models
                 {
                     Name = name.Text,
                     Sign = sign.Text,
-                    RefDesignation = designator?.Text ?? string.Empty
+                    RefDesignation = designator?.Text ?? string.Empty,
+                    Position = position?.Text ?? string.Empty
                 };
 
                 if (!string.IsNullOrEmpty(combine.RefDesignation))
@@ -336,6 +339,7 @@ namespace GostDOC.Models
 
             if (_docType == DocType.Specification)
             {
+                //UpdateAutoSort(enableAutoSort);
                 UpdateDesignators(components);
             }
         }
@@ -439,19 +443,24 @@ namespace GostDOC.Models
                 // Recursive call for subgroups
                 SortComponents(subGroup.Value, aGroupName, aDocType);
             }
-
-            // Sort components
-            SortType sortType = Utils.GetSortType(aDocType, aGroupName);
-            ISort<Component> sorter = SortFactory.GetSort(sortType);
-            if (sorter != null) {
-                aGroup.Components = sorter.Sort(aGroup.Components);
+                        
+            aGroup.AutoSort = CheckEnableAutoSort(aGroup.Components);
+            if (aGroup.AutoSort)
+            {
+                // Sort components
+                SortType sortType = Utils.GetSortType(aDocType, aGroupName);
+                ISort<Component> sorter = SortFactory.GetSort(sortType);
+                if (sorter != null)
+                {
+                    aGroup.Components = sorter.Sort(aGroup.Components);
+                }
             }
         }
 
         private void SortComponents(Configuration aCfg)
         {
             foreach (var group in aCfg.Specification.Values)
-            {
+            {                
                 SortComponents(group, group.Name, DocType.Specification);
             }
 
@@ -895,6 +904,23 @@ namespace GostDOC.Models
                     componenets.Add(new Component(Guid.NewGuid(), 0));
                 }            
             }
+        }
+
+
+        private bool CheckEnableAutoSort(List<Component> aComponents)
+        {
+            foreach (var cmp in aComponents)
+            {
+                var position = cmp.GetProperty(Constants.ComponentPosition);
+                 if (string.IsNullOrEmpty(position) || string.Equals(position, "0"))
+                 {
+                    return true;
+                 }
+                 else
+                    return false;
+            }
+
+            return true;
         }
     }
 }

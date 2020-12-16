@@ -1116,14 +1116,20 @@ namespace GostDOC.ViewModels
             return _project.GetGroupData(ConfigurationName, _docType, groupInfo);
         }
 
-        private void UpdateGroup()
+        private void UpdateGroup(bool? aAutoSort = null)
         {
             var groupData = GetGroupData();
             if (groupData == null)
             {
                 return;
             }
-            IsAutoSortEnabled.Value = groupData.AutoSort;
+
+            if (aAutoSort == null)
+                IsAutoSortEnabled.Value = groupData.AutoSort;
+            else
+            {
+                IsAutoSortEnabled.Value = groupData.AutoSort = (bool)aAutoSort;                
+            }
 
             // Fill components
             Components.Clear();
@@ -1450,7 +1456,7 @@ namespace GostDOC.ViewModels
                         if (positions != null && positions is Dictionary<string, List<Tuple<string, int>>>)
                         {
                             _specifiactionPositionsDic = ((Dictionary<string, List<Tuple<string, int>>>)positions);
-                            UpdateGroup();
+                            UpdateGroup(false);
                         }
                     }
                 }

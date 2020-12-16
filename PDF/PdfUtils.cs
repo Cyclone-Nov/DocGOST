@@ -105,7 +105,7 @@ namespace GostDOC.PDF
                 name_strings.Add(aString);
             } else
             {
-                string fullName = aString;
+                string fullName = aString;                
                 do
                 {
                     // извлекаем из строки то число символов, которое может поместиться в указанную длину maxLength
@@ -113,7 +113,20 @@ namespace GostDOC.PDF
                     string partName = fullName.Substring(0, symbOnMaxLength);
 
                     // пробуем найти ближайший символ, по которому можно переносить фразу и извлечем часть для первой строки
-                    int index = (aUseGOST && PREF_ARR.Any(s=> partName.Contains(s))) ? partName.IndexOf(PREF_ARR.Find(b => partName.Contains(b))) : partName.LastIndexOfAny(aDelimiters);
+                    int index = -1;
+                    if (aUseGOST && PREF_ARR.Any(s => partName.Contains(s)))
+                    {
+                        index = partName.IndexOf(PREF_ARR.Find(b => partName.Contains(b)));
+                        aUseGOST = false;
+                    }
+                    else
+                    {
+                        if(aDelimiters.Contains(' '))
+                            index = partName.LastIndexOfAny(new char[] { ' ' });
+                        if (index < 0)
+                            index = partName.LastIndexOfAny(aDelimiters);
+                    }
+
                     if (index < 0)
                     {
                         name_strings.Add(partName);
