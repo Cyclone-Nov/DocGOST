@@ -195,38 +195,55 @@ namespace GostDOC.Models
                 || aGroupInfo.GroupName == Constants.GroupKits;
         }
 
-        private bool ParseAssemblyUnit(Configuration aNewCfg, string aUnitName, uint complexCount)
+        private bool ParseAssemblyUnit(Configuration aNewCfg, string aUnitSign, string aUnitName, uint complexCount)
         {
             string searchCfg = "-00";
 
             Regex regex = new Regex(@"-\d{2}");
-            Match match = regex.Match(aUnitName);
+            Match match = regex.Match(aUnitSign);
             if (match.Success && match.Groups.Count > 0)
             {
                 searchCfg = match.Groups[0].Value;
-                aUnitName = aUnitName.Remove(match.Groups[0].Index);
+                aUnitSign = aUnitSign.Remove(match.Groups[0].Index);
             }
 
             RootXml xml = new RootXml();
-            string filePath = Path.Combine(_dir, aUnitName + ".xml");            
+            string filePath = Path.Combine(_dir, aUnitSign + ".xml");            
             if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref xml, filePath))
             {
-                _error.Error($"Ошибка загрузки файла {aUnitName}.xml!");
+                _error.Error($"Ошибка загрузки файла {aUnitSign}.xml!");
                 return false;
             }
 
             CheckVersion(filePath);
-
+            string nameSignInTopSpec = ConcatNameSign(aUnitName, aUnitSign);
             foreach (var cfg in xml.Transaction.Project.Configurations)
             {
                 if (cfg.Name == searchCfg)
                 {
-                    Group newAssembly = new Group() { Name = ParseNameSign(cfg.Graphs) };
+                    string name = ParseGraphValue(cfg.Graphs, Constants.GraphName);
+                    string sign = ParseGraphValue(cfg.Graphs, Constants.GraphSign);
+                    string nameSignInThisSpec  = ConcatNameSign(name, sign);
+                    if(!string.Equals(nameSignInTopSpec, nameSignInThisSpec, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        _error.Error($"Имя или обозначение сборочной единицы (узла) из файла верхней спецификации ({nameSignInTopSpec}) " +
+                                     $"не соответсвует имени или обозначению ({nameSignInThisSpec}) из файла спецификации {aUnitSign}.xml!");
+                    }
+                    Group newAssembly = new Group() { Name = nameSignInTopSpec };
                     if (_currentAssemblyD27.SubGroups == null)
                     {
                         _currentAssemblyD27.SubGroups = new Dictionary<string, Group>();
                     }
-                    _currentAssemblyD27.SubGroups.Add(newAssembly.Name, newAssembly);
+
+                    if (_currentAssemblyD27.SubGroups.ContainsKey(newAssembly.Name))
+                    {
+                        // increment components in _currentAssemblyD27  +1
+                        //IncrementComponentsInGroups(_currentAssemblyD27.SubGroups);
+
+                    } else
+                    {
+                        _currentAssemblyD27.SubGroups.Add(newAssembly.Name, newAssembly);                        
+                    }
                     _currentAssemblyD27 = newAssembly;
 
                     AddComponents(aNewCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, complexCount);
@@ -307,10 +324,12 @@ namespace GostDOC.Models
                     // Parse complex components
                     if (IsComplexComponent(groups[0]))
                     {
-                        string val;
-                        if (component.Properties.TryGetValue(Constants.ComponentSign, out val) && !string.IsNullOrEmpty(val))
+                        string _sign;
+                        if (component.Properties.TryGetValue(Constants.ComponentSign, out _sign) && !string.IsNullOrEmpty(_sign))
                         {
-                            ParseAssemblyUnit(aNewCfg, val.Trim(new char[] { ' ' }), component.Count);
+                            string _name;
+                            component.Properties.TryGetValue(Constants.ComponentName, out _name);
+                            ParseAssemblyUnit(aNewCfg, _sign.Trim(new char[] { ' ' }), _name, component.Count);
                         }
                     }                    
 
@@ -596,9 +615,14 @@ namespace GostDOC.Models
             return ParseGraphValue(aGraphs, Constants.GraphName) + " " + ParseGraphValue(aGraphs, Constants.GraphSign);
         }
 
-        private string ParseNameSign(IList<GraphXml> aGraphs)
+        //private string ParseNameSign(IList<GraphXml> aGraphs)
+        //{
+        //    return ParseGraphValue(aGraphs, Constants.GraphName) + " " + ParseGraphValue(aGraphs, Constants.GraphSign);
+        //}
+
+        private string ConcatNameSign(string aName, string aSign)
         {
-            return ParseGraphValue(aGraphs, Constants.GraphName) + " " + ParseGraphValue(aGraphs, Constants.GraphSign);
+            return $"{aName} {aSign}";
         }
 
         private Tuple<string, int> ParseDesignatorId(string aInput)
@@ -761,7 +785,7 @@ namespace GostDOC.Models
         {
             if (aGroup.Name.Contains(@"\"))
             {
-                string[] split = aGroup.Name.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] split = aGroup.Name.Split(new char[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
                 if (split.Length == 2)
                 {
                     string name = aGroup.Components.Count > 1 ? split[1] : split[0];
@@ -921,6 +945,35 @@ namespace GostDOC.Models
             }
 
             return true;
+        }
+
+
+        private void IncrementComponentsInGroups(IDictionary<string, Group> aGroups)
+        {
+            if (aGroups?.Count() == 0)
+                return;
+            
+            foreach (var grp in aGroups.Values)
+            {
+                IncrementComponents(grp.Components);
+                IncrementComponentsInGroups(grp.SubGroups);
+            }
+        }
+
+
+        private void IncrementComponents(List<Component> aComponents)
+        {
+            if (aComponents?.Count() == 0)
+                return;
+
+            foreach (var cmp in aComponents)
+            {
+                string groupSp = cmp.GetProperty(Constants.GroupNameSp);
+                //if (IsBillComponent (groupSp))
+                {
+                    cmp.Count++;
+                }
+            }
         }
     }
 }

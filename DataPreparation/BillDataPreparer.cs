@@ -327,7 +327,8 @@ namespace GostDOC.DataPreparation
             // записываем компоненты в таблицу данных
 
             // Cортировка компонентов по значению свойства "Позиционное обозначение"
-            Models.Component[] sortComponents = SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();
+            //Models.Component[] sortComponents = SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();
+            Models.Component[] sortComponents = SortFactory.GetSort(SortType.Name).Sort(aComponents.ToList()).ToArray();
 
             // записываем наименование группы, если есть
             if (AddGroupName(aTable, aGroupName))
