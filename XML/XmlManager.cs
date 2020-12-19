@@ -47,7 +47,8 @@ namespace GostDOC.Models
                 return OpenFileResult.Fail;
             }
 
-            CheckVersion(aFilePath);
+            if (!CheckVersion(aFilePath))
+                return OpenFileResult.Fail;
 
             _dir = Path.GetDirectoryName(aFilePath);
             _projectType = ParseProjectType(_xml.Transaction.Type);
@@ -134,7 +135,7 @@ namespace GostDOC.Models
             foreach (var cfg in aPrj.Configurations)
             {
                 ConfigurationXml cfgXml = new ConfigurationXml() { Name = cfg.Key };
-                
+
                 // Fill graphs
                 foreach (var graph in cfg.Value.Graphs)
                 {
@@ -153,7 +154,7 @@ namespace GostDOC.Models
                     PropertiesToXml(component.Properties, cmp.Properties);
 
                     SetProperty(cmp, Constants.ComponentCount, component.Count.ToString());
-                    
+
                     switch (component.Type)
                     {
                         case ComponentType.Document:
@@ -165,7 +166,7 @@ namespace GostDOC.Models
                         default:
                             cfgXml.Components.Add(cmp);
                             break;
-                    }                    
+                    }
                 }
 
                 _xml.Transaction.Project.Configurations.Add(cfgXml);
@@ -175,8 +176,8 @@ namespace GostDOC.Models
 
         private bool IsBillComponent(SubGroupInfo aGroupInfo)
         {
-            return aGroupInfo.GroupName == Constants.GroupOthers 
-                || aGroupInfo.GroupName == Constants.GroupStandard 
+            return aGroupInfo.GroupName == Constants.GroupOthers
+                || aGroupInfo.GroupName == Constants.GroupStandard
                 || aGroupInfo.GroupName == Constants.GroupMaterials;
         }
 
@@ -197,6 +198,8 @@ namespace GostDOC.Models
 
         private bool ParseAssemblyUnit(Configuration aNewCfg, string aUnitSign, string aUnitName, uint complexCount)
         {
+            string _topSpecFile = ParseGraphValue(aNewCfg.Graphs, Constants.GraphSign) + ".xml";
+
             string searchCfg = "-00";
 
             Regex regex = new Regex(@"-\d{2}");
@@ -207,15 +210,18 @@ namespace GostDOC.Models
                 aUnitSign = aUnitSign.Remove(match.Groups[0].Index);
             }
 
+
             RootXml xml = new RootXml();
-            string filePath = Path.Combine(_dir, aUnitSign + ".xml");            
+            string filePath = Path.Combine(_dir, aUnitSign + ".xml");
             if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref xml, filePath))
             {
                 _error.Error($"Ошибка загрузки файла {aUnitSign}.xml!");
                 return false;
             }
 
-            CheckVersion(filePath);
+            if (!CheckVersion(filePath))
+                return false;
+
             string nameSignInTopSpec = ConcatNameSign(aUnitName, aUnitSign);
             foreach (var cfg in xml.Transaction.Project.Configurations)
             {
@@ -223,11 +229,11 @@ namespace GostDOC.Models
                 {
                     string name = ParseGraphValue(cfg.Graphs, Constants.GraphName);
                     string sign = ParseGraphValue(cfg.Graphs, Constants.GraphSign);
-                    string nameSignInThisSpec  = ConcatNameSign(name, sign);
-                    if(!string.Equals(nameSignInTopSpec, nameSignInThisSpec, StringComparison.InvariantCultureIgnoreCase))
+                    string nameSignInThisSpec = ConcatNameSign(name, sign);
+                    if (!string.Equals(nameSignInTopSpec, nameSignInThisSpec, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        _error.Error($"Имя или обозначение сборочной единицы (узла) из файла верхней спецификации ({nameSignInTopSpec}) " +
-                                     $"не соответсвует имени или обозначению ({nameSignInThisSpec}) из файла спецификации {aUnitSign}.xml!");
+                        _error.Error($"Имя или обозначение узла ({nameSignInTopSpec}) из файла спецификации {_topSpecFile} " +
+                                     $"не соответсвует имени или обозначению ({nameSignInThisSpec}) в его спецификации ({aUnitSign}.xml)!");
                     }
                     Group newAssembly = new Group() { Name = nameSignInTopSpec };
                     if (_currentAssemblyD27.SubGroups == null)
@@ -242,7 +248,7 @@ namespace GostDOC.Models
 
                     } else
                     {
-                        _currentAssemblyD27.SubGroups.Add(newAssembly.Name, newAssembly);                        
+                        _currentAssemblyD27.SubGroups.Add(newAssembly.Name, newAssembly);
                     }
                     _currentAssemblyD27 = newAssembly;
 
@@ -259,7 +265,7 @@ namespace GostDOC.Models
             var groupD27 = _currentAssemblyD27;
             Dictionary<CombineProperties, Component> components = new Dictionary<CombineProperties, Component>();
             HashSet<string> positions = new HashSet<string>();
-            bool enableAutoSort = true;
+            string _specFileName = ParseGraphValue(aNewCfg.Graphs, Constants.GraphSign) + ".xml";            
 
             foreach (var cmp in aComponents)
             {
@@ -270,13 +276,13 @@ namespace GostDOC.Models
 
                 if (name == null && position == null)
                 {
-                    _error.Error($"Имя компонента не задано!");
+                    _error.Error($"Файл {_specFileName}: имя компонента не задано!");
                     continue;
                 }
 
-                if (sign == null) 
+                if (sign == null)
                 {
-                    _error.Error($"Компонент {name}: 'Обозначение' не задано!");
+                    _error.Error($"Файл {_specFileName}. Компонент {name}: 'Обозначение' не задано!");
                     continue;
                 }
 
@@ -293,8 +299,7 @@ namespace GostDOC.Models
                     if (positions.Contains(combine.RefDesignation))
                     {
                         _error.Error($"Найдено дублирующееся позиционное обозначение {combine.RefDesignation}!");
-                    }
-                    else
+                    } else
                     {
                         positions.Add(combine.RefDesignation);
                     }
@@ -307,7 +312,7 @@ namespace GostDOC.Models
                     continue;
 
                 // Create component
-                Component component = new Component(cmp) { Type = aType, Count = count };                
+                Component component = new Component(cmp) { Type = aType, Count = count };
 
                 // Fill group info
                 SubGroupInfo[] groups = UpdateGroups(cmp, component);
@@ -320,7 +325,7 @@ namespace GostDOC.Models
 
                 // Add component to bill
                 if (_docType == DocType.Bill || _docType == DocType.D27)
-                {                   
+                {
                     // Parse complex components
                     if (IsComplexComponent(groups[0]))
                     {
@@ -331,7 +336,7 @@ namespace GostDOC.Models
                             component.Properties.TryGetValue(Constants.ComponentName, out _name);
                             ParseAssemblyUnit(aNewCfg, _sign.Trim(new char[] { ' ' }), _name, component.Count);
                         }
-                    }                    
+                    }
 
                     if (IsBillComponent(groups[0]))
                     {
@@ -344,7 +349,7 @@ namespace GostDOC.Models
                     }
 
                     if (IsD27Component(groups[0]))
-                    {                        
+                    {
                         groupD27.Components.Add(component);
                     }
 
@@ -354,7 +359,7 @@ namespace GostDOC.Models
 
                 // Save added component for counting
                 components.Add(combine, component);
-            }            
+            }
 
             if (_docType == DocType.Specification)
             {
@@ -376,9 +381,9 @@ namespace GostDOC.Models
             if (string.IsNullOrEmpty(aGroupInfo.SubGroupName))
             {
                 // Add component, no subgroup
-                spGroup.Components.Add(aComponent);
-            }
-            else
+                //spGroup.Components.Add(aComponent);
+                AddOrIncrementComponent(spGroup, aComponent);
+            } else
             {
                 Group subGroup = null;
                 if (!spGroup.SubGroups.TryGetValue(aGroupInfo.SubGroupName, out subGroup))
@@ -388,7 +393,7 @@ namespace GostDOC.Models
                     spGroup.SubGroups.Add(subGroup.Name, subGroup);
                 }
                 // Add component to subgroup
-                subGroup.Components.Add(aComponent);
+                AddOrIncrementComponent(subGroup, aComponent);
             }
         }
 
@@ -409,16 +414,13 @@ namespace GostDOC.Models
                 if (property.Name == Constants.GroupNameSp)
                 {
                     result[0].GroupName = property.Text;
-                }
-                else if (property.Name == Constants.SubGroupNameSp)
+                } else if (property.Name == Constants.SubGroupNameSp)
                 {
                     result[0].SubGroupName = property.Text;
-                }
-                else if (property.Name == Constants.GroupNameB)
+                } else if (property.Name == Constants.GroupNameB)
                 {
                     result[1].GroupName = property.Text;
-                }
-                else if (property.Name == Constants.SubGroupNameB)
+                } else if (property.Name == Constants.SubGroupNameB)
                 {
                     result[1].SubGroupName = property.Text;
                 }
@@ -462,7 +464,7 @@ namespace GostDOC.Models
                 // Recursive call for subgroups
                 SortComponents(subGroup.Value, aGroupName, aDocType);
             }
-                        
+
             aGroup.AutoSort = CheckEnableAutoSort(aGroup.Components);
             if (aGroup.AutoSort)
             {
@@ -479,7 +481,7 @@ namespace GostDOC.Models
         private void SortComponents(Configuration aCfg)
         {
             foreach (var group in aCfg.Specification.Values)
-            {                
+            {
                 SortComponents(group, group.Name, DocType.Specification);
             }
 
@@ -520,8 +522,7 @@ namespace GostDOC.Models
 
                     return true;
                 }
-            }
-            else if (_docType == DocType.ItemsList) 
+            } else if (_docType == DocType.ItemsList)
             {
                 if (aComponents.TryGetValue(aCombine, out existing))
                 {
@@ -529,16 +530,15 @@ namespace GostDOC.Models
                     existing.Count += aCount;
                     return true;
                 }
-            }
-            else
+            } else
             {
-                var keys = aComponents.Keys.ToArray();                
+                var keys = aComponents.Keys.ToArray();
                 for (var i = 0; i < keys.Length; i++)
-                {                                        
+                {
                     if (keys[i].Name == aCombine.Name && keys[i].Sign == aCombine.Sign)
                     {
                         aComponents[keys[i]].Count += aCount;
-                        return true;
+                        return false;
                     }
                 }
             }
@@ -552,11 +552,10 @@ namespace GostDOC.Models
             if (property == null)
             {
                 aComponent.Properties.Add(new PropertyXml() { Name = aName, Text = aText });
-            }
-            else
+            } else
             {
                 property.Text = aText;
-            }            
+            }
         }
 
         private string GetProperty(ComponentXml aComponent, string aName)
@@ -571,7 +570,7 @@ namespace GostDOC.Models
             // Read count if set
             uint.TryParse(GetProperty(aComponent, Constants.ComponentCount), out count);
             // Return 1 as default or count if set
-            return count > 0 ? count : 1;                
+            return count > 0 ? count : 1;
         }
 
         private ProjectType ParseProjectType(string aType)
@@ -643,8 +642,7 @@ namespace GostDOC.Models
             if (aItems.Count == 0)
             {
                 return;
-            }
-            else if (aItems.Count <= 2)
+            } else if (aItems.Count <= 2)
             {
                 // Add ids with ","
                 foreach (var item in aItems)
@@ -655,8 +653,7 @@ namespace GostDOC.Models
                     }
                     aBuilder.Append(item.Key);
                 }
-            }
-            else
+            } else
             {
                 // Add ids with "-"
                 var f = aItems.First();
@@ -681,7 +678,7 @@ namespace GostDOC.Models
             {
                 string currentPos;
                 if (cmp.Properties.TryGetValue(Constants.ComponentDesignatorID, out currentPos))
-                {       
+                {
                     if (_projectType != ProjectType.Other)
                     {
                         // Not needed to process already combined components
@@ -691,7 +688,7 @@ namespace GostDOC.Models
 
                     // Split ids
                     string[] split = currentPos.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    
+
                     if (split.Length < 2)
                     {
                         // Not needed to process 1 or 0 values
@@ -720,7 +717,7 @@ namespace GostDOC.Models
                         {
                             // Add current id in list
                             items.Add(split[i], ParseDesignatorId(split[i]));
-                            continue;                            
+                            continue;
                         }
 
                         // Get previous and current
@@ -734,8 +731,7 @@ namespace GostDOC.Models
                             {
                                 // Add to list
                                 items.Add(split[i], c);
-                            }
-                            else
+                            } else
                             {
                                 // Process collected items
                                 ProcessItems(items, result);
@@ -744,8 +740,7 @@ namespace GostDOC.Models
                                 // Add to list
                                 items.Add(split[i], c);
                             }
-                        }
-                        else
+                        } else
                         {
                             // Process collected items
                             ProcessItems(items, result);
@@ -781,7 +776,7 @@ namespace GostDOC.Models
             //}
         }
 
-        private void UpdateGroupNames(IDictionary<string, Group> aGroups, Group aGroup) 
+        private void UpdateGroupNames(IDictionary<string, Group> aGroups, Group aGroup)
         {
             if (aGroup.Name.Contains(@"\"))
             {
@@ -791,8 +786,7 @@ namespace GostDOC.Models
                     string name = aGroup.Components.Count > 1 ? split[1] : split[0];
                     UpdateGroupNames(aGroups, aGroup, name);
                 }
-            }
-            else
+            } else
             {
                 if (aGroup.Components.Count > 1)
                 {
@@ -800,8 +794,7 @@ namespace GostDOC.Models
                     if (string.IsNullOrEmpty(name))
                     {
                         _error.Error($"Множественное число для группы {aGroup.Name} в словаре GroupNames.cfg не найдено!");
-                    }
-                    else
+                    } else
                     {
                         UpdateGroupNames(aGroups, aGroup, name);
                     }
@@ -819,8 +812,7 @@ namespace GostDOC.Models
                 {
                     aOthers.Value.Components.AddRange(gp.Value.Components);
                     aGroups.Remove(gp.Key);
-                }
-                else
+                } else
                 {
                     UpdateGroupNames(aGroups, gp.Value);
                 }
@@ -871,8 +863,7 @@ namespace GostDOC.Models
                 });
 
                 ProcessGroupNames(others, aCfg.Bill);
-            }
-            else
+            } else
             {
                 foreach (var gp in aCfg.Specification)
                 {
@@ -881,27 +872,29 @@ namespace GostDOC.Models
             }
         }
 
-        private void CheckVersion(string aFilePath)
+        private bool CheckVersion(string aFilePath)
         {
             Version v;
             if (Version.TryParse(_xml.Transaction.Version, out v))
             {
                 if (v.CompareTo(MinVersion) < 0)
                 {
-                    _error.Error($"Версия файла {aFilePath} меньше {MinVersion}!");
+                    _error.Error($"Версия ({v}) загружаемого файла {aFilePath} меньше текущей рабочей версии {MinVersion}!");
+                    return false;
                 }
             }
+            return true;
         }
 
         private bool HasASсhema(Configuration aConfifg)
         {
             Group docs;
             if (aConfifg.Specification.TryGetValue(Constants.GroupDoc, out docs))
-            {                
+            {
                 var doc = docs.Components.Where(key => key.GetProperty(Constants.ComponentName).ToLower().Contains("схема"));
                 if (doc != null && doc.Count() > 0)
                     return true;
-            }            
+            }
             return false;
         }
 
@@ -920,13 +913,12 @@ namespace GostDOC.Models
                         gp.Value.Components.Add(new Component(Guid.NewGuid(), 0));
                         gp.Value.Components.Add(new Component(Guid.NewGuid(), 0));
                     }
-                }
-                else
+                } else
                 {
                     var componenets = gp.Value.SubGroups.Last().Value.Components;
                     componenets.Add(new Component(Guid.NewGuid(), 0));
                     componenets.Add(new Component(Guid.NewGuid(), 0));
-                }            
+                }
             }
         }
 
@@ -936,11 +928,10 @@ namespace GostDOC.Models
             foreach (var cmp in aComponents)
             {
                 var position = cmp.GetProperty(Constants.ComponentPosition);
-                 if (string.IsNullOrEmpty(position) || string.Equals(position, "0"))
-                 {
+                if (string.IsNullOrEmpty(position) || string.Equals(position, "0"))
+                {
                     return true;
-                 }
-                 else
+                } else
                     return false;
             }
 
@@ -952,7 +943,7 @@ namespace GostDOC.Models
         {
             if (aGroups?.Count() == 0)
                 return;
-            
+
             foreach (var grp in aGroups.Values)
             {
                 IncrementComponents(grp.Components);
@@ -973,6 +964,34 @@ namespace GostDOC.Models
                 {
                     cmp.Count++;
                 }
+            }
+        }
+
+
+        private void AddOrIncrementComponent(Group aGroup, Component aComponent)
+        {
+            if (aGroup.Components.Count == 0)
+                aGroup.Components.Add(aComponent);
+            else
+            {                
+                string whereIncluded = aComponent.GetProperty(Constants.ComponentWhereIncluded);
+                string name = aComponent.GetProperty(Constants.ComponentName);
+                string sign = aComponent.GetProperty(Constants.ComponentSign);
+                bool inc = false;
+                foreach (var cmp in aGroup.Components) 
+                {
+                    string cmp_name = cmp.GetProperty(Constants.ComponentName);
+                    string cmp_whereIncluded = cmp.GetProperty(Constants.ComponentWhereIncluded);
+                    string cmp_sign = cmp.GetProperty(Constants.ComponentSign);
+                    if (string.Equals(cmp_name, name) && string.Equals(whereIncluded, cmp_whereIncluded) && string.Equals(cmp_sign, sign))
+                    {
+                        cmp.Count += aComponent.Count;
+                        inc = true;
+                        break;
+                    }
+                }
+                if (!inc)
+                    aGroup.Components.Add(aComponent);
             }
         }
     }
