@@ -25,13 +25,6 @@ namespace GostDOC.Models
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        public static void AddRange<T>(this ObservableCollection<T> col, IEnumerable<T> data) 
-        {
-            foreach (T val in data)
-            {
-                col.Add(val);
-            }
-        }
         public static void AddRange<T, V>(this IDictionary<T, V> dst, IDictionary<T, V> src)
         {
             foreach (var val in src)
@@ -72,6 +65,14 @@ namespace GostDOC.Models
                 result.Add(obj.Memento);
             }
             return result;
+        }
+
+        public static void AddRange<T>(this ICollection<T> aDst, ICollection<T> aSrc)
+        {
+            foreach (T item in aSrc)
+            {
+                aDst.Add(item);
+            }
         }
 
         public static void SetMementos<V>(this ObservableCollection<V> dst, IList<object> src) where V : IMemento<object>, new()

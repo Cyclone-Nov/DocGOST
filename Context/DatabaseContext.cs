@@ -11,17 +11,29 @@ namespace GostDOC.Context
 {
     public class DatabaseContext : DbContext
     {
+        public string FileName { get; } = "Database";
+
         public DatabaseContext()
         {
             Database.EnsureCreated();
         }
+        public DatabaseContext(string aFileName)
+        {
+            FileName = aFileName;
+            Database.EnsureCreated();
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Filename=Database.db");
+            optionsBuilder.UseSqlite($"Filename={FileName}.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ComponentSupplierProfile>()
+            .HasIndex(x => x.ComponentName)
+            .IsUnique();
+
             modelBuilder.Entity<ComponentSupplierProfile>()
             .HasOne(x => x.Properties)
             .WithOne()

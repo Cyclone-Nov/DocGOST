@@ -9,6 +9,7 @@ namespace GostDOC.Context
     public class ComponentSupplierProfile
     {
         public int Id { get; set; }
+        public string ComponentName { get; set; }
         public virtual SupplierProperties Properties { get; set; } = new SupplierProperties();
         public virtual ICollection<Supplier> Suppliers { get; set; } = new List<Supplier>();
         public virtual ICollection<WarehouseAcceptance> WarehouseAcceptances { get; set; } = new List<WarehouseAcceptance>();
