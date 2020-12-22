@@ -254,11 +254,12 @@ namespace GostDOC.Models
 
                     if (_currentAssemblyD27.SubGroups.ContainsKey(newAssembly.Name))
                     {
+                        _currentAssemblyD27 = _currentAssemblyD27.SubGroups[newAssembly.Name];
                     } else
                     {
                         _currentAssemblyD27.SubGroups.Add(newAssembly.Name, newAssembly);
-                    }
-                    _currentAssemblyD27 = newAssembly;
+                        _currentAssemblyD27 = newAssembly;
+                    }                    
 
                     if (_docType != DocType.Bill)
                         AddComponents(aNewCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, aUnitSign, complexCount);
@@ -347,7 +348,7 @@ namespace GostDOC.Models
                         }
                     }
 
-                    if (IsBillComponent(groups[0]))
+                    if (IsBillComponent(groups[0]) && _docType == DocType.Bill)
                     {
                         // Add to Bill                        
                         if (string.IsNullOrEmpty(groups[1].GroupName))
@@ -357,9 +358,10 @@ namespace GostDOC.Models
                         AddComponent(aNewCfg.Bill, component, groups[1]);
                     }
 
-                    if (IsD27Component(groups[0]))
+                    if (IsD27Component(groups[0]) && _docType == DocType.D27)
                     {
-                        groupD27.Components.Add(component);
+                        AddComponent(groupD27, component);
+                        //groupD27.Components.Add(component);
                     }
 
                     // Reset current D27 group
@@ -389,9 +391,8 @@ namespace GostDOC.Models
 
             if (string.IsNullOrEmpty(aGroupInfo.SubGroupName))
             {
-                // Add component, no subgroup
-                //spGroup.Components.Add(aComponent);
-                AddOrIncrementComponent(spGroup, aComponent);
+                // Add component, no subgroup                
+                AddComponent(spGroup, aComponent);
             } else
             {
                 Group subGroup = null;
@@ -402,7 +403,7 @@ namespace GostDOC.Models
                     spGroup.SubGroups.Add(subGroup.Name, subGroup);
                 }
                 // Add component to subgroup
-                AddOrIncrementComponent(subGroup, aComponent);
+                AddComponent(subGroup, aComponent);
             }
         }
 
@@ -966,7 +967,7 @@ namespace GostDOC.Models
         }
 
 
-        private void AddOrIncrementComponent(Group aGroup, Component aComponent)
+        private void AddComponent(Group aGroup, Component aComponent)
         {
             if (aGroup.Components.Count == 0)
                 aGroup.Components.Add(aComponent);

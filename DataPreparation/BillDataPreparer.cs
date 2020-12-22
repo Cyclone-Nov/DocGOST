@@ -390,8 +390,8 @@ namespace GostDOC.DataPreparation
                         row = aTable.NewRow();
                         row[Constants.ColumnQuantityTotal] = new FormattedString { Value = (compCount).ToString(), IsOverlined = true };                        
                         aTable.Rows.Add(row);
-                        compCount = 0;
-                        continue;
+                        compCount = 0;            
+                        // проджолжим дальше так как компонент есть
                     }
                 }
 
