@@ -1500,8 +1500,8 @@ namespace GostDOC.ViewModels
             ComponentSupplierProfile.Properties.Quantity.Value = (int)quantity;
             ComponentSupplierProfile.Properties.AllQuantity.Value = (int)allQuantity;
 
-            _purchaseDepartment.ChangeThisComponent(GetConfigurationName(), aComponentName);
-            _purchaseDepartment.GetComponentSupplierProfile();
+            //_purchaseDepartment.ChangeThisComponent(GetConfigurationName(), aComponentName);
+            //_purchaseDepartment.GetComponentSupplierProfile();
 
         }
 
