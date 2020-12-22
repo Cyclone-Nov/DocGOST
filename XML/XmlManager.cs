@@ -67,6 +67,8 @@ namespace GostDOC.Models
                 return OpenFileResult.FileFormatError;
             }
 
+            string unitSign = string.Empty;
+
             aResult.Version = _xml.Transaction.Version;
             // Clear configurations
             aResult.Configurations.Clear();
@@ -81,13 +83,17 @@ namespace GostDOC.Models
                     newCfg.Graphs.Add(graph.Name, graph.Text);
                 }
 
+                if(string.IsNullOrEmpty(unitSign))
+                    unitSign = ParseGraphValue(newCfg.Graphs, Constants.GraphSign);
+
                 // Set current D27 group
                 _currentAssemblyD27 = newCfg.D27;
                 _currentAssemblyD27.Name = ParseNameSign(newCfg.Graphs);
 
-                AddComponents(newCfg, cfg.Documents, ComponentType.Document);
-                AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB);
-                AddComponents(newCfg, cfg.Components, ComponentType.Component);
+                AddComponents(newCfg, cfg.Documents, ComponentType.Document, unitSign);
+                if(_docType != DocType.Bill)
+                    AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, unitSign);
+                AddComponents(newCfg, cfg.Components, ComponentType.Component, unitSign);
 
                 if (aDocType == DocType.ItemsList)
                 {
@@ -196,11 +202,9 @@ namespace GostDOC.Models
                 || aGroupInfo.GroupName == Constants.GroupKits;
         }
 
-        private bool ParseAssemblyUnit(Configuration aNewCfg, string aUnitSign, string aUnitName, uint complexCount)
+        private bool ParseAssemblyUnit(Configuration aNewCfg, string aUnitSign, string aUnitName, string aTopSpecFile, uint complexCount)
         {
-            string _topSpecFile = ParseGraphValue(aNewCfg.Graphs, Constants.GraphSign) + ".xml";
-
-            string searchCfg = "-00";
+            string searchCfg = Constants.MAIN_CONFIG_INDEX;
 
             Regex regex = new Regex(@"-\d{2}");
             Match match = regex.Match(aUnitSign);
@@ -210,12 +214,11 @@ namespace GostDOC.Models
                 aUnitSign = aUnitSign.Remove(match.Groups[0].Index);
             }
 
-
             RootXml xml = new RootXml();
             string filePath = Path.Combine(_dir, aUnitSign + ".xml");
             if (!XmlSerializeHelper.LoadXmlStructFile<RootXml>(ref xml, filePath))
             {
-                _error.Error($"Ошибка загрузки файла {aUnitSign}.xml!");
+                _error.Error($"Ошибка загрузки файла {filePath}!");
                 return false;
             }
 
@@ -223,19 +226,27 @@ namespace GostDOC.Models
                 return false;
 
             string nameSignInTopSpec = ConcatNameSign(aUnitName, aUnitSign);
+
+            string name = string.Empty;
+            string sign = string.Empty;
             foreach (var cfg in xml.Transaction.Project.Configurations)
             {
+                if (cfg.Name == Constants.MAIN_CONFIG_INDEX)
+                {
+                    name = ParseGraphValue(cfg.Graphs, Constants.GraphName);
+                    sign = ParseGraphValue(cfg.Graphs, Constants.GraphSign);
+                }                
+
                 if (cfg.Name == searchCfg)
                 {
-                    string name = ParseGraphValue(cfg.Graphs, Constants.GraphName);
-                    string sign = ParseGraphValue(cfg.Graphs, Constants.GraphSign);
                     string nameSignInThisSpec = ConcatNameSign(name, sign);
                     if (!string.Equals(nameSignInTopSpec, nameSignInThisSpec, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        _error.Error($"Имя или обозначение узла ({nameSignInTopSpec}) из файла спецификации {_topSpecFile} " +
+                        _error.Error($"Имя или обозначение узла ({nameSignInTopSpec}) из файла спецификации {aTopSpecFile} " +
                                      $"не соответсвует имени или обозначению ({nameSignInThisSpec}) в его спецификации ({aUnitSign}.xml)!");
                     }
-                    Group newAssembly = new Group() { Name = nameSignInTopSpec };
+                    string fullSign = string.Equals(searchCfg, Constants.MAIN_CONFIG_INDEX) ? sign : $"{sign}{searchCfg}";
+                    Group newAssembly = new Group() { Name = ConcatNameSign(name, fullSign)  }; //nameSignInTopSpec
                     if (_currentAssemblyD27.SubGroups == null)
                     {
                         _currentAssemblyD27.SubGroups = new Dictionary<string, Group>();
@@ -243,36 +254,34 @@ namespace GostDOC.Models
 
                     if (_currentAssemblyD27.SubGroups.ContainsKey(newAssembly.Name))
                     {
-                        // increment components in _currentAssemblyD27  +1
-                        //IncrementComponentsInGroups(_currentAssemblyD27.SubGroups);
-
                     } else
                     {
                         _currentAssemblyD27.SubGroups.Add(newAssembly.Name, newAssembly);
                     }
                     _currentAssemblyD27 = newAssembly;
 
-                    AddComponents(aNewCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, complexCount);
-                    AddComponents(aNewCfg, cfg.Components, ComponentType.Component, complexCount);
+                    if (_docType != DocType.Bill)
+                        AddComponents(aNewCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, aUnitSign, complexCount);
+                    AddComponents(aNewCfg, cfg.Components, ComponentType.Component, aUnitSign, complexCount);
                     break;
                 }
             }
             return true;
         }
 
-        private void AddComponents(Configuration aNewCfg, List<ComponentXml> aComponents, ComponentType aType, uint complexCount = 1)
+        private void AddComponents(Configuration aNewCfg, List<ComponentXml> aComponents, ComponentType aType, string aSpecFileName, uint complexCount = 1)
         {
             var groupD27 = _currentAssemblyD27;
             Dictionary<CombineProperties, Component> components = new Dictionary<CombineProperties, Component>();
             HashSet<string> positions = new HashSet<string>();
-            string _specFileName = ParseGraphValue(aNewCfg.Graphs, Constants.GraphSign) + ".xml";            
+            string _specFileName = aSpecFileName + ".xml";            
 
             foreach (var cmp in aComponents)
             {
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
                 var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
                 var designator = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatorID);
-                var position = cmp.Properties.Find(x => x.Name == Constants.ColumnPosition);
+                var position = cmp.Properties.Find(x => x.Name == Constants.ColumnPosition);                
 
                 if (name == null && position == null)
                 {
@@ -291,7 +300,7 @@ namespace GostDOC.Models
                     Name = name.Text,
                     Sign = sign.Text,
                     RefDesignation = designator?.Text ?? string.Empty,
-                    Position = position?.Text ?? string.Empty
+                    Position = position?.Text ?? string.Empty,                    
                 };
 
                 if (!string.IsNullOrEmpty(combine.RefDesignation))
@@ -334,7 +343,7 @@ namespace GostDOC.Models
                         {
                             string _name;
                             component.Properties.TryGetValue(Constants.ComponentName, out _name);
-                            ParseAssemblyUnit(aNewCfg, _sign.Trim(new char[] { ' ' }), _name, component.Count);
+                            ParseAssemblyUnit(aNewCfg, _sign.Trim(new char[] { ' ' }), _name, _specFileName, component.Count);
                         }
                     }
 
@@ -530,18 +539,7 @@ namespace GostDOC.Models
                     existing.Count += aCount;
                     return true;
                 }
-            } else
-            {
-                var keys = aComponents.Keys.ToArray();
-                for (var i = 0; i < keys.Length; i++)
-                {
-                    if (keys[i].Name == aCombine.Name && keys[i].Sign == aCombine.Sign)
-                    {
-                        aComponents[keys[i]].Count += aCount;
-                        return false;
-                    }
-                }
-            }
+            }           
 
             return false;
         }
