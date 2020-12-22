@@ -58,7 +58,7 @@ namespace GostDOC.ViewModels
         private Progress _progress;
         private LogView _logView = null;
 
-        private PurchaseDepartment _purchaseDepartment;
+        private PurchaseDepartment _purchaseDepartment = new PurchaseDepartment();
 
         public ObservableProperty<string> Title { get; } = new ObservableProperty<string>();
         public ObservableProperty<Node> SelectedItem { get; } = new ObservableProperty<Node>();
@@ -231,31 +231,8 @@ namespace GostDOC.ViewModels
             // Update title
             UpdateTitle();
 
-            /*
-            using (DatabaseContext db = new DatabaseContext())
-            {
-                db.Profiles.Add(new ComponentSupplierProfile()
-                {
-                    Properties = new SupplierProperties()
-                    {
-                        Manufacturer = "MS",
-                        AllQuantity = 100
-                    },
-                    Suppliers = new List<Supplier>()
-                    {
-                        new Supplier() { Name = "goga"},
-                        new Supplier() { Name = "vasya"}
-                    }                    
-                });
-
-                db.SaveChanges();
-
-                var first = db.Profiles.First();
-                db.Profiles.Remove(first);
-
-                db.SaveChanges();
-            }
-            */
+            // Init PD
+            _purchaseDepartment.ConnectToDB("Database");
         }
 
         #region Commands impl
@@ -1500,9 +1477,8 @@ namespace GostDOC.ViewModels
             ComponentSupplierProfile.Properties.Quantity.Value = (int)quantity;
             ComponentSupplierProfile.Properties.AllQuantity.Value = (int)allQuantity;
 
-            //_purchaseDepartment.ChangeThisComponent(GetConfigurationName(), aComponentName);
-            //_purchaseDepartment.GetComponentSupplierProfile();
-
+            _purchaseDepartment.ComponentName = aComponentName;
+            _purchaseDepartment.GetComponentSupplierProfile();
         }
 
         #endregion PURCHASE DEPARTMENT
