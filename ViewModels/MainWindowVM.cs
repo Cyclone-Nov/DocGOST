@@ -1265,6 +1265,7 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentCountReg, aSrc.CountReg.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCount, aSrc.Count.Value.ToString());
             aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
+            aDst.Properties.Add(Constants.ComponentWhereIncluded, aSrc.WhereIncluded.Value);
 
             if (!string.IsNullOrEmpty(aSrc.MaterialGroup))
             {
@@ -1513,16 +1514,6 @@ namespace GostDOC.ViewModels
                         
             return new Tuple<string, string>(($"{config_name} {group_name}").Trim(), group_name);
         }
-
-
-        private string GetConfigurationName()
-        {               
-            var item = _selectedItem;
-            while (item.NodeType != NodeType.Configuration)            
-                item = item.Parent;
-            return item.Name;
-        }
-
 
         /// <summary>
         /// получить список позиций для компонентов для документа спецификация
