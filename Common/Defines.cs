@@ -194,7 +194,104 @@ namespace GostDOC.Common
 
     }
 
-    public static class Constants {
+    #region Имена столбцов в Excel
+
+    public enum ExcelColumn 
+    {
+        /// <summary>
+        /// 1
+        /// </summary>
+        A = 1,
+        /// <summary>
+        /// 2
+        /// </summary>
+        B, 
+        /// <summary>
+        /// 3
+        /// </summary>
+        C, 
+        /// <summary>
+        /// 4
+        /// </summary>
+        D, 
+        /// <summary>
+        /// 5
+        /// </summary>
+        E, 
+        /// <summary>
+        /// 6
+        /// </summary>
+        F, 
+        /// <summary>
+        /// 7
+        /// </summary>
+        G, 
+        /// <summary>
+        /// 8
+        /// </summary>
+        H, 
+        /// <summary>
+        /// 9
+        /// </summary>
+        I,
+        /// <summary>
+        /// 10
+        /// </summary>
+        J,
+        /// <summary>
+        /// 11
+        /// </summary>
+        K,
+        /// <summary>
+        /// 12
+        /// </summary>
+        L,
+        /// <summary>
+        /// 13
+        /// </summary>
+        M,
+        /// <summary>
+        /// 14
+        /// </summary>
+        N,
+        /// <summary>
+        /// 15
+        /// </summary>
+        O,
+        /// <summary>
+        /// 16
+        /// </summary>
+        P,
+        /// <summary>
+        /// 17
+        /// </summary>
+        Q,
+        /// <summary>
+        /// 18
+        /// </summary>
+        R,
+        /// <summary>
+        /// 19
+        /// </summary>
+        S,
+        /// <summary>
+        /// 20
+        /// </summary>
+        T,
+        /// <summary>
+        /// 21
+        /// </summary>
+        U,
+        /// <summary>
+        /// 22
+        /// </summary>
+        V
+
+    }
+
+#endregion
+
+public static class Constants {
 
         #region Графы
 
@@ -721,7 +818,7 @@ namespace GostDOC.Common
         /// <summary>
         /// количество строк на всех листах кроме первого для документа по умолчанию
         /// </summary>
-        public static readonly int DefaultRowsOnNextPage = 29;
+        public static readonly int DefaultRowsOnNextPage = 30;
 
         #endregion Количество строк на страницах документоа
 
@@ -737,7 +834,6 @@ namespace GostDOC.Common
         public static readonly string AppDataSpecPositions = "SpecPositions";
 
         #endregion
-
 
     }
 }

@@ -85,8 +85,8 @@ namespace GostDOC.ExcelExport
             }
 
             // Update ЛРИ
-            aApp.Sheets["ЛРИ"].Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
-            aApp.Sheets["ЛРИ"].Cells[37, 19] = pages + 1;
+            aApp.Sheets["ЛРИ"].Cells[37, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2); // Cells[35, 12]
+            aApp.Sheets["ЛРИ"].Cells[39, ExcelColumn.U] = pages + 1; //Cells[37, 19]
 
             // Select 1st sheet
             aApp.Sheets["1"].Select();
@@ -102,20 +102,20 @@ namespace GostDOC.ExcelExport
 
             if (_graphs != null)
             {
-                // Fill main title
-                sheet.Cells[33, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1);
-                sheet.Cells[30, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
-                sheet.Cells[34, 15] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4);
-                sheet.Cells[34, 16] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a);
-                sheet.Cells[34, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b);
-
-                sheet.Cells[33, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_dev);
-                sheet.Cells[34, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_chk);
-                sheet.Cells[36, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11norm);
-                sheet.Cells[37, 8] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
+                // Fill main title                
+                sheet.Cells[38, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1); // Cells[33, 12]                
+                sheet.Cells[35, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2); //Cells[30, 12]                
+                sheet.Cells[39, ExcelColumn.P] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4); // Cells[34, 15]                
+                sheet.Cells[39, ExcelColumn.Q] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a); //Cells[34, 16]                
+                sheet.Cells[39, ExcelColumn.R] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b); //Cells[34, 17]
+                                
+                sheet.Cells[38, ExcelColumn.H] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_dev); //Cells[33, 8]                
+                sheet.Cells[39, ExcelColumn.H] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_chk); //Cells[34, 8]                
+                sheet.Cells[41, ExcelColumn.H] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11norm); //Cells[36, 8]                
+                sheet.Cells[42, ExcelColumn.H] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm); //Cells[37, 8]
             }
             // Set pages count
-            sheet.Cells[34, 20] = Pages + 1;
+            sheet.Cells[39, ExcelColumn.V] = Pages + 1; //Cells[34, 20]
             // Fill data
             FillRows(sheet, MaxRowIndexFirst, true);
         }
@@ -123,11 +123,11 @@ namespace GostDOC.ExcelExport
         public void FillSheet(Excel._Worksheet sheet)
         {
             // Set page number
-            sheet.Cells[37, 22] = sheet.Name;
+            sheet.Cells[39, ExcelColumn.R] = sheet.Name; //Cells[37, 22]
             if (_graphs != null)
             {
                 // Set title
-                sheet.Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+                sheet.Cells[38, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2); // Cells[35, 12]
             }
             // Fill data
             FillRows(sheet, MaxRowIndexSecond);
@@ -138,22 +138,37 @@ namespace GostDOC.ExcelExport
             if (_tbl == null)
                 return;
 
-            int row = MinRowIndex;
+            int row = 2;
+            maxRows++;
             while (row <= maxRows && _tableRow < _tbl.Rows.Count)
-            {
-                sheet.SetFormattedValue(row, 4, _tbl.GetTableValueFS(_tableRow, 1));
-                sheet.SetFormattedValue(row, 6, _tbl.GetTableValueFS(_tableRow, 2));
-                sheet.SetFormattedValue(row, 7, _tbl.GetTableValueFS(_tableRow, 3));
-                sheet.SetFormattedValue(row, 9, _tbl.GetTableValueFS(_tableRow, 4));
-                sheet.SetFormattedValue(row, 14, _tbl.GetTableValueFS(_tableRow, 5));
-
+            {                
+                var sign = _tbl.GetTableValueFS(_tableRow, 4);
+                var name = _tbl.GetTableValueFS(_tableRow, 5);
+                var pos = _tbl.GetTableValueFS(_tableRow, 3);
                 int count = _tbl.GetTableValue<int>(_tableRow, 6);
+                var note = _tbl.GetTableValueFS(_tableRow, 7);
+                if (string.IsNullOrEmpty(name?.Value) && string.IsNullOrEmpty(sign?.Value))
+                {
+                    count = 0;
+                    if (pos != null)
+                        pos.Value = string.Empty;
+                }
+                int rows = sheet.SetFormattedValue(row, (int)ExcelColumn.D, _tbl.GetTableValueFS(_tableRow, 1)); // format
+                sheet.SetFormattedValue(row, (int)ExcelColumn.F, _tbl.GetTableValueFS(_tableRow, 2)); // zone
+                sheet.SetFormattedValue(row, (int)ExcelColumn.G, pos);
+                sheet.SetFormattedValue(row, (int)ExcelColumn.I, sign);
+                sheet.SetFormattedValue(row, (int)ExcelColumn.N, name);
+
                 if (count > 0)
-                    sheet.Cells[row, aFirst ? 19 : 20] = count;
+                    sheet.Cells[row, aFirst ? (int)ExcelColumn.T : (int)ExcelColumn.P] = count;
 
-                sheet.SetFormattedValue(row, 21, _tbl.GetTableValueFS(_tableRow, 7));
+                
+                sheet.SetFormattedValue(row, aFirst ? (int)ExcelColumn.U : (int)ExcelColumn.Q, note);
 
-                row++;
+                if (rows > 1)
+                    maxRows += rows - 1;
+
+                row+= rows;
                 _tableRow++;
             }
         }

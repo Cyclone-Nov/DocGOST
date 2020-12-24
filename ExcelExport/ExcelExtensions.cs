@@ -40,13 +40,15 @@ namespace GostDOC.ExcelExport
             ws.Cells[r1, c1].VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
         }
 
-        public static void SetFormattedValue(this Excel._Worksheet ws, int r1, int c1, BasePreparer.FormattedString txt)
+        public static int SetFormattedValue(this Excel._Worksheet ws, int r1, int c1, BasePreparer.FormattedString txt)
         {
+            var cell = (Excel.Range)ws.Cells[r1, c1];
+            int merge_rows_cnt = ((Excel.Range)((Excel.Range)cell.MergeArea).Rows).Count;
             if (txt != null)
-            {
+            {                
                 if (txt.IsOverlined)
                 {
-                    ws.Cells[r1, c1] = "\u035E" + txt.Value;
+                    ws.Cells[r1, c1] = "\u035E" + txt.Value;                    
                 }
                 else
                 {
@@ -55,6 +57,7 @@ namespace GostDOC.ExcelExport
 
                 ws.Cells[r1, c1].Font.Bold = txt.IsBold;
 
+                
                 if (txt.IsUnderlined)
                 {
                     ws.Cells[r1, c1].Font.Underline = Excel.XlUnderlineStyle.xlUnderlineStyleSingle;
@@ -79,7 +82,8 @@ namespace GostDOC.ExcelExport
                         break;
                 }
             }
-        } 
+            return merge_rows_cnt;
+        }         
     }
 
     static class DataTableExtensions
