@@ -380,9 +380,8 @@ namespace GostDOC.Models
         }
 
         private void AddComponent(IDictionary<string, Group> aGroups, Component aComponent, SubGroupInfo aGroupInfo)
-        {
-            Group spGroup = null;
-            if (!aGroups.TryGetValue(aGroupInfo.GroupName, out spGroup))
+        {            
+            if (!aGroups.TryGetValue(aGroupInfo.GroupName, out var spGroup))
             {
                 // Add group
                 spGroup = new Group() { Name = aGroupInfo.GroupName, SubGroups = new Dictionary<string, Group>() };
@@ -394,9 +393,8 @@ namespace GostDOC.Models
                 // Add component, no subgroup                
                 AddComponent(spGroup, aComponent);
             } else
-            {
-                Group subGroup = null;
-                if (!spGroup.SubGroups.TryGetValue(aGroupInfo.SubGroupName, out subGroup))
+            {                
+                if (!spGroup.SubGroups.TryGetValue(aGroupInfo.SubGroupName, out var subGroup))
                 {
                     // Add subgroup
                     subGroup = new Group() { Name = aGroupInfo.SubGroupName };
@@ -612,12 +610,7 @@ namespace GostDOC.Models
         {
             return ParseGraphValue(aGraphs, Constants.GraphName) + " " + ParseGraphValue(aGraphs, Constants.GraphSign);
         }
-
-        //private string ParseNameSign(IList<GraphXml> aGraphs)
-        //{
-        //    return ParseGraphValue(aGraphs, Constants.GraphName) + " " + ParseGraphValue(aGraphs, Constants.GraphSign);
-        //}
-
+              
         private string ConcatNameSign(string aName, string aSign)
         {
             return $"{aName} {aSign}";
@@ -764,15 +757,7 @@ namespace GostDOC.Models
             aGroups.Remove(aGroup.Name);
             // Update name, add back
             aGroup.Name = aNewName;
-            aGroups.Add(aNewName, aGroup);
-
-            //if (_docType == DocType.ItemsList)
-            //{
-            //    foreach (var cmp in aGroup.Components)
-            //    {
-            //        cmp.Properties[Constants.SubGroupNameSp] = aGroup.Name;
-            //    }
-            //}
+            aGroups.Add(aNewName, aGroup);           
         }
 
         private void UpdateGroupNames(IDictionary<string, Group> aGroups, Group aGroup)
@@ -803,7 +788,7 @@ namespace GostDOC.Models
 
         private void ProcessGroupNames(Lazy<Group> aOthers, IDictionary<string, Group> aGroups)
         {
-            foreach (var gp in aGroups.AsNotNull().ToList())
+            foreach (var gp in aGroups.AsNotNull().ToList().OrderBy(item => item.Key))
             {
                 ProcessGroupNames(aOthers, gp.Value.SubGroups);
 
@@ -937,36 +922,6 @@ namespace GostDOC.Models
             return true;
         }
 
-
-        private void IncrementComponentsInGroups(IDictionary<string, Group> aGroups)
-        {
-            if (aGroups?.Count() == 0)
-                return;
-
-            foreach (var grp in aGroups.Values)
-            {
-                IncrementComponents(grp.Components);
-                IncrementComponentsInGroups(grp.SubGroups);
-            }
-        }
-
-
-        private void IncrementComponents(List<Component> aComponents)
-        {
-            if (aComponents?.Count() == 0)
-                return;
-
-            foreach (var cmp in aComponents)
-            {
-                string groupSp = cmp.GetProperty(Constants.GroupNameSp);
-                //if (IsBillComponent (groupSp))
-                {
-                    cmp.Count++;
-                }
-            }
-        }
-
-
         private void AddComponent(Group aGroup, Component aComponent)
         {
             if (aGroup.Components.Count == 0)
@@ -977,6 +932,7 @@ namespace GostDOC.Models
                 string name = aComponent.GetProperty(Constants.ComponentName);
                 string sign = aComponent.GetProperty(Constants.ComponentSign);
                 bool inc = false;
+
                 foreach (var cmp in aGroup.Components) 
                 {
                     string cmp_name = cmp.GetProperty(Constants.ComponentName);
@@ -989,6 +945,7 @@ namespace GostDOC.Models
                         break;
                     }
                 }
+
                 if (!inc)
                     aGroup.Components.Add(aComponent);
             }

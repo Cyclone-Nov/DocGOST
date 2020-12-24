@@ -276,8 +276,8 @@ namespace GostDOC.PDF
             tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("новых")));
             tbl.AddCell(CreateCell(1,1).Add(CreateParagraph("аннули-\nрованных")));
 
-
-            for (int i = 0; i < (RowNumberOnNextPage-3) * 10; ++i) {
+            // независимо от типа документа в таблице Листа регистрации всегда одинаковое количество строк
+            for (int i = 0; i < (Constants.DefaultRowsOnNextPage - 3) * 10; ++i) {
                 tbl.AddCell(new Cell().SetHeight(8*mmH()).SetPadding(0).SetBorderLeft(THICK_BORDER)).SetBorderRight(THICK_BORDER);
             }
             for (int i = 0; i < 10; ++i) {
