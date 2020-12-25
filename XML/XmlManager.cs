@@ -80,7 +80,10 @@ namespace GostDOC.Models
                 // Fill graphs
                 foreach (var graph in cfg.Graphs)
                 {
-                    newCfg.Graphs.Add(graph.Name, graph.Text);
+                    if(newCfg.Graphs.ContainsKey(graph.Name))
+                        _error.Error($"Обнаружено дублирование графа {graph.Name}. Будет использован первый");
+                    else
+                        newCfg.Graphs.Add(graph.Name, graph.Text);
                 }
 
                 if(string.IsNullOrEmpty(unitSign))
@@ -928,17 +931,11 @@ namespace GostDOC.Models
                 aGroup.Components.Add(aComponent);
             else
             {                
-                string whereIncluded = aComponent.GetProperty(Constants.ComponentWhereIncluded);
-                string name = aComponent.GetProperty(Constants.ComponentName);
-                string sign = aComponent.GetProperty(Constants.ComponentSign);
-                bool inc = false;
-
+                
+                bool inc = false;                
                 foreach (var cmp in aGroup.Components) 
-                {
-                    string cmp_name = cmp.GetProperty(Constants.ComponentName);
-                    string cmp_whereIncluded = cmp.GetProperty(Constants.ComponentWhereIncluded);
-                    string cmp_sign = cmp.GetProperty(Constants.ComponentSign);
-                    if (string.Equals(cmp_name, name) && string.Equals(whereIncluded, cmp_whereIncluded) && string.Equals(cmp_sign, sign))
+                {                    
+                    if (EqualComponents(_docType, aComponent, cmp))
                     {
                         cmp.Count += aComponent.Count;
                         inc = true;
@@ -949,6 +946,34 @@ namespace GostDOC.Models
                 if (!inc)
                     aGroup.Components.Add(aComponent);
             }
+        }
+
+        private bool EqualComponents(DocType aDocType, Component aFirstComponent, Component aSecondComponent)
+        {            
+            string name = aFirstComponent.GetProperty(Constants.ComponentName);
+            string sign = aFirstComponent.GetProperty(Constants.ComponentSign);
+            
+
+            string cmp_name = aSecondComponent.GetProperty(Constants.ComponentName);            
+            string cmp_sign = aSecondComponent.GetProperty(Constants.ComponentSign);
+            
+
+            if (aDocType == DocType.ItemsList)
+            {
+                string designator = aFirstComponent.GetProperty(Constants.ComponentDesignatorID);
+                string cmp_designator = aSecondComponent.GetProperty(Constants.ComponentDesignatorID);
+                return (string.Equals(cmp_name, name) && string.Equals(designator, cmp_designator) && string.Equals(cmp_sign, sign));
+            }
+
+            if (aDocType == DocType.Bill || aDocType == DocType.D27)
+            {
+                string cmp_whereIncluded = aSecondComponent.GetProperty(Constants.ComponentWhereIncluded);
+                string whereIncluded = aFirstComponent.GetProperty(Constants.ComponentWhereIncluded);
+                return (string.Equals(cmp_name, name) && string.Equals(cmp_whereIncluded, whereIncluded) && string.Equals(cmp_sign, sign));
+            }
+
+            return (string.Equals(cmp_name, name) && string.Equals(cmp_sign, sign));
+                        
         }
     }
 }
