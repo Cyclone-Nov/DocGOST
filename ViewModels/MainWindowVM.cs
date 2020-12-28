@@ -1265,6 +1265,8 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentCountReg, aSrc.CountReg.Value.ToString());
             aDst.Properties.Add(Constants.ComponentCount, aSrc.Count.Value.ToString());
             aDst.Properties.Add(Constants.ComponentNote, aSrc.Note.Value);
+            aDst.Properties.Add(Constants.ComponentZone, aSrc.Zone.Value);
+            aDst.Properties.Add(Constants.ComponentPosition, aSrc.Position.Value.ToString());
             aDst.Properties.Add(Constants.ComponentWhereIncluded, aSrc.WhereIncluded.Value);
 
             if (!string.IsNullOrEmpty(aSrc.MaterialGroup))

@@ -312,10 +312,11 @@ namespace GostDOC.DataPreparation
                 var note = component.GetProperty(Constants.ComponentNote);
                 string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth - 3, note, new char[] {'-', ',' }, Constants.SpecificationFontSize).ToArray();
                 string designation = component.GetProperty(Constants.ComponentSign);
+                string zone = component.GetProperty(Constants.ComponentZone);
 
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString { Value = component.GetProperty(Constants.ComponentFormat) };
-                row[Constants.ColumnZone] = new FormattedString{Value = component.GetProperty(Constants.ComponentZone)};                
+                row[Constants.ColumnZone] = new FormattedString{ Value = zone };                
                 if (aSetPos)
                 {
                     ++aPos;
