@@ -116,6 +116,12 @@ namespace GostDOC.ExcelExport
             }
             // Set pages count
             sheet.Cells[39, ExcelColumn.V] = Pages + 1; //Cells[34, 20]
+
+            if (Pages > 1)
+            {
+                sheet.Cells[39, ExcelColumn.T] = 1; //[34, 19]
+            }
+
             // Fill data
             FillRows(sheet, MaxRowIndexFirst, true);
         }
