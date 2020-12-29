@@ -719,7 +719,7 @@ internal class ElementListDataPreparer : BasePreparer {
                 string lastDesignatorType = GetDesignatorType(aSortedComponents[0].Key);
                 string firstDesignator = aSortedComponents[0].Key;
                 int countSubGroupCanges = 0;
-                int countComponents = 0;
+                int countComponents = 1;
                 for (int i = 1; i < aSortedComponents.Length; i++)
                 {
                     var component = aSortedComponents[i].Value.Item2;
@@ -730,10 +730,10 @@ internal class ElementListDataPreparer : BasePreparer {
                     // если происходит смена типа позиционного обозначения, то создадим новую группу
                     if (!string.Equals(lastDesignatorType, currDesignatorType))
                     {
-                        groupNamesDic.Add(firstDesignator, new Tuple<string, int>(countSubGroupCanges > 0 ? "" : lastGroupName, countComponents));
+                        groupNamesDic.Add(firstDesignator, new Tuple<string, int>(countSubGroupCanges > 0 ? "" : lastGroupName, countComponents - 1));
                         firstDesignator = aSortedComponents[i].Key;
                         countSubGroupCanges = 0;
-                        countComponents = 0;
+                        countComponents = 1;
                         lastGroupName = currGroupName;
                         lastDesignatorType = currDesignatorType;
                     }

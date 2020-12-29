@@ -102,7 +102,8 @@ namespace GostDOC.Models
                 {
                     if (!HasASсhema(newCfg))
                     {
-                        _error.Error($"Не найдена схема в разделе документации при импорте перечня элементов");
+                        string config_name = (cfg.Name == "-00" ) ? "Базовое исполнение" : $"Исполнение {cfg.Name}";
+                        _error.Error($"{config_name}: не найдена схема в разделе документации при импорте перечня элементов");
                     }
                 }
 
