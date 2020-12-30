@@ -285,8 +285,27 @@ namespace GostDOC.Common
         /// <summary>
         /// 22
         /// </summary>
-        V
-
+        V,
+        /// <summary>
+        /// 23
+        /// </summary>
+        W,
+        /// <summary>
+        /// 24
+        /// </summary>
+        X,
+        /// <summary>
+        /// 25
+        /// </summary>
+        Y,
+        /// <summary>
+        /// 26
+        /// </summary>
+        Z,
+        /// <summary>
+        /// 27
+        /// </summary>
+        AA
     }
 
 #endregion

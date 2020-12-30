@@ -14,11 +14,11 @@ namespace GostDOC.ExcelExport
     {
         private const int MinRowIndex = 3;
         private readonly int MaxRowIndexFirst = Constants.BillRowsOnFirstPage;
-        private readonly int MaxRowIndexSecond = Constants.BillRowsOnNextPage;
+        private readonly int MaxRowIndexNext = Constants.BillRowsOnNextPage;
         private const string BillPostfix = "ВП";
 
         private readonly int RowCountFirst = Constants.BillRowsOnFirstPage - MinRowIndex + 1;
-        private readonly int RowCountSecond = Constants.BillRowsOnNextPage - MinRowIndex + 1;
+        private readonly int RowCountNext = Constants.BillRowsOnNextPage - MinRowIndex + 1;
 
         private PrepareManager _prepareManager = PrepareManager.Instance;
         private DocManager _docManager = DocManager.Instance;
@@ -35,7 +35,7 @@ namespace GostDOC.ExcelExport
                 {
                     if (_tbl.Rows.Count > RowCountFirst)
                     {
-                        count += (_tbl.Rows.Count - RowCountFirst) / RowCountSecond + 1;
+                        count += (_tbl.Rows.Count - RowCountFirst) / RowCountNext + 1;
                     }
                 }
                 return count;
@@ -84,8 +84,8 @@ namespace GostDOC.ExcelExport
             }
 
             // Update ЛРИ
-            aApp.Sheets["ЛРИ"].Cells[34, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
-            aApp.Sheets["ЛРИ"].Cells[36, 19] = pages + 1;
+            aApp.Sheets["ЛРИ"].Cells[37, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2);
+            aApp.Sheets["ЛРИ"].Cells[39, ExcelColumn.U] = pages + 1;
 
             // Select 1st sheet
             aApp.Sheets["1"].Select();
@@ -102,35 +102,50 @@ namespace GostDOC.ExcelExport
             if (_graphs != null)
             {
                 // Fill main title
-                sheet.Cells[34, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1);
-                sheet.Cells[31, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2) + BillPostfix;
-                sheet.Cells[35, 24] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4);
-                sheet.Cells[35, 25] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a);
-                sheet.Cells[35, 26] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b);
+                sheet.Cells[41, ExcelColumn.O] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1);
+                string sign = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2) + BillPostfix;
+                sheet.Cells[38, ExcelColumn.O] = sign;
+                sheet.Cells[42, ExcelColumn.T] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4);
+                sheet.Cells[42, ExcelColumn.U] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a);
+                sheet.Cells[42, ExcelColumn.W] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b);
 
-                sheet.Cells[34, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11bl_dev);
-                sheet.Cells[35, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11bl_chk);
-                sheet.Cells[37, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11norm);
-                sheet.Cells[38, 12] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
+                sheet.Cells[1, ExcelColumn.C] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_25);// [34, 17]
+
+                sheet.Cells[43, ExcelColumn.I] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_10); // [33, 6]
+                sheet.Cells[43, ExcelColumn.K] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11app); // [33, 6]
+
+                sheet.Cells[41, ExcelColumn.K] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11bl_dev);
+                sheet.Cells[42, ExcelColumn.K] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11bl_chk);
+                sheet.Cells[44, ExcelColumn.K] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11norm);
+                sheet.Cells[45, ExcelColumn.K] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm);
+
+                // Set approved sign
+                sheet.Cells[36, ExcelColumn.I] = $"Утвержден {sign}-ЛУ";
             }
             // Set pages count
-            sheet.Cells[35, 29] = Pages + 1;
+            sheet.Cells[42, ExcelColumn.AA] = Pages > 2 ? Pages + 1 : Pages;
+
+            if (Pages > 1)            
+                sheet.Cells[42, ExcelColumn.Y] = 1; //[34, 19]
+
+            
+
             // Fill data
-            FillRows(sheet, MaxRowIndexFirst);
+            FillRows(sheet, MaxRowIndexFirst, true);
         }
 
         public void FillSheet(Excel._Worksheet sheet)
         {
             // Set page number
-            sheet.Cells[37, 30] = sheet.Name;
+            sheet.Cells[44, ExcelColumn.W] = sheet.Name;
             
             if (_graphs != null)
             {
                 // Set title
-                sheet.Cells[35, 17] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2) + BillPostfix;
+                sheet.Cells[42, ExcelColumn.O] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2) + BillPostfix;
             }
             // Fill data
-            FillRows(sheet, MaxRowIndexSecond);
+            FillRows(sheet, MaxRowIndexNext);
         }
 
         private void FillCount(Excel._Worksheet sheet, int row, int col, int tableIndex)
@@ -142,28 +157,32 @@ namespace GostDOC.ExcelExport
             }
         }
 
-        private void FillRows(Excel._Worksheet sheet, int maxRows)
+        private void FillRows(Excel._Worksheet sheet, int maxRows, bool aFirstPage = false)
         {
             if (_tbl == null)
                 return;
 
             int row = 3;
+            maxRows += 2;
             while (row <= maxRows && _tableRow < _tbl.Rows.Count)
             {
-                sheet.SetFormattedValue(row, 4, _tbl.GetTableValueFS(_tableRow, 1));  // Наименование
-                sheet.SetFormattedValue(row, 5, _tbl.GetTableValueFS(_tableRow, 2));  // Код продукции
-                sheet.SetFormattedValue(row, 6, _tbl.GetTableValueFS(_tableRow, 3));  // Обозначение документа на поставку
-                sheet.SetFormattedValue(row, 7, _tbl.GetTableValueFS(_tableRow, 4));  // Поставщик
-                sheet.SetFormattedValue(row, 14, _tbl.GetTableValueFS(_tableRow, 5)); // Куда входит (обозначение)
+                int rows = sheet.SetFormattedValue(row, (int)ExcelColumn.E, _tbl.GetTableValueFS(_tableRow, 1));  // Наименование
+                sheet.SetFormattedValue(row, (int)ExcelColumn.F, _tbl.GetTableValueFS(_tableRow, 2));  // Код продукции
+                sheet.SetFormattedValue(row, (int)ExcelColumn.G, _tbl.GetTableValueFS(_tableRow, 3));  // Обозначение документа на поставку
+                sheet.SetFormattedValue(row, (int)ExcelColumn.H, _tbl.GetTableValueFS(_tableRow, 4));  // Поставщик
+                sheet.SetFormattedValue(row, (int)ExcelColumn.L, _tbl.GetTableValueFS(_tableRow, 5)); // Куда входит (обозначение)
 
-                FillCount(sheet, row, 19, 6); // Количество на изделие
-                FillCount(sheet, row, 21, 7); // Количество в комплекты
-                FillCount(sheet, row, 23, 8); // Количество на регулир.
+                FillCount(sheet, row, (int)ExcelColumn.Q, 6); // Количество на изделие
+                FillCount(sheet, row, (int)ExcelColumn.R, 7); // Количество в комплекты
+                FillCount(sheet, row, (int)ExcelColumn.S, 8); // Количество на регулир.
 
-                sheet.SetFormattedValue(row, 25, _tbl.GetTableValueFS(_tableRow, 9)); // Количество всего
-                sheet.SetFormattedValue(row, 28, _tbl.GetTableValueFS(_tableRow, 10)); // Примечание
-                
-                row++;
+                sheet.SetFormattedValue(row, aFirstPage ? (int)ExcelColumn.X : (int)ExcelColumn.U, _tbl.GetTableValueFS(_tableRow, 9)); // Количество всего
+                sheet.SetFormattedValue(row, aFirstPage ? (int)ExcelColumn.Z : (int)ExcelColumn.V, _tbl.GetTableValueFS(_tableRow, 10)); // Примечание
+
+                if (rows > 1)
+                    maxRows += rows - 1;
+
+                row += rows;
                 _tableRow++;
             }
         }
