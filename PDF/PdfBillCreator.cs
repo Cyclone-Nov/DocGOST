@@ -96,9 +96,14 @@ namespace GostDOC.PDF
 
         internal override int AddFirstPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aCountPages, Dictionary<string, object> aAppParams = null) {
             SetPageMargins(aInDoc);
+
+            // добавить таблицу с верхней дополнительной графой
+            aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
+
+            // добавить таблицу с нижней дополнительной графой
             aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
 
-            var titleBlock = CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, CurrentPage = 1,  DocType = DocType.Bill});
+            var titleBlock = CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, CurrentPage = 1,  DocType = DocType.Bill});            
             titleBlock.SetFixedPosition(
                 PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -14.7f -5f, 
                 BOTTOM_MARGIN, 
