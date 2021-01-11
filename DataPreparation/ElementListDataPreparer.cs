@@ -203,11 +203,7 @@ internal class ElementListDataPreparer : BasePreparer {
             if (!aComponentsDic.Any()) 
                 return;
 
-            string change_name = $"см. табл. {aSchemaDesignation}";
-
-            //ищем компоненты с наличием ТУ/ГОСТ в свойстве "Документ на поставку" и запоминаем позиционные обозначения компонентов с совпадающим значением                
-            //Dictionary< string/* group*/ , Dictionary<string/* GOST/TY string*/, List<string> /* array indexes */>> StandardDic =
-            //    FindComponentsWithStandardDoc(aComponentsDic, out var StandardComponentsDic);
+            string change_name = $"см. табл. {aSchemaDesignation}";                       
 
             // записываем таблицу данных                        
             var comparer = new DesignatorIDComparer(); 
@@ -215,7 +211,7 @@ internal class ElementListDataPreparer : BasePreparer {
 
             var groupNames = MakeGroupNamesDic(component_pair_arr);
 
-            bool addGroupName = true;
+            bool addGroupNameToNameField = true;
             int countDifferentComponents = 0;
             //bool singleGroupName = true;
             for (int i=0; i < component_pair_arr.Length;)
@@ -260,24 +256,18 @@ internal class ElementListDataPreparer : BasePreparer {
                 }
                 i = j;
 
-                // если позиционное обозначение есть в словаре имен групп, то запишем наименование группы еслди оно есть                
+                // если позиционное обозначение есть в словаре имен групп, то запишем наименование группы если оно есть                
                 if (groupNames.ContainsKey(designator)) 
-                {                    
-                    //AddEmptyRow(aTable);
-
+                {   
                     string groupName = groupNames[designator].Item1;
                     int count = groupNames[designator].Item2;
-                    if (!string.IsNullOrEmpty(groupName) && (count != sameComponents))
-                    {
-                        AddEmptyRow(aTable);
-                        addGroupName = false;
-                        AddGroupName(aTable, GetGroupNameByCount(groupName, false));
-                        AddEmptyRow(aTable);
-                    } else
-                    {
-                        //singleGroupName = false;
-                        addGroupName = true;
-                    }
+                    addGroupNameToNameField = string.IsNullOrEmpty(groupName) || (count == sameComponents); //if (!string.IsNullOrEmpty(groupName) && (count != sameComponents))
+                    AddEmptyRow(aTable);
+
+                    // если не надо добавлять имя группы  строку имени, то добавим имя группы отдельно
+                    if (!addGroupNameToNameField)                                         
+                        AddGroupName(aTable, GetGroupNameByCount(groupName, false));                     
+                    
                     countDifferentComponents = 0;
                 }
 
@@ -299,7 +289,7 @@ internal class ElementListDataPreparer : BasePreparer {
                     }
                     else
                     {
-                        name = (addGroupName) ? $"{GetGroupNameByCount(subGroupName, true)} {component_name} {doc}" : $"{component_name} {doc}";
+                        name = (addGroupNameToNameField) ? $"{GetGroupNameByCount(subGroupName, true)} {component_name} {doc}" : $"{component_name} {doc}";
                     }
                 }
                 
@@ -316,7 +306,8 @@ internal class ElementListDataPreparer : BasePreparer {
         /// </summary>
         /// <param name="aGroup">a group.</param>
         /// <returns></returns>
-        private Dictionary<string, Tuple<string, Component, uint>> PrepareComponentsList(Group aMainGroup)
+        private Dictionary<string, Tuple<string, Component, uint>> 
+        PrepareComponentsList(Group aMainGroup)
         {
             Dictionary<string, Tuple<string, Component, uint>> dic = new Dictionary<string, Tuple<string, Component, uint>>();
 
@@ -337,7 +328,8 @@ internal class ElementListDataPreparer : BasePreparer {
         /// </summary>
         /// <param name="aDic">a dic.</param>
         /// <param name="aComponents">a components.</param>
-        private void FillPrepareDictionary(Dictionary<string, Tuple<string, Component, uint>> aDic, IEnumerable<Component> aComponents)
+        private void FillPrepareDictionary(Dictionary<string, Tuple<string, Component, uint>> aDic,
+                                           IEnumerable<Component> aComponents)
         {
             foreach (var component in aComponents)
             {
@@ -352,7 +344,6 @@ internal class ElementListDataPreparer : BasePreparer {
 
                 try
                 {
-
                     if (designators.Length == 1)
                     {
                         aDic.Add(designator.Trim(), new Tuple<string, Component, uint>(string.Empty, component, component.Count));
@@ -411,7 +402,8 @@ internal class ElementListDataPreparer : BasePreparer {
                             }
                         }
                     }
-                } catch(Exception ex)
+                }
+                catch(Exception ex)
                 {
                     // todo: log
                 }
@@ -507,62 +499,62 @@ internal class ElementListDataPreparer : BasePreparer {
             aTable.Rows.Add(row);
         }
 
-        /// <summary>
-        /// добавить в таблицу данных стандартные документы на поставку при наличии перед перечнем компонентов
-        /// </summary>
-        /// <param name="aGroupName">имя группы</param>
-        /// <param name="aComponents">список компонентов</param>
-        /// <param name="aTable">таблица данных</param>
-        /// <param name="aStandardDic">словарь со стандартными документами на поставку</param>
-        /// <returns>true - стандартные документы добавлены </returns>
-        private bool AddStandardDocsToTable(string aGroupName, DataTable aTable,
-                                            Dictionary<string, Tuple<string, Component, uint>> aComponentsDic,
-                                            Dictionary<string, Dictionary<string, List<string>>> aStandardDic)
-        {
-            bool isApplied = false;
-            DataRow row;
-            bool applied = false;
-            Dictionary<string, List<string>> standards;
-            if (aStandardDic.TryGetValue(aGroupName, out standards))
-            {
-                foreach (var item in standards) 
-                {
-                    if (item.Value.Count() > MIN_ITEMS_FOR_COMBINE_BY_STANDARD) {
-                        if (!applied) {
-                            applied = true;
-                            //AddEmptyRow(aTable);
-                        }
+        ///// <summary>
+        ///// добавить в таблицу данных стандартные документы на поставку при наличии перед перечнем компонентов
+        ///// </summary>
+        ///// <param name="aGroupName">имя группы</param>
+        ///// <param name="aComponents">список компонентов</param>
+        ///// <param name="aTable">таблица данных</param>
+        ///// <param name="aStandardDic">словарь со стандартными документами на поставку</param>
+        ///// <returns>true - стандартные документы добавлены </returns>
+        //private bool AddStandardDocsToTable(string aGroupName, DataTable aTable,
+        //                                    Dictionary<string, Tuple<string, Component, uint>> aComponentsDic,
+        //                                    Dictionary<string, Dictionary<string, List<string>>> aStandardDic)
+        //{
+        //    bool isApplied = false;
+        //    DataRow row;
+        //    bool applied = false;
+        //    Dictionary<string, List<string>> standards;
+        //    if (aStandardDic.TryGetValue(aGroupName, out standards))
+        //    {
+        //        foreach (var item in standards) 
+        //        {
+        //            if (item.Value.Count() > MIN_ITEMS_FOR_COMBINE_BY_STANDARD) {
+        //                if (!applied) {
+        //                    applied = true;
+        //                    //AddEmptyRow(aTable);
+        //                }
 
-                        row = aTable.NewRow();
-                        var index = item.Value.First();
-                        string name = $"{GetGroupNameByCount(aGroupName, false)} {aComponentsDic[index].Item2.GetProperty(Constants.ComponentType)} {item.Key}";
-                        row[Constants.ColumnName] = name;
-                        aTable.Rows.Add(row);
-                        isApplied = true;
-                    }
-                }
-            }
+        //                row = aTable.NewRow();
+        //                var index = item.Value.First();
+        //                string name = $"{GetGroupNameByCount(aGroupName, false)} {aComponentsDic[index].Item2.GetProperty(Constants.ComponentType)} {item.Key}";
+        //                row[Constants.ColumnName] = name;
+        //                aTable.Rows.Add(row);
+        //                isApplied = true;
+        //            }
+        //        }
+        //    }
 
-            return isApplied;
-        }
+        //    return isApplied;
+        //}
 
 
-        /// <summary>
-        /// получить количество компонентов
-        /// </summary>
-        /// <param name="aCountStr"></param>
-        /// <returns></returns>
-        private int GetComponentCount(string aCountStr) {
-            int count = 1;
-            if (!string.IsNullOrEmpty(aCountStr)) {
-                if (!Int32.TryParse(aCountStr, out count)) {
-                    count = 1;
-                    //throw new Exception($"Не удалось распарсить значение свойства \"Количество на изд.\" для компонента с именем {component_name}");
-                }
-            }
+        ///// <summary>
+        ///// получить количество компонентов
+        ///// </summary>
+        ///// <param name="aCountStr"></param>
+        ///// <returns></returns>
+        //private int GetComponentCount(string aCountStr) {
+        //    int count = 1;
+        //    if (!string.IsNullOrEmpty(aCountStr)) {
+        //        if (!Int32.TryParse(aCountStr, out count)) {
+        //            count = 1;
+        //            //throw new Exception($"Не удалось распарсить значение свойства \"Количество на изд.\" для компонента с именем {component_name}");
+        //        }
+        //    }
 
-            return count;
-        }
+        //    return count;
+        //}
 
         private uint GetCountByDesignators(string aFirstDesigantor, string aLastDesigantor)
         {            
@@ -588,10 +580,8 @@ internal class ElementListDataPreparer : BasePreparer {
                 designator = aDesignators.First();
             else if (aDesignators.Count() == 2)
                 designator = $"{aDesignators.First()},{aDesignators.Last()}";
-            else
-            {                
-                designator = $"{aDesignators.First()}-{aDesignators.Last()}";
-            }
+            else                            
+                designator = $"{aDesignators.First()}-{aDesignators.Last()}";            
 
             return designator;
         }
@@ -641,49 +631,49 @@ internal class ElementListDataPreparer : BasePreparer {
             }
         }
 
-        /// <summary>
-        /// Checks the equals next subgroup.
-        /// </summary>
-        /// <param name="aIndex">a index.</param>
-        /// <param name="aSubGroupName">Name of a sub group.</param>
-        /// <param name="aComponentsPairs">a components pairs.</param>
-        /// <returns></returns>
-        private bool CheckEqualsNextSubgroup(int aIndex, string aSubGroupName, KeyValuePair<string, Tuple<string, Component, uint>>[] aComponentsPairs)
-        {
-            if (aIndex + 1 != aComponentsPairs.Length)
-            {
-                var nextcomponent = aComponentsPairs[aIndex + 1].Value;
-                string nextSubGroupName = nextcomponent.Item2.GetProperty(Constants.SubGroupNameSp);
-                return !string.Equals(aSubGroupName, nextSubGroupName);
-            }
+        ///// <summary>
+        ///// Checks the equals next subgroup.
+        ///// </summary>
+        ///// <param name="aIndex">a index.</param>
+        ///// <param name="aSubGroupName">Name of a sub group.</param>
+        ///// <param name="aComponentsPairs">a components pairs.</param>
+        ///// <returns></returns>
+        //private bool CheckEqualsNextSubgroup(int aIndex, string aSubGroupName, KeyValuePair<string, Tuple<string, Component, uint>>[] aComponentsPairs)
+        //{
+        //    if (aIndex + 1 != aComponentsPairs.Length)
+        //    {
+        //        var nextcomponent = aComponentsPairs[aIndex + 1].Value;
+        //        string nextSubGroupName = nextcomponent.Item2.GetProperty(Constants.SubGroupNameSp);
+        //        return !string.Equals(aSubGroupName, nextSubGroupName);
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
 
-        /// <summary>
-        /// Determines whether this instance [can output standard docs] the specified a designator.
-        /// </summary>
-        /// <param name="aDesignator">a designator.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance [can output standard docs] the specified a designator; otherwise, <c>false</c>.
-        /// </returns>
-        private bool CanOutputStandardDocs(string aDesignator)
-        {
-            if (string.IsNullOrEmpty(aDesignator))
-                return false;
+        ///// <summary>
+        ///// Determines whether this instance [can output standard docs] the specified a designator.
+        ///// </summary>
+        ///// <param name="aDesignator">a designator.</param>
+        ///// <returns>
+        /////   <c>true</c> if this instance [can output standard docs] the specified a designator; otherwise, <c>false</c>.
+        ///// </returns>
+        //private bool CanOutputStandardDocs(string aDesignator)
+        //{
+        //    if (string.IsNullOrEmpty(aDesignator))
+        //        return false;
 
-            int index = aDesignator.IndexOfAny(new char[] { '0','1', '2', '3', '4', '5', '6', '7', '8', '9'});
-            string symbols = aDesignator.Substring(0, index).ToUpper();
+        //    int index = aDesignator.IndexOfAny(new char[] { '0','1', '2', '3', '4', '5', '6', '7', '8', '9'});
+        //    string symbols = aDesignator.Substring(0, index).ToUpper();
 
-            if (string.Equals(symbols, "R") ||
-                string.Equals(symbols, "C") ||
-                string.Equals(symbols, "L") ||
-                string.Equals(symbols, "XP")||
-                string.Equals(symbols, "XS"))
-                return true;
+        //    if (string.Equals(symbols, "R") ||
+        //        string.Equals(symbols, "C") ||
+        //        string.Equals(symbols, "L") ||
+        //        string.Equals(symbols, "XP")||
+        //        string.Equals(symbols, "XS"))
+        //        return true;
 
-            return false;
-        }
+        //    return false;
+        //}
 
         /// <summary>
         /// Gets the group name by count.
@@ -708,13 +698,13 @@ internal class ElementListDataPreparer : BasePreparer {
         /// Makes the group names dic.
         /// </summary>
         /// <param name="aSortedComponents">a sorted components.</param>
-        /// <returns> dictionary with key = desigantor of first component of group, value = group name </returns>
-        private IDictionary<string, Tuple<string,int>> MakeGroupNamesDic(KeyValuePair<string, Tuple<string, Component, uint>>[] aSortedComponents)
+        /// <returns> dictionary with key = desigantor of first component of group, value = Tuple of group name and count components in group </returns>
+        private IDictionary<string, Tuple<string,int>>
+        MakeGroupNamesDic(KeyValuePair<string, Tuple<string, Component, uint>>[] aSortedComponents)
         {
             var groupNamesDic = new Dictionary<string, Tuple<string, int>>();
             if (aSortedComponents.Length > 1)
-            {
-                //string addGroupName = string.Empty;
+            {                
                 string lastGroupName = aSortedComponents[0].Value.Item2.GetProperty(Constants.SubGroupNameSp);
                 string lastDesignatorType = GetDesignatorType(aSortedComponents[0].Key);
                 string firstDesignator = aSortedComponents[0].Key;
@@ -730,7 +720,8 @@ internal class ElementListDataPreparer : BasePreparer {
                     // если происходит смена типа позиционного обозначения, то создадим новую группу
                     if (!string.Equals(lastDesignatorType, currDesignatorType))
                     {
-                        groupNamesDic.Add(firstDesignator, new Tuple<string, int>(countSubGroupCanges > 0 ? "" : lastGroupName, countComponents - 1));
+                        groupNamesDic.Add(firstDesignator, new Tuple<string, int>(countSubGroupCanges > 0 ? "" : lastGroupName, 
+                                                                                  countComponents - 1));
                         firstDesignator = aSortedComponents[i].Key;
                         countSubGroupCanges = 0;
                         countComponents = 1;
@@ -744,7 +735,6 @@ internal class ElementListDataPreparer : BasePreparer {
                         countSubGroupCanges++;
                         lastGroupName = currGroupName;
                     }
-
                 }
 
                 groupNamesDic.Add(firstDesignator, new Tuple<string, int>(countSubGroupCanges > 0 ? "" : lastGroupName, countComponents));
