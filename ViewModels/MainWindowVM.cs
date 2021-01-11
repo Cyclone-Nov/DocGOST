@@ -153,14 +153,16 @@ namespace GostDOC.ViewModels
         public ICommand AutoSortCheckedCmd => new Command<bool>(AutoSortChecked);
         public ICommand ShowLogCmd => new Command(ShowLog);
 
-        public string WindowTitle
+        /// <summary>
+        /// Наименование главного окна программы по умолчанию
+        /// </summary>
+        /// <returns></returns>
+        public string GetDefaultWindowTitle()
         {
-            get
-            {
-                Version version = Assembly.GetExecutingAssembly().GetName().Version;
-                return "ПО формирования документов КД на изделие в соответствие с ГОСТ " + version;
-            }
+            Version version = Assembly.GetExecutingAssembly().GetName().Version;
+            return $"ПО формирования документов КД на изделие. Версия {version}";
         }
+
         /// <summary>
         /// Current selected configuration
         /// </summary>
@@ -1364,11 +1366,11 @@ namespace GostDOC.ViewModels
         {
             if (string.IsNullOrEmpty(_filePath))
             {
-                Title.Value = WindowTitle;
+                Title.Value = GetDefaultWindowTitle();
             }
             else
             {
-                Title.Value = WindowTitle + " - " + Path.GetFileName(_filePath);
+                Title.Value = GetDefaultWindowTitle() + " - " + Path.GetFileName(_filePath);
             }
         }
         private void UpdateUndoRedoComponents()
