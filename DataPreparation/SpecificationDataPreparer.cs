@@ -247,7 +247,7 @@ namespace GostDOC.DataPreparation
             var сomponents = group.Components;
             AddComponents(aTable, сomponents, ref aPos, aPositions, !string.Equals(aGroupName, Constants.GroupDoc) && !string.Equals(aGroupName, Constants.GroupComplex));
             
-            if (сomponents.Count > 0 || group.SubGroups?.Count > 0)
+            if (сomponents.Count > 0 && group.SubGroups?.Count > 0)
             {
                 AddEmptyRow(aTable);
             }
@@ -259,6 +259,7 @@ namespace GostDOC.DataPreparation
                 {
                     string subGroupName = GetSubgroupNameByCount(subgroup);                    
                     AddSubgroup(aTable, subGroupName, subgroup.Value.Components, ref aPos, aPositions);
+                    AddEmptyRow(aTable);
                 }
             }
 
@@ -268,8 +269,11 @@ namespace GostDOC.DataPreparation
                 if (subgroup_other.Components.Count > 0)
                 {                       
                     AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, subgroup_other.Components, ref aPos, aPositions);
-                }
+                    AddEmptyRow(aTable);
+                }                
             }
+
+            RemoveLastRow(aTable);
         }
 
 
@@ -283,11 +287,8 @@ namespace GostDOC.DataPreparation
             if (AddGroupName(aTable, aGroupName))
                 AddEmptyRow(aTable);
 
-            AddComponents(aTable, aSortComponents, ref aPos, aPositions);
-
-            AddEmptyRow(aTable);
+            AddComponents(aTable, aSortComponents, ref aPos, aPositions);                        
             aTable.AcceptChanges();
-
             return true;
         }
 
@@ -562,6 +563,14 @@ namespace GostDOC.DataPreparation
             }
         }
 
+        private void RemoveLastRow(DataTable table)
+        {
+            if (table.Rows.Count > 1)
+            {
+                int last_index = table.Rows.Count - 1;                
+                table.Rows.RemoveAt(last_index);
+            }
+        }
 
         private bool IsEmptyRow(DataTable aTable, int aIndex)
         {
