@@ -199,7 +199,7 @@ namespace GostDOC.PDF
         /// добавить к документу лист регистрации изменений
         /// </summary>
         /// <param name="aInPdfDoc">a in PDF document.</param>
-        internal void AddRegisterList(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, int aPageNumber)
+        internal void AddRegisterList(iText.Layout.Document aInPdfDoc, IDictionary<string, string> aGraphs, int aPageNumber, Dictionary<string, object> aAppParams = null)
         {
             //aInPdfDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
             aInPdfDoc.Add(new AreaBreak(PageSize.A4));
@@ -213,16 +213,19 @@ namespace GostDOC.PDF
                 TITLE_BLOCK_WIDTH - 0.02f);
             aInPdfDoc.Add(regTable);
 
+            // добавим обозначение документа если оно есть            
+            object docSign = string.Empty;
+            aAppParams?.TryGetValue(Constants.AppParamDocSign, out docSign);
 
             // добавить таблицу с основной надписью для последуюших старницы
-            var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = Type });
+            var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, CurrentPage = aPageNumber, DocType = Type, DocSign = docSign.ToString() });
             titleBlock.SetFixedPosition(DATA_TABLE_LEFT,
                 BOTTOM_MARGIN,
                 TITLE_BLOCK_WIDTH - 0.02f);
             aInPdfDoc.Add(titleBlock);
 
             // добавить таблицу с нижней дополнительной графой
-            aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
+            aInPdfDoc.Add(CreateBottomAppendGraph(aGraphs));
 
             var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
             DrawVerticalLine(aPageNumber, fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 200);
@@ -751,6 +754,7 @@ namespace GostDOC.PDF
             return c;
         }
 
+
         protected static Cell CreateAppendGraphWideTextCell(float height, string text = null)
         {
             var c = new Cell();
@@ -782,7 +786,7 @@ namespace GostDOC.PDF
         /// создать таблицу для верхней дополнительной графы
         /// </summary>
         /// <returns></returns>
-        protected Table CreateTopAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs) {
+        protected Table CreateTopAppendGraph(IDictionary<string, string> aGraphs) {
         float[] columnSizes = {5 * mmW(), 7 * mmW()};
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
@@ -794,8 +798,7 @@ namespace GostDOC.PDF
 
             tbl.SetFixedPosition(
                 APPEND_GRAPHS_LEFT, 
-                PdfDefines.A4Height - (TOP_MARGIN + GetTableHeight(tbl, 1)) /*+ 5.5f*/,
-                // TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE, 
+                PdfDefines.A4Height - (TOP_MARGIN + GetTableHeight(tbl, 1)) /*+ 5.5f*/,                
                 APPEND_GRAPHS_WIDTH);
 
             return tbl;
@@ -805,7 +808,7 @@ namespace GostDOC.PDF
         /// создать таблицу для нижней дополнительной графы
         /// </summary>
         /// <returns></returns>
-        protected Table CreateBottomAppendGraph(PageSize aPageSize, IDictionary<string, string> aGraphs) { 
+        protected Table CreateBottomAppendGraph(IDictionary<string, string> aGraphs) { 
             float[] columnSizes = {5 * mmW(), 7 * mmW()};
             Table tbl = new Table(UnitValue.CreatePointArray(columnSizes));
 
@@ -829,20 +832,26 @@ namespace GostDOC.PDF
             return tbl;
         }
 
-
+        /// <summary>
+        /// добавить на лист вертикальную подпись с названием проекта
+        /// </summary>
+        /// <param name="aInDoc">a in document.</param>
+        /// <param name="aGraphs">a graphs.</param>
         protected void AddVerticalProjectSubscription(iText.Layout.Document aInDoc, IDictionary<string, string> aGraphs)
         {
-            var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);
-            
-            var p =
-                new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT))
+            var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);            
+            var p = new Paragraph(GetGraphByName(aGraphs, Constants.GRAPH_PROJECT))
                     .SetRotationAngle(DegreesToRadians(90))
                     .AddStyle(style)
                     .SetFixedPosition(10 * mmW() + 0 - TO_LEFT_CORRECTION, TOP_APPEND_GRAPH_BOTTOM_FIRST_PAGE + 10 * mmW(), 300);
             aInDoc.Add(p);
         }
 
-
+        /// <summary>
+        /// Добавить подписи Формат и Копировал вниз листа
+        /// </summary>
+        /// <param name="aInDoc">a in document.</param>
+        /// <param name="aPageNumber">a page number.</param>
         protected void AddCopyFormatSubscription(iText.Layout.Document aInDoc, int aPageNumber)
         {
             var style = new Style().SetItalic().SetFontSize(12).SetFont(f1).SetTextAlignment(TextAlignment.CENTER);

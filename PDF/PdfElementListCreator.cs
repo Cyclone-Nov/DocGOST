@@ -63,10 +63,10 @@ internal class PdfElementListCreator : PdfCreator {
             _currentPageNumber++;
             lastProcessedRow = AddNextPage(_doc, graphs, dataTable, _currentPageNumber, lastProcessedRow, aAppParams);
         }
-        
+         
         if (_pdfDoc.GetNumberOfPages() > PdfDefines.MAX_PAGES_WITHOUT_CHANGELIST) {
             _currentPageNumber++;
-            AddRegisterList(_doc, graphs, _currentPageNumber);
+            AddRegisterList(_doc, graphs, _currentPageNumber, aAppParams);
         }
 
         _doc.Close();
@@ -101,10 +101,10 @@ internal class PdfElementListCreator : PdfCreator {
         }));
 
         // добавить таблицу с верхней дополнительной графой
-        aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
+        aInDoc.Add(CreateTopAppendGraph(aGraphs));
 
         // добавить таблицу с нижней дополнительной графой
-        aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
+        aInDoc.Add(CreateBottomAppendGraph(aGraphs));
 
         DrawLines(1);
         AddCopyFormatSubscription(aInDoc, 1);
@@ -150,7 +150,7 @@ internal class PdfElementListCreator : PdfCreator {
         titleBlock.SetFixedPosition(DATA_TABLE_LEFT, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH - 0.02f);
         aInPdfDoc.Add(titleBlock);
 
-        aInPdfDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
+        aInPdfDoc.Add(CreateBottomAppendGraph(aGraphs));
 
         DrawLines(aPageNumber);
 
