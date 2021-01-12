@@ -109,8 +109,18 @@ namespace GostDOC.PDF
                 do
                 {
                     // извлекаем из строки то число символов, которое может поместиться в указанную длину maxLength
-                    int symbOnMaxLength = (int)((fullName.Length / currLength) * maxLength);
+                    int nameLength = fullName.Length;
+                    int symbOnMaxLength = (int)(nameLength * (maxLength / currLength));
                     string partName = fullName.Substring(0, symbOnMaxLength);
+
+                    // проверим что получившася подстрока вмещается, иначе уменьшим ее
+                    float newLength = font.GetWidth(partName, aFontSize);
+                    while(newLength > maxLength)
+                    {
+                        symbOnMaxLength--;
+                        partName = fullName.Substring(0, symbOnMaxLength);
+                        newLength = font.GetWidth(partName, aFontSize);
+                    }
 
                     // пробуем найти ближайший символ, по которому можно переносить фразу и извлечем часть для первой строки
                     int index = -1;
