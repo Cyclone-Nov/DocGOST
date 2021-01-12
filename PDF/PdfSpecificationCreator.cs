@@ -92,10 +92,10 @@ namespace GostDOC.PDF
             aInDoc.Add(CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, CurrentPage = 1, DocType = DocType.Specification}));
 
             // добавить таблицу с верхней дополнительной графой
-            aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
+            aInDoc.Add(CreateTopAppendGraph(aGraphs));
 
             // добавить таблицу с нижней дополнительной графой
-            aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
+            aInDoc.Add(CreateBottomAppendGraph(aGraphs));
 
             DrawLines(1);
 
@@ -125,12 +125,11 @@ namespace GostDOC.PDF
             titleBlock.SetFixedPosition(DATA_TABLE_LEFT, BOTTOM_MARGIN, TITLE_BLOCK_WIDTH - 0.02f);
             aInDoc.Add(titleBlock);
 
-
             // добавить таблицу с нижней дополнительной графой
-            aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
+            aInDoc.Add(CreateBottomAppendGraph(aGraphs));
 
             DrawLines(_currentPageNumber);
-
+                        
             AddCopyFormatSubscription(aInDoc, aPageNamuber);
 
             AddVerticalProjectSubscription(aInDoc, aGraphs);
@@ -138,29 +137,46 @@ namespace GostDOC.PDF
             return lastProcessedRow;
         }
 
+        /// <summary>
+        /// добавить заголовок таблицы данных
+        /// </summary>
+        /// <param name="aTable">a table.</param>
         void AddDataTableHeader(Table aTable) {
 
-            Cell headerCell = new Cell().SetVerticalAlignment(VerticalAlignment.MIDDLE).SetBorder(THICK_BORDER).SetHeight(15*mmH()).SetPadding(0);
-            Paragraph CreateParagraph(string text) => new Paragraph(text).SetFont(f1).SetItalic().SetTextAlignment(TextAlignment.CENTER).SetFontSize(14)/*.SetMargin(0)*/;
+            Cell headerCell = new Cell().SetVerticalAlignment(VerticalAlignment.MIDDLE)
+                                        .SetBorder(THICK_BORDER)
+                                        .SetHeight(15*mmH())
+                                        .SetPadding(0);
 
-            Table AddHeaderCell90(string text) => 
-                aTable.AddCell(headerCell.Clone(false)
-                    .SetHorizontalAlignment(HorizontalAlignment.CENTER)
-                    .SetVerticalAlignment(VerticalAlignment.MIDDLE)
-                    .Add(CreateParagraph(text).SetRotationAngle(DegreesToRadians(90))));
-            Table AddHeaderCell(string text) => 
-                aTable.AddCell(headerCell.Clone(false)
-                    .Add(CreateParagraph(text).SetFixedLeading(11)));
+            Paragraph CreateParagraph(string text) => new Paragraph(text).SetFont(f1)
+                                                                         .SetItalic()
+                                                                         .SetTextAlignment(TextAlignment.CENTER)
+                                                                         .SetFontSize(14)/*.SetMargin(0)*/;
 
-            AddHeaderCell90("Формат");
-            AddHeaderCell90("Зона");
-            AddHeaderCell90("Поз.");
+            Table AddHeaderCellVertical(string text) => aTable.AddCell(headerCell.Clone(false)
+                                                              .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                                                              .SetVerticalAlignment(VerticalAlignment.MIDDLE)
+                                                              .Add(CreateParagraph(text).SetRotationAngle(DegreesToRadians(90))));
+
+            Table AddHeaderCell(string text) => aTable.AddCell(headerCell.Clone(false)
+                                                      .Add(CreateParagraph(text)
+                                                      .SetFixedLeading(11)));
+
+            AddHeaderCellVertical("Формат");
+            AddHeaderCellVertical("Зона");
+            AddHeaderCellVertical("Поз.");
             AddHeaderCell("Обозначение");
             AddHeaderCell("Наименование");
-            AddHeaderCell90("Кол.");
+            AddHeaderCellVertical("Кол.");
             AddHeaderCell("Приме-\nчание");
         }
 
+        /// <summary>
+        /// заполнить таблицу данных
+        /// </summary>
+        /// <param name="aDataTableStruct">a data table structure.</param>
+        /// <param name="outLastProcessedRow">The out last processed row.</param>
+        /// <returns></returns>
         Table CreateDataTable(DataTableStruct aDataTableStruct, out int outLastProcessedRow) {
             const int COLUMNS = 7;
             var aStartRow = aDataTableStruct.StartRow;
@@ -180,31 +196,60 @@ namespace GostDOC.PDF
             AddDataTableHeader(tbl);
 
             Cell centrAlignCell = CreateEmptyCell(1, 1, 2, 2, 0, 1)
-                .SetMargin(0)
-                .SetPaddings(0, 0, 0, 0)
-                .SetHeight(8 * PdfDefines.mmAXh)
-                .SetTextAlignment(TextAlignment.CENTER)
-                .SetItalic()
-                .SetFont(f1)
-                .SetBorderLeft(THICK_BORDER)
-                .SetBorderRight(THICK_BORDER)
-                .SetFontSize(Constants.SpecificationFontSize);
-            Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 0, 0, 2)
-                .SetHeight(8 * PdfDefines.mmAXh)
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetItalic()
-                .SetFont(f1)
-                .SetBorderLeft(THICK_BORDER)
-                .SetBorderRight(THICK_BORDER)
-                .SetFontSize(Constants.SpecificationFontSize);
-            Cell rightPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1).SetMargin(0).SetPaddings(0, 2, 0, 0)
-                .SetHeight(8 * PdfDefines.mmAXh)
-                .SetTextAlignment(TextAlignment.RIGHT)
-                .SetItalic()
-                .SetFont(f1)
-                .SetBorderLeft(THICK_BORDER)
-                .SetBorderRight(THICK_BORDER)
-                .SetFontSize(Constants.SpecificationFontSize);
+                                    .SetMargin(0)
+                                    .SetPaddings(0, 0, 0, 0)
+                                    .SetHeight(8 * PdfDefines.mmAXh)
+                                    .SetTextAlignment(TextAlignment.CENTER)
+                                    .SetItalic()
+                                    .SetFont(f1)
+                                    .SetBorderLeft(THICK_BORDER)
+                                    .SetBorderRight(THICK_BORDER)
+                                    .SetFontSize(Constants.SpecificationFontSize);
+
+            Cell leftPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1)
+                                    .SetMargin(0)
+                                    .SetPaddings(0, 0, 0, 2)
+                                    .SetHeight(8 * PdfDefines.mmAXh)
+                                    .SetTextAlignment(TextAlignment.LEFT)
+                                    .SetItalic()
+                                    .SetFont(f1)
+                                    .SetBorderLeft(THICK_BORDER)
+                                    .SetBorderRight(THICK_BORDER)
+                                    .SetFontSize(Constants.SpecificationFontSize);
+
+            Cell rightPaddCell = CreateEmptyCell(1, 1, 2, 2, 0, 1)
+                                    .SetMargin(0)
+                                    .SetPaddings(0, 2, 0, 0)
+                                    .SetHeight(8 * PdfDefines.mmAXh)
+                                    .SetTextAlignment(TextAlignment.RIGHT)
+                                    .SetItalic()
+                                    .SetFont(f1)
+                                    .SetBorderLeft(THICK_BORDER)
+                                    .SetBorderRight(THICK_BORDER)
+                                    .SetFontSize(Constants.SpecificationFontSize);
+
+            void AddCellFormatted(BasePreparer.FormattedString fs)
+            {
+                Cell c;
+                if (fs != null)
+                {
+                    if (fs.TextAlignment == TextAlignment.CENTER)
+                    {
+                        c = (centrAlignCell.Clone(false).Add(new Paragraph(fs.Value)));
+                    } else if (fs.TextAlignment == TextAlignment.LEFT)
+                    {
+                        c = (leftPaddCell.Clone(false).Add(new Paragraph(fs.Value)));
+                    } else
+                    {
+                        c = (rightPaddCell.Clone(false).Add(new Paragraph(fs.Value)));
+                    }
+                    if (fs.IsUnderlined) c.SetUnderline(0.5f, -1);
+                } else
+                {
+                    c = centrAlignCell.Clone(false);
+                }
+                tbl.AddCell(c);
+            }
 
             int remainingPdfTableRows = (aDataTableStruct.FirstPage) ? RowNumberOnFirstPage : RowNumberOnNextPage;
             outLastProcessedRow = aStartRow;
@@ -213,14 +258,13 @@ namespace GostDOC.PDF
             DataRow row;
             for (int ind = aStartRow; ind < Rows.Length; ind++) {
 
-                if (remainingPdfTableRows <= 0) {
-                    break;
-                }
+                if (remainingPdfTableRows <= 0) 
+                    break;                
 
                 row = Rows[ind];
 
-                string GetCellString(string columnName) =>
-                    (row[columnName] == System.DBNull.Value)
+                string GetCellString(string columnName) => 
+                     (row[columnName] == System.DBNull.Value) 
                         ? string.Empty
                         : ((BasePreparer.FormattedString) row[columnName]).Value;
 
@@ -234,35 +278,10 @@ namespace GostDOC.PDF
                 string position = GetCellString(Constants.ColumnPosition).Truncate(3);
                 string note = GetCellString(Constants.ColumnFootnote).Truncate(14);
                 var sign = GetCellStringFormatted(Constants.ColumnSign);
-                if (sign != null) {
+                if (sign != null) 
                     sign.Value = sign.Value.Truncate(38);
-                }
-
+                    
                 var name = GetCellStringFormatted(Constants.ColumnName);
-
-                void AddCellFormatted(BasePreparer.FormattedString fs) {
-                    Cell c;
-                    if (fs != null)
-                    {                        
-                        if (fs.TextAlignment == TextAlignment.CENTER)
-                        {
-                            c = (centrAlignCell.Clone(false).Add(new Paragraph(fs.Value)));
-                        } else if (fs.TextAlignment == TextAlignment.LEFT)
-                        {
-                            c = (leftPaddCell.Clone(false).Add(new Paragraph(fs.Value)));
-                        }
-                        else{
-                            c = (rightPaddCell.Clone(false).Add(new Paragraph(fs.Value)));
-                        }
-                        if (fs.IsUnderlined) c.SetUnderline(0.5f, -1);
-                    }
-                    else
-                    {
-                        c = centrAlignCell.Clone(false);
-                    }
-                    tbl.AddCell(c);
-                }
-
                 int quantity = (row[Constants.ColumnQuantity] == System.DBNull.Value)
                     ? 0
                     : (int) row[Constants.ColumnQuantity];
@@ -320,6 +339,10 @@ namespace GostDOC.PDF
             return tbl;
         }
 
+        /// <summary>
+        /// нарисовать вертикальную линию на странице <paramref name="pageNumber"/>
+        /// </summary>
+        /// <param name="pageNumber">The page number.</param>
         private void DrawLines(int pageNumber) {
             var fromLeft = 19.3f * mmW() + TITLE_BLOCK_WIDTH - 2f - TO_LEFT_CORRECTION;
             DrawVerticalLine(pageNumber, fromLeft, BOTTOM_MARGIN + (8+7) * mmW()-6f, 2, 200);

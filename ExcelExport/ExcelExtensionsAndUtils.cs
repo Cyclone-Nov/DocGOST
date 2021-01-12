@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GostDOC.Common;
+﻿using System.Collections.Generic;
 using GostDOC.DataPreparation;
 using GostDOC.Models;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -85,53 +78,6 @@ namespace GostDOC.ExcelExport
             return merge_rows_cnt;
         }         
     }
-
-    static class DataTableExtensions
-    {
-        public static T GetTableValue<T>(this DataTable tbl, int row, int col)
-        {
-            var val = tbl.Rows[row].ItemArray[col];
-            if (val != System.DBNull.Value)
-            {
-                return (T)val;
-            }
-            return default(T);
-        }
-
-        public static string GetTableValue(this DataTable tbl, int row, int col)
-        {
-            var val = tbl.Rows[row].ItemArray[col];
-            if (val != System.DBNull.Value)
-            {
-                return val.ToString();
-            }
-            return string.Empty;
-        }
-
-        public static BasePreparer.FormattedString GetTableValueFS(this DataTable tbl, int row, int col)
-        {
-            var val = tbl.Rows[row].ItemArray[col];
-            if (val != System.DBNull.Value)
-            {
-                return val as BasePreparer.FormattedString;
-            }
-            return null;
-        }        
-    }
-
-
-    static class DataTableUtils
-    {
-        public static DataTable GetDataTable(DocType aDocType)
-        {
-            if (PrepareManager.Instance.PrepareDataTable(aDocType, DocManager.Instance.Project.Configurations))
-            {
-                return PrepareManager.Instance.GetDataTable(aDocType);
-            }
-            return null;
-        }
-    }
-
 
     static class ExcelUtils
     {

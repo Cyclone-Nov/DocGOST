@@ -299,9 +299,10 @@
     <Compile Include="DataPreparation\SpecificationDataPreparer.cs" />
     <Compile Include="Dictionaries\ProductTypes.cs" />
     <Compile Include="Events\TEventArgs.cs" />
+    <Compile Include="ExcelExport\DataTableExtensionsAndUtils.cs" />
     <Compile Include="ExcelExport\ExcelStructuresD27.cs" />
     <Compile Include="ExcelExport\ExcelExportFactory.cs" />
-    <Compile Include="ExcelExport\ExcelExtensions.cs" />
+    <Compile Include="ExcelExport\ExcelExtensionsAndUtils.cs" />
     <Compile Include="ExcelExport\ExportD27.cs" />
     <Compile Include="ExcelExport\ExportBill.cs" />
     <Compile Include="ExcelExport\ExportList.cs" />

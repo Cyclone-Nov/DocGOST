@@ -98,10 +98,10 @@ namespace GostDOC.PDF
             SetPageMargins(aInDoc);
 
             // добавить таблицу с верхней дополнительной графой
-            aInDoc.Add(CreateTopAppendGraph(_pageSize, aGraphs));
+            aInDoc.Add(CreateTopAppendGraph(aGraphs));
 
             // добавить таблицу с нижней дополнительной графой
-            aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
+            aInDoc.Add(CreateBottomAppendGraph(aGraphs));
 
             var titleBlock = CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, CurrentPage = 1,  DocType = DocType.Bill});            
             titleBlock.SetFixedPosition(
@@ -135,7 +135,7 @@ namespace GostDOC.PDF
         internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow, Dictionary<string, object> aAppParams = null) {
             aInDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
             SetPageMargins(aInDoc);
-            aInDoc.Add(CreateBottomAppendGraph(_pageSize, aGraphs));
+            aInDoc.Add(CreateBottomAppendGraph(aGraphs));
 
             var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber, CurrentPage = aPageNumber, DocType = DocType.Bill });
             titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -14.8f-5f, 
