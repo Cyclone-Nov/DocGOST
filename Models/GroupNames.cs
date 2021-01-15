@@ -14,14 +14,20 @@ namespace GostDOC.Models
         {
             FillGroupNames();
         }
-        public static string GetGroupName(string aName)
+
+        /// <summary>
+        /// Gets the plaural name of the group.
+        /// </summary>
+        /// <param name="aSingleGroupName">a name.</param>
+        /// <returns></returns>
+        public static string GetPluralGroupName(string aSingleGroupName)
         {
-            if (!string.IsNullOrEmpty(aName))
+            if (!string.IsNullOrEmpty(aSingleGroupName))
             {
-                string name;
-                if (_groupNames.TryGetValue(aName, out name))
+                string plauralName;
+                if (_groupNames.TryGetValue(aSingleGroupName, out plauralName))
                 {
-                    return name;
+                    return plauralName;
                 }
             }
             return string.Empty;

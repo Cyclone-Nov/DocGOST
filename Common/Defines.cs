@@ -308,9 +308,12 @@ namespace GostDOC.Common
         AA
     }
 
-#endregion
+    #endregion
 
-public static class Constants {
+    /// <summary>
+    /// общие константы для сборки
+    /// </summary>
+    internal static class Constants {
 
         #region Графы
 
@@ -322,7 +325,7 @@ public static class Constants {
         /// <summary>
         /// индекс основного исполнения (конфигурации) в виде строки
         /// </summary>
-        public static readonly string MAIN_CONFIG_INDEX = "-00";
+        public const string MAIN_CONFIG_INDEX = "-00";
 
         /// <summary>
         /// название графы №1 (Наименование изделия) основной надписи в структуре xml
@@ -748,7 +751,7 @@ public static class Constants {
         #endregion
 
 
-        #region Графы Дракулы
+        #region Графы
 
         public static readonly string GraphCommentsSp = "Комментарии СП";
         public static readonly string GraphCommentsB = "Комментарии ВП";
@@ -783,13 +786,13 @@ public static class Constants {
 
         #endregion Файлы
 
-        #region Шрифты
+        public static string DesignatiorID { get; internal set; }
+
+        #region Размеры шрифтов
 
         public static readonly float SpecificationFontSize = 12.0f;
         public static readonly float BillFontSize = 12.0f;
         public static readonly float ItemListFontSize = 12.0f;
-
-        public static string DesignatiorID { get; internal set; }
 
         /// <summary>
         /// размер шрифта для вывода символа литеры в соответсвующей графе основной надписи
@@ -799,8 +802,6 @@ public static class Constants {
         /// размер шрифта для вывода числа рядом с символом литеры в соответсвующей графе основной надписи
         /// </summary>
         public static readonly float LiteraSmallFontSize = 7.0f;
-
-
 
         #endregion
 
