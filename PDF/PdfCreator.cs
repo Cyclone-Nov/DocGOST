@@ -346,21 +346,6 @@ namespace GostDOC.PDF
             public int StartRow;
         }
 
-
-        string GetAdditionalGraph2(DocType aDocType) {
-            string additional= "";
-            switch (aDocType) {
-                case DocType.Bill:
-                    additional= "ВП";
-                    break;
-                case DocType.ItemsList:
-                    additional= "ПЭ3";
-                    break;
-            }
-
-            return additional;
-        }
-
         string GetAdditionalGraph1(DocType aDocType) {
             string documentTypeGraph1 = "";
             switch (aDocType) {

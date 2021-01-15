@@ -770,6 +770,11 @@ namespace GostDOC.Common
         public static readonly string NewProductMenuItem = "<Добавить изделие>";
         public static readonly string NewGroupMenuItem = "<Добавить группу>";
 
+        /// <summary>
+        /// обозначение документа Ведомость покупных изделий
+        /// </summary>
+        public static readonly string BillDocSign = "ВП";
+
         #region Файлы
 
         // Excel
