@@ -168,6 +168,50 @@ namespace GostDOC.Models
             return string.Empty;
         }
 
+        /// <summary>
+        /// признак задания значение для тега позиция компонентов (не из раздела Documentation)
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if [is position exists]; otherwise, <c>false</c>.
+        /// </returns>
+        public bool IsPositionExists(string aConfig = Constants.MAIN_CONFIG_INDEX)
+        {
+            if (Project.Configurations.TryGetValue(aConfig, out var mainConfig))
+            {
+                bool ExistPositionInAnyComponent(List<Component> aComponents)
+                {
+                    foreach (var cmp in aComponents)
+                    {
+                        string pos = cmp.GetProperty(Constants.ComponentPosition);
+                        if (!string.IsNullOrEmpty(pos) && !string.Equals(pos, "0"))
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                var data = mainConfig.Specification;
+                foreach (var gr in data)
+                {
+                    if (!string.Equals(gr.Key, Constants.GroupDoc))
+                    {
+                        if (ExistPositionInAnyComponent(gr.Value.Components))                        
+                            return true;                        
+                        else
+                        {
+                            foreach (var subgr in gr.Value.SubGroups.Values)
+                            {
+                                if (ExistPositionInAnyComponent(subgr.Components))                                
+                                    return true;                                
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         #endregion Public
 
         /// <summary>
@@ -186,6 +230,11 @@ namespace GostDOC.Models
             return false;
         }
 
+        /// <summary>
+        /// получить обозначение документа
+        /// </summary>
+        /// <param name="aDocType">тип документа</param>
+        /// <returns></returns>
         private string GetDocSign(DocType aDocType)
         {   
             if (!Project.Configurations.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))

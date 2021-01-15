@@ -72,11 +72,12 @@ namespace GostDOC.Models
             aResult.Version = _xml.Transaction.Version;
             // Clear configurations
             aResult.Configurations.Clear();
+
             // Fill configurations
             foreach (var cfg in _xml.Transaction.Project.Configurations)
-            {
-                // Set cfg name
+            {                
                 Configuration newCfg = new Configuration() { Name = cfg.Name };
+             
                 // Fill graphs
                 foreach (var graph in cfg.Graphs)
                 {
@@ -86,7 +87,7 @@ namespace GostDOC.Models
                         newCfg.Graphs.Add(graph.Name, graph.Text);
                 }
 
-                if(string.IsNullOrEmpty(unitSign))
+                if (string.IsNullOrEmpty(unitSign))
                     unitSign = ParseGraphValue(newCfg.Graphs, Constants.GraphSign);
 
                 // Set current D27 group
@@ -94,30 +95,45 @@ namespace GostDOC.Models
                 _currentAssemblyD27.Name = ParseNameSign(newCfg.Graphs);
 
                 AddComponents(newCfg, cfg.Documents, ComponentType.Document, unitSign);
+
                 if(_docType != DocType.Bill)
                     AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, unitSign);
+
                 AddComponents(newCfg, cfg.Components, ComponentType.Component, unitSign);
 
                 if (aDocType == DocType.ItemsList)
                 {
-                    if (!HasASсhema(newCfg))
+                    if (!HasSсhema(newCfg))
                     {
-                        string config_name = (cfg.Name == "-00" ) ? "Базовое исполнение" : $"Исполнение {cfg.Name}";
+                        string config_name = string.Equals(cfg.Name, Constants.MAIN_CONFIG_INDEX) ? "Базовое исполнение" : $"Исполнение {cfg.Name}";
                         _error.Error($"{config_name}: не найдена схема в разделе документации при импорте перечня элементов");
                     }
                 }
 
                 // Move single elements to group "Прочие" and update group names
-                ProcessGroupNames(newCfg);
-                // Sort components
-                SortComponents(newCfg);
+                ProcessGroups(newCfg);
+
+                // не будем сортировать компоненты для спецификации, которые имеют непустую позицию
+                if (_docType == DocType.Specification && _projectType == ProjectType.GostDoc && IsPositionExists(newCfg))
+                {   
+                    // и отключим автосортировку для всей конфигурации
+                    newCfg.ChangeAutoSort(false);
+                }
+                else
+                {
+                    // Sort components
+                    SortComponents(newCfg);
+                }
+                
                 // Fill default graphs
                 newCfg.FillDefaultGraphs();
+
                 // Fill default groups
                 newCfg.FillDefaultGroups();
+
                 // add two empty components for every group in specification
                 if (aDocType == DocType.Specification && _projectType == ProjectType.Other)
-                    AddEmptyComponentsToSpecificationGroups(newCfg);
+                    AddTwoEmptyComponentsToSpecificationGroups(newCfg);
 
                 aResult.Configurations.Add(newCfg.Name, newCfg);
             }
@@ -286,15 +302,18 @@ namespace GostDOC.Models
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
                 var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
                 var designator = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatorID);
-                var position = cmp.Properties.Find(x => x.Name == Constants.ColumnPosition);                
-
-                if (name == null && position == null)
+                var position = cmp.Properties.Find(x => x.Name == Constants.ComponentPosition);                
+                
+                // для спецификации добавим возможность добавлять пустые компоненты
+                if ((name == null && _docType != DocType.Specification) ||
+                   (name == null && position == null && _docType == DocType.Specification))
                 {
                     _error.Error($"Файл {_specFileName}: имя компонента не задано!");
                     continue;
                 }
-
-                if (sign == null)
+                                
+                if ((sign == null && _docType != DocType.Specification) ||
+                   (sign == null && position == null && _docType == DocType.Specification))
                 {
                     _error.Error($"Файл {_specFileName}. Компонент {name}: 'Обозначение' не задано!");
                     continue;
@@ -302,8 +321,8 @@ namespace GostDOC.Models
 
                 CombineProperties combine = new CombineProperties(_docType == DocType.Specification)
                 {
-                    Name = name.Text,
-                    Sign = sign.Text,
+                    Name = name?.Text ?? string.Empty,
+                    Sign = sign?.Text ?? string.Empty,
                     RefDesignation = designator?.Text ?? string.Empty,
                     Position = position?.Text ?? string.Empty,                    
                 };
@@ -417,10 +436,6 @@ namespace GostDOC.Models
                 new SubGroupInfo()
             };
 
-            var id = aSrc.Properties.Find(x => x.Name == Constants.ComponentDesignatorID)?.Text ?? string.Empty;
-            var name = aSrc.Properties.Find(x => x.Name == Constants.ComponentName)?.Text ?? string.Empty;
-            var included = aSrc.Properties.Find(x => x.Name == Constants.ComponentWhereIncluded)?.Text ?? string.Empty;
-
             foreach (var property in aSrc.Properties)
             {
                 if (property.Name == Constants.GroupNameSp)
@@ -438,11 +453,16 @@ namespace GostDOC.Models
                 }
             }
 
-            if (result[0].GroupName == Constants.GroupOthers && string.IsNullOrEmpty(result[0].SubGroupName))
+            if (string.Equals(result[0].GroupName, Constants.GroupOthers) && string.IsNullOrEmpty(result[0].SubGroupName))
             {
-                _error.Error($"Не задан Подраздел СП для раздела {result[0].GroupName} в файле {included} компонента {name}!");
+                //var id = aSrc.Properties.Find(x => x.Name == Constants.ComponentDesignatorID)?.Text ?? string.Empty;
+                var name = aSrc.Properties.Find(x => x.Name == Constants.ComponentName)?.Text ?? string.Empty;
+                if (!string.IsNullOrEmpty(name))
+                {
+                    var included = aSrc.Properties.Find(x => x.Name == Constants.ComponentWhereIncluded)?.Text ?? string.Empty;
+                    _error.Error($"Не задан Подраздел СП для раздела {result[0].GroupName} в файле {included} компонента {name}!");
+                }
             }
-
             return result;
         }
 
@@ -491,7 +511,7 @@ namespace GostDOC.Models
         }
 
         private void SortComponents(Configuration aCfg)
-        {
+        {   
             foreach (var group in aCfg.Specification.Values)
             {
                 SortComponents(group, group.Name, DocType.Specification);
@@ -542,11 +562,16 @@ namespace GostDOC.Models
                     existing.Count += aCount;
                     return true;
                 }
-            }           
-
+            }
             return false;
         }
 
+        /// <summary>
+        /// TODO: replace to extnesions of ComponentXml class
+        /// </summary>
+        /// <param name="aComponent">a component.</param>
+        /// <param name="aName">a name.</param>
+        /// <param name="aText">a text.</param>
         private void SetProperty(ComponentXml aComponent, string aName, string aText)
         {
             var property = aComponent.Properties.FirstOrDefault(x => x.Name == aName);
@@ -559,17 +584,26 @@ namespace GostDOC.Models
             }
         }
 
+        /// <summary>
+        /// TODO: replace to extnesions of ComponentXml class
+        /// </summary>
+        /// <param name="aComponent">a component.</param>
+        /// <param name="aName">a name.</param>
+        /// <returns></returns>
         private string GetProperty(ComponentXml aComponent, string aName)
         {
             var property = aComponent.Properties.FirstOrDefault(x => x.Name == aName);
             return property == null ? string.Empty : property.Text;
         }
 
+        /// <summary>
+        /// TODO: replace to extnesions of ComponentXml class
+        /// </summary>
+        /// <param name="aComponent">a component.</param>
+        /// <returns></returns>
         private uint ParseCount(ComponentXml aComponent)
         {
-            uint count = 0;
-            // Read count if set
-            uint.TryParse(GetProperty(aComponent, Constants.ComponentCount), out count);
+            uint.TryParse(GetProperty(aComponent, Constants.ComponentCount), out var count);
             // Return 1 as default or count if set
             return count > 0 ? count : 1;
         }
@@ -683,9 +717,9 @@ namespace GostDOC.Models
                     }
 
                     // Split ids
-                    string[] split = currentPos.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] ids = currentPos.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    if (split.Length < 2)
+                    if (ids.Length < 2)
                     {
                         // Not needed to process 1 or 0 values
                         UpdateNote(cmp, currentPos);
@@ -693,57 +727,42 @@ namespace GostDOC.Models
                     }
 
                     // Sort ids
-                    Array.Sort(split, (x, y) =>
+                    Array.Sort(ids, (x, y) =>
                     {
                         int r = x.Length.CompareTo(y.Length);
                         // Compare length
-                        if (r == 0)
-                        {
-                            // Compare strings
-                            r = string.Compare(x, y);
-                        }
+                        if (r == 0)                                                    
+                            r = string.Compare(x, y); // compare strings                        
                         return r;
                     });
 
                     StringBuilder result = new StringBuilder();
                     Dictionary<string, Tuple<string, int>> items = new Dictionary<string, Tuple<string, int>>();
-                    for (int i = 0; i < split.Length; i++)
+                    for (int i = 0; i < ids.Length; i++)
                     {
                         if (items.Count == 0)
                         {
                             // Add current id in list
-                            items.Add(split[i], ParseDesignatorId(split[i]));
+                            items.Add(ids[i], ParseDesignatorId(ids[i]));
                             continue;
                         }
 
                         // Get previous and current
                         var p = items.Last();
-                        var c = ParseDesignatorId(split[i]);
+                        var c = ParseDesignatorId(ids[i]);
 
                         // Compare with previous
-                        if (c.Item1 == p.Value.Item1)
-                        {
-                            if (c.Item2 == p.Value.Item2 + 1)
-                            {
-                                // Add to list
-                                items.Add(split[i], c);
-                            } else
-                            {
-                                // Process collected items
-                                ProcessItems(items, result);
-                                // Clear ids 
-                                items.Clear();
-                                // Add to list
-                                items.Add(split[i], c);
-                            }
+                        if (c.Item1 == p.Value.Item1 &&
+                            c.Item2 == p.Value.Item2 + 1)
+                        {   
+                            items.Add(ids[i], c);                            
                         } else
                         {
                             // Process collected items
                             ProcessItems(items, result);
                             // Clear ids 
-                            items.Clear();
-                            // Add to list
-                            items.Add(split[i], c);
+                            items.Clear();                         
+                            items.Add(ids[i], c);
                         }
                     }
                     // Process remained items
@@ -764,37 +783,45 @@ namespace GostDOC.Models
             aGroups.Add(aNewName, aGroup);           
         }
 
+
         private void UpdateGroupNames(IDictionary<string, Group> aGroups, Group aGroup)
-        {
-            if (aGroup.Name.Contains(@"\"))
-            {
-                string[] split = aGroup.Name.Split(new char[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
-                if (split.Length == 2)
-                {
-                    string name = aGroup.Components.Count > 1 ? split[1] : split[0];
-                    UpdateGroupNames(aGroups, aGroup, name);
-                }
-            } else
-            {
-                if (aGroup.Components.Count > 1)
-                {
-                    var name = GroupNames.GetGroupName(aGroup.Name);
-                    if (string.IsNullOrEmpty(name))
-                    {
-                        _error.Error($"Множественное число для группы {aGroup.Name} в словаре GroupNames.cfg не найдено!");
-                    } else
-                    {
-                        UpdateGroupNames(aGroups, aGroup, name);
-                    }
-                }
-            }
+        {            
+            if (GroupNameByCountIsValid(aGroup, out var name))
+                UpdateGroupNames(aGroups, aGroup, name);  
+            else
+                _error.Error($"Множественное число для группы {aGroup.Name} в словаре GroupNames.cfg не найдено!");            
         }
 
-        private void ProcessGroupNames(Lazy<Group> aOthers, IDictionary<string, Group> aGroups)
+
+        /// <summary>
+        /// Получить название группы по количеству элементов в группе
+        /// </summary>
+        /// <param name="aGroup">a group.</param>
+        /// <param name="aName">a name.</param>
+        /// <returns>true - удалось получить валидное имя группы</returns>
+        private bool GroupNameByCountIsValid(Group aGroup, out string aName)
+        {
+            // check with aGroup.Name = empty
+            string[] split = aGroup.Name.Split(new char[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);            
+            if (aGroup.Components.Count > 1)
+            {                
+                aName = split.Length == 2 ? split[1] : GroupNames.GetPluralGroupName(aGroup.Name);
+            }
+            else            
+                aName = split[0];
+
+            if (string.IsNullOrEmpty(aName))
+                return false;
+
+            return true;
+        }
+
+
+        private void ProcessGroups(Lazy<Group> aOthers, IDictionary<string, Group> aGroups)
         {
             foreach (var gp in aGroups.AsNotNull().ToList().OrderBy(item => item.Key))
             {
-                ProcessGroupNames(aOthers, gp.Value.SubGroups);
+                ProcessGroups(aOthers, gp.Value.SubGroups);
 
                 if (gp.Value.Components.Count == 1)
                 {
@@ -812,7 +839,11 @@ namespace GostDOC.Models
             }
         }
 
-        private void ProcessGroupNames(Group aGroup)
+        /// <summary>
+        /// move single elements to group other
+        /// </summary>
+        /// <param name="aGroup"></param>
+        private void ProcessGroups(Group aGroup)
         {
             foreach (var gp in aGroup.SubGroups.AsNotNull().ToList())
             {
@@ -828,14 +859,14 @@ namespace GostDOC.Models
                     string name = cp.GetProperty(Constants.ComponentName);
                     cp.SetPropertyValue(Constants.ComponentName, name.Contains(type) ? name : type + " " + name);
                     // Move component to parent group
-                    aGroup.Components.Add(cp);
+                    aGroup.Components.Insert(0, cp);// Add(cp);
                     // Remove subgroup
                     aGroup.SubGroups.Remove(gp.Value.Name);
                 }
             }
         }
 
-        private void ProcessGroupNames(Configuration aCfg)
+        private void ProcessGroups(Configuration aCfg)
         {
             if (_docType == DocType.Bill)
             {
@@ -850,12 +881,12 @@ namespace GostDOC.Models
                     return groupOthers;
                 });
 
-                ProcessGroupNames(others, aCfg.Bill);
+                ProcessGroups(others, aCfg.Bill);
             } else
             {
                 foreach (var gp in aCfg.Specification)
                 {
-                    ProcessGroupNames(gp.Value);
+                    ProcessGroups(gp.Value);
                 }
             }
         }
@@ -874,10 +905,10 @@ namespace GostDOC.Models
             return true;
         }
 
-        private bool HasASсhema(Configuration aConfifg)
+        private bool HasSсhema(Configuration aConfig)
         {
             Group docs;
-            if (aConfifg.Specification.TryGetValue(Constants.GroupDoc, out docs))
+            if (aConfig.Specification.TryGetValue(Constants.GroupDoc, out docs))
             {
                 var doc = docs.Components.Where(key => key.GetProperty(Constants.ComponentName).ToLower().Contains("схема"));
                 if (doc != null && doc.Count() > 0)
@@ -890,22 +921,28 @@ namespace GostDOC.Models
         /// добавить по два пустых компонента (пустых строки) в каждый раздел спецификации
         /// </summary>
         /// <param name="aConfig">a configuration.</param>
-        private void AddEmptyComponentsToSpecificationGroups(Configuration aConfig)
-        {
+        private void AddTwoEmptyComponentsToSpecificationGroups(Configuration aConfig)
+        {       
+            Component CreateEmptyComponent(string aGroupName, string aSubgroupName)
+            {
+                var cmp = new Component(Guid.NewGuid(), 0);
+                cmp.SetPropertyValue(Constants.GroupNameSp, aGroupName);
+                cmp.SetPropertyValue(Constants.SubGroupNameSp, aSubgroupName);
+                return cmp;
+            }
+
             foreach (var gp in aConfig.Specification)
             {
-                if (gp.Value.SubGroups.Count == 0)
+                bool subGroupsExist = gp.Value.SubGroups.Count > 0;
+                var components = gp.Value.Components;
+                if (subGroupsExist)
+                    components = gp.Value.SubGroups.Last().Value.Components;
+
+                if (components.Count > 0)
                 {
-                    if (gp.Value.Components.Count > 0)
-                    {
-                        gp.Value.Components.Add(new Component(Guid.NewGuid(), 0));
-                        gp.Value.Components.Add(new Component(Guid.NewGuid(), 0));
-                    }
-                } else
-                {
-                    var componenets = gp.Value.SubGroups.Last().Value.Components;
-                    componenets.Add(new Component(Guid.NewGuid(), 0));
-                    componenets.Add(new Component(Guid.NewGuid(), 0));
+                    string lastSubGroupName = (subGroupsExist) ? gp.Value.SubGroups.Last().Key : string.Empty;
+                    components.Add(CreateEmptyComponent(gp.Key, lastSubGroupName));
+                    components.Add(CreateEmptyComponent(gp.Key, lastSubGroupName));
                 }
             }
         }
@@ -953,11 +990,13 @@ namespace GostDOC.Models
         {            
             string name = aFirstComponent.GetProperty(Constants.ComponentName);
             string sign = aFirstComponent.GetProperty(Constants.ComponentSign);
-            
+            string position = aFirstComponent.GetProperty(Constants.ComponentPosition);
+
 
             string cmp_name = aSecondComponent.GetProperty(Constants.ComponentName);            
             string cmp_sign = aSecondComponent.GetProperty(Constants.ComponentSign);
-            
+            string cmp_position = aSecondComponent.GetProperty(Constants.ComponentPosition);
+
 
             if (aDocType == DocType.ItemsList)
             {
@@ -973,8 +1012,50 @@ namespace GostDOC.Models
                 return (string.Equals(cmp_name, name) && string.Equals(cmp_whereIncluded, whereIncluded) && string.Equals(cmp_sign, sign));
             }
 
-            return (string.Equals(cmp_name, name) && string.Equals(cmp_sign, sign));
+            return (string.Equals(cmp_name, name) && string.Equals(cmp_sign, sign) && string.Equals(cmp_position, position));
                         
+        }
+
+        /// <summary>
+        /// признак задания значение для тега позиция компонентов (не из раздела Documentation)
+        /// </summary>
+        /// <param name="aCfg">a CFG.</param>
+        /// <returns>
+        ///   <c>true</c> if [is position exists] [the specified a CFG]; otherwise, <c>false</c>.
+        /// </returns>
+        private bool IsPositionExists(Configuration aCfg)
+        {            
+            bool ExistPositionInAnyComponent(List<Component> aComponents)
+            {
+                foreach (var cmp in aComponents)
+                {
+                    string pos = cmp.GetProperty(Constants.ComponentPosition);
+                    if (!string.IsNullOrEmpty(pos) && !string.Equals(pos, "0"))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+                        
+            foreach (var gr in aCfg.Specification)
+            {
+                if (!string.Equals(gr.Key, Constants.GroupDoc))
+                {
+                    if (ExistPositionInAnyComponent(gr.Value.Components))
+                        return true;
+                    else
+                    {
+                        foreach (var subgr in gr.Value.SubGroups.Values)
+                        {
+                            if (ExistPositionInAnyComponent(subgr.Components))
+                                return true;
+                        }
+                    }
+                }
+            }
+            
+            return false;
         }
     }
 }

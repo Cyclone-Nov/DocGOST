@@ -56,10 +56,11 @@ namespace GostDOC.Models
 
             if (_combinePosition)
             {
-                return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign);
+                return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign) && string.Equals(other.Position, Position);
             }
             return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign) && string.Equals(other.RefDesignation, RefDesignation) && string.Equals(other.Position, Position);
         }
+
         public override bool Equals(object other)
         {
             return Equals(other as CombineProperties);

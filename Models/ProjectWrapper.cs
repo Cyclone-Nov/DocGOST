@@ -143,9 +143,79 @@ namespace GostDOC.Models
             return string.Empty;
         }
 
+        public bool UpdateSpecificationPositions(Dictionary<string, List<Tuple<string, int>>> aPositions)
+        {            
+            foreach (var cfg in _docManager.Project.Configurations)
+            {
+                var cfg_name = cfg.Key;
+                var groups = cfg.Value.Specification;
+
+                foreach (var grp in groups)
+                {
+                    UpdatePositions(cfg_name, grp.Key, grp.Value.Components, aPositions);
+                    foreach (var subgrp in grp.Value.SubGroups)
+                    {
+                        UpdatePositions(cfg_name, grp.Key, subgrp.Value.Components, aPositions);
+                    }
+                }
+            }
+            return true;
+        }
+
         #endregion Public
 
         #region Private
+
+        private void UpdatePositions(string aConfigName, string aGroup, List<Component> aComponents, Dictionary<string, List<Tuple<string, int>>> aPositions)
+        {
+            string key = ($"{aConfigName} {aGroup}").Trim();
+            if (aPositions.TryGetValue(key, out var positions))
+            {             
+                int lastPosition = 0;
+                foreach (var component in aComponents)
+                {
+                    lastPosition = SetSpecificationPosition(positions, component, lastPosition);
+                }
+            }
+        }
+
+        /// <summary>
+        /// записать позицию в свойство Позиция для данного компонента
+        /// </summary>
+        /// <param name="aPositions"></param>
+        /// <param name="aComponent"></param>
+        /// <param name="aPrevPosition"></param>
+        private int SetSpecificationPosition(List<Tuple<string, int>> aPositions, Component aComponent, int aPrevPosition)
+        {
+            int retposition = 0;
+            if (aPositions != null)
+            {
+                string name = aComponent.GetProperty(Constants.ComponentName);
+                string designator = aComponent.GetProperty(Constants.ComponentSign);
+                string val = ($"{name} {designator}").Trim();
+                var positions = aPositions.Where(item => string.Equals(item.Item1, val));
+                if (positions != null && positions.Count() > 0)
+                {
+                    if (positions.Count() == 1)
+                    {
+                        retposition = positions.First().Item2;
+                        aComponent.SetPropertyValue(Constants.ComponentPosition, retposition.ToString());
+                    } else
+                    {
+                        foreach (var pos in positions)
+                        {
+                            retposition = pos.Item2;
+                            if (retposition != 0 && (retposition - aPrevPosition == 1))
+                            {
+                                aComponent.SetPropertyValue(Constants.ComponentPosition, retposition.ToString());
+                                return retposition;
+                            }
+                        }
+                    }
+                }
+            }
+            return retposition;
+        }
 
         private void UpdateComponentGroupInfo(IList<Component> aComponents, DocType aDocType, SubGroupInfo aGroupInfo)
         {

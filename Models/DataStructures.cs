@@ -40,6 +40,10 @@ namespace GostDOC.Models
         public List<Component> Components { get; set; } = new List<Component>();
         public IDictionary<string, Group> SubGroups { get; set; } = new Dictionary<string, Group>();
 
+        /// <summary>
+        /// глубокое копирование группы
+        /// </summary>
+        /// <returns></returns>
         public Group DeepCopy()
         {
             Group copy = (Group)this.MemberwiseClone();
@@ -48,6 +52,7 @@ namespace GostDOC.Models
                                                              entry => entry.Value.DeepCopy());
             if(this.Components?.Count > 0)
                 copy.Components = new List<Component>(this.Components);
+
             return copy;
         }
     }
@@ -57,11 +62,36 @@ namespace GostDOC.Models
         public string Name { get; set; }
         public IDictionary<string, string> Graphs { get; set; } = new Dictionary<string, string>();
 
-        public IDictionary<string, Group> Specification { get; set; } = new OrderedDictionary<string, Group>();// new Dictionary<string, Group>();
+        public IDictionary<string, Group> Specification { get; set; } = new OrderedDictionary<string, Group>();
         
         public IDictionary<string, Group> Bill { get; set; } = new Dictionary<string, Group>();
         public Group D27 { get; set; } = new Group();
 
+        /// <summary>
+        /// изменить автосортировку
+        /// </summary>
+        /// <param name="aEnable">включить - <c>true</c>, отключить - <c>false</c></param>
+        public void ChangeAutoSort(bool aEnable)
+        {
+            D27.AutoSort = aEnable;
+            void ChangeAutoSortInGroups(IDictionary<string, Group> aGroups)
+            {
+                foreach (var grp in aGroups)
+                {
+                    grp.Value.AutoSort = aEnable;
+                    if (grp.Value.SubGroups.Count() > 0)
+                        foreach (var subgrp in grp.Value.SubGroups)
+                            subgrp.Value.AutoSort = aEnable;
+                }
+            }
+            ChangeAutoSortInGroups(Bill);
+            ChangeAutoSortInGroups(Specification);
+        }
+
+        /// <summary>
+        /// глубокое копировани конфигурации
+        /// </summary>
+        /// <returns></returns>
         public Configuration DeepCopy()
         {
             Configuration copy = (Configuration)this.MemberwiseClone();
@@ -89,5 +119,15 @@ namespace GostDOC.Models
         public ProjectType Type { get; set; } = ProjectType.GostDoc;
         public string Version { get; set; }
         public IDictionary<string, Configuration> Configurations { get; } = new Dictionary<string, Configuration>();
+
+        /// <summary>
+        /// изменить автосортировку во всем проекте
+        /// </summary>
+        /// <param name="aEnable">if set to <c>true</c> [a enable].</param>
+        public void ChangeAutoSort(bool aEnable)
+        {
+            foreach (var cfg in Configurations)
+                cfg.Value.ChangeAutoSort(aEnable);
+        }
     }
 }
