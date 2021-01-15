@@ -21,6 +21,7 @@ namespace GostDOC.ExcelExport
 
         private int _complexColumn = 0;
         private int _complexRow = 0;
+        private ComplexD27 _complex;
 
         public ExportD27()
         {
@@ -75,6 +76,7 @@ namespace GostDOC.ExcelExport
             _nextColor = FirstColor;
             _complexColumn = 2;
             _complexRow = 1;
+            _complex = null;
 
             foreach (var gp in _components)
             {
@@ -84,26 +86,26 @@ namespace GostDOC.ExcelExport
 
         private void Process(Excel._Worksheet aWs, Group aGroup)
         {
-            ComplexD27 complex = new ComplexD27();
+            _complex = new ComplexD27();
             // Prepare print structure
-            ProcessGroup(complex, aGroup);
+            ProcessGroup(_complex, aGroup);
             // Print headers
-            Print(aWs, complex);
+            Print(aWs, _complex);
 
             // Sum
-            int lastCol = complex.Size.Width + 2;
+            int lastCol = _complex.Size.Width + 2;
             aWs.Cells[1, lastCol] = "Итого";
-            var range = aWs.MergeRange(1, lastCol, complex.Size.Height, lastCol, 2);
+            var range = aWs.MergeRange(1, lastCol, _complex.Size.Height, lastCol, 2);
             range.Orientation = 90;
 
             // Supplier
-            int suplier = complex.Size.Width + 3;
+            int suplier = _complex.Size.Width + 3;
             aWs.Cells[1, suplier] = "Поставщик";
-            var rangeSup = aWs.MergeRange(1, suplier, complex.Size.Height, suplier, 2);
+            var rangeSup = aWs.MergeRange(1, suplier, _complex.Size.Height, suplier, 2);
             rangeSup.Orientation = 90;
 
             // Print components
-            int row = complex.Size.Height;
+            int row = _complex.Size.Height;
             foreach (var gp in _components)
             {
                 if (gp.Components.Count == 0)
@@ -129,12 +131,14 @@ namespace GostDOC.ExcelExport
                 }
             }
             // Merge general name cells
-            aWs.MergeRange(1, 1, complex.Size.Height, 1, 2);
+            aWs.MergeRange(1, 1, _complex.Size.Height, 1, 2);
         }
 
         private void Print(Excel._Worksheet aWs, ComplexD27 aSrc)
         {
             _nextColor++;
+            int endRow = _complex.Size.Height;
+
             if (aSrc.SubComplex?.Count > 0)
             {
                 // Set name
@@ -143,7 +147,7 @@ namespace GostDOC.ExcelExport
                 aWs.MergeRange(aSrc.Row, aSrc.Column, aSrc.Row, aSrc.Column + aSrc.Size.Width - 1, _nextColor);
                 aWs.GroupRange(aSrc.Row, aSrc.Column + 1, aSrc.Row, aSrc.Column + aSrc.Size.Width - 1);
                 // vertical
-                aWs.MergeRange(aSrc.Row + 1, aSrc.Column, aSrc.Row + aSrc.Size.Height - 1, aSrc.Column, _nextColor);
+                aWs.MergeRange(aSrc.Row + 1, aSrc.Column, endRow, aSrc.Column, _nextColor);
 
                 foreach (var complex in aSrc.SubComplex)
                 {
@@ -155,7 +159,7 @@ namespace GostDOC.ExcelExport
                 // Set name
                 aWs.Cells[aSrc.Row, aSrc.Column] = aSrc.Name;
                 // vertical only
-                var range = aWs.MergeRange(aSrc.Row, aSrc.Column, aSrc.Row + aSrc.Size.Height - 1, aSrc.Column, _nextColor);
+                var range = aWs.MergeRange(aSrc.Row, aSrc.Column, endRow, aSrc.Column, _nextColor);
                 range.Orientation = 90;
             }            
         }
@@ -198,6 +202,7 @@ namespace GostDOC.ExcelExport
                 string supplier = cmp.GetProperty(Constants.ComponentSupplier);
                 if(string.IsNullOrEmpty(supplier))
                     supplier = cmp.GetProperty(Constants.ComponentManufacturer);
+
                 ComponentD27 component = new ComponentD27()
                 {
                     Name = name,
