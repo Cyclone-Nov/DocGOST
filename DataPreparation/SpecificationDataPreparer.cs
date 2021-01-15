@@ -217,6 +217,7 @@ namespace GostDOC.DataPreparation
             AddGroup(aTable, Constants.GroupMaterials, data, ref aPosition, aPositions);
             AddGroup(aTable, Constants.GroupKits, data, ref aPosition, aPositions);
 
+            AddEmptyRow(aTable);
             aTable.AcceptChanges();
         }
 
@@ -247,7 +248,7 @@ namespace GostDOC.DataPreparation
             var сomponents = group.Components;
             AddComponents(aTable, сomponents, ref aPos, aPositions, !string.Equals(aGroupName, Constants.GroupDoc) && !string.Equals(aGroupName, Constants.GroupComplex));
             
-            if (сomponents.Count > 0 || group.SubGroups?.Count > 0)
+            if (сomponents.Count > 0)
             {
                 AddEmptyRow(aTable);
             }
@@ -259,6 +260,7 @@ namespace GostDOC.DataPreparation
                 {
                     string subGroupName = GetSubgroupNameByCount(subgroup);                    
                     AddSubgroup(aTable, subGroupName, subgroup.Value.Components, ref aPos, aPositions);
+                    AddEmptyRow(aTable);
                 }
             }
 
@@ -268,8 +270,11 @@ namespace GostDOC.DataPreparation
                 if (subgroup_other.Components.Count > 0)
                 {                       
                     AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, subgroup_other.Components, ref aPos, aPositions);
-                }
+                    AddEmptyRow(aTable);
+                }                
             }
+
+            RemoveLastRow(aTable);
         }
 
 
@@ -283,11 +288,8 @@ namespace GostDOC.DataPreparation
             if (AddGroupName(aTable, aGroupName))
                 AddEmptyRow(aTable);
 
-            AddComponents(aTable, aSortComponents, ref aPos, aPositions);
-
-            AddEmptyRow(aTable);
+            AddComponents(aTable, aSortComponents, ref aPos, aPositions);                        
             aTable.AcceptChanges();
-
             return true;
         }
 
@@ -419,7 +421,7 @@ namespace GostDOC.DataPreparation
         /// <param name="table">The table.</param>
         private void AddConfigsVariableDataSign(DataTable aTable)
         {
-            AddEmptyRow(aTable);
+            //AddEmptyRow(aTable);
             var row = aTable.NewRow();
             row[Constants.ColumnSign] = new FormattedString { Value = "Переменные данные", IsUnderlined = true, TextAlignment = TextAlignment.RIGHT };
             row[Constants.ColumnName] = new FormattedString { Value = "для исполнений", IsUnderlined = true, TextAlignment = TextAlignment.LEFT };            
@@ -562,6 +564,14 @@ namespace GostDOC.DataPreparation
             }
         }
 
+        private void RemoveLastRow(DataTable table)
+        {
+            if (table.Rows.Count > 1)
+            {
+                int last_index = table.Rows.Count - 1;                
+                table.Rows.RemoveAt(last_index);
+            }
+        }
 
         private bool IsEmptyRow(DataTable aTable, int aIndex)
         {

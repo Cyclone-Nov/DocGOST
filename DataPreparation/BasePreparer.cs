@@ -35,21 +35,21 @@ public abstract class BasePreparer {
     /// <summary>
     /// формирование таблицы данных
     /// </summary>
-    /// <param name="aConfigs">a configs.</param>
+    /// <param name="aConfigs">словарь конфигураций типа IDictionary<string ConfigName, Configuration Config>, где ConfigName - имя конфигурации, Config - конфигурация</param>
     /// <returns></returns>
     public abstract DataTable CreateDataTable(IDictionary<string, Configuration> aConfigs);
 
     /// <summary>
-    /// Gets the document sign.
+    /// Получить обозначение документа
     /// </summary>
-    /// <param name="aMainConfig">a main configuration.</param>
+    /// <param name="aMainConfig">основная конфигурация (-00)</param>
     /// <returns></returns>
     public abstract string GetDocSign(Configuration aMainConfig);
 
     /// <summary>
     /// создать таблицу данных
     /// </summary>
-    /// <param name="aDataTableName">Name of a data table.</param>
+    /// <param name="aDataTableName">имя таблицы данных</param>
     /// <returns></returns>
     protected abstract DataTable CreateTable(string aDataTableName);
 
@@ -58,40 +58,27 @@ public abstract class BasePreparer {
     /// </summary>
     /// <param name="aConfig"></param>
     /// <returns></returns>
-    protected static string GetSchemaDesignation(Configuration aConfig, out string outDocCode) {
-        string designation = string.Empty;
-        Group docs;
+    protected static string GetSchemaDesignation(Configuration aConfig, out string outDocCode) 
+    {
+        string designation = string.Empty;        
         outDocCode = "ПЭ3";
-        if (aConfig.Specification.TryGetValue(Constants.GroupDoc, out docs)) {
-            if (docs.Components.Count() > 0 || docs.SubGroups.Count() > 0) {
-                var docсomponents = docs.Components.Where(val =>
-                    val.GetProperty(Constants.ComponentName).ToLower().Contains(Constants.DOC_SCHEMA.ToLower()));
+        if (aConfig.Specification.TryGetValue(Constants.GroupDoc, out var docs)) {
+            if (docs.Components.Count() > 0 || docs.SubGroups.Count() > 0) 
+            {
+                var docсomponents = docs.Components.Where(val => val.GetProperty(Constants.ComponentName).ToLower().Contains(Constants.DOC_SCHEMA.ToLower()));                
+                // в любом случае берем первую
                 if (docсomponents.Count() > 0) {
-                    // если заканчивается на c3 или э3, то берем ее.
-                    //var shemas = docсomponents.Where(val => (
-                    //    val.GetProperty(Constants.ComponentDocCode).EndsWith("С3") ||
-                    //    val.GetProperty(Constants.ComponentDocCode).EndsWith("Э3"))
-                    //);
-
-                    
-                    // в любом случае берем первую
-                    if (docсomponents.Count() > 0) {
-                        designation = docсomponents.First().GetProperty(Constants.ComponentSign);
-                        outDocCode = "П"+ docсomponents.First().GetProperty(Constants.ComponentDocCode);
-                    }
-                    else {
-                        designation = docсomponents.First().GetProperty(Constants.ComponentSign);
-                    }
+                    designation = docсomponents.First().GetProperty(Constants.ComponentSign);
+                    outDocCode = "П"+ docсomponents.First().GetProperty(Constants.ComponentDocCode);
                 }
                 else {
-                    // log: в исходном xml файле документов не найдено (раздел Документация пуст)
+                    designation = docсomponents.First().GetProperty(Constants.ComponentSign);
                 }
             }
             else {
                 // log: в исходном xml файле документов не найдено (раздел Документация пуст)
             }
         }
-
         return designation;
     }
 
@@ -102,56 +89,42 @@ public abstract class BasePreparer {
     /// <param name="aConfigs">список всез конфигураций</param>
     /// <returns>список словарей элементов</returns>
     protected IEnumerable<Dictionary<string, Component>>
-    MakeComponentDesignatorsDictionaryOtherConfigs(IDictionary<string, Configuration> aConfigs) {
+    MakeComponentDesignatorsDictionaryOtherConfigs(IDictionary<string, Configuration> aConfigs)
+    {
         var result = new List<Dictionary<string, Component>>();
+        void AddSelectedComponents(Group aGroup, Dictionary<string, Component> aDic)
+        {
+            if (aGroup.Components.Count() > 0 || aGroup.SubGroups.Count() > 0)
+            {
+                // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
+                var mainсomponents = aGroup.Components.Where(val =>
+                    !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
+                foreach (var comp in mainсomponents)
+                        aDic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
+
+                foreach (var subgroup in aGroup.SubGroups.OrderBy(key => key.Key))
+                {
+                    // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
+                    var сomponents = subgroup.Value.Components.Where(val =>
+                        !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
+                    foreach (var comp in сomponents)
+                            aDic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
+                }
+
+                result.Add(aDic);
+            }
+        }
+
         // ваыбираем все конфигурации кроме базовой
         var configs = aConfigs.Where(val => !string.Equals(val.Key, Constants.MAIN_CONFIG_INDEX));
-
-        foreach (var config in configs) {
-            Dictionary<string, Component> dic = new Dictionary<string, Component>();
-            Group others;
-            Group units;
-            if (config.Value.Specification.TryGetValue(Constants.GroupOthers, out others)) {
-                if (others.Components.Count() > 0 || others.SubGroups.Count() > 0) {
-                    // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
-                    var mainсomponents = others.Components.Where(val =>
-                        !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
-                    foreach (var comp in mainсomponents)
-                        dic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
-
-                    foreach (var subgroup in others.SubGroups.OrderBy(key => key.Key)) {
-                        // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
-                        var сomponents = subgroup.Value.Components.Where(val =>
-                            !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
-                        foreach (var comp in сomponents)
-                            dic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
-                    }
-
-                    result.Add(dic);
-                }
-
-                if (config.Value.Specification.TryGetValue(Constants.GroupAssemblyUnits, out units))
-                {
-                    if (units.Components.Count() > 0 || units.SubGroups.Count() > 0)
-                    {
-                        // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
-                        var mainсomponents = units.Components.Where(val =>
-                            !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
-                        foreach (var comp in mainсomponents)
-                            dic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
-
-                        foreach (var subgroup in units.SubGroups.OrderBy(key => key.Key))
-                        {
-                            // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
-                            var сomponents = subgroup.Value.Components.Where(val =>
-                                !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
-                            foreach (var comp in сomponents)
-                                dic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
-                        }
-
-                        result.Add(dic);
-                    }
-                }
+        foreach (var config in configs) 
+        {
+            Dictionary<string, Component> dic = new Dictionary<string, Component>();                        
+            if (config.Value.Specification.TryGetValue(Constants.GroupOthers, out var others))
+            {
+                AddSelectedComponents(others, dic);
+                if (config.Value.Specification.TryGetValue(Constants.GroupAssemblyUnits, out var units))                
+                    AddSelectedComponents(units, dic);                
             }
         }
 

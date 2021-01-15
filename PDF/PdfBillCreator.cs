@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GostDOC.Common;
 using GostDOC.DataPreparation;
 using GostDOC.Models;
@@ -87,8 +85,11 @@ namespace GostDOC.PDF
             }
         
             if (_pdfDoc.GetNumberOfPages() > PdfDefines.MAX_PAGES_WITHOUT_CHANGELIST) {
-                _currentPageNumber++;
-                AddRegisterList(_doc, graphs, _currentPageNumber);
+                _currentPageNumber++;                
+                AddRegisterList(_doc, graphs, _currentPageNumber, 
+                                new Dictionary<string, object>() { 
+                                    { Constants.AppParamDocSign, Constants.BillDocSign } 
+                                });
             }
 
             _doc.Close();            
@@ -103,7 +104,9 @@ namespace GostDOC.PDF
             // добавить таблицу с нижней дополнительной графой
             aInDoc.Add(CreateBottomAppendGraph(aGraphs));
 
-            var titleBlock = CreateFirstTitleBlock(new TitleBlockStruct {PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, CurrentPage = 1,  DocType = DocType.Bill});            
+            var titleBlock = CreateFirstTitleBlock(new TitleBlockStruct {
+                PageSize = _pageSize, Graphs = aGraphs, Pages = aCountPages, CurrentPage = 1,  DocType = DocType.Bill, DocSign = Constants.BillDocSign
+            });            
             titleBlock.SetFixedPosition(
                 PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -14.7f -5f, 
                 BOTTOM_MARGIN, 
@@ -137,7 +140,9 @@ namespace GostDOC.PDF
             SetPageMargins(aInDoc);
             aInDoc.Add(CreateBottomAppendGraph(aGraphs));
 
-            var titleBlock = CreateNextTitleBlock(new TitleBlockStruct { PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber, CurrentPage = aPageNumber, DocType = DocType.Bill });
+            var titleBlock = CreateNextTitleBlock(new TitleBlockStruct {
+                PageSize = _pageSize, Graphs = aGraphs, Pages = aPageNumber, CurrentPage = aPageNumber, DocType = DocType.Bill, DocSign = Constants.BillDocSign
+            });
             titleBlock.SetFixedPosition(PdfDefines.A3Height-RIGHT_MARGIN-TITLE_BLOCK_WIDTH+LEFT_MARGIN -14.8f-5f, 
                                         BOTTOM_MARGIN, 
                                         TITLE_BLOCK_WIDTH);
@@ -438,12 +443,6 @@ namespace GostDOC.PDF
                 return true;
             }
             return false;
-        }
-
-
-        void WriteRowToTable(Table aTable, DataRow aRow)
-        { 
-            
         }
 
     }

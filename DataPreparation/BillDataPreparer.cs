@@ -14,7 +14,6 @@ namespace GostDOC.DataPreparation
 {
     internal class BillDataPreparer : BasePreparer
     {
-
         public override string GetDocSign(Configuration aMainConfig)
         {
             return "ВП";
@@ -119,11 +118,9 @@ namespace GostDOC.DataPreparation
         /// <returns></returns>
         private IDictionary<string, Configuration> PrepareConfigs(IDictionary<string, Configuration> aConfigs, out Configuration aMainConfig)
         {
-            if (aConfigs == null || !aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))
-            {
-                aMainConfig = null;
-                return null;
-            }
+            aMainConfig = null;
+            if (aConfigs == null || !aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))               
+                return null;            
             
             if (aConfigs.Count() == 1)
             {
@@ -131,81 +128,64 @@ namespace GostDOC.DataPreparation
                 return null;
             }
 
-            // если конфигураций несколько
-            IDictionary<string, Configuration> preparedConfigs = new Dictionary<string, Configuration>();
-            aMainConfig = new Configuration();
-            aMainConfig.Graphs = mainConfig.Graphs;
-            var deltaMainConfig = new Configuration();
-            deltaMainConfig.Graphs = mainConfig.Graphs;
+            // если конфигураций несколько            
+            aMainConfig = new Configuration() { Graphs = mainConfig.Graphs }; //aMainConfig.Graphs = mainConfig.Graphs;            
+            var deltaMainConfig = new Configuration() { Graphs = mainConfig.Graphs }; //deltaMainConfig.Graphs = mainConfig.Graphs;            
             var mainData = mainConfig.Bill;
 
-            Dictionary<string, Configuration> otherConfigs = new Dictionary<string, Configuration>();
-            foreach (var config in aConfigs)
+            // выберем все конфигурации кроме основной в отдельный словарь
+            Dictionary<string, Configuration> otherConfigs = 
+                    aConfigs.Where(cfg => !string.Equals(cfg.Key, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase)).
+                    ToDictionary(key => key.Key, value => value.Value.DeepCopy());
+
+            Dictionary<string, Configuration> otherConfigs2 = new Dictionary<string, Configuration>();
+            foreach (var config in aConfigs)            
+                if (!string.Equals(config.Key, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))                
+                    otherConfigs2.Add(config.Key, config.Value.DeepCopy());
+                
+            void AddComponentToConfigGroup(IDictionary<string, Group> aConfig, string aGroupName, Component aCmp, bool aIncludeInAll = false)
             {
-                if (!string.Equals(config.Key, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))
+                if (!aConfig.ContainsKey(aGroupName))
                 {
-                    otherConfigs.Add(config.Key, config.Value.DeepCopy());
+                    aConfig.Add(aGroupName, new Group());
+                    if(aIncludeInAll)
+                        aConfig[aGroupName].Name = aGroupName;
                 }
+                aConfig[aGroupName].Components.Add(aCmp);
+            }
+
+            void AddComponentToConfigSubGroup(IDictionary<string, Group> aConfig, string aGroupName, string aSubGroupName, Component aCmp)
+            {
+                if (!aConfig.ContainsKey(aGroupName))                
+                    aConfig.Add(aGroupName, new Group());
+                    
+                if (!aConfig[aGroupName].SubGroups.ContainsKey(aSubGroupName))                
+                    aConfig[aGroupName].SubGroups.Add(aSubGroupName, new Group());
+                
+                aConfig[aGroupName].SubGroups[aSubGroupName].Components.Add(aCmp);
             }
 
             foreach (var group in mainData.OrderBy(key => key.Key))
             {
                 foreach (var component in group.Value.Components)
                 {
-                    if (CheckComponent(otherConfigs, component, group.Key))
-                    {
-                        if (!aMainConfig.Bill.ContainsKey(group.Key))
-                        {
-                            aMainConfig.Bill.Add(group.Key, new Group());
-                            aMainConfig.Bill[group.Key].Name = group.Key;
-                        }
-                        aMainConfig.Bill[group.Key].Components.Add(component);
-                    }
-                    else
-                    {
-                        if(!deltaMainConfig.Bill.ContainsKey(group.Key))
-                        {   
-                            deltaMainConfig.Bill.Add(group.Key, new Group());                            
-                        }
-                        deltaMainConfig.Bill[group.Key].Components.Add(component);
-                        //otherConfigs[Constants.MAIN_CONFIG_INDEX].Bill[group.Key].Components.Add(component);
-                    }
+                    bool inAllConfigs = IsComponentInAllConfigs(otherConfigs, component, group.Key);
+                    var config = inAllConfigs ? aMainConfig.Bill : deltaMainConfig.Bill;
+                    AddComponentToConfigGroup(config, group.Key, component, inAllConfigs);                    
                 }
 
-                foreach (var subgroup in group.Value.SubGroups.OrderBy(key2 => key2.Key))
+                foreach (var subgroup in group.Value.SubGroups.OrderBy(subkey => subkey.Key))
                 {
                     foreach (var component in subgroup.Value.Components)
-                    {
-                        if (CheckComponent(otherConfigs, component, group.Key, subgroup.Key))
-                        {
-                            if (!aMainConfig.Bill.ContainsKey(group.Key))
-                            {
-                                aMainConfig.Bill.Add(group.Key, new Group());
-                            }
-                            if (!aMainConfig.Bill[group.Key].SubGroups.ContainsKey(subgroup.Key))
-                            {
-                                aMainConfig.Bill[group.Key].SubGroups.Add(subgroup.Key, new Group());
-                            }
-                            aMainConfig.Bill[group.Key].SubGroups[subgroup.Key].Components.Add(component);
-                        } else
-                        {
-                            if (!deltaMainConfig.Bill.ContainsKey(group.Key))
-                            {
-                                deltaMainConfig.Bill.Add(group.Key, new Group());
-                            }
-                            if (!deltaMainConfig.Bill[group.Key].SubGroups.ContainsKey(subgroup.Key))
-                            {
-                                deltaMainConfig.Bill[group.Key].SubGroups.Add(subgroup.Key, new Group());
-                            }
-                            deltaMainConfig.Bill[group.Key].SubGroups[subgroup.Key].Components.Add(component);                            
-                        }
+                    {                        
+                        var config = IsComponentInAllConfigs(otherConfigs, component, group.Key, subgroup.Key) ? aMainConfig.Bill : deltaMainConfig.Bill;
+                        AddComponentToConfigSubGroup(config, group.Key, subgroup.Key, component);                        
                     }
                 }
             }
-
-            preparedConfigs = otherConfigs;
+                        
+            var preparedConfigs = otherConfigs;
             preparedConfigs.Add(Constants.MAIN_CONFIG_INDEX, deltaMainConfig);
-
             return preparedConfigs;
         }
 
@@ -458,7 +438,7 @@ namespace GostDOC.DataPreparation
         /// <param name="aGroupName">Name of a group.</param>
         /// <param name="aOtherConfigs">a other configs.</param>
         /// <returns></returns>
-        private bool CheckComponent(Dictionary<string, Configuration> aOtherConfigs, Component aComponent, string aGroupName, string aSubGroupName = "")
+        private bool IsComponentInAllConfigs(Dictionary<string, Configuration> aOtherConfigs, Component aComponent, string aGroupName, string aSubGroupName = "")
         {            
             List<Component> removeList = null;            
             bool bRemoveGroup = false;

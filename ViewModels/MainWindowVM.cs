@@ -58,6 +58,11 @@ namespace GostDOC.ViewModels
         private Progress _progress;
         private LogView _logView = null;
 
+        /// <summary>
+        /// признак расчета позиции для компонентов спецификации
+        /// </summary>
+        private bool _isSpecPositionsRecalculated = false;
+
         private PurchaseDepartment _purchaseDepartment = new PurchaseDepartment();
 
         public ObservableProperty<string> Title { get; } = new ObservableProperty<string>();
@@ -432,6 +437,9 @@ namespace GostDOC.ViewModels
 
         private void TreeViewSelectionChanged(Node obj)
         {
+            if(_isSpecPositionsRecalculated)
+                IsAutoSortEnabled.Value = false;
+
             SaveData();
 
             _selectedItem = obj;
@@ -477,7 +485,7 @@ namespace GostDOC.ViewModels
         {
             var cmp = new ComponentVM();
             cmp.CountDev.Value = 0;
-            cmp.IsReadOnly = true;
+            cmp.IsReadOnly = true;            
             Components.Add(cmp);
             UpdateUndoRedoComponents();
         }
@@ -674,8 +682,8 @@ namespace GostDOC.ViewModels
                 _docManager.PreparePDF(_docType);
                 CurrentPdfData.Value = _docManager.GetPdfData(_docType);
             }
-
         }
+
 
         private Tuple<string, string> GetGroups(MenuNode obj)
         {
@@ -958,7 +966,7 @@ namespace GostDOC.ViewModels
                 DocNodes.Clear();
 
                 if (OpenFile(path))
-                {
+                {                    
                     DocNodes.Add(aNode);
                     IsSaveEnabled.Value = (aDocType == DocType.Specification || aDocType == DocType.Bill);                    
                 }
@@ -971,32 +979,40 @@ namespace GostDOC.ViewModels
                 HideTables();
             }            
         }
+
         private bool OpenFile(string aFilePath)
         {
+            // сбросим флаг расчета позиции при загрузке нового документа
+            _isSpecPositionsRecalculated = false;
+            _specifiactionPositionsDic?.Clear();
+            _specifiactionPositionsDic = null;
+
             // Save current file name only if one file was selected
             _filePath = aFilePath;
-            // Save file path to title
-            UpdateTitle();
-
+            
             ClearVisible();
 
             // Parse xml files
             switch (_docManager.LoadData(_filePath, _docType))
             {
                 case OpenFileResult.Ok:
+                    // update title by path
+                    UpdateTitle(_filePath);
                     // Update visual data
                     UpdateData();
                     // Show errors
-                    ShowErrors();
-                    // Success
+                    ShowErrors();                                     
                     return true;
                 case OpenFileResult.FileFormatError:
-                    System.Windows.MessageBox.Show("Попытка открыть файл ведомости в другом режиме!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Windows.MessageBox.Show($"Попытка открыть файл ведомости ({_filePath}) в другом режиме!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
                 case OpenFileResult.Fail:
-                    System.Windows.MessageBox.Show("Некорректный Формат файла!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Windows.MessageBox.Show($"Некорректный Формат файла ({_filePath})!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
             }
+
+            // update title
+            UpdateTitle(string.Empty);
             return false;
         }
 
@@ -1103,22 +1119,22 @@ namespace GostDOC.ViewModels
                 return;
             }
 
-            if (aAutoSort == null)
-                IsAutoSortEnabled.Value = groupData.AutoSort;
-            else
-            {
-                IsAutoSortEnabled.Value = groupData.AutoSort = (bool)aAutoSort;                
+            IsAutoSortEnabled.Value = aAutoSort ?? groupData.AutoSort;            
+
+            // для спецификации проверим признак рачета позиции и отключим автосортировку
+            if (_docType == DocType.Specification && _isSpecPositionsRecalculated)
+            {                
+                IsAutoSortEnabled.Value = false;
             }
 
             // Fill components
             Components.Clear();
                         
-            var positions = GetSpecificationPositions();
-            int lastPosition = 0;
+            //var positions = GetSpecificationPositions();
+            //int lastPosition = 0;
             foreach (var component in groupData.Components)
             {
-                lastPosition = SetSpecificationPosition(positions, component, lastPosition);
-
+                //lastPosition = SetSpecificationPosition(positions, component, lastPosition);
                 //add position here
                 Components.Add(new ComponentVM(component));
             }
@@ -1362,15 +1378,15 @@ namespace GostDOC.ViewModels
             }
         }
 
-        private void UpdateTitle()
+        private void UpdateTitle(string aPath = "")
         {
-            if (string.IsNullOrEmpty(_filePath))
+            if (string.IsNullOrEmpty(aPath))
             {
                 Title.Value = GetDefaultWindowTitle();
             }
             else
             {
-                Title.Value = GetDefaultWindowTitle() + " - " + Path.GetFileName(_filePath);
+                Title.Value = GetDefaultWindowTitle() + " - " + Path.GetFileName(aPath);
             }
         }
         private void UpdateUndoRedoComponents()
@@ -1438,6 +1454,12 @@ namespace GostDOC.ViewModels
                         if (positions != null && positions is Dictionary<string, List<Tuple<string, int>>>)
                         {
                             _specifiactionPositionsDic = ((Dictionary<string, List<Tuple<string, int>>>)positions);
+                            _isSpecPositionsRecalculated = true;
+                            IsAutoSortEnabled.Value = false;
+
+                            // update position in whole project??
+                            _project.UpdateSpecificationPositions(_specifiactionPositionsDic);
+
                             UpdateGroup(false);
                         }
                     }
@@ -1489,32 +1511,21 @@ namespace GostDOC.ViewModels
         #endregion PURCHASE DEPARTMENT
 
         private Tuple<string, string> GetSpecificationPositionDicKey()
-        {
-            //string subgroup_name = string.Empty;
+        {            
             string group_name = string.Empty;
             string config_name = string.Empty;
             var item = _selectedItem;
-            if (item.NodeType == NodeType.Component)
-            {
+            if (item.NodeType == NodeType.Component)            
                 item = _selectedItem.Parent;
-            }
-
-            if (item.NodeType == NodeType.SubGroup)
-            {
-                //subgroup_name = item.Name;
+            if (item.NodeType == NodeType.SubGroup)                            
                 item = item.Parent;
-            }
-
             if (item.NodeType == NodeType.Group)
             {
                 group_name = item.Name;
                 item = item.Parent;
             }
-
-            if (item.NodeType == NodeType.Configuration)
-            {
-                config_name = item.Name;                
-            }
+            if (item.NodeType == NodeType.Configuration)            
+                config_name = item.Name;
                         
             return new Tuple<string, string>(($"{config_name} {group_name}").Trim(), group_name);
         }
@@ -1526,12 +1537,10 @@ namespace GostDOC.ViewModels
         private List<Tuple<string, int>> GetSpecificationPositions()
         {
             if (_specifiactionPositionsDic != null)
-            {
-                List<Tuple<string, int>> positions = null;
-                var key = GetSpecificationPositionDicKey();
-                if (_specifiactionPositionsDic.ContainsKey(key.Item1))
-                    positions = _specifiactionPositionsDic[key.Item1];                
-                return positions;
+            {                
+                var key = GetSpecificationPositionDicKey().Item1;
+                if (_specifiactionPositionsDic.TryGetValue(key, out var positions))                
+                    return positions;                
             }
             return null;
         }
@@ -1541,6 +1550,7 @@ namespace GostDOC.ViewModels
         /// </summary>
         /// <param name="aPositions"></param>
         /// <param name="aComponent"></param>
+        /// <param name="aPrevPosition"></param>
         private int SetSpecificationPosition(List<Tuple<string, int>> aPositions, Component aComponent, int aPrevPosition)
         {
             int retposition = 0;
@@ -1586,8 +1596,7 @@ namespace GostDOC.ViewModels
             }
             else
             {
-                //FirstOrDefault
-                //var val = GeneralGraphValues.Where(k => string.Equals(k.Name.Value, "Обозначение")).ToArray();
+                //FirstOrDefault                
                 var val = GeneralGraphValues.First(k => string.Equals(k.Name.Value, "Обозначение"));
                 if (val != null && !string.IsNullOrEmpty(val.Text.Value))
                 {
@@ -1600,11 +1609,13 @@ namespace GostDOC.ViewModels
             return filename;
         }
 
+
         private void ClearVisible()
         {
             GeneralGraphValues.Clear();
             Components.Clear();
         }
+
 
         private void AddComponent(ComponentVM aComponent)
         {
