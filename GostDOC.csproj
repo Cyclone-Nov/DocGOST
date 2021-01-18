@@ -545,7 +545,15 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Tests\Common\" />
+    <Folder Include="Tests\Converters\" />
+    <Folder Include="Tests\DataPreparation\" />
+    <Folder Include="Tests\Model\" />
+    <Folder Include="Tests\PDF\" />
+    <Folder Include="Tests\ViewModel\" />
+    <Folder Include="Tests\XML\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (powershell Compress-Archive -Path '$(TargetDir)*' -DestinationPath '$(SolutionDir)\gostdoc.zip' -Force)
