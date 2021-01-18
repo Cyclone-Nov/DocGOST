@@ -9,7 +9,7 @@ namespace GostDOC.ExcelExport
     {
         public static dynamic MergeRange(this Excel._Worksheet ws, int r1, int c1, int r2, int c2, int col)
         {
-            var range = ws.Range[ws.Cells[r1, c1], ws.Cells[r2, c2]];
+            Excel.Range range = ws.Range[ws.Cells[r1, c1], ws.Cells[r2, c2]];
             range.Merge();
             range.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
             range.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
@@ -20,8 +20,9 @@ namespace GostDOC.ExcelExport
 
         public static dynamic GroupRange(this Excel._Worksheet ws, int r1, int c1, int r2, int c2)
         {
-            var range = ws.Range[ws.Cells[r1, c1], ws.Cells[r2, c2]];
+            Excel.Range range = ws.Range[ws.Cells[r1, c1], ws.Cells[r2, c2]];       
             range.Group();
+            range.WrapText = true;
             return range;
         }
 
