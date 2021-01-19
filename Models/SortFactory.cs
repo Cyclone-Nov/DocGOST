@@ -87,8 +87,11 @@ namespace GostDOC.Models
             if (string.IsNullOrEmpty(y))
                 return 1;
 
-            Tuple<string, int> dX = Common.Converters.SplitDesignatorToStringAndNumber(x);//x.GetProperty(Constants.ComponentDesignatorID);
-            Tuple<string, int> dY = Common.Converters.SplitDesignatorToStringAndNumber(y);// y.GetProperty(Constants.ComponentDesignatorID);
+            if (!Common.Converters.SplitDesignatorToStringAndNumber(x, out var dX))
+                return -1;
+
+            if (!Common.Converters.SplitDesignatorToStringAndNumber(y, out var dY))
+                return 1;
 
             int result = string.Compare(dX.Item1, dY.Item1);
 
