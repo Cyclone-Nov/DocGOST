@@ -241,20 +241,20 @@ internal class PdfElementListCreator : PdfCreator {
                 AddEmptyRowToPdfTable(tbl, 1, 4, leftPaddCell, remainingPdfTableRows == 1 ? true : false);
                 remainingPdfTableRows--;
             }            
-            else if (IsGroupName(row)) // это наименование группы
-            {                
-                if (remainingPdfTableRows > 4 || ((remainingPdfTableRows > 1) && !string.IsNullOrEmpty(nextPosition)))
-                {
-                    // если есть место для записи более 4 строк то записываем группу, иначе выходим
-                    tbl.AddCell(centrAlignCell.Clone(false));
-                    tbl.AddCell(centrAlignCell.Clone(true).Add(new Paragraph(name.Value)));
-                    tbl.AddCell(centrAlignCell.Clone(false));
-                    tbl.AddCell(leftPaddCell.Clone(false));
-                    remainingPdfTableRows--;
-                }
-                else                 
-                    break;                
-            }
+            //else if (IsGroupName(row)) // это наименование группы
+            //{                
+            //    if (remainingPdfTableRows > 4 || ((remainingPdfTableRows > 1) && !string.IsNullOrEmpty(nextPosition)))
+            //    {
+            //        // если есть место для записи более 4 строк то записываем группу, иначе выходим
+            //        tbl.AddCell(centrAlignCell.Clone(false));
+            //        tbl.AddCell(centrAlignCell.Clone(true).Add(new Paragraph(name.Value)));
+            //        tbl.AddCell(centrAlignCell.Clone(false));
+            //        tbl.AddCell(leftPaddCell.Clone(false));
+            //        remainingPdfTableRows--;
+            //    }
+            //    else                 
+            //        break;                
+            //}
             else 
             {
                 if (remainingPdfTableRows == 1)
