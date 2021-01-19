@@ -8,11 +8,11 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("GostDOC")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Creates design documantation by standard")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Central Research Institute Cyclone")]
 [assembly: AssemblyProduct("GostDOC")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCopyright("JSC CRI Cyclone ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.1.24")]
-[assembly: AssemblyFileVersion("1.1.1.24")]
+[assembly: AssemblyVersion("1.1.1.25")]
+[assembly: AssemblyFileVersion("1.1.1.25")]
