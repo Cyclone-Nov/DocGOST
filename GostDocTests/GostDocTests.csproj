@@ -68,7 +68,7 @@
     <Folder Include="Tests\XML\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DocGOST\GostDOC.csproj">
+    <ProjectReference Include="..\DocGOSTSources\GostDOC.csproj">
       <Project>{9915231c-5c5e-4feb-8ee6-feaa42e953e6}</Project>
       <Name>GostDOC</Name>
     </ProjectReference>
