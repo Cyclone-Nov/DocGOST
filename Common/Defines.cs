@@ -141,59 +141,6 @@ namespace GostDOC.Common
     }
 
 
-    public static class Converters
-    {
-        /// <summary>
-        /// Получить строку с кодом документа по типу документа
-        /// </summary>
-        /// <param name="aDocType">Type of a document.</param>
-        /// <returns></returns>
-        public static string GetDocumentCode(DocType aDocType)
-        {            
-            switch(aDocType)
-            {
-                case DocType.Bill:
-                    return @"ВП";
-                case DocType.ItemsList:
-                    return @"ПЭ3";
-                case DocType.Specification:
-                case DocType.D27:
-                case DocType.None:
-                    return string.Empty;
-            }
-            return string.Empty;
-        }
-
-        public static Tuple<string, int> SplitDesignatorToStringAndNumber(string s)
-        {
-            string val = string.Empty;
-            int dig = 0;
-            for (int i = 0; i<s.Length ;i++)
-            {
-                if (Char.IsDigit(s[i]))
-                {
-                    val = s.Substring(0, i);
-                    dig = Int32.Parse(s.Substring(i));
-                    break;
-                }
-            }
-
-            return new Tuple<string, int>(val, dig);
-        }
-
-        public static float GetPriceWithTax(float aPurePrice, TaxTypes aTax)
-        {
-            if (aTax == TaxTypes.Tax10)
-                return aPurePrice * 1.1f;
-
-            if (aTax == TaxTypes.Tax20)
-                return aPurePrice * 1.2f;
-
-            return aPurePrice;
-        }
-
-    }
-
     #region Имена столбцов в Excel
 
     public enum ExcelColumn 
