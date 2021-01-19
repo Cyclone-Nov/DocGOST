@@ -72,6 +72,7 @@ namespace GostDOC.Tests.Converters
         [Fact]
         public void ConvertBack_ReturnEmpty()
         {
+            throw new NotImplementedException();
             //
             // TODO: Add test logic here
             //
@@ -82,6 +83,7 @@ namespace GostDOC.Tests.Converters
         [InlineData("30")]
         public void ConvertBack_ReturnValue(string value)
         {
+            throw new NotImplementedException();
             //
             // TODO: Add test logic here
             //

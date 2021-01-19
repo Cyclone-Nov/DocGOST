@@ -39,14 +39,15 @@ namespace GostDOC.Tests.Common
         [Fact]
         public void GetDocumentCode_SetItemsList_ReturnItemListString()
         {
+            throw new NotImplementedException();
             // Arrange
-            
+
 
             // Act
-            
+
 
             // Assert
-            
+
         }
 
         // TODO: GetDocumentCode: повторить тесты для Д27 и спецификации, проверить граничные значения
@@ -56,6 +57,7 @@ namespace GostDOC.Tests.Common
         [Fact]
         public void SplitDesignatorToStringAndNumber_SetEmpty_ReturnFalse()
         {
+            throw new NotImplementedException();
             // Arrange
 
 

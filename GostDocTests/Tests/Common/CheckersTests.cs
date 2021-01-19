@@ -41,7 +41,7 @@ namespace GostDocTests.Tests.Common
         [InlineData("1")]
         public void CheckDesignatorFormat_SetLess2LengthValue_ReturnFalse(string inValue)
         {
-            
+            throw new NotImplementedException();
             // Act
 
 
@@ -52,6 +52,8 @@ namespace GostDocTests.Tests.Common
         [Fact]        
         public void CheckDesignatorFormat_SetValueWithoutSymbols_ReturnFalse()
         {
+            throw new NotImplementedException();
+
             // Arrange
             string value = "123";
 
@@ -65,6 +67,7 @@ namespace GostDocTests.Tests.Common
         [Fact]
         public void CheckDesignatorFormat_SetValueWithoutDigits_ReturnFalse()
         {
+            throw new NotImplementedException();
             // Arrange
 
 
@@ -81,6 +84,7 @@ namespace GostDocTests.Tests.Common
         [InlineData("BMN456")]
         public void CheckDesignatorFormat_SetTrueValues_ReturnTrue(string InValue)
         {
+            throw new NotImplementedException();
             // Arrange
 
 
