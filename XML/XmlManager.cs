@@ -302,8 +302,9 @@ namespace GostDOC.Models
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
                 var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
                 var designator = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatorID);
-                var position = cmp.Properties.Find(x => x.Name == Constants.ComponentPosition);                
-                
+                var position = cmp.Properties.Find(x => x.Name == Constants.ComponentPosition);
+                var groupNameSp = cmp.Properties.Find(x => x.Name == Constants.GroupNameSp);
+
                 // для спецификации добавим возможность добавлять пустые компоненты
                 if ((name == null && _docType != DocType.Specification) ||
                    (name == null && position == null && _docType == DocType.Specification))
@@ -315,7 +316,13 @@ namespace GostDOC.Models
                 if ((sign == null && _docType != DocType.Specification) ||
                    (sign == null && position == null && _docType == DocType.Specification))
                 {
-                    _error.Error($"Файл {_specFileName}. Компонент {name}: 'Обозначение' не задано!");
+                    _error.Error($"Файл {_specFileName}. Компонент \"{name?.Text}\": 'Обозначение' не задано!");
+                    continue;
+                }
+
+                if (_docType == DocType.ItemsList && !string.Equals(groupNameSp?.Text, Constants.GroupDoc) && !Checkers.CheckDesignatorFormat(designator?.Text))
+                {
+                    _error.Error($"Файл {_specFileName}. Компонент \"{name?.Text}\" обрабатываться не будет так как у него неверный формат позиционного обозначения: {designator?.Text}.");
                     continue;
                 }
 
@@ -331,7 +338,7 @@ namespace GostDOC.Models
                 {
                     if (positions.Contains(combine.RefDesignation))
                     {
-                        _error.Error($"Найдено дублирующееся позиционное обозначение {combine.RefDesignation}!");
+                        _error.Error($"Найдено дублирующееся позиционное обозначение {combine.RefDesignation}. Имя компонента {combine.Name}!");
                     } else
                     {
                         positions.Add(combine.RefDesignation);
