@@ -35,14 +35,16 @@ namespace GostDOC.Converters
 
         object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) return "";
+            if (value == null) 
+                return "";
             Enum myEnum = (Enum)value;
             return GetEnumDescription(myEnum);
         }
 
         object IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) return null;
+            if (value == null) 
+                return null;
             foreach (var one in Enum.GetValues(targetType))
             {
                 Enum myEnum = (Enum)one;
