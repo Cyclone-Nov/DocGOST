@@ -99,16 +99,26 @@ public abstract class BasePreparer {
                 // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
                 var mainсomponents = aGroup.Components.Where(val =>
                     !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
+
                 foreach (var comp in mainсomponents)
-                        aDic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
+                { 
+                    var desigantor = comp.GetProperty(Constants.ComponentDesignatorID);
+                    if (!aDic.ContainsKey(desigantor))
+                        aDic.Add(desigantor, comp);
+                }
 
                 foreach (var subgroup in aGroup.SubGroups.OrderBy(key => key.Key))
                 {
                     // выбираем только компоненты с заданными значением для свойства "Позиционое обозначение"
                     var сomponents = subgroup.Value.Components.Where(val =>
                         !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
-                    foreach (var comp in сomponents)
-                            aDic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
+                    foreach (var comp in сomponents)                    
+                    {
+                        //aDic.Add(comp.GetProperty(Constants.ComponentDesignatorID), comp);
+                        var desigantor = comp.GetProperty(Constants.ComponentDesignatorID);
+                        if (!aDic.ContainsKey(desigantor))
+                            aDic.Add(desigantor, comp);
+                    }   
                 }
 
                 result.Add(aDic);
