@@ -5,9 +5,9 @@ namespace GostDOC.Common
     public static class Converters
     {
         /// <summary>
-        /// Получить строку с кодом документа по типу документа
+        /// Получить строку с символьным кодом документа по типу документа
         /// </summary>
-        /// <param name="aDocType">Type of a document.</param>
+        /// <param name="aDocType">Тип документа типа <paramref name="DocType"/></param>
         /// <returns></returns>
         public static string GetDocumentCode(DocType aDocType)
         {
@@ -26,11 +26,12 @@ namespace GostDOC.Common
         }
 
         /// <summary>
-        /// Конвертирование строки с позиционным обозначением компонента в формате 
+        /// Конвертирование строки с позиционным обозначением компонента в пару значений <paramref name="Result"/>, 
+        /// соответствующую символам позиционного обозначения и числу позиционного обозначения отдельно
         /// </summary>
-        /// <param name="s">The s.</param>
-        /// <param name="Result">The result.</param>
-        /// <returns></returns>
+        /// <param name="s">входная строка с позиционным обозначенияем</param>
+        /// <param name="Result">результат разделения позуионного обозначения на строку сисмволов и число</param>
+        /// <returns>true - конвертиация прошла успешно, иначе false</returns>
         public static bool SplitDesignatorToStringAndNumber(string s, out Tuple<string, int> Result)
         {            
             Result = null;
@@ -56,10 +57,10 @@ namespace GostDOC.Common
         }
 
         /// <summary>
-        /// Gets the price with tax.
+        /// получить стоимость с учетом налога
         /// </summary>
-        /// <param name="aPurePrice">a pure price.</param>
-        /// <param name="aTax">a tax.</param>
+        /// <param name="aPurePrice">стоимость до учета налога</param>
+        /// <param name="aTax">тип налоговой ставки</param>
         /// <returns></returns>
         public static float GetPriceWithTax(float aPurePrice, TaxTypes aTax)
         {

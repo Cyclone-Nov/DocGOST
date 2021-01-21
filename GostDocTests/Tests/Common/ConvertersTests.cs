@@ -64,6 +64,8 @@ namespace GostDOC.Tests.Common
             // Assert
             Assert.False(actual);
         }
-        
+
+
+        // TODO: проверки для функции GetPriceWithTax
     }
 }
