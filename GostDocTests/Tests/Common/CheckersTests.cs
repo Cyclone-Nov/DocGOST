@@ -67,7 +67,6 @@ namespace GostDocTests.Tests.Common
         [Theory]
         [InlineData("/?*")]
         [InlineData("abc")]
-        [InlineData("")]
         public void CheckDesignatorFormat_SetValueWithoutDigits_ReturnFalse(string tValue)
         {
             // Act

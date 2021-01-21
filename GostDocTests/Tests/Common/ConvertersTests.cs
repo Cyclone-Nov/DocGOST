@@ -58,15 +58,11 @@ namespace GostDOC.Tests.Common
         [Fact]
         public void SplitDesignatorToStringAndNumber_SetEmpty_ReturnFalse()
         {
-            throw new NotImplementedException();
-            // Arrange
-
-
             // Act
-
+            bool actual = GostDOC.Common.Converters.SplitDesignatorToStringAndNumber(string.Empty, out var Result);
 
             // Assert
-
+            Assert.False(actual);
         }
         
     }
