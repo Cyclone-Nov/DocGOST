@@ -39,15 +39,16 @@ namespace GostDOC.Tests.Common
         [Fact]
         public void GetDocumentCode_SetItemsList_ReturnItemListString()
         {
-            throw new NotImplementedException();
+  
             // Arrange
-
+            DocType input = DocType.ItemsList;
+            string expected = @"ПЭ3";
 
             // Act
-
+            var actual = GostDOC.Common.Converters.GetDocumentCode(input);
 
             // Assert
-
+            Assert.Equal(actual, expected);
         }
 
         // TODO: GetDocumentCode: повторить тесты для Д27 и спецификации, проверить граничные значения
@@ -57,15 +58,11 @@ namespace GostDOC.Tests.Common
         [Fact]
         public void SplitDesignatorToStringAndNumber_SetEmpty_ReturnFalse()
         {
-            throw new NotImplementedException();
-            // Arrange
-
-
             // Act
-
+            bool actual = GostDOC.Common.Converters.SplitDesignatorToStringAndNumber(string.Empty, out var Result);
 
             // Assert
-
+            Assert.False(actual);
         }
         
     }
