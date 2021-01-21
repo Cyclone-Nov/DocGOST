@@ -39,42 +39,42 @@ namespace GostDocTests.Tests.Common
         [Theory]
         [InlineData("A")]
         [InlineData("1")]
-        public void CheckDesignatorFormat_SetLess2LengthValue_ReturnFalse(string inValue)
+        public void CheckDesignatorFormat_SetLess2LengthValue_ReturnFalse(string tValue)
         {
-            throw new NotImplementedException();
             // Act
+            bool actual = Checkers.CheckDesignatorFormat(tValue);
 
-
+            
             // Assert            
+            Assert.False(actual);
+
         }
 
         // TODO: реализовать тест. задать значение без символов на входе и получить false
-        [Fact]        
-        public void CheckDesignatorFormat_SetValueWithoutSymbols_ReturnFalse()
+        [Theory]
+        [InlineData("000")]
+        [InlineData("123")]
+        public void CheckDesignatorFormat_SetValueWithoutSymbols_ReturnFalse(string tValue)
         {
-            throw new NotImplementedException();
-
-            // Arrange
-            string value = "123";
-
             // Act
+            bool actual = Checkers.CheckDesignatorFormat(tValue);
 
-
-            // Assert            
+            // Assert
+            Assert.False(actual);
         }
 
         // TODO: реализовать тест. задать значение без цифр после символов на входе и получить false
-        [Fact]
-        public void CheckDesignatorFormat_SetValueWithoutDigits_ReturnFalse()
+        [Theory]
+        [InlineData("/?*")]
+        [InlineData("abc")]
+        [InlineData("")]
+        public void CheckDesignatorFormat_SetValueWithoutDigits_ReturnFalse(string tValue)
         {
-            throw new NotImplementedException();
-            // Arrange
-
-
             // Act
+            bool actual = Checkers.CheckDesignatorFormat(tValue);
 
-
-            // Assert            
+            // Assert
+            Assert.False(actual);
         }
 
         // TODO: реализовать тест. задать правильные значения на входе и получить true
@@ -82,16 +82,16 @@ namespace GostDocTests.Tests.Common
         [InlineData("A1")]
         [InlineData("VD23")]
         [InlineData("BMN456")]
-        public void CheckDesignatorFormat_SetTrueValues_ReturnTrue(string InValue)
+        public void CheckDesignatorFormat_SetTrueValues_ReturnTrue(string tValue)
         {
-            throw new NotImplementedException();
             // Arrange
 
 
             // Act
+            bool actual = Checkers.CheckDesignatorFormat(tValue);
 
-
-            // Assert            
+            // Assert
+            Assert.True(actual);
         }
 
     }
