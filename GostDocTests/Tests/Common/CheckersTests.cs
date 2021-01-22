@@ -35,7 +35,7 @@ namespace GostDocTests.Tests.Common
             Assert.False(actual);
         }
 
-        // TODO: реализовать тест. задать значение меньше 2 символов на входе и получить false
+        // задаем значение меньше 2 символов на входе и получаем false
         [Theory]
         [InlineData("A")]
         [InlineData("1")]
@@ -50,7 +50,7 @@ namespace GostDocTests.Tests.Common
 
         }
 
-        // TODO: реализовать тест. задать значение без символов на входе и получить false
+        // задаем значение без символов на входе и получаем false
         [Theory]
         [InlineData("000")]
         [InlineData("123")]
@@ -63,20 +63,29 @@ namespace GostDocTests.Tests.Common
             Assert.False(actual);
         }
 
-        // TODO: реализовать тест. задать значение без цифр после символов на входе и получить false
-        [Theory]
-        [InlineData("/?*")]
-        [InlineData("abc")]
-        public void CheckDesignatorFormat_SetValueWithoutDigits_ReturnFalse(string tValue)
+        // задаем значение без цифр после символов на входе и получаем false
+        [Fact]
+        public void CheckDesignatorFormat_SetValueWithoutDigits_ReturnFalse()
         {
             // Act
-            bool actual = Checkers.CheckDesignatorFormat(tValue);
+            bool actual = Checkers.CheckDesignatorFormat("abc");
 
             // Assert
             Assert.False(actual);
         }
 
-        // TODO: реализовать тест. задать правильные значения на входе и получить true
+        // задаем значение состоящее из символов на входе и получаем false
+        [Fact]
+        public void CheckDesignatorFormat_SetSpecialSymbols_ReturnFalse()
+        {
+            // Act
+            bool actual = Checkers.CheckDesignatorFormat("/?*1");
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        // задаем правильные значения на входе и получаем true
         [Theory]
         [InlineData("A1")]
         [InlineData("VD23")]
