@@ -140,6 +140,27 @@ namespace GostDOC.Common
         MA
     }
 
+    /// <summary>
+    /// типы форматов документов
+    /// </summary>
+    public enum DocumentFormats
+    {
+        [Description("")]
+        Empty,
+        [Description("A0")]
+        A0,
+        [Description("A1")]
+        A1,
+        [Description("A2")]
+        A2,
+        [Description("A3")]
+        A3,
+        [Description("A4")]
+        A4,
+        [Description("*)")]
+        Any        
+    }
+
 
     #region Имена столбцов в Excel
 
@@ -261,6 +282,8 @@ namespace GostDOC.Common
     /// общие константы для сборки
     /// </summary>
     internal static class Constants {
+
+        public static IEnumerable<DocumentFormats> DocumentFormatsList => Enum.GetValues(typeof(DocumentFormats)).Cast<DocumentFormats>();
 
         #region Графы
 

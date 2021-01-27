@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:GostDOC.ViewModels"
              xmlns:local="clr-namespace:GostDOC.UserControls"
+             xmlns:common="clr-namespace:GostDOC.Common"
              xmlns:col="clr-namespace:System.Collections;assembly=mscorlib"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:converters="clr-namespace:GostDOC.Converters"
@@ -16,6 +17,7 @@
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="inverseConverter" />
         <converters:CountConverter x:Key="countConverter" />
+        <converters:EnumDescriptionConverter x:Key="enumConverter" />
         <BooleanToVisibilityConverter x:Key="b2v" />
     </UserControl.Resources>
     
@@ -77,18 +79,8 @@
             </DataGrid.ContextMenu>
 
             <DataGrid.Columns>
-                <DataGridComboBoxColumn Header="Формат" SelectedItemBinding="{Binding Path=Format.Value}">
-                    <DataGridComboBoxColumn.ItemsSource>
-                        <col:ArrayList>
-                            <sys:String>*)</sys:String>
-                            <sys:String>А0</sys:String>
-                            <sys:String>А1</sys:String>
-                            <sys:String>А2</sys:String>
-                            <sys:String>А3</sys:String>
-                            <sys:String>А4</sys:String>
-                        </col:ArrayList>
-                    </DataGridComboBoxColumn.ItemsSource>
-                </DataGridComboBoxColumn>
+                <DataGridComboBoxColumn Header="Формат" SelectedValueBinding="{Binding Path=Format.Value, Converter={StaticResource enumConverter}}"
+                                        ItemsSource="{Binding Source={converters:EnumToItemsSource {x:Type common:DocumentFormats}}}" />
                 <DataGridTextColumn Header="Зона" Binding="{Binding Zone.Value}"/>
                 <DataGridTextColumn Header="Поз." Binding="{Binding Position.Value}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Обозначение" Binding="{Binding Sign.Value}"/>

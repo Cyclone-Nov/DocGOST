@@ -1,9 +1,78 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Reflection;
+using System.Linq;
+using System.Text;
 
 namespace GostDOC.Common
 {
     public static class Converters
     {
+        public static string GetEnumDescription(Enum enumObj)
+        {
+            FieldInfo fieldInfo = enumObj.GetType().GetField(enumObj.ToString());
+            object[] attribArray = fieldInfo.GetCustomAttributes(false);
+
+            if (attribArray.Length == 0)
+                return enumObj.ToString();
+            else
+            {
+                DescriptionAttribute attrib = null;
+
+                foreach (var att in attribArray)
+                {
+                    if (att is DescriptionAttribute)
+                        attrib = att as DescriptionAttribute;
+                }
+
+                if (attrib != null)
+                    return attrib.Description;
+
+                return enumObj.ToString();
+            }
+        }
+
+        /// <summary>
+        /// преобразование строки с описаниеи для типа перечисления в соответсвующее значение перечисления
+        /// </summary>
+        /// <typeparam name="T">должен быть типа перечисления Enum с установленными атрибутами Description</typeparam>
+        /// <param name="aDescription">строка с описанием</param>
+        /// <param name="bIsValid">признак успешного преобразования -  <c>true</c>.</param>
+        /// <returns></returns>
+        public static T DescriptionToEnum<T>(string aDescription, out bool bIsValid) where T : Enum // where T : struct, IConvertible
+        {
+            bIsValid = false;
+            T errVal = (T)Enum.GetValues(typeof(T)).GetValue(0);
+            if (!typeof(T).IsEnum)
+            {                
+                return errVal;
+                //throw new ArgumentException("T must be an enumerated type");
+            }
+
+            if (UnicodeCyrillicToASCIIUtils.IsUnicode(aDescription))
+            {
+                aDescription = UnicodeCyrillicToASCIIUtils.UnicodeRusStringToASCII(aDescription);
+            }
+
+            foreach (T item in Enum.GetValues(typeof(T)))
+            {
+                FieldInfo fieldInfo = item.GetType().GetField(item.ToString());
+                object[] attribArray = fieldInfo.GetCustomAttributes(false);
+                if (attribArray.Length == 0)
+                    continue; // 
+                else
+                {
+                    var attrib = attribArray.Where( attr => attr is DescriptionAttribute).First() as DescriptionAttribute;
+                    if (attrib != null && string.Equals(attrib.Description, aDescription, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        bIsValid = true;
+                        return item;
+                    }
+                }
+            }
+            return errVal;
+        }
+
         /// <summary>
         /// Получить строку с символьным кодом документа по типу документа
         /// </summary>
@@ -24,6 +93,23 @@ namespace GostDOC.Common
             }
             return string.Empty;
         }
+
+        public static string DocTypeToString(DocType aDocType)
+        {
+            switch (aDocType)
+            {
+                case DocType.Bill:
+                    return @"ВП";
+                case DocType.ItemsList:
+                    return @"ПЭ3";
+                case DocType.Specification:
+                case DocType.D27:
+                case DocType.None:
+                    return string.Empty;
+            }
+            return string.Empty;
+        }
+
 
         /// <summary>
         /// Конвертирование строки с позиционным обозначением компонента в пару значений <paramref name="Result"/>, 

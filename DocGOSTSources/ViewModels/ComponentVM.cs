@@ -40,7 +40,7 @@ namespace GostDOC.ViewModels
         /// <value>
         /// The format.
         /// </value>
-        public ObservableProperty<string> Format { get; } = new ObservableProperty<string>();
+        public ObservableProperty<DocumentFormats> Format { get; } = new ObservableProperty<DocumentFormats>();
         /// <summary>
         /// Наличиен данного компонента в сборке
         /// </summary>
@@ -133,7 +133,7 @@ namespace GostDOC.ViewModels
             public Guid Guid { get; set; }
             public string Name { get; set; }
             public string Code { get; set; }
-            public string Format { get; set; }
+            public DocumentFormats Format { get; set; }
             public string Entry { get; set; }
             public string Manufacturer { get; set; }
             public int Position { get; set; }
@@ -205,7 +205,11 @@ namespace GostDOC.ViewModels
 
             Name.Value = GetValue(Constants.ComponentName, aComponent);
             Code.Value = GetValue(Constants.ComponentProductCode, aComponent);
-            Format.Value = GetValue(Constants.ComponentFormat, aComponent);
+            string strForamt = GetValue(Constants.ComponentFormat, aComponent);            
+            Format.Value = string.IsNullOrEmpty(strForamt) ? 
+                            DocumentFormats.Empty : 
+                            Common.Converters.DescriptionToEnum<DocumentFormats>(strForamt, out var isValid);
+            
             Entry.Value = GetValue(Constants.ComponentDoc, aComponent);
             Manufacturer.Value = GetValue(Constants.ComponentSupplier, aComponent);
 

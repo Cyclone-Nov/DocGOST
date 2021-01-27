@@ -719,7 +719,7 @@ namespace GostDOC.ViewModels
                     cmp.Name.Value = doc.Name;
                     cmp.Sign.Value = included + doc.Code;
                     cmp.WhereIncluded.Value = included;
-                    cmp.Format.Value = "А4";
+                    cmp.Format.Value = DocumentFormats.A4;
                     AddComponent(cmp);
                 }        
             }
@@ -1275,7 +1275,7 @@ namespace GostDOC.ViewModels
             aDst.Properties.Add(Constants.ComponentName, aSrc.Name.Value);
             aDst.Properties.Add(Constants.ComponentSign, aSrc.Sign.Value);
             aDst.Properties.Add(Constants.ComponentProductCode, aSrc.Code.Value);
-            aDst.Properties.Add(Constants.ComponentFormat, aSrc.Format.Value);
+            aDst.Properties.Add(Constants.ComponentFormat, Common.Converters.GetEnumDescription(aSrc.Format.Value));
             aDst.Properties.Add(Constants.ComponentDoc, aSrc.Entry.Value);
             aDst.Properties.Add(Constants.ComponentSupplier, aSrc.Manufacturer.Value);
             aDst.Properties.Add(Constants.ComponentCountDev, aSrc.CountDev.Value.ToString());
