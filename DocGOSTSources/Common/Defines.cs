@@ -386,7 +386,7 @@ namespace GostDOC.Common
         /// <summary>
         /// название графы №25 Первичное применение изделия в структуре xml
         /// </summary>
-        public static readonly string GRAPH_25 = "Перв.Примен.";
+        public static readonly string GRAPH_25 = "Первичная применяемость";
 
         public static readonly string GRAPH_27 = "";
         public static readonly string GRAPH_28 = "";
