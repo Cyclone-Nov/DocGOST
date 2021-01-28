@@ -102,7 +102,7 @@ namespace GostDOC.ExcelExport
 
             if (_graphs != null)
             {
-                // Fill main title                
+                // Fill main title                      
                 sheet.Cells[38, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1); // Cells[33, 12]                
                 sheet.Cells[35, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2); //Cells[30, 12]                
                 sheet.Cells[39, ExcelColumn.P] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4); // Cells[34, 15]                
@@ -113,6 +113,10 @@ namespace GostDOC.ExcelExport
                 sheet.Cells[39, ExcelColumn.H] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_chk); //Cells[34, 8]                
                 sheet.Cells[41, ExcelColumn.H] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11norm); //Cells[36, 8]                
                 sheet.Cells[42, ExcelColumn.H] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11affirm); //Cells[37, 8]
+
+                Excel.Range range = sheet.Cells[1, ExcelColumn.C]; // Cells[1, 3] 
+                range.Value2 = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_25); 
+                range.Orientation = 90;
             }
             // Set pages count
             sheet.Cells[39, ExcelColumn.V] = Pages + 1; //Cells[34, 20]
