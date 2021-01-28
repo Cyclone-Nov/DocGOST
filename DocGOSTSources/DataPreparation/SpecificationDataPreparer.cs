@@ -100,8 +100,7 @@ namespace GostDOC.DataPreparation
                 return null;
             }
 
-            // если конфигураций несколько
-            IDictionary<string, Configuration> preparedConfigs = new Dictionary<string, Configuration>();
+            // если конфигураций несколько            
             aMainConfig = new Configuration();
             aMainConfig.Graphs = mainConfig.Graphs;
             var deltaMainConfig = new Configuration();
@@ -176,10 +175,8 @@ namespace GostDOC.DataPreparation
                 }
             }
 
-            preparedConfigs = otherConfigs;
-            preparedConfigs.Add(Constants.MAIN_CONFIG_INDEX, deltaMainConfig);
-
-            return preparedConfigs;
+            otherConfigs.Add(Constants.MAIN_CONFIG_INDEX, deltaMainConfig);
+            return otherConfigs;
         }
 
         /// <summary>
@@ -246,7 +243,11 @@ namespace GostDOC.DataPreparation
                 AddEmptyRow(aTable);           
 
             var сomponents = group.Components;
-            AddComponents(aTable, сomponents, ref aPos, aPositions, !string.Equals(aGroupName, Constants.GroupDoc) && !string.Equals(aGroupName, Constants.GroupComplex));
+            // добавим в наименование компонента название группы, если это раздел Прочие изделия
+            bool addSubGroupNameToComponentName = string.Equals(aGroupName, Constants.GroupOthers);
+            // будем добавлять позицию, если раздел не Документация и не Комплексы
+            bool setPos = !string.Equals(aGroupName, Constants.GroupDoc) && !string.Equals(aGroupName, Constants.GroupComplex);
+            AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, addSubGroupNameToComponentName);
             
             if (сomponents.Count > 0)
             {
@@ -285,8 +286,9 @@ namespace GostDOC.DataPreparation
                 return false;
             }
 
-            if (AddGroupName(aTable, aGroupName))
-                AddEmptyRow(aTable);
+            AddGroupName(aTable, aGroupName, false, TextAlignment.LEFT);
+            //if (AddGroupName(aTable, aGroupName))
+            //AddEmptyRow(aTable);
 
             AddComponents(aTable, aSortComponents, ref aPos, aPositions);                        
             aTable.AcceptChanges();
@@ -294,7 +296,7 @@ namespace GostDOC.DataPreparation
         }
 
 
-        private void AddComponents(DataTable aTable, List<Component> aSortComponents, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions, bool aSetPos = true)
+        private void AddComponents(DataTable aTable, List<Component> aSortComponents, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions, bool aSetPos = true, bool aAddSubGroupName = false)
         {
             DataRow row;
             foreach (var component in aSortComponents)
@@ -308,6 +310,12 @@ namespace GostDOC.DataPreparation
                 if (string.Equals(groupSp, Constants.GroupDoc))
                 {
                     component_count = 0;
+                }
+
+                if (aAddSubGroupName)
+                {                    
+                    string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);
+                    component_name = $"{subGroupName} {component_name}";
                 }
 
                 string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize).ToArray();                
@@ -365,12 +373,12 @@ namespace GostDOC.DataPreparation
         /// </summary>
         /// <param name="aTable"></param>
         /// <param name="aGroupName"></param>
-        private bool AddGroupName(DataTable aTable, string aGroupName) 
+        private bool AddGroupName(DataTable aTable, string aGroupName, bool aIsUnderline = true, TextAlignment aTextAlignment = TextAlignment.CENTER) 
         {
             if (string.IsNullOrEmpty(aGroupName)) 
                 return false;
             DataRow row = aTable.NewRow();
-            row[Constants.ColumnName] = new FormattedString {Value = aGroupName, IsUnderlined = true, TextAlignment = TextAlignment.CENTER};
+            row[Constants.ColumnName] = new FormattedString {Value = aGroupName, IsUnderlined = aIsUnderline, TextAlignment = aTextAlignment };
             aTable.Rows.Add(row);
             return true;
         }

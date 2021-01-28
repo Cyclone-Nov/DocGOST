@@ -162,6 +162,28 @@ public abstract class BasePreparer {
     }
 
     /// <summary>
+    /// получить имя группы или подгруппы из строки вида "Единственное число\\Множественное число"    
+    /// </summary>
+    /// <param name="aSubgroupName">строка с именем группы или подгруппы</param>
+    /// <param name="aFirst"><c>true</c> - выдать идинственное число, иначе множественное</param>
+    /// <returns>возвращеет единственное или множественное число название группы/подгруппы</returns>
+    protected string GetSubgroupName(string aSubgroupName, bool aFirst)
+    {        
+        var subgroupNamesArr = aSubgroupName.Split(new char[] { '\\', '/' });   
+        string subroupName = aSubgroupName;
+        if (subgroupNamesArr.Length == 1)
+        { 
+            subroupName = subgroupNamesArr[0];
+        }
+        else if(subgroupNamesArr.Length == 2)
+        {
+            subroupName = aFirst ? subgroupNamesArr[0] : subgroupNamesArr[1];
+        }
+
+        return subroupName;
+    }
+
+    /// <summary>
     /// получить имя компонента для столбца "Наименование"
     /// </summary>
     /// <param name="aHasStandardDoc">признак наличия ГОСТ/ТУ символов в документе на поставку</param>
