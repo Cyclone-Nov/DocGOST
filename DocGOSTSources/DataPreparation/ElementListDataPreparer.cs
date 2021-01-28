@@ -109,6 +109,7 @@ namespace GostDOC.DataPreparation
                 string designator = GetDesignator(key, component.Item1, component.Item3);
                 string doc = component.Item2.GetProperty(Constants.ComponentDoc);                
                 string component_name = component.Item2.GetProperty(Constants.ComponentName);
+                string component_sign = component.Item2.GetProperty(Constants.ComponentSign);
                 string subGroupName = component.Item2.GetProperty(Constants.SubGroupNameSp);
 
                 bool haveToChangeName = string.Equals(component.Item2.GetProperty(Constants.ComponentPresence), "0") ||
@@ -130,8 +131,9 @@ namespace GostDOC.DataPreparation
                         uint nextCount = componentNext.Item3;
                         string componentNext_name = componentNext.Item2.GetProperty(Constants.ComponentName);// GetComponentName(nextKey, canOutputStandardDocs, StandardComponentsDic, componentNext.Item2);
                         string nextSubGroupName = componentNext.Item2.GetProperty(Constants.SubGroupNameSp);
+                        string componentNext_sign = componentNext.Item2.GetProperty(Constants.ComponentSign);
 
-                        if (string.Equals(component_name, componentNext_name) && string.Equals(subGroupName, nextSubGroupName))
+                        if (string.Equals(component_name, componentNext_name) && string.Equals(subGroupName, nextSubGroupName) && string.Equals(component_sign, componentNext_sign))
                         {
                             same = true;
                             component_count+= nextCount;
