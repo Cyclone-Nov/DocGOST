@@ -8,6 +8,11 @@ namespace GostDOC.Common
 {
     public static class Converters
     {
+        /// <summary>
+        /// получить значение тега DescriptionAttribute для значения enumObj перечисление типа Enum 
+        /// </summary>
+        /// <param name="enumObj">значение перечисления типа Enum</param>
+        /// <returns>строка со значением атрибута DescriptionAttribute для данного значения перечисления Enum иначе само значение</returns>
         public static string GetEnumDescription(Enum enumObj)
         {
             FieldInfo fieldInfo = enumObj.GetType().GetField(enumObj.ToString());
