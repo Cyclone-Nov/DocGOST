@@ -74,9 +74,9 @@ namespace GostDocTests.Tests.Common
             Assert.False(actual);
         }
 
-        // задаем значение состоящее из символов на входе и получаем false
+        // задаем значение состоящее из спец символов и числа на входе и получаем false
         [Fact]
-        public void CheckDesignatorFormat_SetSpecialSymbols_ReturnFalse()
+        public void CheckDesignatorFormat_SetSpecialSymbolsAndDigit_ReturnFalse()
         {
             // Act
             bool actual = Checkers.CheckDesignatorFormat("/?*1");

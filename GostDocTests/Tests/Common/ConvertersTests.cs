@@ -20,7 +20,7 @@ namespace GostDOC.Tests.Common
     /// </summary>    
     public class ConvertersTests
     {    
-
+        // Получаем код документа Bill и сравниваем с ожидаемым результатом
         [Fact]
         public void GetDocumentCode_SetBill_ReturnBillString()
         {
@@ -35,7 +35,7 @@ namespace GostDOC.Tests.Common
             Assert.Equal(actual, expected);
         }
 
-        // TODO: сделать тоже самое что и для ВП
+        // Получаем код документа ItemList и сравниваем с ожидаемым результатом
         [Fact]
         public void GetDocumentCode_SetItemsList_ReturnItemListString()
         {
@@ -51,8 +51,37 @@ namespace GostDOC.Tests.Common
             Assert.Equal(actual, expected);
         }
 
-        // TODO: GetDocumentCode: повторить тесты для Д27 и спецификации, проверить граничные значения
+        // Получаем код документа Specification и сравниваем с ожидаемым результатом
+        [Fact]
+        public void GetDocumentCode_SetSpecification_ReturnItemListString()
+        {
 
+            // Arrange
+            DocType input = DocType.Specification;
+            string expected = "";
+
+            // Act
+            var actual = GostDOC.Common.Converters.GetDocumentCode(input);
+
+            // Assert
+            Assert.Equal(actual, expected);
+        }
+
+        // Получаем код документа D27 и сравниваем с ожидаемым результатом
+        [Fact]
+        public void GetDocumentCode_SetD27_ReturnItemListString()
+        {
+
+            // Arrange
+            DocType input = DocType.D27;
+            string expected = "";
+
+            // Act
+            var actual = GostDOC.Common.Converters.GetDocumentCode(input);
+
+            // Assert
+            Assert.Equal(actual, expected);
+        }
 
         // TODO: проверки для функции SplitDesignatorToStringAndNumber
         [Fact]
