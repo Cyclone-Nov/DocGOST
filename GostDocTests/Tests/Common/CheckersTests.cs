@@ -23,7 +23,7 @@ namespace GostDocTests.Tests.Common
     {
 
         /// <summary>
-        ///  задаем пустое значение на входе и получаем false
+        ///  Задаем пустое значение на входе и получаем false
         /// </summary>
         [Fact]
         public void CheckDesignatorFormat_SetEmpty_ReturnFalse()
@@ -35,7 +35,10 @@ namespace GostDocTests.Tests.Common
             Assert.False(actual);
         }
 
-        // задаем значение меньше 2 символов на входе и получаем false
+        /// <summary>
+        /// Задаем значение меньше 2 символов на входе и получаем false
+        /// </summary>
+        /// <param name="tValue"></param>
         [Theory]
         [InlineData("A")]
         [InlineData("1")]
