@@ -302,8 +302,7 @@ namespace GostDOC.Models
                 var name = cmp.Properties.Find(x => x.Name == Constants.ComponentName);
                 var sign = cmp.Properties.Find(x => x.Name == Constants.ComponentSign);
                 var designator = cmp.Properties.Find(x => x.Name == Constants.ComponentDesignatorID);
-                var position = cmp.Properties.Find(x => x.Name == Constants.ComponentPosition);
-                var groupNameSp = cmp.Properties.Find(x => x.Name == Constants.GroupNameSp);
+                var position = cmp.Properties.Find(x => x.Name == Constants.ComponentPosition);                
 
                 // для спецификации добавим возможность добавлять пустые компоненты
                 if ((name == null && _docType != DocType.Specification) ||
@@ -320,10 +319,11 @@ namespace GostDOC.Models
                     continue;
                 }
 
-                if (_docType == DocType.ItemsList && !string.Equals(groupNameSp?.Text, Constants.GroupDoc) && !Checkers.CheckDesignatorFormat(designator?.Text))
+                // для перечня элементов не будем рассматривать компоненты без позиционного обозначения
+                if (!string.IsNullOrEmpty(designator?.Text))
                 {
-                    _error.Error($"Файл {_specFileName}. Компонент \"{name?.Text}\" обрабатываться не будет так как у него неверный формат позиционного обозначения: {designator?.Text}.");
-                    continue;
+                    if (!Checkers.CheckDesignatorFormat(designator?.Text))
+                        _error.Error($"Файл {_specFileName}. Компонент \"{name?.Text}\" имеет неверный формат позиционного обозначения: {designator?.Text}.");                    
                 }
 
                 CombineProperties combine = new CombineProperties(_docType == DocType.Specification)
@@ -375,6 +375,10 @@ namespace GostDOC.Models
                             string _name;
                             component.Properties.TryGetValue(Constants.ComponentName, out _name);
                             ParseAssemblyUnit(aNewCfg, _sign.Trim(new char[] { ' ' }), _name, _specFileName, component.Count);
+                        } else
+                        {
+                            var groupSp = cmp.Properties.Find(x => x.Name == Constants.GroupNameSp);
+                            _error.Error($"Не задано обозначение для объединяющего компонента {combine.Name} из раздела {groupSp?.Text}: его спецификация загружена не будет!");
                         }
                     }
 

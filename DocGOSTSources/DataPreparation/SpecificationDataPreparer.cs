@@ -12,6 +12,26 @@ using GostDOC.PDF;
 
 namespace GostDOC.DataPreparation
 {
+
+    /// <summary>
+    /// 
+    /// </summary>
+    enum ChangeNameBySubGroupName
+    {
+        /// <summary>
+        /// добавить в имя компонента имя группы в единственно числе
+        /// </summary>
+        AddSubgroupName,
+        /// <summary>
+        /// исключить из имени компонента имя группы в единственном числе
+        /// </summary>
+        ExcludeSubgroupSingleName,
+        /// <summary>
+        /// ничего не менять
+        /// </summary>
+        WithoutCahnges
+    }
+
     internal class SpecificationDataPreparer : BasePreparer
     {
 
@@ -88,6 +108,7 @@ namespace GostDOC.DataPreparation
         /// <returns></returns>
         private IDictionary<string, Configuration> PrepareConfigs(IDictionary<string, Configuration> aConfigs, out Configuration aMainConfig)
         {
+            
             if (aConfigs == null || !aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))
             {
                 aMainConfig = null;
@@ -102,9 +123,8 @@ namespace GostDOC.DataPreparation
 
             // если конфигураций несколько            
             aMainConfig = new Configuration();
-            aMainConfig.Graphs = mainConfig.Graphs;
             var deltaMainConfig = new Configuration();
-            deltaMainConfig.Graphs = mainConfig.Graphs;
+            deltaMainConfig.Graphs = aMainConfig.Graphs = mainConfig.Graphs;
             var mainData = mainConfig.Specification;
 
             // выберем неглавные конфигурации
@@ -116,8 +136,7 @@ namespace GostDOC.DataPreparation
                     otherConfigs.Add(config.Key, config.Value.DeepCopy());
                 }
             }
-
-            //foreach (var group in mainData.OrderBy(key => key.Key))
+                        
             foreach (var group in mainData)
             {
                 // для списка компонентов из корня каждого раздела
@@ -201,8 +220,7 @@ namespace GostDOC.DataPreparation
 
                 var row = aTable.NewRow();
                 row[Constants.ColumnName] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };                
-                aTable.Rows.Add(row);
-                //AddEmptyRow(aTable);
+                aTable.Rows.Add(row);                
             }
 
             AddGroup(aTable, Constants.GroupDoc, data, ref aPosition, aPositions);
@@ -234,7 +252,7 @@ namespace GostDOC.DataPreparation
             if (!aGroupDic.TryGetValue(aGroupName, out var group))
                 return;
 
-            if(group.Components?.Count == 0 && group.SubGroups?.Count == 0)            
+            if (group.Components?.Count == 0 && group.SubGroups?.Count == 0)            
                 return;            
 
             // наименование раздела
@@ -243,24 +261,29 @@ namespace GostDOC.DataPreparation
                 AddEmptyRow(aTable);           
 
             var сomponents = group.Components;
+
             // добавим в наименование компонента название группы, если это раздел Прочие изделия
-            bool addSubGroupNameToComponentName = string.Equals(aGroupName, Constants.GroupOthers);
+            ChangeNameBySubGroupName changeComponentName = ChangeNameBySubGroupName.WithoutCahnges;
+            if (string.Equals(aGroupName, Constants.GroupOthers))
+                changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;
+
             // будем добавлять позицию, если раздел не Документация и не Комплексы
             bool setPos = !string.Equals(aGroupName, Constants.GroupDoc) && !string.Equals(aGroupName, Constants.GroupComplex);
-            AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, addSubGroupNameToComponentName);
+            AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, changeComponentName);
             
-            if (сomponents.Count > 0)
-            {
-                AddEmptyRow(aTable);
-            }
+            if (сomponents.Count > 0)            
+                AddEmptyRow(aTable);            
 
             // добавляем подгруппы
             foreach (var subgroup in group.SubGroups.OrderBy(key => key.Key).Where(key => !string.Equals(key.Key, Constants.SUBGROUPFORSINGLE)))
             {
                 if (subgroup.Value.Components.Count > 0)
                 {
-                    string subGroupName = GetSubgroupNameByCount(subgroup);                    
-                    AddSubgroup(aTable, subGroupName, subgroup.Value.Components, ref aPos, aPositions);
+                    string subGroupName = GetSubgroupNameByCount(subgroup);
+                    if (string.Equals(aGroupName, Constants.GroupStandard) && !string.IsNullOrEmpty(subGroupName))
+                        changeComponentName = ChangeNameBySubGroupName.ExcludeSubgroupSingleName;
+
+                    AddSubgroup(aTable, subGroupName, subgroup.Value.Components, ref aPos, aPositions, changeComponentName);
                     AddEmptyRow(aTable);
                 }
             }
@@ -278,44 +301,68 @@ namespace GostDOC.DataPreparation
             RemoveLastRow(aTable);
         }
 
-
-        private bool AddSubgroup(DataTable aTable, string aGroupName, List<Component> aSortComponents, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions)
+        /// <summary>
+        /// Adds the subgroup.
+        /// </summary>
+        /// <param name="aTable">a table.</param>
+        /// <param name="aGroupName">Name of a group.</param>
+        /// <param name="aSortComponents">a sort components.</param>
+        /// <param name="aPos">a position.</param>
+        /// <param name="aPositions">a positions.</param>
+        /// <param name="aChangeComponentName">Name of a change component.</param>
+        /// <returns></returns>
+        private bool AddSubgroup(DataTable aTable, 
+                                 string aGroupName, 
+                                 List<Component> aSortComponents, 
+                                 ref int aPos, 
+                                 IDictionary<string, List<Tuple<string, int>>> aPositions,
+                                 ChangeNameBySubGroupName aChangeComponentName = ChangeNameBySubGroupName.WithoutCahnges)
         {
-            if (!aSortComponents.Any())
-            {
-                return false;
-            }
+            if (!aSortComponents.Any())            
+                return false;            
 
             AddGroupName(aTable, aGroupName, false, TextAlignment.LEFT);
-            //if (AddGroupName(aTable, aGroupName))
-            //AddEmptyRow(aTable);
 
-            AddComponents(aTable, aSortComponents, ref aPos, aPositions);                        
+            AddComponents(aTable, aSortComponents, ref aPos, aPositions, true, aChangeComponentName);                        
             aTable.AcceptChanges();
             return true;
         }
 
-
-        private void AddComponents(DataTable aTable, List<Component> aSortComponents, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions, bool aSetPos = true, bool aAddSubGroupName = false)
+        /// <summary>
+        /// Adds the components.
+        /// </summary>
+        /// <param name="aTable">a table.</param>
+        /// <param name="aSortComponents">a sort components.</param>
+        /// <param name="aPos">a position.</param>
+        /// <param name="aPositions">a positions.</param>
+        /// <param name="aSetPos">if set to <c>true</c> [a set position].</param>
+        /// <param name="aChangeComponentName">Name of a change component.</param>
+        private void AddComponents(DataTable aTable, 
+                                   List<Component> aSortComponents, 
+                                   ref int aPos, 
+                                   IDictionary<string, List<Tuple<string, int>>> aPositions, 
+                                   bool aSetPos = true, 
+                                   ChangeNameBySubGroupName aChangeComponentName = ChangeNameBySubGroupName.WithoutCahnges)
         {
             DataRow row;
             foreach (var component in aSortComponents)
             {   
                 string component_name = component.GetProperty(Constants.ComponentName);
-                uint component_count = component.Count;
-                int count_property = GetComponentCount(component.GetProperty(Constants.ComponentCountDev));
-                if (count_property > component_count)
-                    component_count = (uint)count_property;
-                string groupSp = component.GetProperty(Constants.GroupNameSp);                
-                if (string.Equals(groupSp, Constants.GroupDoc))
-                {
-                    component_count = 0;
-                }
+                string groupSp = component.GetProperty(Constants.GroupNameSp);
+                int component_count = GetComponentCount(component, string.Equals(groupSp, Constants.GroupDoc));                
 
-                if (aAddSubGroupName)
+                if (aChangeComponentName == ChangeNameBySubGroupName.AddSubgroupName)
                 {                    
+                    string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);                    
+                    if (component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase) < 0)                    
+                        component_name = $"{subGroupName} {component_name}";                    
+                }
+                else if (aChangeComponentName == ChangeNameBySubGroupName.ExcludeSubgroupSingleName)
+                {
                     string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);
-                    component_name = $"{subGroupName} {component_name}";
+                    int val = component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase);
+                    if (val == 0)                    
+                        component_name = component_name.Substring(subGroupName.Length).TrimStart();
                 }
 
                 string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize).ToArray();                
@@ -442,16 +489,20 @@ namespace GostDOC.DataPreparation
         /// </summary>
         /// <param name="aCountStr"></param>
         /// <returns></returns>
-        private int GetComponentCount(string aCountStr) {
-            int count = 1;
+        private int GetComponentCount(Component aComponent, bool ZeroCount) {
+
+            if (ZeroCount)            
+                return 0;
+            
+            string aCountStr = aComponent.GetProperty(Constants.ComponentCountDev);
+            uint count = 1;
             if (!string.IsNullOrEmpty(aCountStr)) {
-                if (!Int32.TryParse(aCountStr, out count)) {
-                    count = 1;
-                    //throw new Exception($"Не удалось распарсить значение свойства \"Количество на изд.\" для компонента с именем {component_name}");
+                if (Int32.TryParse(aCountStr, out var cnt)) {
+                    count = (uint)cnt;                    
                 }
             }
 
-            return count;
+            return (int)((count > aComponent.Count) ?  count : aComponent.Count);
         }
 
         /// <summary>

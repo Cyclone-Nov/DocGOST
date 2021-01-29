@@ -73,7 +73,7 @@ namespace GostDOC.DataPreparation
 
             return table;
         }
-   
+        
 
         /// <summary>
         /// заполнить таблицу данных
