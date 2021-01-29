@@ -19,8 +19,10 @@ namespace GostDOC.Tests.Common
     /// 
     /// </summary>    
     public class ConvertersTests
-    {    
-        // Получаем код документа Bill и сравниваем с ожидаемым результатом
+    {
+        /// <summary>
+        /// Получаем код документа Bill и сравниваем с ожидаемым результатом
+        /// </summary>
         [Fact]
         public void GetDocumentCode_SetBill_ReturnBillString()
         {
@@ -35,7 +37,9 @@ namespace GostDOC.Tests.Common
             Assert.Equal(actual, expected);
         }
 
-        // Получаем код документа ItemList и сравниваем с ожидаемым результатом
+        /// <summary>
+        /// Получаем код документа ItemList и сравниваем с ожидаемым результатом
+        /// </summary>
         [Fact]
         public void GetDocumentCode_SetItemsList_ReturnItemListString()
         {
@@ -51,7 +55,9 @@ namespace GostDOC.Tests.Common
             Assert.Equal(actual, expected);
         }
 
-        // Получаем код документа Specification и сравниваем с ожидаемым результатом
+        /// <summary>
+        /// Получаем код документа Specification и сравниваем с ожидаемым результатом
+        /// </summary>
         [Fact]
         public void GetDocumentCode_SetSpecification_ReturnEmptyString()
         {
@@ -67,7 +73,9 @@ namespace GostDOC.Tests.Common
             Assert.Equal(actual, expected);
         }
 
-        // Получаем код документа D27 и сравниваем с ожидаемым результатом
+        /// <summary>
+        /// Получаем код документа D27 и сравниваем с ожидаемым результатом
+        /// </summary>
         [Fact]
         public void GetDocumentCode_SetD27_ReturnEmptyString()
         {
@@ -83,7 +91,9 @@ namespace GostDOC.Tests.Common
             Assert.Equal(actual, expected);
         }
 
-        // TODO: проверки для функции SplitDesignatorToStringAndNumber
+        /// <summary>
+        /// Задаем пустое значение на входе и получаем false
+        /// </summary>
         [Fact]
         public void SplitDesignatorToStringAndNumber_SetEmpty_ReturnFalse()
         {
