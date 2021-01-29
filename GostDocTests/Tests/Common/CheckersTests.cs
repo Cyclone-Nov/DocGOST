@@ -53,7 +53,10 @@ namespace GostDocTests.Tests.Common
 
         }
 
-        // задаем значение без символов на входе и получаем false
+        /// <summary>
+        /// Задаем значение без символов на входе и получаем false
+        /// </summary>
+        /// <param name="tValue"></param>
         [Theory]
         [InlineData("000")]
         [InlineData("123")]
@@ -66,7 +69,9 @@ namespace GostDocTests.Tests.Common
             Assert.False(actual);
         }
 
-        // задаем значение без цифр после символов на входе и получаем false
+        /// <summary>
+        /// Задаем значение без цифр после символов на входе и получаем false
+        /// </summary>
         [Fact]
         public void CheckDesignatorFormat_SetValueWithoutDigits_ReturnFalse()
         {
@@ -77,7 +82,9 @@ namespace GostDocTests.Tests.Common
             Assert.False(actual);
         }
 
-        // задаем значение состоящее из спец символов и числа на входе и получаем false
+        /// <summary>
+        /// Задаем значение состоящее из спец символов и числа на входе и получаем false
+        /// </summary>
         [Fact]
         public void CheckDesignatorFormat_SetSpecialSymbolsAndDigit_ReturnFalse()
         {
@@ -88,7 +95,10 @@ namespace GostDocTests.Tests.Common
             Assert.False(actual);
         }
 
-        // задаем правильные значения на входе и получаем true
+        /// <summary>
+        /// Задаем правильные значения на входе и получаем true
+        /// </summary>
+        /// <param name="tValue"></param>
         [Theory]
         [InlineData("A1")]
         [InlineData("VD23")]

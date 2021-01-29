@@ -53,7 +53,7 @@ namespace GostDOC.Tests.Common
 
         // Получаем код документа Specification и сравниваем с ожидаемым результатом
         [Fact]
-        public void GetDocumentCode_SetSpecification_ReturnItemListString()
+        public void GetDocumentCode_SetSpecification_ReturnEmptyString()
         {
 
             // Arrange
@@ -69,7 +69,7 @@ namespace GostDOC.Tests.Common
 
         // Получаем код документа D27 и сравниваем с ожидаемым результатом
         [Fact]
-        public void GetDocumentCode_SetD27_ReturnItemListString()
+        public void GetDocumentCode_SetD27_ReturnEmptyString()
         {
 
             // Arrange
