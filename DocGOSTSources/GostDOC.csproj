@@ -297,6 +297,7 @@
     <Compile Include="Common\UnicodeCyrillicToASCIIUtils.cs" />
     <Compile Include="DataPreparation\BasePreparer.cs" />
     <Compile Include="DataPreparation\BillDataPreparer.cs" />
+    <Compile Include="DataPreparation\DataPreparationUtils.cs" />
     <Compile Include="DataPreparation\ElementListDataPreparer.cs" />
     <Compile Include="DataPreparation\EquipmentBillDataPreparer.cs" />
     <Compile Include="DataPreparation\SpecificationDataPreparer.cs" />

@@ -378,7 +378,7 @@ namespace GostDOC.DataPreparation
                     ++aPos;
                     row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString() };
 
-                    string posComponentName = ($"{component_name} {designation}").Trim();
+                    string posComponentName = DataPreparationUtils.GetNameForPositionDictionary(component);
                     var configNames = aTable.TableName.Split(',');
                     foreach (var cfgName in configNames)
                     {

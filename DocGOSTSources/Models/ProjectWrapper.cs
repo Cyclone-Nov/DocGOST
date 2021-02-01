@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Common;
+using GostDOC.DataPreparation;
 
 namespace GostDOC.Models
 {
@@ -189,11 +190,9 @@ namespace GostDOC.Models
         {
             int retposition = 0;
             if (aPositions != null)
-            {
-                string name = aComponent.GetProperty(Constants.ComponentName);
-                string designator = aComponent.GetProperty(Constants.ComponentSign);
-                string val = ($"{name} {designator}").Trim();
-                var positions = aPositions.Where(item => string.Equals(item.Item1, val));
+            {                
+                string name = DataPreparationUtils.GetNameForPositionDictionary(aComponent);
+                var positions = aPositions.Where(item => string.Equals(item.Item1, name));
                 if (positions != null && positions.Count() > 0)
                 {
                     if (positions.Count() == 1)
