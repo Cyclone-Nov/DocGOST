@@ -77,7 +77,24 @@ namespace GostDOC.ExcelExport
                 }
             }
             return merge_rows_cnt;
-        }         
+        }      
+        
+        public static dynamic FormatLitera(this Excel.Range range, string txt)
+        {
+            range.Value2 = txt;
+            if (!string.IsNullOrEmpty(txt))
+            {
+                for (int i = 0; i < txt.Length; i++)
+                {
+                    if (char.IsDigit(txt[i]))
+                    {
+                        Excel.Characters ch = range.Characters[i + 1, 1];
+                        ch.Font.Size = ch.Font.Size - 1;
+                    }
+                }
+            }
+            return range;
+        }
     }
 
     static class ExcelUtils
