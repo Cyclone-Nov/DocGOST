@@ -156,13 +156,11 @@ namespace GostDOC.DataPreparation
                         {
                             deltaMainConfig.Specification.Add(group.Key, new Group());
                         }
-                        deltaMainConfig.Specification[group.Key].Components.Add(component);
-                        //otherConfigs[Constants.MAIN_CONFIG_INDEX].Bill[group.Key].Components.Add(component);
+                        deltaMainConfig.Specification[group.Key].Components.Add(component);                        
                     }
                 }
 
-                // для списка компонентов из корня каждого раздела
-                //foreach (var subgroup in group.Value.SubGroups.OrderBy(key2 => key2.Key))
+                // для списка компонентов из корня каждого раздела                
                 foreach (var subgroup in group.Value.SubGroups)
                 {
                     foreach (var component in subgroup.Value.Components)
@@ -348,24 +346,25 @@ namespace GostDOC.DataPreparation
             foreach (var component in aSortComponents)
             {   
                 string component_name = component.GetProperty(Constants.ComponentName);
+                string prepared_component_name = component_name;
                 string groupSp = component.GetProperty(Constants.GroupNameSp);
                 int component_count = GetComponentCount(component, string.Equals(groupSp, Constants.GroupDoc));                
 
                 if (aChangeComponentName == ChangeNameBySubGroupName.AddSubgroupName)
                 {                    
                     string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);                    
-                    if (component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase) < 0)                    
-                        component_name = $"{subGroupName} {component_name}";                    
+                    if (component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase) < 0)
+                        prepared_component_name = $"{subGroupName} {component_name}";                    
                 }
                 else if (aChangeComponentName == ChangeNameBySubGroupName.ExcludeSubgroupSingleName)
                 {
                     string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);
                     int val = component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase);
-                    if (val == 0)                    
-                        component_name = component_name.Substring(subGroupName.Length).TrimStart();
+                    if (val == 0)
+                        prepared_component_name = component_name.Substring(subGroupName.Length).TrimStart();
                 }
 
-                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, component_name, new char[] {' '}, Constants.SpecificationFontSize).ToArray();                
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, prepared_component_name, new char[] {' '}, Constants.SpecificationFontSize).ToArray();                
                 var note = component.GetProperty(Constants.ComponentNote);
                 string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth - 3, note, new char[] {'-', ',' }, Constants.SpecificationFontSize).ToArray();
                 string designation = component.GetProperty(Constants.ComponentSign);
@@ -379,15 +378,15 @@ namespace GostDOC.DataPreparation
                     ++aPos;
                     row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString() };
 
-                    string val = ($"{component_name} {designation}").Trim();
+                    string posComponentName = ($"{component_name} {designation}").Trim();
                     var configNames = aTable.TableName.Split(',');
-                    foreach (var name in configNames)
+                    foreach (var cfgName in configNames)
                     {
-                        string key = ($"{name} {groupSp}").Trim();                        
+                        string key = ($"{cfgName} {groupSp}").Trim();                        
                         if (!aPositions.ContainsKey(key))
-                            aPositions.Add(key, new List<Tuple<string, int>>() { new Tuple<string, int>(val, aPos) });
+                            aPositions.Add(key, new List<Tuple<string, int>>() { new Tuple<string, int>(posComponentName, aPos) });
                         else
-                            aPositions[key].Add(new Tuple<string, int>(val, aPos));
+                            aPositions[key].Add(new Tuple<string, int>(posComponentName, aPos));
                     }
                 }
                                                 
