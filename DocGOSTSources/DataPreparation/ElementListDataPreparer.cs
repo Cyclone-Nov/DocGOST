@@ -151,12 +151,14 @@ namespace GostDOC.DataPreparation
                 {   
                     string groupName = groupNames[designator].Item1;
                     int count = groupNames[designator].Item2;
-                    addGroupNameToNameField = string.IsNullOrEmpty(groupName) || (count == sameComponents); //if (!string.IsNullOrEmpty(groupName) && (count != sameComponents))
-                    AddEmptyRow(aTable);
+                    addGroupNameToNameField = string.IsNullOrEmpty(groupName) || (count == sameComponents); //if (!string.IsNullOrEmpty(groupName) && (count != sameComponents))                    
 
-                    // если не надо добавлять имя группы  строку имени, то добавим имя группы отдельно
-                    if (!addGroupNameToNameField)                                         
-                        AddGroupName(aTable, GetGroupNameByCount(groupName, false));                     
+                    // если не надо добавлять имя группы в строку с именем, то добавим имя группы отдельно
+                    if (!addGroupNameToNameField)
+                    {
+                        AddEmptyRow(aTable);
+                        AddGroupName(aTable, GetGroupNameByCount(groupName, false));
+                    }
                     
                     countDifferentComponents = 0;
                 }
