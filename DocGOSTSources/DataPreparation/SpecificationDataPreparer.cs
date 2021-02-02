@@ -352,7 +352,7 @@ namespace GostDOC.DataPreparation
 
                 if (aChangeComponentName == ChangeNameBySubGroupName.AddSubgroupName)
                 {                    
-                    string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);                    
+                    string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);
                     if (component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase) < 0)
                         prepared_component_name = $"{subGroupName} {component_name}";                    
                 }

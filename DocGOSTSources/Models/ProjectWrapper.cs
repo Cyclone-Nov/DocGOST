@@ -183,9 +183,10 @@ namespace GostDOC.Models
         /// <summary>
         /// записать позицию в свойство Позиция для данного компонента
         /// </summary>
-        /// <param name="aPositions"></param>
-        /// <param name="aComponent"></param>
-        /// <param name="aPrevPosition"></param>
+        /// <param name="aPositions">список с позициями</param>
+        /// <param name="aComponent">компонент</param>
+        /// <param name="aPrevPosition">номер предыдущей позиции</param>
+        /// <returns> </returns>
         private int SetSpecificationPosition(List<Tuple<string, int>> aPositions, Component aComponent, int aPrevPosition)
         {
             int retposition = 0;
