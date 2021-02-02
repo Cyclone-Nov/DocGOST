@@ -23,7 +23,7 @@ namespace GostDocTests.Tests.Common
     {
 
         /// <summary>
-        ///  задаем пустое значение на входе и получаем false
+        ///  Задаем пустое значение на входе и получаем false
         /// </summary>
         [Fact]
         public void CheckDesignatorFormat_SetEmpty_ReturnFalse()
@@ -35,7 +35,10 @@ namespace GostDocTests.Tests.Common
             Assert.False(actual);
         }
 
-        // TODO: реализовать тест. задать значение меньше 2 символов на входе и получить false
+        /// <summary>
+        /// Задаем значение меньше 2 символов на входе и получаем false
+        /// </summary>
+        /// <param name="tValue"></param>
         [Theory]
         [InlineData("A")]
         [InlineData("1")]
@@ -50,7 +53,10 @@ namespace GostDocTests.Tests.Common
 
         }
 
-        // TODO: реализовать тест. задать значение без символов на входе и получить false
+        /// <summary>
+        /// Задаем значение без символов на входе и получаем false
+        /// </summary>
+        /// <param name="tValue"></param>
         [Theory]
         [InlineData("000")]
         [InlineData("123")]
@@ -63,20 +69,36 @@ namespace GostDocTests.Tests.Common
             Assert.False(actual);
         }
 
-        // TODO: реализовать тест. задать значение без цифр после символов на входе и получить false
-        [Theory]
-        [InlineData("/?*")]
-        [InlineData("abc")]
-        public void CheckDesignatorFormat_SetValueWithoutDigits_ReturnFalse(string tValue)
+        /// <summary>
+        /// Задаем значение без цифр после символов на входе и получаем false
+        /// </summary>
+        [Fact]
+        public void CheckDesignatorFormat_SetValueWithoutDigits_ReturnFalse()
         {
             // Act
-            bool actual = Checkers.CheckDesignatorFormat(tValue);
+            bool actual = Checkers.CheckDesignatorFormat("abc");
 
             // Assert
             Assert.False(actual);
         }
 
-        // TODO: реализовать тест. задать правильные значения на входе и получить true
+        /// <summary>
+        /// Задаем значение состоящее из спец символов и числа на входе и получаем false
+        /// </summary>
+        [Fact]
+        public void CheckDesignatorFormat_SetSpecialSymbolsAndDigit_ReturnFalse()
+        {
+            // Act
+            bool actual = Checkers.CheckDesignatorFormat("/?*1");
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        /// <summary>
+        /// Задаем правильные значения на входе и получаем true
+        /// </summary>
+        /// <param name="tValue"></param>
         [Theory]
         [InlineData("A1")]
         [InlineData("VD23")]
