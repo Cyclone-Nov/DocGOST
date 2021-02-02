@@ -164,7 +164,7 @@ namespace GostDOC.Common
 
     #region Имена столбцов в Excel
 
-    public enum ExcelColumn 
+    public enum ExcelColumn
     {
         /// <summary>
         /// 1
@@ -308,7 +308,7 @@ namespace GostDOC.Common
         /// <summary>
         /// название графы №4 Обозначение Литеры А изделия в структуре xml
         /// </summary>
-        public static readonly string GRAPH_4 = "Литера1";
+        public static readonly string GRAPH_4 = "Литера";
         /// название графы №4а Обозначение Литеры О изделия в структуре xml
         /// </summary>
         public static readonly string GRAPH_4a = "Литера2";

@@ -104,10 +104,11 @@ namespace GostDOC.ExcelExport
             {
                 // Fill main title                      
                 sheet.Cells[38, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_1); // Cells[33, 12]                
-                sheet.Cells[35, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2); //Cells[30, 12]                
-                sheet.Cells[39, ExcelColumn.P] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4); // Cells[34, 15]                
-                sheet.Cells[39, ExcelColumn.Q] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a); //Cells[34, 16]                
-                sheet.Cells[39, ExcelColumn.R] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b); //Cells[34, 17]
+                sheet.Cells[35, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2); //Cells[30, 12]   
+                                
+                (sheet.Cells[39, ExcelColumn.P] as Excel.Range).FormatLitera(Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4)); // Cells[39, 16]                
+                (sheet.Cells[39, ExcelColumn.Q] as Excel.Range).FormatLitera(Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4a)); //Cells[39, 17]                
+                (sheet.Cells[39, ExcelColumn.R] as Excel.Range).FormatLitera(Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_4b)); //Cells[39, 18]
                                 
                 sheet.Cells[38, ExcelColumn.H] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_dev); //Cells[33, 8]                
                 sheet.Cells[39, ExcelColumn.H] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_11sp_chk); //Cells[34, 8]                
