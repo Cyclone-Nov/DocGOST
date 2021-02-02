@@ -37,6 +37,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoFixture, Version=4.15.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
       <HintPath>packages\AutoFixture.4.15.0\lib\net452\AutoFixture.dll</HintPath>
@@ -511,6 +514,7 @@
     <None Include="Settings\NewSpecificationGraphNames.cfg" />
     <Resource Include="Resources\ghost.png" />
     <Resource Include="Resources\icon.jpg" />
+    <Resource Include="icon.ico" />
     <Content Include="Settings\PhysicalDesignators.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
