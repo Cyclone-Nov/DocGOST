@@ -163,33 +163,51 @@ namespace GostDOC.Models
             return 0.0;
         }
 
+        private int CompareFirstLetter(string aFirst, string aSecond)
+        {
+            if (string.IsNullOrEmpty(aFirst) && string.IsNullOrEmpty(aSecond))
+                return 0;
+
+            if (string.IsNullOrEmpty(aFirst))
+                return -1;
+
+            if (string.IsNullOrEmpty(aSecond))
+                return 1;
+
+            return aFirst[0].CompareTo(aSecond[0]);
+        }
+
+        private int CompareValues(string aFirst, string aSecond)
+        {
+            // Compare 1st letter
+            var result = CompareFirstLetter(aFirst, aSecond);
+
+            if (result == 0)
+            {
+                // Parse value and compare it
+                var num1 = ParseValue(aFirst);
+                var num2 = ParseValue(aSecond);
+                result = num1.CompareTo(num2);
+            }
+            return result;
+        }
+
         public List<Component> Sort(List<Component> aItems)
         {            
             aItems.Sort((x, y) =>
             {
-                string nameX = x.GetProperty(Constants.ComponentName);
-                string nameY = y.GetProperty(Constants.ComponentName);
+                string nameX = x.GetProperty(Constants.ComponentNote);
+                string nameY = y.GetProperty(Constants.ComponentNote);
 
-                if (string.IsNullOrEmpty(nameX) && string.IsNullOrEmpty(nameY))
-                    return 0;
+                int cmp = CompareFirstLetter(nameX, nameY);
 
-                if (string.IsNullOrEmpty(nameX))
-                    return -1;
-
-                if (string.IsNullOrEmpty(nameY))
-                    return 1;
-
-                // Compare 1st letter
-                var result = nameX[0].CompareTo(nameY[0]);
-
-                if (result == 0)
+                if (cmp == 0)
                 {
-                    // Parse value and compare it
-                    var num1 = ParseValue(nameX);
-                    var num2 = ParseValue(nameY);
-                    result = num1.CompareTo(num2);
+                    nameX = x.GetProperty(Constants.ComponentName);
+                    nameY = y.GetProperty(Constants.ComponentName);
+                    cmp = CompareValues(nameX, nameY);
                 }
-                return result;
+                return cmp;
             });
             return aItems;
         }
