@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Common;
+using GostDOC.DataPreparation;
 
 namespace GostDOC.Models
 {
@@ -182,18 +183,17 @@ namespace GostDOC.Models
         /// <summary>
         /// записать позицию в свойство Позиция для данного компонента
         /// </summary>
-        /// <param name="aPositions"></param>
-        /// <param name="aComponent"></param>
-        /// <param name="aPrevPosition"></param>
+        /// <param name="aPositions">список с позициями</param>
+        /// <param name="aComponent">компонент</param>
+        /// <param name="aPrevPosition">номер предыдущей позиции</param>
+        /// <returns> </returns>
         private int SetSpecificationPosition(List<Tuple<string, int>> aPositions, Component aComponent, int aPrevPosition)
         {
             int retposition = 0;
             if (aPositions != null)
-            {
-                string name = aComponent.GetProperty(Constants.ComponentName);
-                string designator = aComponent.GetProperty(Constants.ComponentSign);
-                string val = ($"{name} {designator}").Trim();
-                var positions = aPositions.Where(item => string.Equals(item.Item1, val));
+            {                
+                string name = DataPreparationUtils.GetNameForPositionDictionary(aComponent);
+                var positions = aPositions.Where(item => string.Equals(item.Item1, name));
                 if (positions != null && positions.Count() > 0)
                 {
                     if (positions.Count() == 1)

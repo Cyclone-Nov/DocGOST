@@ -7,13 +7,18 @@ namespace GostDOC.ExcelExport
 {
     static class ExcelExtensions
     {
+        /// <summary>
+        /// максимальное количество цветов в палитре Workbook Excel по умолчанию, если палитру не меняли
+        /// </summary>
+        public static int MAX_EXCEL_PALETTE_COLORS = 56;
+
         public static dynamic MergeRange(this Excel._Worksheet ws, int r1, int c1, int r2, int c2, int col)
         {
             Excel.Range range = ws.Range[ws.Cells[r1, c1], ws.Cells[r2, c2]];
             range.Merge();
             range.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
             range.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
-            range.Interior.ColorIndex = col;
+            range.Interior.ColorIndex = col % MAX_EXCEL_PALETTE_COLORS;
             range.Font.Bold = true;
             return range;            
         }

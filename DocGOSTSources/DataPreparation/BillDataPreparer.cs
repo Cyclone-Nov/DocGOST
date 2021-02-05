@@ -306,8 +306,7 @@ namespace GostDOC.DataPreparation
             if (!aComponents.Any()) return;
             // записываем компоненты в таблицу данных
 
-            // Cортировка компонентов по значению свойства "Позиционное обозначение"
-            //Models.Component[] sortComponents = SortFactory.GetSort(SortType.DesignatorID).Sort(aComponents.ToList()).ToArray();
+            // Cортировка компонентов по значению свойства "Наименование"            
             Models.Component[] sortComponents = SortFactory.GetSort(SortType.Name).Sort(aComponents.ToList()).ToArray();
 
             // записываем наименование группы, если есть
@@ -373,6 +372,13 @@ namespace GostDOC.DataPreparation
                         compCount = 0;            
                         // проджолжим дальше так как компонент есть
                     }
+                }
+
+                // если группа Прочие, то к наименованию прибавим имя подгруппы из тега Подраздел СП
+                if (string.Equals(aGroupName, Constants.SUBGROUPFORSINGLE, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var subgroupSp = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true); 
+                    name = ($"{subgroupSp} {name}").TrimStart();
                 }
 
                 // вчисляем длины полей и переносим на следующую строку при необходимости 
