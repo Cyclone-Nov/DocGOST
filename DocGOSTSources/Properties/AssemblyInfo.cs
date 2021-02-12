@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Central Research Institute Cyclone")]
 [assembly: AssemblyProduct("GostDOC")]
-[assembly: AssemblyCopyright("JSC CRI Cyclone ©  2020")]
+[assembly: AssemblyCopyright("JSC CRI Cyclone ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.1.28")]
-[assembly: AssemblyFileVersion("1.1.1.28")]
+[assembly: AssemblyVersion("1.1.1.29")]
+[assembly: AssemblyFileVersion("1.1.1.29")]
