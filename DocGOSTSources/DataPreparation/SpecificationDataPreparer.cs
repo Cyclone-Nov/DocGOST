@@ -376,7 +376,7 @@ namespace GostDOC.DataPreparation
                 if (aSetPos)
                 {
                     ++aPos;
-                    row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString() };
+                    row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString(), TextAlignment = TextAlignment.CENTER };
 
                     string posComponentName = DataPreparationUtils.GetNameForPositionDictionary(component);
                     var configNames = aTable.TableName.Split(',');
