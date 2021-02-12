@@ -96,7 +96,7 @@ namespace GostDOC.Models
 
                 AddComponents(newCfg, cfg.Documents, ComponentType.Document, unitSign);
 
-                if(_docType != DocType.Bill)
+                if(_docType != DocType.Bill && _docType != DocType.D27)
                     AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, unitSign);
 
                 AddComponents(newCfg, cfg.Components, ComponentType.Component, unitSign);
