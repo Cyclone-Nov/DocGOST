@@ -260,17 +260,21 @@ namespace GostDOC.DataPreparation
 
             var сomponents = group.Components;
 
-            // добавим в наименование компонента название группы, если это раздел Прочие изделия
+            // добавим в наименование компонента название группы для компонентов без групппы для раздела Прочие изделия
             ChangeNameBySubGroupName changeComponentName = ChangeNameBySubGroupName.WithoutCahnges;
             if (string.Equals(aGroupName, Constants.GroupOthers))
                 changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;
 
             // будем добавлять позицию, если раздел не Документация и не Комплексы
             bool setPos = !string.Equals(aGroupName, Constants.GroupDoc) && !string.Equals(aGroupName, Constants.GroupComplex);
+            
             AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, changeComponentName);
             
             if (сomponents.Count > 0)            
-                AddEmptyRow(aTable);            
+                AddEmptyRow(aTable);
+
+            // для подгрупп не будет добавлять наименование группы в наименовение компонента
+            changeComponentName = ChangeNameBySubGroupName.WithoutCahnges;
 
             // добавляем подгруппы
             foreach (var subgroup in group.SubGroups.OrderBy(key => key.Key).Where(key => !string.Equals(key.Key, Constants.SUBGROUPFORSINGLE)))
@@ -348,20 +352,24 @@ namespace GostDOC.DataPreparation
                 string component_name = component.GetProperty(Constants.ComponentName);
                 string prepared_component_name = component_name;
                 string groupSp = component.GetProperty(Constants.GroupNameSp);
-                int component_count = GetComponentCount(component, string.Equals(groupSp, Constants.GroupDoc));                
+                int component_count = GetComponentCount(component, string.Equals(groupSp, Constants.GroupDoc));
 
-                if (aChangeComponentName == ChangeNameBySubGroupName.AddSubgroupName)
-                {                    
-                    string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);
-                    if (component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase) < 0)
-                        prepared_component_name = $"{subGroupName} {component_name}";                    
-                }
-                else if (aChangeComponentName == ChangeNameBySubGroupName.ExcludeSubgroupSingleName)
+                // признак что компонент не пустой
+                bool nonEmptyComponent = !string.IsNullOrEmpty(component_name);
+                if (nonEmptyComponent)
                 {
-                    string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);
-                    int val = component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase);
-                    if (val == 0)
-                        prepared_component_name = component_name.Substring(subGroupName.Length).TrimStart();
+                    if (aChangeComponentName == ChangeNameBySubGroupName.AddSubgroupName)
+                    {
+                        string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);
+                        if (component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase) < 0)
+                            prepared_component_name = $"{subGroupName} {component_name}";
+                    } else if (aChangeComponentName == ChangeNameBySubGroupName.ExcludeSubgroupSingleName)
+                    {
+                        string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);
+                        int val = component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase);
+                        if (val == 0)
+                            prepared_component_name = component_name.Substring(subGroupName.Length).TrimStart();
+                    }
                 }
 
                 string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, prepared_component_name, new char[] {' '}, Constants.SpecificationFontSize).ToArray();                
@@ -372,11 +380,15 @@ namespace GostDOC.DataPreparation
 
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString { Value = component.GetProperty(Constants.ComponentFormat) };
-                row[Constants.ColumnZone] = new FormattedString{ Value = zone };                
+                row[Constants.ColumnZone] = new FormattedString{ Value = zone };  
+                
+                // если необходимо установить позицию
                 if (aSetPos)
                 {
                     ++aPos;
-                    row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString(), TextAlignment = TextAlignment.CENTER };
+                    // если элемент не пустой
+                    if(nonEmptyComponent)
+                        row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString(), TextAlignment = TextAlignment.CENTER };
 
                     string posComponentName = DataPreparationUtils.GetNameForPositionDictionary(component);
                     var configNames = aTable.TableName.Split(',');
