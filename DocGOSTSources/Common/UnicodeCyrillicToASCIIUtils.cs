@@ -1,11 +1,14 @@
-﻿using System;
+﻿using System.Runtime.CompilerServices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+[assembly: InternalsVisibleTo("GostDocTests")]
 namespace GostDOC.Common
 {
+    //[assembly: InternalsVisibleTo("GostDocTests")]    
     internal static class UnicodeCyrillicToASCIIUtils
     {
         private enum UnicodeHexCode : ushort
