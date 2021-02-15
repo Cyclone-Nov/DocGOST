@@ -103,28 +103,28 @@ namespace GostDOC.DataPreparation
         /// <summary>
         /// подготовить данные конфигураций к выводу в таблицу данных
         /// </summary>
-        /// <param name="aConfigs">a configs.</param>
-        /// <param name="aMainConfig">a main configuration.</param>
+        /// <param name="aConfigs">все исполнения спецификации</param>
+        /// <param name="aCommonConfig">общая часть конфигураций для всех исполнений спецификации</param>
         /// <returns></returns>
-        private IDictionary<string, Configuration> PrepareConfigs(IDictionary<string, Configuration> aConfigs, out Configuration aMainConfig)
-        {
-            
+        private IDictionary<string, Configuration> PrepareConfigs(IDictionary<string, Configuration> aConfigs, out Configuration aCommonConfig)
+        {            
             if (aConfigs == null || !aConfigs.TryGetValue(Constants.MAIN_CONFIG_INDEX, out var mainConfig))
             {
-                aMainConfig = null;
+                aCommonConfig = null;
                 return null;
             }
 
+            // если конфигурация одна то, она же общая часть
             if (aConfigs.Count() == 1)
             {
-                aMainConfig = mainConfig;
+                aCommonConfig = mainConfig;
                 return null;
             }
 
             // если конфигураций несколько            
-            aMainConfig = new Configuration();
+            aCommonConfig = new Configuration();
             var deltaMainConfig = new Configuration();
-            deltaMainConfig.Graphs = aMainConfig.Graphs = mainConfig.Graphs;
+            deltaMainConfig.Graphs = aCommonConfig.Graphs = mainConfig.Graphs;
             var mainData = mainConfig.Specification;
 
             // выберем неглавные конфигурации
@@ -136,20 +136,21 @@ namespace GostDOC.DataPreparation
                     otherConfigs.Add(config.Key, config.Value.DeepCopy());
                 }
             }
-                        
+             
+            // для каждого раздела спецификации
             foreach (var group in mainData)
             {
-                // для списка компонентов из корня каждого раздела
+                // для каждого компонента из корня каждого раздела
                 foreach (var component in group.Value.Components)
                 {
-                    if (CheckComponentInOtherConfigs(otherConfigs, component, group.Key))
+                    if (ExcludeCommonComponentFormOtherConfigs(otherConfigs, component, group.Key))
                     {
-                        if (!aMainConfig.Specification.ContainsKey(group.Key))
+                        if (!aCommonConfig.Specification.ContainsKey(group.Key))
                         {
-                            aMainConfig.Specification.Add(group.Key, new Group());
-                            aMainConfig.Specification[group.Key].Name = group.Key;
+                            aCommonConfig.Specification.Add(group.Key, new Group());
+                            aCommonConfig.Specification[group.Key].Name = group.Key;
                         }
-                        aMainConfig.Specification[group.Key].Components.Add(component);
+                        aCommonConfig.Specification[group.Key].Components.Add(component);
                     } else
                     {
                         if (!deltaMainConfig.Specification.ContainsKey(group.Key))
@@ -160,24 +161,27 @@ namespace GostDOC.DataPreparation
                     }
                 }
 
-                // для списка компонентов из корня каждого раздела                
+                // для каждой подгруппы из данного раздела 
                 foreach (var subgroup in group.Value.SubGroups)
                 {
+                    // для каждого компонента из подгруппы данного раздела
                     foreach (var component in subgroup.Value.Components)
-                    {
-                        if (CheckComponentInOtherConfigs(otherConfigs, component, group.Key, subgroup.Key))
+                    {                           
+                        if (ExcludeCommonComponentFormOtherConfigs(otherConfigs, component, group.Key, subgroup.Key))
                         {
-                            if (!aMainConfig.Specification.ContainsKey(group.Key))
+                            // поместим исключенный компонент в общую часть
+                            if (!aCommonConfig.Specification.ContainsKey(group.Key))
                             {
-                                aMainConfig.Specification.Add(group.Key, new Group());
+                                aCommonConfig.Specification.Add(group.Key, new Group());
                             }
-                            if (!aMainConfig.Specification[group.Key].SubGroups.ContainsKey(subgroup.Key))
+                            if (!aCommonConfig.Specification[group.Key].SubGroups.ContainsKey(subgroup.Key))
                             {
-                                aMainConfig.Specification[group.Key].SubGroups.Add(subgroup.Key, new Group());
+                                aCommonConfig.Specification[group.Key].SubGroups.Add(subgroup.Key, new Group());
                             }
-                            aMainConfig.Specification[group.Key].SubGroups[subgroup.Key].Components.Add(component);
+                            aCommonConfig.Specification[group.Key].SubGroups[subgroup.Key].Components.Add(component);
                         } else
                         {
+                            // поместим компонент, который встречается не во всех исполнениях в часть отличий
                             if (!deltaMainConfig.Specification.ContainsKey(group.Key))
                             {
                                 deltaMainConfig.Specification.Add(group.Key, new Group());
@@ -192,8 +196,16 @@ namespace GostDOC.DataPreparation
                 }
             }
 
-            otherConfigs.Add(Constants.MAIN_CONFIG_INDEX, deltaMainConfig);
-            return otherConfigs;
+            // если часть основного исполнения с различиями не пуста, то добавим ее к прочим исполнениям
+            if (deltaMainConfig.Specification.Count > 0)
+            {
+                deltaMainConfig.Graphs = mainConfig.Graphs;
+                otherConfigs.Add(Constants.MAIN_CONFIG_INDEX, deltaMainConfig);
+                return otherConfigs;
+            }
+
+            // так как часть основного исполнения с различиями пуста, то и прочие исполения нас не интересуют
+            return null;
         }
 
         /// <summary>
@@ -517,13 +529,14 @@ namespace GostDOC.DataPreparation
         }
 
         /// <summary>
-        /// определение наличия компонента во всех конфигурациях
+        /// исключить (удалить) компонент из прочих (не главноего) исполнений при наличие его в них
         /// </summary>
-        /// <param name="aComponent">a component.</param>
-        /// <param name="aGroupName">Name of a group.</param>
-        /// <param name="aOtherConfigs">a other configs.</param>
+        /// <param name="aOtherConfigs">словарь прочих исполнений</param>
+        /// <param name="aComponent">компонент</param>
+        /// <param name="aGroupName">имя раздела</param>
+        /// <param name="aGroupName">имя подгруппы</param>
         /// <returns></returns>
-        private bool CheckComponentInOtherConfigs(Dictionary<string, Configuration> aOtherConfigs, Component aComponent, string aGroupName, string aSubGroupName = "")
+        private bool ExcludeCommonComponentFormOtherConfigs(Dictionary<string, Configuration> aOtherConfigs, Component aComponent, string aGroupName, string aSubGroupName = "")
         {
             List<Component> removeList = null;
             bool bRemoveGroup = false;
