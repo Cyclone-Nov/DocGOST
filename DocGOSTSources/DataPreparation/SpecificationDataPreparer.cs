@@ -374,7 +374,7 @@ namespace GostDOC.DataPreparation
 
                 string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 3, prepared_component_name, new char[] {' '}, Constants.SpecificationFontSize).ToArray();                
                 var note = component.GetProperty(Constants.ComponentNote);
-                string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth - 3, note, new char[] {'-', ',' }, Constants.SpecificationFontSize).ToArray();
+                string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth - 3, note, new char[] {' ','-', ',' }, Constants.SpecificationFontSize).ToArray();
                 string designation = component.GetProperty(Constants.ComponentSign);
                 string zone = component.GetProperty(Constants.ComponentZone);
 
