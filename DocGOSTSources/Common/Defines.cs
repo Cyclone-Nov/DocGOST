@@ -440,7 +440,7 @@ namespace GostDOC.Common
         /// </summary>
         public static readonly string GroupMainCompontns = "";
 
-        public static readonly string GroupOthersB = "Прочие";
+        public static readonly string GroupOthersB = "Прочие изделия";
 
         #endregion
 
