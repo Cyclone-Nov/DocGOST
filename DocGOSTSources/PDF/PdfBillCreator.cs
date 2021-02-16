@@ -75,7 +75,7 @@ namespace GostDOC.PDF
             _pdfDoc.SetDefaultPageSize(_pageSize);
             _doc = new Document(_pdfDoc, _pdfDoc.GetDefaultPageSize().Rotate(), true);
             
-            int countPages = PdfUtils.GetCountPage(Type, dataTable.Rows.Count);
+            int countPages = CommonUtils.GetCountPage(Type, dataTable.Rows.Count);
             int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable, countPages);
         
             _currentPageNumber = 1;
@@ -84,7 +84,7 @@ namespace GostDOC.PDF
                 lastProcessedRow = AddNextPage(_doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
             }
         
-            if (_pdfDoc.GetNumberOfPages() > PdfDefines.MAX_PAGES_WITHOUT_CHANGELIST) {
+            if (_pdfDoc.GetNumberOfPages() > Constants.MAX_PAGES_WITHOUT_CHANGELIST) {
                 _currentPageNumber++;                
                 AddRegisterList(_doc, graphs, _currentPageNumber, 
                                 new Dictionary<string, object>() { 
@@ -266,7 +266,7 @@ namespace GostDOC.PDF
                             AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 3, leftPaddCell);
                         } else
                         {
-                            tbl.AddCell(leftPaddCell.Clone(true).Add(new Paragraph(name)).SetUnderline());
+                            tbl.AddCell(leftPaddCell.Clone(true).SetTextAlignment(TextAlignment.CENTER).Add(new Paragraph(name)).SetUnderline());
                             AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 2, leftPaddCell);
                         }
                         rowNumber--;
