@@ -221,7 +221,7 @@ namespace GostDOC.DataPreparation
 
             var data = aConfig.Bill;
 
-            foreach (var group in data.OrderBy(key => key.Key).Where(key => !string.Equals(key.Key, Constants.SUBGROUPFORSINGLE)))
+            foreach (var group in data.OrderBy(key => key.Key).Where(key => !string.Equals(key.Key, Constants.GroupOthersB)))
             {
                 if (group.Value.Components.Count() > 0 || group.Value.SubGroups.Count() > 0)
                 {
@@ -239,13 +239,23 @@ namespace GostDOC.DataPreparation
             }
 
             // отдельно запишем прогруппу "Прочие"
-            if (data.TryGetValue(Constants.SUBGROUPFORSINGLE, out var group_other))
+            if (data.TryGetValue(Constants.GroupOthersB, out var group_other))
             {
                 if (group_other.Components.Count > 0)
                 {
                     var mainсomponents = group_other.Components.ToList();
-                    FillDataTable(aTable, Constants.SUBGROUPFORSINGLE, mainсomponents);                    
+                    FillDataTable(aTable, Constants.GroupOthersB, mainсomponents);                    
                 }
+            }
+
+            // проверим надо ли добавить оглавление в ВП
+            int countPages = CommonUtils.GetCountPage(DocType.Bill, aTable.Rows.Count);
+            if (countPages > Constants.BillPagesWithoutContent)
+            {
+                // сделаем оглавление
+
+                // запишем оглавление в таблицу данных
+
             }
         }
 
@@ -255,18 +265,7 @@ namespace GostDOC.DataPreparation
         /// <param name="aTable"></param>
         private void AddEmptyRow(DataTable aTable) 
         {
-            DataRow row = aTable.NewRow();
-            //row[Constants.ColumnName] = string.Empty;
-            //row[Constants.ColumnProductCode] = string.Empty;
-            //row[Constants.ColumnDeliveryDocSign] = string.Empty;
-            //row[Constants.ColumnSupplier] = string.Empty;
-            //row[Constants.ColumnEntry] = string.Empty;
-            //row[Constants.ColumnQuantityDevice] = 0;
-            //row[Constants.ColumnQuantityComplex] = 0;
-            //row[Constants.ColumnQuantityRegul] = 0;
-            //row[Constants.ColumnQuantityTotal] = 0;
-            //row[Constants.ColumnFootnote] = string.Empty;
-            //row[Constants.ColumnTextFormat] = string.Empty;            
+            DataRow row = aTable.NewRow();                      
             aTable.Rows.Add(row);
         }
 
@@ -391,7 +390,7 @@ namespace GostDOC.DataPreparation
 
                 row = aTable.NewRow();
                 row[Constants.ColumnName] = new FormattedString { Value = namearr.First() };
-                if (IsRussianSupplier(supplier))
+                if (CommonUtils.IsRussianSupplier(supplier))
                 {
                     row[Constants.ColumnProductCode] = new FormattedString { Value = component.GetProperty(Constants.ComponentProductCode) };
                 }
@@ -514,7 +513,12 @@ namespace GostDOC.DataPreparation
             return result;
         }
 
-
+        /// <summary>
+        /// Equealses the bill components.
+        /// </summary>
+        /// <param name="aFirstComponent">a first component.</param>
+        /// <param name="aSecondComponent">a second component.</param>
+        /// <returns></returns>
         private bool EquealsBillComponents(Component aFirstComponent, Component aSecondComponent)
         {
             string name1 = aFirstComponent.GetProperty(Constants.ComponentName);
@@ -533,6 +537,10 @@ namespace GostDOC.DataPreparation
             return false;
         }
 
+        /// <summary>
+        /// Removes the last empty rows.
+        /// </summary>
+        /// <param name="table">The table.</param>
         private void RemoveLastEmptyRows(DataTable table)
         {
             if (table.Rows.Count > 1)
@@ -564,31 +572,7 @@ namespace GostDOC.DataPreparation
             }
         }
 
-        /// <summary>
-        /// проверка что поставщик русский (на основе наличия неанглийских букв в наименовании)
-        /// </summary>
-        /// <param name="aSupplier">a supplier.</param>
-        /// <returns>
-        ///   <c>true</c> if [is russian supplier] [the specified a supplier]; otherwise, <c>false</c>.
-        /// </returns>
-        private bool IsRussianSupplier(string aSupplier)
-        {
-            if (string.IsNullOrEmpty(aSupplier))
-                return true;
-
-            char letter;
-            int i = 0;
-            do
-            {
-                letter = aSupplier[i++];
-            }
-            while (Char.IsDigit(letter) && i < aSupplier.Length);
-
-            if (letter > 127)
-                return true;
-
-            return false;
-        }
+        
     }
 }
 

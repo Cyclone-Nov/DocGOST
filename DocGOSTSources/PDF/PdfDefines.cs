@@ -24,10 +24,5 @@ namespace GostDOC.PDF
         public static PdfFont MainFont = PdfFontFactory.CreateFont(@"Font\\GOST_TYPE_A.ttf", "cp1251", true);
 
         public const float DefaultFontSize = 14f;
-
-        /// <summary>
-        /// допустимое количество страниц для документа без добавления листа регистрации изменений
-        /// </summary>
-        public const int MAX_PAGES_WITHOUT_CHANGELIST = 3;
     }
 }

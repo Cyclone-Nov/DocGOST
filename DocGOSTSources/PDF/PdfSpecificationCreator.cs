@@ -57,7 +57,7 @@ namespace GostDOC.PDF
             _doc = new iText.Layout.Document(_pdfDoc, _pdfDoc.GetDefaultPageSize(), true);
             
             var dataTable = aData;
-            int countPages = PdfUtils.GetCountPage(Type, dataTable.Rows.Count);
+            int countPages = CommonUtils.GetCountPage(Type, dataTable.Rows.Count);
             int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable, countPages);
             
             _currentPageNumber = 1;
@@ -66,7 +66,7 @@ namespace GostDOC.PDF
                 lastProcessedRow = AddNextPage(_doc, graphs, dataTable, _currentPageNumber, lastProcessedRow);
             }
             
-            if (_pdfDoc.GetNumberOfPages() > PdfDefines.MAX_PAGES_WITHOUT_CHANGELIST) {
+            if (_pdfDoc.GetNumberOfPages() > Constants.MAX_PAGES_WITHOUT_CHANGELIST) {
                 _currentPageNumber++;
                 AddRegisterList(_doc, graphs, _currentPageNumber);
             }

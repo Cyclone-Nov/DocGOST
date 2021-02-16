@@ -453,6 +453,15 @@ namespace GostDOC.Common
         public static readonly string SubGroupNameSp = "Подраздел СП";
         public static readonly string GroupNameB = "Раздел ВП";
         public static readonly string SubGroupNameB = "Подраздел ВП";
+        /// <summary>
+        /// количество страниц ВП, после которого надо добавлять в ВП оглавление
+        /// </summary>
+        public static readonly int BillPagesWithoutContent = 24;
+
+        /// <summary>
+        /// допустимое количество страниц для документа без добавления листа регистрации изменений
+        /// </summary>
+        public const int MAX_PAGES_WITHOUT_CHANGELIST = 3;
 
         #region Компоненты        
         /// <summary>

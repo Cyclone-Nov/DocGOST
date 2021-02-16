@@ -55,7 +55,7 @@ internal class PdfElementListCreator : PdfCreator {
         _pdfDoc = new PdfDocument(_pdfWriter);
         _pdfDoc.SetDefaultPageSize(_pageSize);
         _doc = new Document(_pdfDoc, _pdfDoc.GetDefaultPageSize(), true);
-        int countPages = PdfUtils.GetCountPage(Type, dataTable.Rows.Count);
+        int countPages = CommonUtils.GetCountPage(Type, dataTable.Rows.Count);
         int lastProcessedRow = AddFirstPage(_doc, graphs, dataTable, countPages, aAppParams);
         
         _currentPageNumber = 1;
@@ -64,7 +64,7 @@ internal class PdfElementListCreator : PdfCreator {
             lastProcessedRow = AddNextPage(_doc, graphs, dataTable, _currentPageNumber, lastProcessedRow, aAppParams);
         }
          
-        if (_pdfDoc.GetNumberOfPages() > PdfDefines.MAX_PAGES_WITHOUT_CHANGELIST) {
+        if (_pdfDoc.GetNumberOfPages() > Constants.MAX_PAGES_WITHOUT_CHANGELIST) {
             _currentPageNumber++;
             AddRegisterList(_doc, graphs, _currentPageNumber, aAppParams);
         }
