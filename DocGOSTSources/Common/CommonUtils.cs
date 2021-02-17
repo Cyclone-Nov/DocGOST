@@ -35,46 +35,12 @@ namespace GostDOC.Common
         /// <returns></returns>
         public static bool FullPage(DocType aType, int aTotalRows)
         {
-            int RowsOnFirstPage;
-            int RowsOnNextPage;
-            switch (aType)
-            {
-                case DocType.Bill:
-                {
-                    RowsOnFirstPage = Constants.BillRowsOnFirstPage;
-                    RowsOnNextPage = Constants.BillRowsOnNextPage;
-                }
-                break;
-                case DocType.D27:
-                {
-                    RowsOnFirstPage = Constants.DefaultRowsOnFirstPage;
-                    RowsOnNextPage = Constants.DefaultRowsOnNextPage;
-                }
-                break;
-                case DocType.Specification:
-                {
-                    RowsOnFirstPage = Constants.SpecificationRowsOnFirstPage;
-                    RowsOnNextPage = Constants.SpecificationRowsOnNextPage;
-                }
-                break;
-                case DocType.ItemsList:
-                {
-                    RowsOnFirstPage = Constants.ItemListRowsOnFirstPage;
-                    RowsOnNextPage = Constants.ItemListRowsOnNextPage;
-                }
-                break;
-                default:
-                {
-                    RowsOnFirstPage = Constants.DefaultRowsOnFirstPage;
-                    RowsOnNextPage = Constants.DefaultRowsOnNextPage;
-                }
-                break;
-            }
-            
-            int notFirstPageRows = aTotalRows - RowsOnFirstPage;
+            var rows = GetRowsCountsForDocument(aType); // Item1 = rows on first page, Item2 = rows on next page
+
+            int notFirstPageRows = aTotalRows - rows.Item1;
             if (notFirstPageRows > 0)
             {
-                return notFirstPageRows % RowsOnNextPage == 0 ;
+                return notFirstPageRows % rows.Item2 == 0 ;
             }
 
             return true;
@@ -89,47 +55,13 @@ namespace GostDOC.Common
         /// <returns>количество страниц</returns>
         public static int GetCurrentPage(DocType aType, int aCurrentRowNumber)
         {
-            int RowsOnFirstPage;
-            int RowsOnNextPage;
-            switch (aType)
-            {
-                case DocType.Bill:
-                {
-                    RowsOnFirstPage = Constants.BillRowsOnFirstPage;
-                    RowsOnNextPage = Constants.BillRowsOnNextPage;
-                }
-                break;
-                case DocType.D27:
-                {
-                    RowsOnFirstPage = Constants.DefaultRowsOnFirstPage;
-                    RowsOnNextPage = Constants.DefaultRowsOnNextPage;
-                }
-                break;
-                case DocType.Specification:
-                {
-                    RowsOnFirstPage = Constants.SpecificationRowsOnFirstPage;
-                    RowsOnNextPage = Constants.SpecificationRowsOnNextPage;
-                }
-                break;
-                case DocType.ItemsList:
-                {
-                    RowsOnFirstPage = Constants.ItemListRowsOnFirstPage;
-                    RowsOnNextPage = Constants.ItemListRowsOnNextPage;
-                }
-                break;
-                default:
-                {
-                    RowsOnFirstPage = Constants.DefaultRowsOnFirstPage;
-                    RowsOnNextPage = Constants.DefaultRowsOnNextPage;
-                }
-                break;
-            }
+            var rows = GetRowsCountsForDocument(aType); // Item1 = rows on first page, Item2 = rows on next page
 
             int countPages = 1;
-            int notFirstPageRows = aCurrentRowNumber - RowsOnFirstPage;
+            int notFirstPageRows = aCurrentRowNumber - rows.Item1;
             if (notFirstPageRows > 0)
             {
-                countPages += (int)(notFirstPageRows / RowsOnNextPage) + (notFirstPageRows % RowsOnNextPage > 0 ? 1 : 0);
+                countPages += (int)(notFirstPageRows / rows.Item2) + (notFirstPageRows % rows.Item2 > 0 ? 1 : 0);
             }            
             return countPages;
         }
@@ -143,58 +75,44 @@ namespace GostDOC.Common
         /// <returns>количество строк до конца текущей страницы</returns>
         public static int GetRowsToEndOfPage(DocType aType, int aCurrentRowNumber)
         {
-            int RowsOnFirstPage;
-            int RowsOnNextPage;
-            switch (aType)
-            {
-                case DocType.Bill:
-                {
-                    RowsOnFirstPage = Constants.BillRowsOnFirstPage;
-                    RowsOnNextPage = Constants.BillRowsOnNextPage;
-                }
-                break;
-                case DocType.D27:
-                {
-                    RowsOnFirstPage = Constants.DefaultRowsOnFirstPage;
-                    RowsOnNextPage = Constants.DefaultRowsOnNextPage;
-                }
-                break;
-                case DocType.Specification:
-                {
-                    RowsOnFirstPage = Constants.SpecificationRowsOnFirstPage;
-                    RowsOnNextPage = Constants.SpecificationRowsOnNextPage;
-                }
-                break;
-                case DocType.ItemsList:
-                {
-                    RowsOnFirstPage = Constants.ItemListRowsOnFirstPage;
-                    RowsOnNextPage = Constants.ItemListRowsOnNextPage;
-                }
-                break;
-                default:
-                {
-                    RowsOnFirstPage = Constants.DefaultRowsOnFirstPage;
-                    RowsOnNextPage = Constants.DefaultRowsOnNextPage;
-                }
-                break;
-            }
+            var rows = GetRowsCountsForDocument(aType); // Item1 = rows on first page, Item2 = rows on next page
 
-            int lastRows = aCurrentRowNumber - RowsOnFirstPage;            
+            int lastRows = aCurrentRowNumber - rows.Item1;            
             if (lastRows > 0)
             {
-                int delta = lastRows % RowsOnNextPage;
+                int delta = lastRows % rows.Item2;
                 if (delta == 0)
                     lastRows = 1;
                 else
-                    lastRows = RowsOnNextPage - delta  + 1;
+                    lastRows = rows.Item2 - delta  + 1;
             }
             else if (lastRows < 0)
             {
-                lastRows = RowsOnFirstPage - aCurrentRowNumber + 1;
+                lastRows = rows.Item1 - aCurrentRowNumber + 1;
             }
             return lastRows;
         }
 
+
+        /// <summary>
+        /// получить количество строк таблицы данных на всех листах включая текущий aCurrentPageNumber
+        /// </summary>
+        /// <param name="aType">тип документа.</param>
+        /// <param name="aCurrentPageNumber">номер листа документа</param>
+        /// <returns>количество строк до конца текущей страницы</returns>
+        public static int GetRowsForPages(DocType aType, int aCurrentPageNumber)
+        {
+            if (aCurrentPageNumber < 1)
+                return 0;
+
+            var rows = GetRowsCountsForDocument(aType); // Item1 = rows on first page, Item2 = rows on next page            
+            if (aCurrentPageNumber == 1)
+            {
+                return rows.Item1;
+            }
+
+            return rows.Item1 + rows.Item2 * (aCurrentPageNumber - 1);
+        }
 
         /// <summary>
         /// проверка что поставщик русский (на основе наличия неанглийских букв в наименовании)
@@ -220,6 +138,51 @@ namespace GostDOC.Common
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// получить количество строк для первого листа и для последующих для данного документа aType
+        /// </summary>
+        /// <param name="aType">тип документа</param>
+        /// <returns>Количество строк для первого листа и для последующих (Tuple<первый лист, следующие листы>) для докумнта aType</returns>
+        public static Tuple<int, int> GetRowsCountsForDocument(DocType aType)
+        {
+            int RowsOnFirstPage;
+            int RowsOnNextPage;
+            switch (aType)
+            {
+                case DocType.Bill:
+                {
+                    RowsOnFirstPage = Constants.BillRowsOnFirstPage;
+                    RowsOnNextPage = Constants.BillRowsOnNextPage;
+                }
+                break;
+                case DocType.D27:
+                {
+                    RowsOnFirstPage = Constants.DefaultRowsOnFirstPage;
+                    RowsOnNextPage = Constants.DefaultRowsOnNextPage;
+                }
+                break;
+                case DocType.Specification:
+                {
+                    RowsOnFirstPage = Constants.SpecificationRowsOnFirstPage;
+                    RowsOnNextPage = Constants.SpecificationRowsOnNextPage;
+                }
+                break;
+                case DocType.ItemsList:
+                {
+                    RowsOnFirstPage = Constants.ItemListRowsOnFirstPage;
+                    RowsOnNextPage = Constants.ItemListRowsOnNextPage;
+                }
+                break;
+                default:
+                {
+                    RowsOnFirstPage = Constants.DefaultRowsOnFirstPage;
+                    RowsOnNextPage = Constants.DefaultRowsOnNextPage;
+                }
+                break;
+            }
+            return new Tuple<int, int>(RowsOnFirstPage, RowsOnNextPage);
         }
 
     }

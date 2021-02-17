@@ -596,16 +596,18 @@ namespace GostDOC.DataPreparation
             {
                 // сделаем оглавление
                 var content = MakeContent(aTable);
-                int contentRowsCount = content.Count * 2;
+                int contentRowsCount = content.Count * 2; // учитываем пустые строки между строками оглавления
+                int offsetPages = CommonUtils.GetCurrentPage(DocType.Bill, contentRowsCount);
+                int contentRowsOnPages = CommonUtils.GetRowsForPages(DocType.Bill, offsetPages);
 
-                // добавим пустые строки под оглавление в начало таблицы сразу
-                for (int i = 0; i < contentRowsCount; i++)
+                // добавим пустые строки под страницы, занимаемые оглавлением, сразу
+                for (int i = 0; i < contentRowsOnPages; i++)
                     AddEmptyRow(aTable, i);
 
-                int offsetRows = contentRowsCount;
-                int contentRowIndex = 0;
+                int offsetRows = contentRowsOnPages;
 
                 // запишем оглавление в таблицу данных                                
+                int contentRowIndex = 0;
                 foreach (var str in content)
                 {
                     contentRowIndex++;
@@ -621,10 +623,8 @@ namespace GostDOC.DataPreparation
                         beginGroupPage = firstComponentPage;
                     }
 
-                    int endGroupRowNumber = str.Item3 + offsetRows;                    
-
+                    int endGroupRowNumber = str.Item3 + offsetRows;
                     int endGroupPage = CommonUtils.GetCurrentPage(DocType.Bill, endGroupRowNumber);
-
 
                     string pagesRange = (beginGroupPage == endGroupPage) ?
                                             $"Лист {beginGroupPage}" : 
@@ -648,8 +648,7 @@ namespace GostDOC.DataPreparation
 
             bool firstEmptyRow = false;            
             string groupName = string.Empty;
-            int beginRowNumber = 1;
-            int endRowNumber = 1;
+            int beginRowNumber = 1;            
 
             int rowsCount = aTable.Rows.Count;
             for (int cnt = 0; cnt < rowsCount; cnt++)
@@ -662,7 +661,7 @@ namespace GostDOC.DataPreparation
                     // если первая пустая строка уже была
                     if (firstEmptyRow )
                     {
-                        endRowNumber = cnt + 1;
+                        int endRowNumber = cnt; // последняя строка группы - это последняя непустая строка
                         if (!string.IsNullOrEmpty(groupName))
                         {
                             content.Add(new Tuple<string, int, int>(groupName, beginRowNumber, endRowNumber));
@@ -682,11 +681,11 @@ namespace GostDOC.DataPreparation
                 }
                 else if(IsVariableConfigData(aTable.Rows[cnt]))
                 {
-
+                  // TODO: доделать оглавление при учете переменных данных исполнения
                 }
             }
-
-            content.Add(new Tuple<string, int, int>(groupName, beginRowNumber, endRowNumber));
+            
+            content.Add(new Tuple<string, int, int>(groupName, beginRowNumber, rowsCount));
 
             return content;
         }
