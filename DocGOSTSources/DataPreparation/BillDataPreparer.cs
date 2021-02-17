@@ -59,6 +59,9 @@ namespace GostDOC.DataPreparation
             }
 
             RemoveLastEmptyRows(table);
+            
+            // добавим оглавление если надо
+            AddContentToDataTable(table);
 
             return table;           
         }
@@ -247,26 +250,20 @@ namespace GostDOC.DataPreparation
                     FillDataTable(aTable, Constants.GroupOthersB, mainсomponents);                    
                 }
             }
-
-            // проверим надо ли добавить оглавление в ВП
-            int countPages = CommonUtils.GetCountPage(DocType.Bill, aTable.Rows.Count);
-            if (countPages > Constants.BillPagesWithoutContent)
-            {
-                // сделаем оглавление
-
-                // запишем оглавление в таблицу данных
-
-            }
         }
 
         /// <summary>
-        /// добавить пустую строку в таблицу данных
+        /// добавить пустую строку в таблицу данных (по умолчанию в конец таблица)
         /// </summary>
-        /// <param name="aTable"></param>
-        private void AddEmptyRow(DataTable aTable) 
+        /// <param name="aTable">таблица данных</param>
+        /// <param name="aRowIndex">номер позиции, куда надо вставить пустую строку: -1 - надо вставить в конец таблица</param>
+        private void AddEmptyRow(DataTable aTable, int aRowIndex = -1) 
         {
-            DataRow row = aTable.NewRow();                      
-            aTable.Rows.Add(row);
+            DataRow row = aTable.NewRow();      
+            if (aRowIndex < 0)
+                aTable.Rows.Add(row);
+            else
+                aTable.Rows.InsertAt(row, aRowIndex);
         }
 
         /// <summary>
@@ -277,10 +274,22 @@ namespace GostDOC.DataPreparation
         private bool AddGroupName(DataTable aTable, string aGroupName) {
             if (string.IsNullOrEmpty(aGroupName)) 
                 return false;
-            
+
             string[] aGroupNameArr = PdfUtils.SplitStringByWidth(Constants.BillColumn2NameWidth - 2, aGroupName, new char[] { ' ', '.', '-' }, Constants.BillFontSize).ToArray();            
             DataRow row;
             int ln = aGroupNameArr.Length;
+
+            int groupNameRowNumber = aTable.Rows.Count + ln;
+            int firstComponentRowNumber = groupNameRowNumber + 2;
+            int groupNamePageNumber = CommonUtils.GetCurrentPage(DocType.Bill, groupNameRowNumber);
+            int firstComponentPageNumber = CommonUtils.GetCurrentPage(DocType.Bill, firstComponentRowNumber);
+            if (firstComponentPageNumber > groupNamePageNumber)
+            {
+                int offset = firstComponentPageNumber - groupNamePageNumber - 1 + ln;
+                for(int i = 0; i < offset; i++)
+                    AddEmptyRow(aTable);
+            }
+
             for (int i = 0; i < ln; i++)
             {
                 row = aTable.NewRow();
@@ -310,7 +319,9 @@ namespace GostDOC.DataPreparation
 
             // записываем наименование группы, если есть
             if (AddGroupName(aTable, aGroupName))
+            {
                 AddEmptyRow(aTable);
+            }
 
             //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
             DataRow row;
@@ -373,8 +384,8 @@ namespace GostDOC.DataPreparation
                     }
                 }
 
-                // если группа Прочие, то к наименованию прибавим имя подгруппы из тега Подраздел СП
-                if (string.Equals(aGroupName, Constants.SUBGROUPFORSINGLE, StringComparison.InvariantCultureIgnoreCase))
+                // если группа Прочие изделия, то к наименованию прибавим имя подгруппы из тега Подраздел СП
+                if (string.Equals(aGroupName, Constants.GroupOthersB, StringComparison.InvariantCultureIgnoreCase))
                 {
                     var subgroupSp = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true); 
                     name = ($"{subgroupSp} {name}").TrimStart();
@@ -572,7 +583,181 @@ namespace GostDOC.DataPreparation
             }
         }
 
-        
+        /// <summary>
+        /// добавить в таблицу данных оглавление если надо
+        /// </summary>
+        /// <param name="aTable">Таблица данных</param>
+        /// <returns></returns>
+        private void AddContentToDataTable(DataTable aTable)
+        {
+            // проверим надо ли добавить оглавление
+            int countPages = CommonUtils.GetCountPage(DocType.Bill, aTable.Rows.Count);
+            if (countPages > Constants.BillPagesWithoutContent)
+            {
+                // сделаем оглавление
+                var content = MakeContent(aTable);
+                int contentRowsCount = content.Count * 2;
+
+                // добавим пустые строки под оглавление в начало таблицы сразу
+                for (int i = 0; i < contentRowsCount; i++)
+                    AddEmptyRow(aTable, i);
+
+                int offsetRows = contentRowsCount;
+                int contentRowIndex = 0;
+
+                // запишем оглавление в таблицу данных                                
+                foreach (var str in content)
+                {
+                    contentRowIndex++;
+
+                    int beginGroupRowNumber = str.Item2 + offsetRows;
+                    int firstComponentRowNumber = beginGroupRowNumber + 2;
+                    int beginGroupPage = CommonUtils.GetCurrentPage(DocType.Bill, beginGroupRowNumber);
+                    int firstComponentPage = CommonUtils.GetCurrentPage(DocType.Bill, firstComponentRowNumber);
+                    if (beginGroupPage != firstComponentPage)
+                    {
+                        int addedEmptyRows = AddEmptyRowsToEndPage(aTable, beginGroupRowNumber);
+                        offsetRows += addedEmptyRows;
+                        beginGroupPage = firstComponentPage;
+                    }
+
+                    int endGroupRowNumber = str.Item3 + offsetRows;                    
+
+                    int endGroupPage = CommonUtils.GetCurrentPage(DocType.Bill, endGroupRowNumber);
+
+
+                    string pagesRange = (beginGroupPage == endGroupPage) ?
+                                            $"Лист {beginGroupPage}" : 
+                                            $"Листы {beginGroupPage}-{endGroupPage}";
+                    var row = aTable.Rows[contentRowIndex];
+                    row[Constants.ColumnName] = new FormattedString { Value = str.Item1 };
+                    row[Constants.ColumnDeliveryDocSign] = new FormattedString { Value = pagesRange };
+                    contentRowIndex++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Создать оглавление
+        /// </summary>
+        /// <param name="aTable">таблица данных</param>
+        /// <returns>список для созданий оглавления типа List<Tuple<Наименование группы, номер строки начала группы, номер строки конца группы></returns>
+        private List<Tuple<string,int,int>> MakeContent(DataTable aTable)
+        {
+            List<Tuple<string, int, int>> content = new List<Tuple<string, int, int>>();
+
+            bool firstEmptyRow = false;            
+            string groupName = string.Empty;
+            int beginRowNumber = 1;
+            int endRowNumber = 1;
+
+            int rowsCount = aTable.Rows.Count;
+            for (int cnt = 0; cnt < rowsCount; cnt++)
+            {
+                string GetCellString(string columnName) =>
+                            (aTable.Rows[cnt][columnName] == DBNull.Value) ? string.Empty : ((BasePreparer.FormattedString)aTable.Rows[cnt][columnName]).Value;
+
+                if (IsEmptyRow(aTable.Rows[cnt]) && !string.IsNullOrEmpty(groupName))
+                {
+                    // если первая пустая строка уже была
+                    if (firstEmptyRow )
+                    {
+                        endRowNumber = cnt + 1;
+                        if (!string.IsNullOrEmpty(groupName))
+                        {
+                            content.Add(new Tuple<string, int, int>(groupName, beginRowNumber, endRowNumber));
+                            groupName = string.Empty;
+                            beginRowNumber = 0;
+                            firstEmptyRow = false;
+                        }
+                    } else
+                    {                        
+                        firstEmptyRow = true;
+                    }
+                }
+                else if(IsGroupName(aTable.Rows[cnt]))
+                {
+                    beginRowNumber = cnt + 1;
+                    groupName = GetCellString(Constants.ColumnName);
+                }
+                else if(IsVariableConfigData(aTable.Rows[cnt]))
+                {
+
+                }
+            }
+
+            content.Add(new Tuple<string, int, int>(groupName, beginRowNumber, endRowNumber));
+
+            return content;
+        }
+
+        /// <summary>
+        /// проверка на пустую строку
+        /// </summary>
+        /// <param name="aRow">a row.</param>
+        /// <returns>
+        ///   <c>true</c> if [is empty row] [the specified a row]; otherwise, <c>false</c>.
+        /// </returns>
+        bool IsEmptyRow(DataRow aRow)
+        {
+            if (string.IsNullOrEmpty(aRow[Constants.ColumnName].ToString()) &&
+                string.IsNullOrEmpty(aRow[Constants.ColumnSupplier].ToString()) &&
+                string.IsNullOrEmpty(aRow[Constants.ColumnFootnote].ToString()) &&
+                string.IsNullOrEmpty(aRow[Constants.ColumnDeliveryDocSign].ToString()) &&
+                string.IsNullOrEmpty(aRow[Constants.ColumnQuantityTotal].ToString()))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// проверка строки на заголовок
+        /// </summary>
+        /// <param name="aRow">a row.</param>
+        /// <returns>
+        ///   <c>true</c> if [is empty row] [the specified a row]; otherwise, <c>false</c>.
+        /// </returns>
+        bool IsGroupName(DataRow aRow)
+        {
+            if (!string.IsNullOrEmpty(aRow[Constants.ColumnTextFormat].ToString()))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// проверка строки на заголовок
+        /// </summary>
+        /// <param name="aRow">a row.</param>
+        /// <returns>
+        ///   <c>true</c> if [is empty row] [the specified a row]; otherwise, <c>false</c>.
+        /// </returns>
+        bool IsVariableConfigData(DataRow aRow)
+        {
+            if (!string.IsNullOrEmpty(aRow[Constants.ColumnTextFormat].ToString()))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Adds the empty rows to end page.
+        /// </summary>
+        /// <param name="aTable">a table.</param>
+        /// <param name="beginGroupRowNumber">The begin group row number.</param>
+        /// <returns></returns>
+        int AddEmptyRowsToEndPage(DataTable aTable, int aRowNumber)
+        {            
+            int addedRows = CommonUtils.GetRowsToEndOfPage(DocType.Bill, aRowNumber);
+            for (int i = 0; i < addedRows; i++)
+                AddEmptyRow(aTable, aRowNumber - 1 + i);
+
+            return addedRows;
+        }
+
     }
 }
 

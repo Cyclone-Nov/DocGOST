@@ -255,8 +255,8 @@ namespace GostDOC.PDF
                 }
                 else if (IsGroupName(row))
                 {
-                    if (rowNumber > 4) // если осталось мнее 5 строк для записи группы, то переходим на следующий лист
-                    {
+                    //if (rowNumber > 4) // если осталось мнее 5 строк для записи группы, то переходим на следующий лист
+                    //{
                         // если есть место для записи более 4 строк то записываем группу, иначе выходим
                         tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));
                         if (!string.IsNullOrEmpty(productCode))
@@ -270,11 +270,11 @@ namespace GostDOC.PDF
                             AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 2, leftPaddCell);
                         }
                         rowNumber--;
-                    } else
-                    {
-                        inc--;
-                        break;
-                    }
+                    //} else
+                    //{
+                    //    inc--;
+                    //    break;
+                    //}
                 }
                 else 
                 {
