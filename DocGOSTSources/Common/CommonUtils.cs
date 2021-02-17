@@ -185,5 +185,42 @@ namespace GostDOC.Common
             return new Tuple<int, int>(RowsOnFirstPage, RowsOnNextPage);
         }
 
+        /// <summary>
+        /// получить строку с перечислением авторов проекта
+        /// </summary>
+        /// <returns></returns>
+        public static string GetAuthorsString()
+        {
+            return "Antipov Roman, Vitkovski Victor, Fateev Ilya";
+        }
+
+        /// <summary>
+        /// получить строку с перечислением авторов проекта
+        /// </summary>
+        /// <returns></returns>
+        public static string GetCreatorString()
+        {
+            return $"GOSTDoc ver. {ApplicationVersion}";
+        }
+
+        /// <summary>
+        /// получить строку с перечислением авторов проекта
+        /// </summary>
+        /// <returns></returns>
+        public static string GetCreatorAndVersionString()
+        {            
+            return $"Made by GOSTDoc ver. {ApplicationVersion}";
+        }
+
+        /// <summary>
+        /// Текущая версия ПО
+        /// </summary>
+        /// <value>
+        /// строка с версией ПО
+        /// </value>
+        public static string ApplicationVersion
+        {
+            get => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        }
     }
 }

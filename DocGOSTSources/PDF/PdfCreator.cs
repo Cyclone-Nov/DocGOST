@@ -931,6 +931,18 @@ namespace GostDOC.PDF
             return new Tuple<string, string>(aLitera.Substring(0, index), aLitera.Substring(index));
         }
 
+        /// <summary>
+        /// добавить в PDF документ метаинформацию о версии ПО, названии программы и авторах
+        /// </summary>
+        /// <param name="aPdf">документ PDF</param>
+        protected void AddInfoToPDF(PdfDocument aPdf)
+        {
+            var info = aPdf.GetDocumentInfo();
+            info.SetTitle(CommonUtils.GetCreatorAndVersionString());
+            info.SetAuthor(CommonUtils.GetAuthorsString());
+            info.SetCreator(CommonUtils.GetCreatorString());
+        }
+
         // уменьшаем размер шрифта пока не впишемся в установленный размер
         //RootRenderer canvasRenderer = canvas.getRenderer();
         //while (paragraph.createRendererSubTree().setParent(canvasRenderer).layout(new LayoutContext(new LayoutArea(pageNumber, new Rectangle(allowedWidth, fontSize * 2)))).getStatus() != LayoutResult.FULL)

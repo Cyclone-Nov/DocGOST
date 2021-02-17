@@ -72,6 +72,9 @@ namespace GostDOC.PDF
             MainStream = new MemoryStream();
             _pdfWriter = new PdfWriter(MainStream);
             _pdfDoc = new PdfDocument(_pdfWriter);
+
+            AddInfoToPDF(_pdfDoc);
+
             _pdfDoc.SetDefaultPageSize(_pageSize);
             _doc = new Document(_pdfDoc, _pdfDoc.GetDefaultPageSize().Rotate(), true);
             
@@ -236,7 +239,7 @@ namespace GostDOC.PDF
                     strQuantityReg = quantityReg == 0 ? string.Empty : quantityReg.ToString().Truncate(5);                                        
                 }                
 
-                string note             = GetCellString(Constants.ColumnFootnote).Truncate(12);
+                string note = GetCellString(Constants.ColumnFootnote).Truncate(12);
 
                 inc++;
                 if (IsEmptyRow(row))
@@ -247,34 +250,27 @@ namespace GostDOC.PDF
                 } 
                 else if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(entry) && quantityTotal > 0)  // это строка с суммой по элементам
                 {
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));                        
-                        AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 3, leftPaddCell, rowNumber == 1);                        
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityTotal)).SetUnderline(1, 10.0f)); // Количество всего
-                        tbl.AddCell(leftPaddCell.Clone(false)); // Примечание
-                        rowNumber--;
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));                        
+                    AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 3, leftPaddCell, rowNumber == 1);                        
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(strQuantityTotal)).SetUnderline(1, 10.0f)); // Количество всего
+                    tbl.AddCell(leftPaddCell.Clone(false)); // Примечание
+                    rowNumber--;
                 }
                 else if (IsGroupName(row))
                 {
-                    //if (rowNumber > 4) // если осталось мнее 5 строк для записи группы, то переходим на следующий лист
-                    //{
-                        // если есть место для записи более 4 строк то записываем группу, иначе выходим
-                        tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));
-                        if (!string.IsNullOrEmpty(productCode))
-                        {
-                            tbl.AddCell(leftPaddCell.Clone(true).SetTextAlignment(TextAlignment.RIGHT).Add(new Paragraph(name)).SetUnderline());
-                            tbl.AddCell(leftPaddCell.Clone(true).Add(new Paragraph(productCode)).SetUnderline());
-                            AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 3, leftPaddCell);
-                        } else
-                        {
-                            tbl.AddCell(leftPaddCell.Clone(true).SetTextAlignment(TextAlignment.CENTER).Add(new Paragraph(name)).SetUnderline());
-                            AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 2, leftPaddCell);
-                        }
-                        rowNumber--;
-                    //} else
-                    //{
-                    //    inc--;
-                    //    break;
-                    //}
+                    // запишем наименование группы
+                    tbl.AddCell(centrAlignCell.Clone(false).Add(new Paragraph(inc.ToString())));
+                    if (!string.IsNullOrEmpty(productCode))
+                    {
+                        tbl.AddCell(leftPaddCell.Clone(true).SetTextAlignment(TextAlignment.RIGHT).Add(new Paragraph(name)).SetUnderline());
+                        tbl.AddCell(leftPaddCell.Clone(true).Add(new Paragraph(productCode)).SetUnderline());
+                        AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 3, leftPaddCell);
+                    } else
+                    {
+                        tbl.AddCell(leftPaddCell.Clone(true).SetTextAlignment(TextAlignment.CENTER).Add(new Paragraph(name)).SetUnderline());
+                        AddEmptyRowToPdfTable(tbl, 1, COLUMNS - 2, leftPaddCell);
+                    }
+                    rowNumber--;                   
                 }
                 else 
                 {

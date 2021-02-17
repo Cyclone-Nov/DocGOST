@@ -54,6 +54,9 @@ namespace GostDOC.PDF
             _pdfWriter = new PdfWriter(MainStream);
             _pdfDoc = new PdfDocument(_pdfWriter);
             _pdfDoc.SetDefaultPageSize(_pageSize);
+
+            AddInfoToPDF(_pdfDoc);
+
             _doc = new iText.Layout.Document(_pdfDoc, _pdfDoc.GetDefaultPageSize(), true);
             
             var dataTable = aData;

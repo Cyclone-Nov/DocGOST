@@ -638,7 +638,10 @@ namespace GostDOC.DataPreparation
         }
 
         /// <summary>
-        /// Создать оглавление
+        /// Создать оглавление.
+        /// Агоритм: проходим по строкам документа, зная что заголовок выделяется пустыми строками ниже и выше.
+        /// находим заголовок и запоминаем номер строки - это начало группы
+        /// ищем вторую пустую строку при непустом заголовке и берем номер строки - 1 = это последняя строка с данными для данный группы
         /// </summary>
         /// <param name="aTable">таблица данных</param>
         /// <returns>список для созданий оглавления типа List<Tuple<Наименование группы, номер строки начала группы, номер строки конца группы></returns>
@@ -650,7 +653,7 @@ namespace GostDOC.DataPreparation
             string groupName = string.Empty;
             int beginRowNumber = 1;            
 
-            int rowsCount = aTable.Rows.Count;
+            int rowsCount = aTable.Rows.Count;            
             for (int cnt = 0; cnt < rowsCount; cnt++)
             {
                 string GetCellString(string columnName) =>
@@ -679,8 +682,9 @@ namespace GostDOC.DataPreparation
                     beginRowNumber = cnt + 1;
                     groupName = GetCellString(Constants.ColumnName);
                 }
-                else if(IsVariableConfigData(aTable.Rows[cnt]))
+                else if (IsVariableConfigData(aTable.Rows[cnt]))
                 {
+                    throw new NotImplementedException("оглавление для переменных данных не реализовано");
                   // TODO: доделать оглавление при учете переменных данных исполнения
                 }
             }
