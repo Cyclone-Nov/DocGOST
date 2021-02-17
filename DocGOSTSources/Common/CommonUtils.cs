@@ -77,19 +77,19 @@ namespace GostDOC.Common
         {
             var rows = GetRowsCountsForDocument(aType); // Item1 = rows on first page, Item2 = rows on next page
 
-            int lastRows = aCurrentRowNumber - rows.Item1;            
+            int lastRows = aCurrentRowNumber - rows.Item1;
             if (lastRows > 0)
             {
                 int delta = lastRows % rows.Item2;
                 if (delta == 0)
                     lastRows = 1;
                 else
-                    lastRows = rows.Item2 - delta  + 1;
-            }
-            else if (lastRows < 0)
+                    lastRows = rows.Item2 - delta + 1;
+            } else if (lastRows < 0)
             {
                 lastRows = rows.Item1 - aCurrentRowNumber + 1;
-            }
+            } else
+                lastRows = 1;
             return lastRows;
         }
 

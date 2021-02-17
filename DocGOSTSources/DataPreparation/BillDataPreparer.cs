@@ -271,9 +271,7 @@ namespace GostDOC.DataPreparation
             int firstComponentPageNumber = CommonUtils.GetCurrentPage(DocType.Bill, firstComponentRowNumber);
             if (firstComponentPageNumber > groupNamePageNumber)
             {
-                int offset = firstComponentPageNumber - groupNamePageNumber - 1 + ln;
-                for(int i = 0; i < offset; i++)
-                    AddEmptyRow(aTable);
+                AddEmptyRowsToEndPage(aTable, DocType.Bill, groupNameRowNumber - ln + 1);                
             }
 
             for (int i = 0; i < ln; i++)
@@ -601,7 +599,7 @@ namespace GostDOC.DataPreparation
                     int firstComponentPage = CommonUtils.GetCurrentPage(DocType.Bill, firstComponentRowNumber);
                     if (beginGroupPage != firstComponentPage)
                     {
-                        int addedEmptyRows = AddEmptyRowsToEndPage(aTable, beginGroupRowNumber);
+                        int addedEmptyRows = AddEmptyRowsToEndPage(aTable, DocType.Bill, beginGroupRowNumber);
                         offsetRows += addedEmptyRows;
                         beginGroupPage = firstComponentPage;
                     }
@@ -728,22 +726,6 @@ namespace GostDOC.DataPreparation
             }
             return false;
         }
-
-        /// <summary>
-        /// Adds the empty rows to end page.
-        /// </summary>
-        /// <param name="aTable">a table.</param>
-        /// <param name="beginGroupRowNumber">The begin group row number.</param>
-        /// <returns></returns>
-        int AddEmptyRowsToEndPage(DataTable aTable, int aRowNumber)
-        {            
-            int addedRows = CommonUtils.GetRowsToEndOfPage(DocType.Bill, aRowNumber);
-            for (int i = 0; i < addedRows; i++)
-                AddEmptyRow(aTable, aRowNumber - 1 + i);
-
-            return addedRows;
-        }
-
     }
 }
 

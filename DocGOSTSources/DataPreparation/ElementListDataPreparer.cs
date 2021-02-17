@@ -379,7 +379,18 @@ namespace GostDOC.DataPreparation
         /// <param name="aTable"></param>
         /// <param name="aGroupName"></param>
         private void AddGroupName(DataTable aTable, string aGroupName) {
-            if (string.IsNullOrEmpty(aGroupName)) return;
+            if (string.IsNullOrEmpty(aGroupName)) 
+                return;
+                            
+            int groupNameRowNumber = aTable.Rows.Count + 1;
+            int firstComponentRowNumber = groupNameRowNumber + 1;
+            int groupNamePageNumber = CommonUtils.GetCurrentPage(DocType.ItemsList, groupNameRowNumber);
+            int firstComponentPageNumber = CommonUtils.GetCurrentPage(DocType.ItemsList, firstComponentRowNumber);
+            if (firstComponentPageNumber > groupNamePageNumber)
+            {
+                AddEmptyRowsToEndPage(aTable, DocType.ItemsList, groupNameRowNumber);
+            }
+
             DataRow row = aTable.NewRow();
             row[Constants.ColumnName] = new FormattedString { Value = aGroupName, TextAlignment = TextAlignment.LEFT };
             aTable.Rows.Add(row);

@@ -72,7 +72,7 @@ public abstract class BasePreparer {
                     outDocCode = "П"+ docсomponents.First().GetProperty(Constants.ComponentDocCode);
                 }
                 else {
-                    designation = docсomponents.First().GetProperty(Constants.ComponentSign);
+                    designation = "ПАКБ.ХХХХХХ.ХХХЭ3";
                 }
             }
             else {
@@ -310,6 +310,22 @@ public abstract class BasePreparer {
             aTable.Rows.Add(row);
         else
             aTable.Rows.InsertAt(row, aRowIndex);
+    }
+
+    /// <summary>
+    /// Adds the empty rows to end page.
+    /// </summary>
+    /// <param name="aTable">a table.</param>
+    /// <param name="aType">тип документа</param>
+    /// <param name="beginGroupRowNumber">The begin group row number.</param>
+    /// <returns></returns>
+    protected int AddEmptyRowsToEndPage(DataTable aTable, DocType aType, int aRowNumber)
+    {            
+        int addedRows = CommonUtils.GetRowsToEndOfPage(aType, aRowNumber);
+        for (int i = 0; i < addedRows; i++)
+            AddEmptyRow(aTable, aRowNumber - 1 + i);
+
+        return addedRows;
     }
 
 
