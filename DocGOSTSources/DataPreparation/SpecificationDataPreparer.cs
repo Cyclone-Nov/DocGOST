@@ -627,13 +627,6 @@ namespace GostDOC.DataPreparation
             //return aFirstComponent.Equals(aSecondComponent); //TODO: override Equals
         }
 
-
-        private void AddEmptyRow(DataTable aTable) 
-        {
-            DataRow row = aTable.NewRow();            
-            aTable.Rows.Add(row);
-        }
-
         private void RemoveEmptyRowsAtEnd(DataTable table)
         {
             if (table.Rows.Count > 1)

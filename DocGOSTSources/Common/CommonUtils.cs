@@ -191,7 +191,7 @@ namespace GostDOC.Common
         /// <returns></returns>
         public static string GetAuthorsString()
         {
-            return "Antipov Roman, Vitkovski Victor, Fateev Ilya";
+            return "Antipov Roman, Vitkovski Victor, Fateev Ilya, Grunichev Mikhail";
         }
 
         /// <summary>

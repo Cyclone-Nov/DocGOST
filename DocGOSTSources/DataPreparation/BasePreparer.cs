@@ -298,6 +298,20 @@ public abstract class BasePreparer {
         return StandardDic;
     }
 
+    /// <summary>
+    /// добавить пустую строку в таблицу данных (по умолчанию в конец таблицы)
+    /// </summary>
+    /// <param name="aTable">таблица данных</param>
+    /// <param name="aRowIndex">номер позиции, куда надо вставить пустую строку: -1 - надо вставить в конец таблица</param>
+    protected void AddEmptyRow(DataTable aTable, int aRowIndex = -1)
+    {
+        DataRow row = aTable.NewRow();
+        if (aRowIndex < 0)
+            aTable.Rows.Add(row);
+        else
+            aTable.Rows.InsertAt(row, aRowIndex);
+    }
+
 
     public class FormattedString {
 

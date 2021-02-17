@@ -138,7 +138,8 @@ namespace GostDOC.PDF
         }
 
 
-        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow, Dictionary<string, object> aAppParams = null) {
+        internal override int AddNextPage(Document aInDoc, IDictionary<string, string> aGraphs, DataTable aData, int aPageNumber, int aStartRow, Dictionary<string, object> aAppParams = null)
+        {
             aInDoc.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
             SetPageMargins(aInDoc);
             aInDoc.Add(CreateBottomAppendGraph(aGraphs));

@@ -371,16 +371,7 @@ namespace GostDOC.DataPreparation
                 }
             }
         }
-
-
-        /// <summary>
-        /// добавить пустую строку в таблицу данных
-        /// </summary>
-        /// <param name="aTable"></param>
-        private void AddEmptyRow(DataTable aTable) {
-            DataRow row = aTable.NewRow();            
-            aTable.Rows.Add(row);
-        }
+               
 
         /// <summary>
         /// добавить имя группы в таблицу

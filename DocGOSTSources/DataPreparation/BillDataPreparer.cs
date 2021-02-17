@@ -50,7 +50,7 @@ namespace GostDOC.DataPreparation
             // заполним переменные данные исполнений, если они есть
             if (listPreparedConfigs != null && listPreparedConfigs.Count() > 0)
             {
-                AddAppDataSign(table);
+                AddVariableConfigData(table);
                 
                 foreach (var config in listPreparedConfigs.OrderBy(key => key.Key))
                 {
@@ -103,7 +103,7 @@ namespace GostDOC.DataPreparation
         /// добавить в таблицу данны надписи "Переменные данные исполнений"
         /// </summary>
         /// <param name="table">The table.</param>
-        private void AddAppDataSign(DataTable aTable)
+        private void AddVariableConfigData(DataTable aTable)
         {
             AddEmptyRow(aTable);
             var row = aTable.NewRow();
@@ -253,20 +253,6 @@ namespace GostDOC.DataPreparation
         }
 
         /// <summary>
-        /// добавить пустую строку в таблицу данных (по умолчанию в конец таблица)
-        /// </summary>
-        /// <param name="aTable">таблица данных</param>
-        /// <param name="aRowIndex">номер позиции, куда надо вставить пустую строку: -1 - надо вставить в конец таблица</param>
-        private void AddEmptyRow(DataTable aTable, int aRowIndex = -1) 
-        {
-            DataRow row = aTable.NewRow();      
-            if (aRowIndex < 0)
-                aTable.Rows.Add(row);
-            else
-                aTable.Rows.InsertAt(row, aRowIndex);
-        }
-
-        /// <summary>
         /// добавить имя группы в таблицу
         /// </summary>
         /// <param name="aTable"></param>
@@ -318,10 +304,8 @@ namespace GostDOC.DataPreparation
             Models.Component[] sortComponents = SortFactory.GetSort(SortType.Name).Sort(aComponents.ToList()).ToArray();
 
             // записываем наименование группы, если есть
-            if (AddGroupName(aTable, aGroupName))
-            {
-                AddEmptyRow(aTable);
-            }
+            if (AddGroupName(aTable, aGroupName))            
+                AddEmptyRow(aTable);            
 
             //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
             DataRow row;
@@ -379,8 +363,7 @@ namespace GostDOC.DataPreparation
                         row = aTable.NewRow();
                         row[Constants.ColumnQuantityTotal] = new FormattedString { Value = (compCount).ToString(), IsOverlined = true };                        
                         aTable.Rows.Add(row);
-                        compCount = 0;            
-                        // проджолжим дальше так как компонент есть
+                        compCount = 0;                                    
                     }
                 }
 
@@ -584,7 +567,7 @@ namespace GostDOC.DataPreparation
         }
 
         /// <summary>
-        /// добавить в таблицу данных оглавление если надо
+        /// добавить в таблицу данных оглавление если листов более 24
         /// </summary>
         /// <param name="aTable">Таблица данных</param>
         /// <returns></returns>
