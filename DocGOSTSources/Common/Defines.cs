@@ -308,13 +308,13 @@ namespace GostDOC.Common
         /// <summary>
         /// название графы №4 Обозначение Литеры А изделия в структуре xml
         /// </summary>
-        public static readonly string GRAPH_4 = "Литера 1";
+        public static readonly string GRAPH_4 = "Литера";
         /// название графы №4а Обозначение Литеры О изделия в структуре xml
         /// </summary>
-        public static readonly string GRAPH_4a = "Литера 2";
+        public static readonly string GRAPH_4a = "Литера2";
         /// название графы №4б Обозначение Литеры О1 изделия в структуре xml
         /// </summary>
-        public static readonly string GRAPH_4b = "Литера 3";
+        public static readonly string GRAPH_4b = "Литера3";
         
         
         public static readonly string GRAPH_5 = "";
