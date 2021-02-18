@@ -184,14 +184,24 @@ namespace GostDOC.DataPreparation
                 var designators = MakeComponentDesignatorsString(component_designators);
                 if (string.Equals(doc, component_name))
                     doc = string.Empty;
+
                 string name = string.Empty;
+                string mainGroupName = united_component.GetProperty(Constants.GroupNameSp);
+
+                // если надо менять наименование
                 if (haveToChangeName)
                 {
-                    name = component_disabled_anywhere ? disabled_name : changed_name;
+                    if (component_disabled_anywhere)
+                    {
+                        name = disabled_name;
+                    }
+                    else
+                    {
+                        name = (addGroupNameToNameField) ? $"{GetGroupNameByCount(subGroupName, true)} {changed_name}": changed_name;
+                    }                    
                 }
                 else
                 {                    
-                    string mainGroupName = united_component.GetProperty(Constants.GroupNameSp);
                     if (string.Equals(mainGroupName, Constants.GroupAssemblyUnits) ||
                         string.Equals(mainGroupName, Constants.GroupDetails))
                     {
