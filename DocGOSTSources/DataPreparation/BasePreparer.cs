@@ -208,23 +208,16 @@ public abstract class BasePreparer {
     /// <param name="aComponent">компонент</param>
     /// <param name="aOtherInstances">список словарей всех компонентов в других исполнениях</param>
     /// <returns>true - имя компонента необходимо заменить</returns>
-    protected bool DifferNameInOtherConfigs(Component aComponent,
+    protected bool DifferNameInOtherConfigs(string aDesignator, string aComponentName,
                                              IEnumerable<Dictionary<string, Component>> aOtherConfigurations) 
     {
-        string designator = aComponent.GetProperty(Constants.ComponentDesignatorID);
         // найдем в других исполнениях компонент с таким же позиционным обозначением
-        List<Component> same_components = new List<Component>();
-        foreach (var instance in aOtherConfigurations) {
-            if (instance.ContainsKey(designator)) 
-                same_components.Add(instance[designator]);            
-        }
+        List<Component> same_components = GetSameComponentsFromOtherConfigs(aDesignator, aOtherConfigurations);
 
-        // если в других исполнениях исходный компонент отличается по наименованию либо не представлен, то выведем true
-        string name = aComponent.GetProperty(Constants.ComponentName);
+        // если в других исполнениях исходный компонент отличается по наименованию либо не представлен, то выведем true         
         foreach (var comp in same_components) {
-            string other_name = aComponent.GetProperty(Constants.ComponentName);
-            bool presence = string.Equals(comp.GetProperty(Constants.ComponentPresence), "1");            
-            if (!string.Equals(name, other_name) || !presence) {
+            string other_name = comp.GetProperty(Constants.ComponentName);            
+            if (!string.Equals(aComponentName, other_name)) {
                 return true;
             }
         }
@@ -232,6 +225,54 @@ public abstract class BasePreparer {
         return false;
     }
 
+    
+    /// <summary>
+    /// признак что компонент не применяется в остальных конфигурациях
+    /// </summary>
+    /// <param name="aComponent">компонент</param>
+    /// <param name="aOtherInstances">список словарей всех компонентов в других исполнениях</param>
+    /// <returns>true - компонент не применяется в других испонениях</returns>
+    protected bool DisabledInOtherConfigs(string aDesignator,
+                                          IEnumerable<Dictionary<string, Component>> aOtherConfigurations) 
+    {        
+        // найдем в других исполнениях компонент с таким же позиционным обозначением
+        List<Component> same_components = GetSameComponentsFromOtherConfigs(aDesignator, aOtherConfigurations);
+                
+        // если компонент задействован хотя бы в одном исполнении, то выводим false
+        foreach (var comp in same_components) {            
+            if (!IsComponentDisabled(comp)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+        /// <summary>
+        /// используется ли компонент
+        /// </summary>
+        /// <param name="aComponent">компонент</param>        
+        /// <returns>true - компонент не используется</returns>
+        protected bool IsComponentDisabled(Component aComponent)
+        {
+            return string.Equals(aComponent.GetProperty(Constants.ComponentPresence), "0");
+        }
+
+        /// <summary>
+        /// получить список с компонентами из других (не основной) исполнений, нимеющих тоже самое позиционное обозначение
+        /// </summary>
+        /// <param name="aDesignator">позиционное обозначение</param>
+        /// <param name="aOtherConfigurations">список с неосновными исполнениями</param>
+        /// <returns></returns>
+        private List<Component> GetSameComponentsFromOtherConfigs(string aDesignator, IEnumerable<Dictionary<string, Component>> aOtherConfigurations)
+    {
+        List<Component> same_components = new List<Component>();
+        foreach (var instance in aOtherConfigurations) {
+            if (instance.ContainsKey(aDesignator)) 
+                same_components.Add(instance[aDesignator]);            
+        }
+        return same_components;
+    }
 
     /// <summary>
     /// поиск компонент с наличием ТУ/ГОСТ в свойстве "Документ на поставку", заполнение словаря с индексами найденных компонент для

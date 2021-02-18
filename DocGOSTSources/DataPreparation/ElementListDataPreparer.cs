@@ -43,7 +43,7 @@ namespace GostDOC.DataPreparation
             // из остальных конфигураций получаем список словарей с соответсвующими компонентами
             var otherConfigsElements = MakeComponentDesignatorsDictionaryOtherConfigs(aConfigs);
 
-            // работаем по основной конфигурации,нужны только компоненты из раздела "Прочие изделия" и "Сборочные единицы"        
+            // инициализируем таблицу данных
             DataTable table = CreateTable("ElementListData");
             Dictionary<string, Tuple<string, Component, uint>> allComponentsDic = null;
 
@@ -61,6 +61,7 @@ namespace GostDOC.DataPreparation
                 }           
             }
 
+            // работаем по основной конфигурации,нужны только компоненты из раздела "Прочие изделия" и "Сборочные единицы"        
             AddComponents(Constants.GroupOthers);
             AddComponents(Constants.GroupAssemblyUnits);
             AddComponents(Constants.GroupDetails);
@@ -73,27 +74,29 @@ namespace GostDOC.DataPreparation
 
             return table;
         }
-        
+
 
         /// <summary>
         /// заполнить таблицу данных
         /// </summary>
-        /// <param name="aTable"></param>
-        /// <param name="aGroupName"></param>
-        /// <param name="aComponents"></param>
+        /// <param name="aTable">таблица данных</param>
+        /// <param name="aGroupName">имя группы</param>
+        /// <param name="aComponentsDic">словарь компонентов с ключем по позиционому обозначению, объединных</param>
         /// <param name="aOtherComponents"></param>
-        /// <param name="aSchemaDesignation"></param>
+        /// <param name="aSchemaDesignation">обзначение схемы</param>
         private void FillDataTable(
                 DataTable aTable,
                 Dictionary<string, Tuple<string, Component, uint>> aComponentsDic,                
-                IEnumerable<Dictionary<string, Component>> aOtherComponents, string aSchemaDesignation)
+                IEnumerable<Dictionary<string, Component>> aOtherComponents,
+                string aSchemaDesignation)
         {
             if (!aComponentsDic.Any()) 
                 return;
 
-            string change_name = $"см. табл. {aSchemaDesignation}";                       
-
-            // записываем таблицу данных                        
+            string changed_name = $"см. табл. {aSchemaDesignation}";
+            string disabled_name = "Не устанавливать";
+                         
+            // отсортируем компоненты
             var comparer = new DesignatorIDComparer(); 
             var component_pair_arr = aComponentsDic.OrderBy(key => key.Key, comparer).ToArray();
 
@@ -101,45 +104,57 @@ namespace GostDOC.DataPreparation
 
             bool addGroupNameToNameField = true;
             int countDifferentComponents = 0;
-            //bool singleGroupName = true;
-            for (int i=0; i < component_pair_arr.Length;)
+            
+            for (int i = 0; i < component_pair_arr.Length;)
             {
-                var component = component_pair_arr[i].Value;
-                string key = component_pair_arr[i].Key;
-                string designator = GetDesignator(key, component.Item1, component.Item3);
-                string doc = component.Item2.GetProperty(Constants.ComponentDoc);                
-                string component_name = component.Item2.GetProperty(Constants.ComponentName);
-                string component_sign = component.Item2.GetProperty(Constants.ComponentSign);
-                string subGroupName = component.Item2.GetProperty(Constants.SubGroupNameSp);
+                var united_component = component_pair_arr[i].Value.Item2;
+                string first_designator = component_pair_arr[i].Key;
+                string last_designator = component_pair_arr[i].Value.Item1;
+                uint count = component_pair_arr[i].Value.Item3;
 
-                bool haveToChangeName = string.Equals(component.Item2.GetProperty(Constants.ComponentPresence), "0") ||
-                                                      DifferNameInOtherConfigs(component.Item2, aOtherComponents);
+                string designator = GetDesignator(first_designator, last_designator, count);
+                string doc = united_component.GetProperty(Constants.ComponentDoc);                
+                string component_name = united_component.GetProperty(Constants.ComponentName);
+                string component_sign = united_component.GetProperty(Constants.ComponentSign);                
+                string subGroupName = united_component.GetProperty(Constants.SubGroupNameSp);
+
+                bool component_disabled = IsComponentDisabled(united_component);
+                bool component_disabled_anywhere = DisabledInOtherConfigs(first_designator, aOtherComponents) && component_disabled;
+
+                // определим надо ли будет изменить название компонента при выводе в документ
+                bool haveToChangeName = component_disabled_anywhere || DifferNameInOtherConfigs(first_designator, component_name, aOtherComponents);
 
                 List<string> component_designators = new List<string> { designator };
                 countDifferentComponents++;
 
-                bool same;
+                
                 int j = i + 1;
-                var component_count = component.Item3;
+                var component_count = count;
                 int sameComponents = 1;
                 if (j < component_pair_arr.Length && !haveToChangeName)
                 {
+                    bool same;
                     do
                     {
-                        var componentNext = component_pair_arr[j].Value;                        
-                        var nextKey = component_pair_arr[j].Key;
-                        uint nextCount = componentNext.Item3;
-                        string componentNext_name = componentNext.Item2.GetProperty(Constants.ComponentName);// GetComponentName(nextKey, canOutputStandardDocs, StandardComponentsDic, componentNext.Item2);
-                        string nextSubGroupName = componentNext.Item2.GetProperty(Constants.SubGroupNameSp);
-                        string componentNext_sign = componentNext.Item2.GetProperty(Constants.ComponentSign);
+                        var next_united_component = component_pair_arr[j].Value.Item2;
+                        var next_first_designator = component_pair_arr[j].Key;
+                        var next_last_designator = component_pair_arr[j].Value.Item1;
+                        uint next_count = component_pair_arr[j].Value.Item3;
+                        string componentNext_name = next_united_component.GetProperty(Constants.ComponentName);
+                        string nextSubGroupName = next_united_component.GetProperty(Constants.SubGroupNameSp);
+                        string componentNext_sign = next_united_component.GetProperty(Constants.ComponentSign);
+                        bool next_component_disabled = string.Equals(next_united_component.GetProperty(Constants.ComponentPresence), "0");
 
-                        if (string.Equals(component_name, componentNext_name) && string.Equals(subGroupName, nextSubGroupName) && string.Equals(component_sign, componentNext_sign))
+                        if (string.Equals(component_name, componentNext_name) && 
+                            string.Equals(subGroupName, nextSubGroupName) && 
+                            string.Equals(component_sign, componentNext_sign) &&
+                            (next_component_disabled == component_disabled))
                         {
                             same = true;
-                            component_count+= nextCount;
+                            component_count+= next_count;
                             sameComponents++;
                             j++;
-                            component_designators.Add(GetDesignator(nextKey, componentNext.Item1, nextCount));
+                            component_designators.Add(GetDesignator(next_first_designator, next_last_designator, next_count));
                         } else
                             same = false;
                     } while (same && j < component_pair_arr.Length);
@@ -150,8 +165,8 @@ namespace GostDOC.DataPreparation
                 if (groupNames.ContainsKey(designator)) 
                 {   
                     string groupName = groupNames[designator].Item1;
-                    int count = groupNames[designator].Item2;
-                    addGroupNameToNameField = string.IsNullOrEmpty(groupName) || (count == sameComponents); //if (!string.IsNullOrEmpty(groupName) && (count != sameComponents))                    
+                    int ncount = groupNames[designator].Item2;
+                    addGroupNameToNameField = string.IsNullOrEmpty(groupName) || (ncount == sameComponents);
                     
                     // первая строка на первом листе не может быть пустой
                     if(aTable.Rows.Count > 0)
@@ -172,15 +187,15 @@ namespace GostDOC.DataPreparation
                 string name = string.Empty;
                 if (haveToChangeName)
                 {
-                    name = change_name;
+                    name = component_disabled_anywhere ? disabled_name : changed_name;
                 }
                 else
                 {                    
-                    string mainGroupName = component.Item2.GetProperty(Constants.GroupNameSp);
+                    string mainGroupName = united_component.GetProperty(Constants.GroupNameSp);
                     if (string.Equals(mainGroupName, Constants.GroupAssemblyUnits) ||
                         string.Equals(mainGroupName, Constants.GroupDetails))
                     {
-                        name = $"{component_name.Trim()} {component.Item2.GetProperty(Constants.ComponentSign)}";
+                        name = $"{component_name.Trim()} {united_component.GetProperty(Constants.ComponentSign)}";
                     }
                     else
                     {
@@ -188,7 +203,7 @@ namespace GostDOC.DataPreparation
                     }
                 }
                 
-                var note = component.Item2.GetProperty(Constants.ComponentNote);
+                var note = united_component.GetProperty(Constants.ComponentNote);
                 AddNewRow(aTable, designators, name, component_count, note);
             }
 
@@ -197,21 +212,24 @@ namespace GostDOC.DataPreparation
         }
 
         /// <summary>
-        /// Prepares the components list.
+        /// подготовить список компонентов
         /// </summary>
-        /// <param name="aGroup">a group.</param>
-        /// <returns></returns>
+        /// <param name="aGroup">группа с компонентами</param>
+        /// <returns>словарь </returns>
         private Dictionary<string, Tuple<string, Component, uint>> 
         PrepareComponentsList(Group aMainGroup)
         {
-            Dictionary<string, Tuple<string, Component, uint>> dic = new Dictionary<string, Tuple<string, Component, uint>>();
-
-            var mainсomponents = aMainGroup.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
-            FillPrepareDictionary(dic, mainсomponents);
+            var dic = new Dictionary<string, Tuple<string, Component, uint>>();
             
+            // выбираем из корня группы компоненты с заполненным тегом Позиционное обозначение
+            var mainсomponents = aMainGroup.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
+
+            //  заполним словарь компонентов
+            FillPrepareDictionary(dic, mainсomponents);
+
+            // выбираем из подгрупп группы компоненты с заполненным тегом Позиционное обозначение и заполним словарь
             foreach (var subgroup in aMainGroup.SubGroups.OrderBy(key => GroupNameConverter.GetSymbol(key.Key)))
-            {
-                // выбираем только компоненты с заданными занчением для свойства "Позиционное обозначение"
+            {   
                 var сomponents = subgroup.Value.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
                 FillPrepareDictionary(dic, сomponents);
             }
@@ -219,10 +237,10 @@ namespace GostDOC.DataPreparation
         }
 
         /// <summary>
-        /// Fills the prepare dictionary.
+        /// заполнение словарья компонентов
         /// </summary>
-        /// <param name="aDic">a dic.</param>
-        /// <param name="aComponents">a components.</param>
+        /// <param name="aDic">словарь компонентов</param>
+        /// <param name="aComponents">список компонентов</param>
         private void FillPrepareDictionary(Dictionary<string, Tuple<string, Component, uint>> aDic,
                                            IEnumerable<Component> aComponents)
         {
@@ -230,11 +248,14 @@ namespace GostDOC.DataPreparation
             {
                 string designator = component.GetProperty(Constants.ComponentDesignatorID);
                 string note = component.GetProperty(Constants.ComponentNote);
+
+                // если позиционное обозначение и примечания совпадают, то сделаем примечание пустым
                 if (string.Equals(designator, note))
                 {
                     component.SetPropertyValue(Constants.ComponentNote, string.Empty);
                 }
 
+                // позиционное обозначение может объединять несколько позциионных обозначений - разобем их
                 var designators = designator.Split(new char[] { '-', ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 try
@@ -249,14 +270,14 @@ namespace GostDOC.DataPreparation
                             aDic.Add(designators[0].TrimStart(), new Tuple<string, Component, uint>(designators[1].TrimEnd(), component, component.Count));
                         } else
                         {
-                            string keyDesignator = designators[0].Trim();
-                            string lastDesignator = designators[1].Trim();
-                            if (GetCountByDesignators(keyDesignator, lastDesignator) == 2)
+                            string firstDesignator = designators[0].TrimEnd();
+                            string lastDesignator = designators[1].TrimStart();
+                            if (GetCountByDesignators(firstDesignator, lastDesignator) == 2)
                             {
-                                aDic.Add(keyDesignator, new Tuple<string, Component, uint>(lastDesignator, component, 2));
+                                aDic.Add(firstDesignator, new Tuple<string, Component, uint>(lastDesignator, component, 2));
                             } else
                             {
-                                aDic.Add(keyDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                                aDic.Add(firstDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
                                 aDic.Add(lastDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
                             }
                         }
