@@ -126,7 +126,6 @@ namespace GostDOC.DataPreparation
 
                 List<string> component_designators = new List<string> { designator };
                 countDifferentComponents++;
-
                 
                 int j = i + 1;
                 var component_count = count;
