@@ -208,16 +208,22 @@ public abstract class BasePreparer {
     /// <param name="aComponent">компонент</param>
     /// <param name="aOtherInstances">список словарей всех компонентов в других исполнениях</param>
     /// <returns>true - имя компонента необходимо заменить</returns>
-    protected bool DifferNameInOtherConfigs(string aDesignator, string aComponentName,
+    protected bool DifferNameInOtherConfigs(string aDesignator, Component aComponent,
                                              IEnumerable<Dictionary<string, Component>> aOtherConfigurations) 
     {
         // найдем в других исполнениях компонент с таким же позиционным обозначением
         List<Component> same_components = GetSameComponentsFromOtherConfigs(aDesignator, aOtherConfigurations);
 
+        string component_name = aComponent.GetProperty(Constants.ComponentName);
+        string component_sign = aComponent.GetProperty(Constants.ComponentSign);
+
         // если в других исполнениях исходный компонент отличается по наименованию либо не представлен, то выведем true         
         foreach (var comp in same_components) {
-            string other_name = comp.GetProperty(Constants.ComponentName);            
-            if (!string.Equals(aComponentName, other_name)) {
+            string other_name = comp.GetProperty(Constants.ComponentName);
+            string other_sign = comp.GetProperty(Constants.ComponentSign);
+
+            if (!string.Equals(component_name, other_name) ||
+                !string.Equals(component_sign, other_sign)) {
                 return true;
             }
         }

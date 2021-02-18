@@ -122,7 +122,7 @@ namespace GostDOC.DataPreparation
                 bool component_disabled_anywhere = DisabledInOtherConfigs(first_designator, aOtherComponents) && component_disabled;
 
                 // определим надо ли будет изменить название компонента при выводе в документ
-                bool haveToChangeName = component_disabled_anywhere || DifferNameInOtherConfigs(first_designator, component_name, aOtherComponents);
+                bool haveToChangeName = component_disabled_anywhere || DifferNameInOtherConfigs(first_designator, united_component, aOtherComponents);
 
                 List<string> component_designators = new List<string> { designator };
                 countDifferentComponents++;
@@ -142,7 +142,7 @@ namespace GostDOC.DataPreparation
                         string componentNext_name = next_united_component.GetProperty(Constants.ComponentName);
                         string nextSubGroupName = next_united_component.GetProperty(Constants.SubGroupNameSp);
                         string componentNext_sign = next_united_component.GetProperty(Constants.ComponentSign);
-                        bool next_component_disabled = string.Equals(next_united_component.GetProperty(Constants.ComponentPresence), "0");
+                        bool next_component_disabled = IsComponentDisabled(next_united_component);
 
                         if (string.Equals(component_name, componentNext_name) && 
                             string.Equals(subGroupName, nextSubGroupName) && 
