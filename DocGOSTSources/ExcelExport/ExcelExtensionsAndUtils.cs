@@ -94,7 +94,7 @@ namespace GostDOC.ExcelExport
                     if (char.IsDigit(txt[i]))
                     {
                         Excel.Characters ch = range.Characters[i + 1, 1];
-                        ch.Font.Size = ch.Font.Size - 1;
+                        ch.Font.Size = ch.Font.Size - 3;
                     }
                 }
             }
