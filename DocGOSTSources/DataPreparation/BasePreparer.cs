@@ -205,11 +205,11 @@ public abstract class BasePreparer {
     /// <summary>
     /// определение необходимости заменять имя копонента на основе набора правил
     /// </summary>
+    /// <param name="aDesignator">позиционное обозначение</param>
     /// <param name="aComponent">компонент</param>
     /// <param name="aOtherInstances">список словарей всех компонентов в других исполнениях</param>
     /// <returns>true - имя компонента необходимо заменить</returns>
-    protected bool DifferNameInOtherConfigs(string aDesignator, Component aComponent,
-                                             IEnumerable<Dictionary<string, Component>> aOtherConfigurations) 
+    protected bool DifferNameInOtherConfigs(string aDesignator, Component aComponent, IEnumerable<Dictionary<string, Component>> aOtherConfigurations) 
     {
         // найдем в других исполнениях компонент с таким же позиционным обозначением
         List<Component> same_components = GetSameComponentsFromOtherConfigs(aDesignator, aOtherConfigurations);
@@ -238,8 +238,7 @@ public abstract class BasePreparer {
     /// <param name="aComponent">компонент</param>
     /// <param name="aOtherInstances">список словарей всех компонентов в других исполнениях</param>
     /// <returns>true - компонент не применяется в других испонениях</returns>
-    protected bool DisabledInOtherConfigs(string aDesignator,
-                                          IEnumerable<Dictionary<string, Component>> aOtherConfigurations) 
+    protected bool DisabledInOtherConfigs(string aDesignator, IEnumerable<Dictionary<string, Component>> aOtherConfigurations) 
     {        
         // найдем в других исполнениях компонент с таким же позиционным обозначением
         List<Component> same_components = GetSameComponentsFromOtherConfigs(aDesignator, aOtherConfigurations);
@@ -375,9 +374,24 @@ public abstract class BasePreparer {
         return addedRows;
     }
 
+    /// <summary>
+    /// Gets the value form formatted string.
+    /// </summary>
+    /// <param name="columnName">Name of the column.</param>
+    /// <param name="aRow">a row.</param>
+    /// <returns></returns>
+    protected string 
+    GetValueFormFormattedString(string columnName, DataRow aRow) =>
+                            (aRow[columnName] == DBNull.Value) ? string.Empty : ((BasePreparer.FormattedString)aRow[columnName]).Value;
 
+    /// <summary>
+    /// формтированное значение в виде строки
+    /// </summary>
     public class FormattedString {
 
+        /// <summary>
+        /// строка со значением
+        /// </summary>
         public string Value;
         /// <summary>
         /// строка должна быть с нижним подчеркиванием

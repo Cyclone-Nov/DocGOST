@@ -93,7 +93,7 @@ namespace GostDOC.DataPreparation
             if (!aComponentsDic.Any()) 
                 return;
 
-            string changed_name = $"см. табл. {aSchemaDesignation}";
+            string changed_name = $"(см. табл. {aSchemaDesignation})";
             string disabled_name = "Не устанавливать";
                          
             // отсортируем компоненты
@@ -187,28 +187,25 @@ namespace GostDOC.DataPreparation
                 string name = string.Empty;
                 string mainGroupName = united_component.GetProperty(Constants.GroupNameSp);
 
-                // если надо менять наименование
-                if (haveToChangeName)
+                // если компонент не применяется
+                if (component_disabled_anywhere)
                 {
-                    if (component_disabled_anywhere)
-                    {
-                        name = disabled_name;
-                    }
-                    else
-                    {
-                        name = (addGroupNameToNameField) ? $"{GetGroupNameByCount(subGroupName, true)} {changed_name}": changed_name;
-                    }                    
+                    name = disabled_name;
                 }
                 else
-                {                    
+                {
+                    // для разделов Сборочные единицы и Детали и всех остальных по разному выводится наименование
                     if (string.Equals(mainGroupName, Constants.GroupAssemblyUnits) ||
                         string.Equals(mainGroupName, Constants.GroupDetails))
                     {
-                        name = $"{component_name.Trim()} {united_component.GetProperty(Constants.ComponentSign)}";
-                    }
-                    else
+                        name = haveToChangeName ? $"{component_name.Trim()} {changed_name}" : 
+                                                    $"{component_name.Trim()} {united_component.GetProperty(Constants.ComponentSign)}";
+                    } else
                     {
-                        name = (addGroupNameToNameField) ? $"{GetGroupNameByCount(subGroupName, true)} {component_name} {doc}" : $"{component_name} {doc}";
+                        if (haveToChangeName)
+                            name = (addGroupNameToNameField) ? $"{GetGroupNameByCount(subGroupName, true)} {changed_name}" : changed_name;
+                        else
+                            name = (addGroupNameToNameField) ? $"{GetGroupNameByCount(subGroupName, true)} {component_name} {doc}" : $"{component_name} {doc}";
                     }
                 }
                 

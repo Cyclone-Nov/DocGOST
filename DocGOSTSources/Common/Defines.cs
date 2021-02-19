@@ -306,13 +306,13 @@ namespace GostDOC.Common
         /// </summary>
         public static readonly string GRAPH_2 = "Обозначение";
         /// <summary>
-        /// название графы №4 Обозначение Литеры А изделия в структуре xml
+        /// название графы №4 Обозначение первой Литеры изделия в структуре xml
         /// </summary>
         public static readonly string GRAPH_4 = "Литера 1";
-        /// название графы №4а Обозначение Литеры О изделия в структуре xml
+        /// название графы №4а Обозначение второй Литеры изделия в структуре xml
         /// </summary>
         public static readonly string GRAPH_4a = "Литера 2";
-        /// название графы №4б Обозначение Литеры О1 изделия в структуре xml
+        /// название графы №4б Обозначение третьей Литеры изделия в структуре xml
         /// </summary>
         public static readonly string GRAPH_4b = "Литера 3";
         
@@ -453,6 +453,7 @@ namespace GostDOC.Common
         public static readonly string SubGroupNameSp = "Подраздел СП";
         public static readonly string GroupNameB = "Раздел ВП";
         public static readonly string SubGroupNameB = "Подраздел ВП";
+        
         /// <summary>
         /// количество страниц ВП, после которого надо добавлять в ВП оглавление
         /// </summary>
@@ -753,6 +754,16 @@ namespace GostDOC.Common
         /// обозначение документа Ведомость покупных изделий
         /// </summary>
         public static readonly string BillDocSign = "ВП";
+
+        /// <summary>
+        /// первая часть названия для переменных данных исполнений: "Переменные данные"
+        /// </summary>
+        public static readonly string VariableConfigDataSig1 = "Переменные данные";
+
+        /// <summary>
+        /// вторая часть названия для переменных данных исполнений: "исполнений"
+        /// </summary>
+        public static readonly string VariableConfigDataSig2 = "исполнений";
 
         #region Файлы
 

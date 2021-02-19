@@ -59,9 +59,10 @@ namespace GostDOC.DataPreparation
             }
 
             RemoveLastEmptyRows(table);
-            
+
             // добавим оглавление если надо
-            AddContentToDataTable(table);
+            mainConfig.Graphs.TryGetValue(Constants.GRAPH_2, out var sign);
+            AddContentToDataTable(table, sign);
 
             return table;           
         }
@@ -107,8 +108,8 @@ namespace GostDOC.DataPreparation
         {
             AddEmptyRow(aTable);
             var row = aTable.NewRow();
-            row[Constants.ColumnName] = new FormattedString { Value = "Переменные данные", TextAlignment = TextAlignment.RIGHT };
-            row[Constants.ColumnProductCode] = new FormattedString { Value = "исполнений", TextAlignment = TextAlignment.LEFT };            
+            row[Constants.ColumnName] = new FormattedString { Value = Constants.VariableConfigDataSig1, TextAlignment = TextAlignment.RIGHT };
+            row[Constants.ColumnProductCode] = new FormattedString { Value = Constants.VariableConfigDataSig2, TextAlignment = TextAlignment.LEFT };            
             aTable.Rows.Add(row);
             AddEmptyRow(aTable);
         }
@@ -568,15 +569,16 @@ namespace GostDOC.DataPreparation
         /// добавить в таблицу данных оглавление если листов более 24
         /// </summary>
         /// <param name="aTable">Таблица данных</param>
+        /// <param name="aSign">значение тега Обозначение исходной спецификации</param>
         /// <returns></returns>
-        private void AddContentToDataTable(DataTable aTable)
+        private void AddContentToDataTable(DataTable aTable, string aSign)
         {
             // проверим надо ли добавить оглавление
             int countPages = CommonUtils.GetCountPage(DocType.Bill, aTable.Rows.Count);
             if (countPages > Constants.BillPagesWithoutContent)
             {
                 // сделаем оглавление
-                var content = MakeContent(aTable);
+                var content = MakeContent(aTable, aSign);
                 int contentRowsCount = content.Count * 2; // учитываем пустые строки между строками оглавления
                 int offsetPages = CommonUtils.GetCurrentPage(DocType.Bill, contentRowsCount);
                 int contentRowsOnPages = CommonUtils.GetRowsForPages(DocType.Bill, offsetPages);
@@ -623,10 +625,12 @@ namespace GostDOC.DataPreparation
         /// Агоритм: проходим по строкам документа, зная что заголовок выделяется пустыми строками ниже и выше.
         /// находим заголовок и запоминаем номер строки - это начало группы
         /// ищем вторую пустую строку при непустом заголовке и берем номер строки - 1 = это последняя строка с данными для данный группы
+        /// если встречаем строку с переменными данными то ...
         /// </summary>
         /// <param name="aTable">таблица данных</param>
+        /// <param name="aSign">значение тега Обозначение исходной спецификации</param>
         /// <returns>список для созданий оглавления типа List<Tuple<Наименование группы, номер строки начала группы, номер строки конца группы></returns>
-        private List<Tuple<string,int,int>> MakeContent(DataTable aTable)
+        private List<Tuple<string,int,int>> MakeContent(DataTable aTable, string aSign)
         {
             List<Tuple<string, int, int>> content = new List<Tuple<string, int, int>>();
 
@@ -637,9 +641,6 @@ namespace GostDOC.DataPreparation
             int rowsCount = aTable.Rows.Count;            
             for (int cnt = 0; cnt < rowsCount; cnt++)
             {
-                string GetCellString(string columnName) =>
-                            (aTable.Rows[cnt][columnName] == DBNull.Value) ? string.Empty : ((BasePreparer.FormattedString)aTable.Rows[cnt][columnName]).Value;
-
                 if (IsEmptyRow(aTable.Rows[cnt]) && !string.IsNullOrEmpty(groupName))
                 {
                     // если первая пустая строка уже была
@@ -658,15 +659,19 @@ namespace GostDOC.DataPreparation
                         firstEmptyRow = true;
                     }
                 }
-                else if(IsGroupName(aTable.Rows[cnt]))
+                else if (IsGroupName(aTable.Rows[cnt]))
                 {
                     beginRowNumber = cnt + 1;
-                    groupName = GetCellString(Constants.ColumnName);
+                    groupName = GetValueFormFormattedString(Constants.ColumnName, aTable.Rows[cnt]);
                 }
                 else if (IsVariableConfigData(aTable.Rows[cnt]))
                 {
+                    content.Add(new Tuple<string, int, int>($"{Constants.VariableConfigDataSig1} {Constants.VariableConfigDataSig2}", cnt, aTable.Rows.Count));
+                } 
+                else if (IsVariableConfiguration(aTable.Rows[cnt], aSign))
+                {
                     throw new NotImplementedException("оглавление для переменных данных не реализовано");
-                  // TODO: доделать оглавление при учете переменных данных исполнения
+                    // TODO: доделать оглавление при учете переменных данных исполнения
                 }
             }
             
@@ -712,15 +717,37 @@ namespace GostDOC.DataPreparation
         }
 
         /// <summary>
-        /// проверка строки на заголовок
+        /// проверка что строка содержит заголовок переменных данных исполнений
         /// </summary>
-        /// <param name="aRow">a row.</param>
+        /// <param name="aRow">строка таблицы данных</param>
         /// <returns>
-        ///   <c>true</c> if [is empty row] [the specified a row]; otherwise, <c>false</c>.
+        ///  <c>true</c> если строка содержит заголовок переменных данных исполнений, иначе <c>false</c>.
         /// </returns>
         bool IsVariableConfigData(DataRow aRow)
         {
-            if (!string.IsNullOrEmpty(aRow[Constants.ColumnTextFormat].ToString()))
+            var name = GetValueFormFormattedString(Constants.ColumnName, aRow);
+            var productCode = GetValueFormFormattedString(Constants.ColumnProductCode, aRow);            
+
+            if (string.Equals(name, Constants.VariableConfigDataSig1) &&
+                string.Equals(productCode, Constants.VariableConfigDataSig1))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// проверка строки с наименованием конфигурации для переменных данных исполнений
+        /// </summary>
+        /// <param name="aRow">строка таблицы данных</param>
+        /// <param name="aSign">обозначение главное спецификации</param>
+        /// <returns>
+        ///  <c>true</c> если строка содержит наименование конфигурации, иначе <c>false</c>.
+        /// </returns>
+        bool IsVariableConfiguration(DataRow aRow, string aSign)
+        {
+            var name = GetValueFormFormattedString(Constants.ColumnName, aRow);
+            if (!string.IsNullOrEmpty(aSign) && name.Contains(aSign))
             {
                 return true;
             }
