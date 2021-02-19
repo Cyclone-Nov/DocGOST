@@ -21,6 +21,7 @@ namespace GostDOC.Models
         private ProjectType _projectType = ProjectType.Other;
         private string _dir = string.Empty;
         private Group _currentAssemblyD27 = null;
+        private bool _isPcbFound = false;
 
         private ErrorHandler _error = ErrorHandler.Instance;
 
@@ -35,6 +36,7 @@ namespace GostDOC.Models
             _projectType = ProjectType.Other;
             _dir = string.Empty;
             _currentAssemblyD27 = null;
+            _isPcbFound = false;
         }
 
         public OpenFileResult LoadData(Project aResult, string aFilePath, DocType aDocType)
@@ -81,7 +83,7 @@ namespace GostDOC.Models
                 // Fill graphs
                 foreach (var graph in cfg.Graphs)
                 {
-                    if(newCfg.Graphs.ContainsKey(graph.Name))
+                    if (newCfg.Graphs.ContainsKey(graph.Name))
                         _error.Error($"Обнаружено дублирование графа {graph.Name}. Будет использован первый");
                     else
                         newCfg.Graphs.Add(graph.Name, graph.Text);
@@ -94,11 +96,13 @@ namespace GostDOC.Models
                 _currentAssemblyD27 = newCfg.D27;
                 _currentAssemblyD27.Name = ParseNameSign(newCfg.Graphs);
 
-                AddComponents(newCfg, cfg.Documents, ComponentType.Document, unitSign);
-
-                if(_docType != DocType.Bill && _docType != DocType.D27)
+                if (_docType != DocType.Bill && _docType != DocType.D27)
+                {
                     AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, unitSign);
+                    _isPcbFound = cfg.ComponentsPCB.Count > 0;
+                }
 
+                AddComponents(newCfg, cfg.Documents, ComponentType.Document, unitSign);
                 AddComponents(newCfg, cfg.Components, ComponentType.Component, unitSign);
 
                 if (aDocType == DocType.ItemsList)
@@ -281,8 +285,6 @@ namespace GostDOC.Models
                         _currentAssemblyD27 = newAssembly;
                     }                    
 
-                    if (_docType != DocType.Bill)
-                        AddComponents(aNewCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, aUnitSign, complexCount);
                     AddComponents(aNewCfg, cfg.Components, ComponentType.Component, aUnitSign, complexCount);
                     break;
                 }
@@ -375,7 +377,8 @@ namespace GostDOC.Models
                             string _name;
                             component.Properties.TryGetValue(Constants.ComponentName, out _name);
                             ParseAssemblyUnit(aNewCfg, _sign.Trim(new char[] { ' ' }), _name, _specFileName, component.Count);
-                        } else
+                        } 
+                        else
                         {
                             var groupSp = cmp.Properties.Find(x => x.Name == Constants.GroupNameSp);
                             _error.Error($"Не задано обозначение для объединяющего компонента {combine.Name} из раздела {groupSp?.Text}: его спецификация загружена не будет!");
@@ -452,13 +455,29 @@ namespace GostDOC.Models
                 if (property.Name == Constants.GroupNameSp)
                 {
                     result[0].GroupName = property.Text;
-                } else if (property.Name == Constants.SubGroupNameSp)
-                {
-                    result[0].SubGroupName = property.Text;
-                } else if (property.Name == Constants.GroupNameB)
+
+                    if (property.Text == Constants.GroupOthers && _isPcbFound)
+                    {
+                        var designatorId = aSrc.Properties.Find(x => x.Name == Constants.ComponentDesignatorID)?.Text;
+                        if (!string.IsNullOrEmpty(designatorId))
+                        {
+                            var parse = ParseDesignatorId(designatorId);
+                            result[0].SubGroupName = parse.Item1;
+                        }
+                    }
+                } 
+                else if (property.Name == Constants.SubGroupNameSp)
+                {                   
+                    if (string.IsNullOrEmpty(result[0].SubGroupName))
+                    {
+                        result[0].SubGroupName = property.Text;
+                    }
+                } 
+                else if (property.Name == Constants.GroupNameB)
                 {
                     result[1].GroupName = property.Text;
-                } else if (property.Name == Constants.SubGroupNameB)
+                } 
+                else if (property.Name == Constants.SubGroupNameB)
                 {
                     result[1].SubGroupName = property.Text;
                 }
@@ -796,11 +815,16 @@ namespace GostDOC.Models
 
 
         private void UpdateGroupNames(IDictionary<string, Group> aGroups, Group aGroup)
-        {            
+        {
             if (GroupNameByCountIsValid(aGroup, out var name))
-                UpdateGroupNames(aGroups, aGroup, name);  
+                UpdateGroupNames(aGroups, aGroup, name);
             else
-                _error.Error($"Множественное число для группы {aGroup.Name} в словаре GroupNames.cfg не найдено!");            
+            {
+                if (aGroup.Name.Length > 3)
+                {
+                    _error.Error($"Множественное число для группы {aGroup.Name} в словаре GroupNames.cfg не найдено!");
+                }
+            }
         }
 
 

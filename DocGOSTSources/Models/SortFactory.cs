@@ -196,18 +196,9 @@ namespace GostDOC.Models
         {            
             aItems.Sort((x, y) =>
             {
-                string nameX = x.GetProperty(Constants.ComponentNote);
-                string nameY = y.GetProperty(Constants.ComponentNote);
-
-                int cmp = CompareFirstLetter(nameX, nameY);
-
-                if (cmp == 0)
-                {
-                    nameX = x.GetProperty(Constants.ComponentName);
-                    nameY = y.GetProperty(Constants.ComponentName);
-                    cmp = CompareValues(nameX, nameY);
-                }
-                return cmp;
+                string nameX = x.GetProperty(Constants.ComponentName);
+                string nameY = y.GetProperty(Constants.ComponentName);
+                return CompareValues(nameX, nameY);
             });
             return aItems;
         }
