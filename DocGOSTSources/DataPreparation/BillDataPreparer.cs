@@ -326,7 +326,7 @@ namespace GostDOC.DataPreparation
                     var productCode = component.GetProperty(Constants.ComponentProductCode);
                     var componentDoc = component.GetProperty(Constants.ComponentDoc);
 
-                    // если текущий компонент совпадает с предыдущим то в строку запишем только количества
+                    // если текущий компонент совпадает с предыдущим то в строку запишем только количества и Куда входит
                     if (string.Equals(prevName, name) && string.Equals(prevProductCode, productCode) && string.Equals(prevComponentDoc, componentDoc))
                     {
                         row = aTable.NewRow();
@@ -575,6 +575,7 @@ namespace GostDOC.DataPreparation
         {
             // проверим надо ли добавить оглавление
             int countPages = CommonUtils.GetCountPage(DocType.Bill, aTable.Rows.Count);
+            int toComponentsOffset = 2;
             if (countPages > Constants.BillPagesWithoutContent)
             {
                 // сделаем оглавление
@@ -588,17 +589,40 @@ namespace GostDOC.DataPreparation
                     AddEmptyRow(aTable, i);
 
                 int offsetRows = contentRowsOnPages;
-
+                
                 // запишем оглавление в таблицу данных                                
                 int contentRowIndex = 0;
+                int endRowLastGroupContent = 0;
+                int endPageLastGroupContent = 0;
                 foreach (var str in content)
                 {
                     contentRowIndex++;
-
+                    
+                    // проверим что, между текущей и предыдущей группами нет лишних пустых строк
                     int beginGroupRowNumber = str.Item2 + offsetRows;
-                    int firstComponentRowNumber = beginGroupRowNumber + 2;
                     int beginGroupPage = CommonUtils.GetCurrentPage(DocType.Bill, beginGroupRowNumber);
+                    if (endRowLastGroupContent > 0 &&
+                        beginGroupRowNumber - endRowLastGroupContent > toComponentsOffset && 
+                        endPageLastGroupContent == beginGroupPage)
+                    {
+                        int delta = beginGroupRowNumber - endRowLastGroupContent - toComponentsOffset;
+                        for (int i = 0; i < delta; i++)
+                        {
+                            aTable.Rows.RemoveAt(endRowLastGroupContent);
+                        }                        
+                        offsetRows -= delta;
+                        beginGroupRowNumber = str.Item2 + offsetRows;
+                    }
+                    int endGroupRowNumber = str.Item3 + offsetRows;
+                    endRowLastGroupContent = endGroupRowNumber;
+                    int endGroupPage = CommonUtils.GetCurrentPage(DocType.Bill, endGroupRowNumber);
+                    endPageLastGroupContent = endGroupPage;
+
+                    // оценим нахождение на разных страницах оглавления и 
+                    int firstComponentRowNumber = beginGroupRowNumber + toComponentsOffset;
+                    
                     int firstComponentPage = CommonUtils.GetCurrentPage(DocType.Bill, firstComponentRowNumber);
+                    
                     if (beginGroupPage != firstComponentPage)
                     {
                         int addedEmptyRows = AddEmptyRowsToEndPage(aTable, DocType.Bill, beginGroupRowNumber);
@@ -606,9 +630,7 @@ namespace GostDOC.DataPreparation
                         beginGroupPage = firstComponentPage;
                     }
 
-                    int endGroupRowNumber = str.Item3 + offsetRows;
-                    int endGroupPage = CommonUtils.GetCurrentPage(DocType.Bill, endGroupRowNumber);
-
+                    
                     string pagesRange = (beginGroupPage == endGroupPage) ?
                                             $"Лист {beginGroupPage}" : 
                                             $"Листы {beginGroupPage}-{endGroupPage}";
