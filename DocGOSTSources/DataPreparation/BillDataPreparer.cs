@@ -606,10 +606,9 @@ namespace GostDOC.DataPreparation
                         endPageLastGroupContent == beginGroupPage)
                     {
                         int delta = beginGroupRowNumber - endRowLastGroupContent - toComponentsOffset;
-                        for (int i = 0; i < delta; i++)
-                        {
+                        for (int i = 0; i < delta; i++)                        
                             aTable.Rows.RemoveAt(endRowLastGroupContent);
-                        }                        
+                                                
                         offsetRows -= delta;
                         beginGroupRowNumber = str.Item2 + offsetRows;
                     }
@@ -621,15 +620,13 @@ namespace GostDOC.DataPreparation
                     // оценим нахождение на разных страницах оглавления и 
                     int firstComponentRowNumber = beginGroupRowNumber + toComponentsOffset;
                     
-                    int firstComponentPage = CommonUtils.GetCurrentPage(DocType.Bill, firstComponentRowNumber);
-                    
+                    int firstComponentPage = CommonUtils.GetCurrentPage(DocType.Bill, firstComponentRowNumber);                    
                     if (beginGroupPage != firstComponentPage)
                     {
                         int addedEmptyRows = AddEmptyRowsToEndPage(aTable, DocType.Bill, beginGroupRowNumber);
                         offsetRows += addedEmptyRows;
                         beginGroupPage = firstComponentPage;
                     }
-
                     
                     string pagesRange = (beginGroupPage == endGroupPage) ?
                                             $"Лист {beginGroupPage}" : 

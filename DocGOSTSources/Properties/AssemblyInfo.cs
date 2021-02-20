@@ -8,7 +8,7 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("GOSTDoc")]
-[assembly: AssemblyDescription("Creates design documantation by standard")]
+[assembly: AssemblyDescription("Creates design documentation by standard GOST")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Central Research Institute Cyclone")]
 [assembly: AssemblyProduct("GOSTDoc")]
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.1.32")]
-[assembly: AssemblyFileVersion("1.1.1.32")]
+[assembly: AssemblyVersion("1.1.1.33")]
+[assembly: AssemblyFileVersion("1.1.1.33")]
