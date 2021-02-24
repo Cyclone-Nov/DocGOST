@@ -113,7 +113,7 @@ namespace GostDOC.Models
         public static NameSortRegex Instance => _instance.Value;
         private NameSortRegex()
         {
-            StringBuilder unitsGroup = new StringBuilder(@"\w*?(\d+(?:\.\d+)?)\w*\s*(");
+            StringBuilder unitsGroup = new StringBuilder(@"\w*?(\d+(?:\.\d+)?)\s*(");
 
             bool first = true;
             foreach (var line in Utils.ReadCfgFileLines("Units"))
@@ -177,28 +177,17 @@ namespace GostDOC.Models
             return aFirst[0].CompareTo(aSecond[0]);
         }
 
-        private int CompareValues(string aFirst, string aSecond)
-        {
-            // Compare 1st letter
-            var result = CompareFirstLetter(aFirst, aSecond);
-
-            if (result == 0)
-            {
-                // Parse value and compare it
-                var num1 = ParseValue(aFirst);
-                var num2 = ParseValue(aSecond);
-                result = num1.CompareTo(num2);
-            }
-            return result;
-        }
-
         public List<Component> Sort(List<Component> aItems)
         {            
             aItems.Sort((x, y) =>
             {
                 string nameX = x.GetProperty(Constants.ComponentName);
                 string nameY = y.GetProperty(Constants.ComponentName);
-                return CompareValues(nameX, nameY);
+
+                var num1 = ParseValue(nameX);
+                var num2 = ParseValue(nameY);
+
+                return num1.CompareTo(num2);
             });
             return aItems;
         }
