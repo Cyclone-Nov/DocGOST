@@ -17,7 +17,13 @@ namespace GostDOC.Models
             FillGroupNames();
         }
 
-        public static string GetGroupName(string aSymbol, bool isOneElement = false)
+        /// <summary>
+        /// получить имя группы во множественном или в единственном числе по символам позиционного обозначения
+        /// </summary>
+        /// <param name="aSymbol">символы позиционного обозначения</param>
+        /// <param name="isOneElement">if set to <c>true</c> [is one element].</param>
+        /// <returns>имя группы в единственном или множественном числе</returns>
+        public static string GetSingleOrPluralGroupName(string aSymbol, bool isOneElement = false)
         {
             if (!string.IsNullOrEmpty(aSymbol))
             {
@@ -27,6 +33,26 @@ namespace GostDOC.Models
                 if (_groupNames.TryGetValue(symbol, out names))
                 {
                     return isOneElement ? names.Item1 : names.Item2;
+                }
+            }
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// получить объединенное имя группы (формат - единственное число\множественное числое) по символам позиционного обозначения
+        /// </summary>
+        /// <param name="aSymbol">символы позиционного обозначения</param>
+        /// <returns>объединенное имя группы (единственное число\множественное числое)</returns>
+        public static string GetUnitedGroupName(string aSymbol)
+        {
+            if (!string.IsNullOrEmpty(aSymbol))
+            {
+                string symbol = string.Concat(aSymbol.Where(char.IsLetter));
+
+                Tuple<string, string> names;
+                if (_groupNames.TryGetValue(symbol, out names))
+                {
+                    return $"{names.Item1}\\{names.Item2}";
                 }
             }
             return string.Empty;
@@ -53,6 +79,9 @@ namespace GostDOC.Models
             return string.Empty;
         }
 
+        /// <summary>
+        /// заполним словарь имен групп из файла
+        /// </summary>
         private static void FillGroupNames()
         {
             foreach (var line in Utils.ReadCfgFileLines("PhysicalDesignators"))
