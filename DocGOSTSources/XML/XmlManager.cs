@@ -96,13 +96,15 @@ namespace GostDOC.Models
                 _currentAssemblyD27 = newCfg.D27;
                 _currentAssemblyD27.Name = ParseNameSign(newCfg.Graphs);
 
+
+                AddComponents(newCfg, cfg.Documents, ComponentType.Document, unitSign);
                 if (_docType != DocType.Bill && _docType != DocType.D27)
                 {
                     AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, unitSign);
                     _isPcbFound = cfg.ComponentsPCB.Count > 0;
                 }
 
-                AddComponents(newCfg, cfg.Documents, ComponentType.Document, unitSign);
+                //AddComponents(newCfg, cfg.Documents, ComponentType.Document, unitSign);
                 AddComponents(newCfg, cfg.Components, ComponentType.Component, unitSign);
 
                 if (aDocType == DocType.ItemsList)
@@ -283,8 +285,10 @@ namespace GostDOC.Models
                     {
                         _currentAssemblyD27.SubGroups.Add(newAssembly.Name, newAssembly);
                         _currentAssemblyD27 = newAssembly;
-                    }                    
+                    }
 
+                    //if (_docType != DocType.Bill)
+                    //    AddComponents(aNewCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, aUnitSign, complexCount);
                     AddComponents(aNewCfg, cfg.Components, ComponentType.Component, aUnitSign, complexCount);
                     break;
                 }
@@ -462,7 +466,7 @@ namespace GostDOC.Models
                         if (!string.IsNullOrEmpty(designatorId))
                         {
                             var parse = ParseDesignatorId(designatorId);
-                            result[0].SubGroupName = parse.Item1;
+                            result[0].SubGroupName = GroupNameConverter.GetUnitedGroupName(parse.Item1);
                         }
                     }
                 } 
@@ -820,10 +824,10 @@ namespace GostDOC.Models
                 UpdateGroupNames(aGroups, aGroup, name);
             else
             {
-                if (aGroup.Name.Length > 3)
-                {
+                //if (aGroup.Name.Length > 3)
+                //{
                     _error.Error($"Множественное число для группы {aGroup.Name} в словаре GroupNames.cfg не найдено!");
-                }
+                //}
             }
         }
 
