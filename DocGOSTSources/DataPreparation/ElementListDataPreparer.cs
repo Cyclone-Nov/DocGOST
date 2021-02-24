@@ -93,7 +93,7 @@ namespace GostDOC.DataPreparation
             if (!aComponentsDic.Any()) 
                 return;
 
-            string changed_name = $"(см. табл. {aSchemaDesignation})";
+            string changed_name = $"см. табл. {aSchemaDesignation}";
             string disabled_name = "Не устанавливать";
                          
             // отсортируем компоненты
@@ -198,12 +198,12 @@ namespace GostDOC.DataPreparation
                     if (string.Equals(mainGroupName, Constants.GroupAssemblyUnits) ||
                         string.Equals(mainGroupName, Constants.GroupDetails))
                     {
-                        name = haveToChangeName ? $"{component_name.Trim()} {changed_name}" : 
+                        name = haveToChangeName ? $"{component_name.Trim()} ({changed_name})" : 
                                                     $"{component_name.Trim()} {united_component.GetProperty(Constants.ComponentSign)}";
                     } else
                     {
                         if (haveToChangeName)
-                            name = (addGroupNameToNameField) ? $"{GetGroupNameByCount(subGroupName, true)} {changed_name}" : changed_name;
+                            name = (addGroupNameToNameField) ? $"{GetGroupNameByCount(subGroupName, true)} ({changed_name})" : changed_name;
                         else
                             name = (addGroupNameToNameField) ? $"{GetGroupNameByCount(subGroupName, true)} {component_name} {doc}" : $"{component_name} {doc}";
                     }
