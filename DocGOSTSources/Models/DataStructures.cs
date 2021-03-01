@@ -34,8 +34,15 @@ namespace GostDOC.Models
     }
 
     public class Group
-    {
-        public string Name { get; set; }
+    {        
+        public string Name { get; set; }            
+        /// <summary>
+        /// имя для сортировки данной группы среди прочих групп, если на задано то соритровать необходимо по имени
+        /// </summary>
+        /// <value>
+        /// The name of the sort.
+        /// </value>
+        public string SortName { get; set; }
         public bool AutoSort { get; set; } = true;
         public List<Component> Components { get; set; } = new List<Component>();
         public IDictionary<string, Group> SubGroups { get; set; } = new Dictionary<string, Group>();
@@ -60,6 +67,8 @@ namespace GostDOC.Models
     public class Configuration
     {
         public string Name { get; set; }
+
+        public IDictionary<string, object> PrivateProperties { get; set; } = new Dictionary<string, object>();
         public IDictionary<string, string> Graphs { get; set; } = new Dictionary<string, string>();
 
         public IDictionary<string, Group> Specification { get; set; } = new OrderedDictionary<string, Group>();

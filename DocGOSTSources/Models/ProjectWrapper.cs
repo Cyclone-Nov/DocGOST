@@ -333,7 +333,7 @@ namespace GostDOC.Models
                 {
                     if (!grp.SubGroups.ContainsKey(aGroupInfo.SubGroupName))
                     {
-                        grp.SubGroups.Add(aGroupInfo.SubGroupName, new Group() { Name = aGroupInfo.GroupName });
+                        grp.SubGroups.Add(aGroupInfo.SubGroupName, new Group() { Name = aGroupInfo.SubGroupName, SortName = aGroupInfo.SubGroupSortName });
                         return true;
                     }
                 }
