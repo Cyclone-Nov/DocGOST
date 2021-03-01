@@ -233,12 +233,18 @@ namespace GostDOC.DataPreparation
                 aTable.Rows.Add(row);                
             }
 
+            bool isPCB = false;
+            if (aConfig.PrivateProperties.TryGetValue(Constants.SignPCB, out var val))
+            {
+                isPCB = (bool)val;
+            }
+
             AddGroup(aTable, Constants.GroupDoc, data, ref aPosition, aPositions);
             AddGroup(aTable, Constants.GroupComplex, data, ref aPosition, aPositions);
             AddGroup(aTable, Constants.GroupAssemblyUnits, data, ref aPosition, aPositions);
             AddGroup(aTable, Constants.GroupDetails, data, ref aPosition, aPositions);
             AddGroup(aTable, Constants.GroupStandard, data, ref aPosition, aPositions);
-            AddGroup(aTable, Constants.GroupOthers, data, ref aPosition, aPositions);
+            AddGroup(aTable, Constants.GroupOthers, data, ref aPosition, aPositions, isPCB);
             AddGroup(aTable, Constants.GroupMaterials, data, ref aPosition, aPositions);
             AddGroup(aTable, Constants.GroupKits, data, ref aPosition, aPositions);
 
@@ -254,7 +260,7 @@ namespace GostDOC.DataPreparation
         /// <param name="aComponents"></param>
         /// <param name="aOtherComponents"></param>
         /// <param name="aSchemaDesignation"></param>
-        private void AddGroup(DataTable aTable, string aGroupName, IDictionary<string, Group> aGroupDic, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions)
+        private void AddGroup(DataTable aTable, string aGroupName, IDictionary<string, Group> aGroupDic, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions, bool isPCB = false)
         {
             if (aGroupDic == null || !aGroupDic.ContainsKey(aGroupName))
                 return;
@@ -271,25 +277,30 @@ namespace GostDOC.DataPreparation
                 AddEmptyRow(aTable);           
 
             var сomponents = group.Components;
+            bool subgroupsFirst = isPCB;
 
             // добавим в наименование компонента название группы для компонентов без групппы для раздела Прочие изделия
             ChangeNameBySubGroupName changeComponentName = ChangeNameBySubGroupName.WithoutCahnges;
-            if (string.Equals(aGroupName, Constants.GroupOthers))
-                changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;
+            if (string.Equals(aGroupName, Constants.GroupOthers))            
+                changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;                            
 
             // будем добавлять позицию, если раздел не Документация и не Комплексы
             bool setPos = !string.Equals(aGroupName, Constants.GroupDoc) && !string.Equals(aGroupName, Constants.GroupComplex);
-            
-            AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, changeComponentName);
-            
-            if (сomponents.Count > 0)            
-                AddEmptyRow(aTable);
+
+            if (!subgroupsFirst)
+            {
+                AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, changeComponentName);
+
+                if (сomponents.Count > 0)
+                    AddEmptyRow(aTable);
+            }
 
             // для подгрупп не будет добавлять наименование группы в наименовение компонента
             changeComponentName = ChangeNameBySubGroupName.WithoutCahnges;
 
             // добавляем подгруппы
-            foreach (var subgroup in group.SubGroups.OrderBy(key => key.Key).Where(key => !string.Equals(key.Key, Constants.SUBGROUPFORSINGLE)))
+            foreach (var subgroup in group.SubGroups.OrderBy(key => key.Value.SortName ?? key.Value.Name).
+                                                     Where(key => !string.Equals(key.Key, Constants.SUBGROUPFORSINGLE)))
             {
                 if (subgroup.Value.Components.Count > 0)
                 {
@@ -310,6 +321,12 @@ namespace GostDOC.DataPreparation
                     AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, subgroup_other.Components, ref aPos, aPositions);
                     AddEmptyRow(aTable);
                 }                
+            }
+
+            if (subgroupsFirst)
+            {
+                changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;
+                AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, changeComponentName);
             }
 
             RemoveLastRow(aTable);
