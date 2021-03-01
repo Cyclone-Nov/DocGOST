@@ -29,7 +29,7 @@ namespace GostDOC.DataPreparation
         /// <summary>
         /// ничего не менять
         /// </summary>
-        WithoutCahnges
+        WithoutChanges
     }
 
     internal class SpecificationDataPreparer : BasePreparer
@@ -274,13 +274,16 @@ namespace GostDOC.DataPreparation
             // наименование раздела
             AddEmptyRow(aTable);
             if (AddGroupName(aTable, aGroupName))
-                AddEmptyRow(aTable);           
+            {
+                ShiftToNextPageIfEnd(aTable, true);
+                AddEmptyRow(aTable);
+            }
 
             var сomponents = group.Components;
             bool subgroupsFirst = isPCB;
 
             // добавим в наименование компонента название группы для компонентов без групппы для раздела Прочие изделия
-            ChangeNameBySubGroupName changeComponentName = ChangeNameBySubGroupName.WithoutCahnges;
+            ChangeNameBySubGroupName changeComponentName = ChangeNameBySubGroupName.WithoutChanges;
             if (string.Equals(aGroupName, Constants.GroupOthers))            
                 changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;                            
 
@@ -289,14 +292,14 @@ namespace GostDOC.DataPreparation
 
             if (!subgroupsFirst)
             {
-                AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, changeComponentName);
-
                 if (сomponents.Count > 0)
+                {
+                    AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, changeComponentName);
                     AddEmptyRow(aTable);
+                }
             }
 
-            // для подгрупп не будет добавлять наименование группы в наименовение компонента
-            changeComponentName = ChangeNameBySubGroupName.WithoutCahnges;
+            bool isStandardGroup = string.Equals(aGroupName, Constants.GroupStandard);
 
             // добавляем подгруппы
             foreach (var subgroup in group.SubGroups.OrderBy(key => key.Value.SortName ?? key.Value.Name).
@@ -305,8 +308,12 @@ namespace GostDOC.DataPreparation
                 if (subgroup.Value.Components.Count > 0)
                 {
                     string subGroupName = GetSubgroupNameByCount(subgroup);
-                    if (string.Equals(aGroupName, Constants.GroupStandard) && !string.IsNullOrEmpty(subGroupName))
+                    if (isStandardGroup && !string.IsNullOrEmpty(subGroupName))
                         changeComponentName = ChangeNameBySubGroupName.ExcludeSubgroupSingleName;
+                    else if (HasDifferentSubGroupNames(subgroup.Value.Components))
+                        changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;
+                    else
+                        changeComponentName = ChangeNameBySubGroupName.WithoutChanges;
 
                     AddSubgroup(aTable, subGroupName, subgroup.Value.Components, ref aPos, aPositions, changeComponentName);
                     AddEmptyRow(aTable);
@@ -317,8 +324,8 @@ namespace GostDOC.DataPreparation
             if (group.SubGroups.TryGetValue(Constants.SUBGROUPFORSINGLE, out var subgroup_other))
             {
                 if (subgroup_other.Components.Count > 0)
-                {                       
-                    AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, subgroup_other.Components, ref aPos, aPositions);
+                {                    
+                    AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, subgroup_other.Components, ref aPos, aPositions, ChangeNameBySubGroupName.AddSubgroupName);
                     AddEmptyRow(aTable);
                 }                
             }
@@ -347,12 +354,18 @@ namespace GostDOC.DataPreparation
                                  List<Component> aSortComponents, 
                                  ref int aPos, 
                                  IDictionary<string, List<Tuple<string, int>>> aPositions,
-                                 ChangeNameBySubGroupName aChangeComponentName = ChangeNameBySubGroupName.WithoutCahnges)
+                                 ChangeNameBySubGroupName aChangeComponentName = ChangeNameBySubGroupName.WithoutChanges)
         {
             if (!aSortComponents.Any())            
-                return false;            
+                return false;
 
-            AddGroupName(aTable, aGroupName, false, TextAlignment.LEFT);
+            // не будем добавлять имя подгруппы если надо добавлять наименование группы каждому компоненту
+            if (aChangeComponentName != ChangeNameBySubGroupName.AddSubgroupName)
+            {
+                ShiftToNextPageIfEnd(aTable, false);
+
+                AddGroupName(aTable, aGroupName, false, TextAlignment.LEFT);
+            }
 
             AddComponents(aTable, aSortComponents, ref aPos, aPositions, true, aChangeComponentName);                        
             aTable.AcceptChanges();
@@ -373,7 +386,7 @@ namespace GostDOC.DataPreparation
                                    ref int aPos, 
                                    IDictionary<string, List<Tuple<string, int>>> aPositions, 
                                    bool aSetPos = true, 
-                                   ChangeNameBySubGroupName aChangeComponentName = ChangeNameBySubGroupName.WithoutCahnges)
+                                   ChangeNameBySubGroupName aChangeComponentName = ChangeNameBySubGroupName.WithoutChanges)
         {
             DataRow row;
             foreach (var component in aSortComponents)
@@ -387,16 +400,15 @@ namespace GostDOC.DataPreparation
                 bool nonEmptyComponent = !string.IsNullOrEmpty(component_name);
                 if (nonEmptyComponent)
                 {
+                    string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);
                     if (aChangeComponentName == ChangeNameBySubGroupName.AddSubgroupName)
-                    {
-                        string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);
+                    {                        
                         if (component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase) < 0)
                             prepared_component_name = $"{subGroupName} {component_name}";
-                    } else if (aChangeComponentName == ChangeNameBySubGroupName.ExcludeSubgroupSingleName)
-                    {
-                        string subGroupName = GetSubgroupName(component.GetProperty(Constants.SubGroupNameSp), true);
-                        int val = component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase);
-                        if (val == 0)
+                    }
+                    else if (aChangeComponentName == ChangeNameBySubGroupName.ExcludeSubgroupSingleName)
+                    {                                                
+                        if (component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase) == 0)
                             prepared_component_name = component_name.Substring(subGroupName.Length).TrimStart();
                     }
                 }
@@ -416,7 +428,7 @@ namespace GostDOC.DataPreparation
                 {
                     ++aPos;
                     // если элемент не пустой
-                    if(nonEmptyComponent)
+                    if (nonEmptyComponent)
                         row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString(), TextAlignment = TextAlignment.CENTER };
 
                     string posComponentName = DataPreparationUtils.GetNameForPositionDictionary(component);
@@ -621,6 +633,49 @@ namespace GostDOC.DataPreparation
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Determines whether [has different group names] [the specified components].
+        /// </summary>
+        /// <param name="Components">The components.</param>
+        /// <returns>
+        ///   <c>true</c> if [has different group names] [the specified components]; otherwise, <c>false</c>.
+        /// </returns>
+        private bool HasDifferentSubGroupNames(IList<Component> aComponents)
+        {
+            string lastSubGroupName = aComponents.First().GetProperty(Constants.SubGroupNameSp);
+            string currentSubGroupName = string.Empty;
+
+            foreach (var cmp in aComponents)
+            {
+                currentSubGroupName = cmp.GetProperty(Constants.SubGroupNameSp);
+                if (!string.IsNullOrEmpty(lastSubGroupName) && 
+                    !string.IsNullOrEmpty(currentSubGroupName) && 
+                    !string.Equals(lastSubGroupName, currentSubGroupName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// добавить пустые строки для выравния по странице если заголовок раздела или подгруппы и копоненты оказываются на разных страницах 
+        /// </summary>
+        /// <param name="aTable">таблица с данными</param>
+        /// <param name="aIsGroup"><c>true</c> - если это раздел, иначе подгруппа (<c>false</c>).</param>
+        private void ShiftToNextPageIfEnd(DataTable aTable, bool aIsGroup)
+        {
+            int groupNameRowNumber = aTable.Rows.Count + 1;
+            int firstComponentRowNumber = aIsGroup ? groupNameRowNumber + 2 : groupNameRowNumber + 1;
+            int groupNamePageNumber = CommonUtils.GetCurrentPage(DocType.Specification, groupNameRowNumber);
+            int firstComponentPageNumber = CommonUtils.GetCurrentPage(DocType.Specification, firstComponentRowNumber);
+            if (firstComponentPageNumber > groupNamePageNumber)
+            {
+                AddEmptyRowsToEndPage(aTable, DocType.Specification, groupNameRowNumber);
+            }
         }
 
 
