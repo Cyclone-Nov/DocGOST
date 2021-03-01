@@ -850,5 +850,11 @@ namespace GostDOC.Common
 
         #endregion
 
+        /// <summary>
+        /// наименование признака указания что данная спецификация PCB
+        /// </summary>
+        public static readonly string SignPCB = "IsPCB";
+        
+
     }
 }
