@@ -102,6 +102,7 @@ namespace GostDOC.Models
                 {
                     AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, unitSign);
                     _isPcbFound = cfg.ComponentsPCB.Count > 0;
+                    newCfg.PrivateProperties.Add(Constants.SignPCB, _isPcbFound);
                 }
 
                 //AddComponents(newCfg, cfg.Documents, ComponentType.Document, unitSign);
@@ -438,7 +439,7 @@ namespace GostDOC.Models
                 if (!spGroup.SubGroups.TryGetValue(aGroupInfo.SubGroupName, out var subGroup))
                 {
                     // Add subgroup
-                    subGroup = new Group() { Name = aGroupInfo.SubGroupName };
+                    subGroup = new Group() { Name = aGroupInfo.SubGroupName, SortName = aGroupInfo.SubGroupSortName };
                     spGroup.SubGroups.Add(subGroup.Name, subGroup);
                 }
                 // Add component to subgroup
@@ -467,6 +468,7 @@ namespace GostDOC.Models
                         {
                             var parse = ParseDesignatorId(designatorId);
                             result[0].SubGroupName = GroupNameConverter.GetUnitedGroupName(parse.Item1);
+                            result[0].SubGroupSortName = parse.Item1;
                         }
                     }
                 } 
@@ -474,7 +476,7 @@ namespace GostDOC.Models
                 {                   
                     if (string.IsNullOrEmpty(result[0].SubGroupName))
                     {
-                        result[0].SubGroupName = property.Text;
+                        result[0].SubGroupName = property.Text;                        
                     }
                 } 
                 else if (property.Name == Constants.GroupNameB)
