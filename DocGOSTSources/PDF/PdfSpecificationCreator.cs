@@ -299,20 +299,15 @@ namespace GostDOC.PDF
                 } 
                 else if (string.IsNullOrEmpty(position) && string.IsNullOrEmpty(note) && string.IsNullOrEmpty(format))  {
                     // наименование группы
-                    if (remainingPdfTableRows > 4)  {
-                        // если есть место для записи более 4 строк то записываем группу, иначе выходим
-                        tbl.AddCell(centrAlignCell.Clone(false)); // формат
-                        tbl.AddCell(centrAlignCell.Clone(false)); // зона
-                        tbl.AddCell(centrAlignCell.Clone(false)); // поз                        
-                        AddCellFormatted(sign); 
-                        AddCellFormatted(name);
-                        tbl.AddCell(centrAlignCell.Clone(false)); // кол
-                        tbl.AddCell(centrAlignCell.Clone(false)); // примеч.
-                        remainingPdfTableRows--;
-                    }
-                    else {
-                        break;
-                    }
+                    tbl.AddCell(centrAlignCell.Clone(false)); // формат
+                    tbl.AddCell(centrAlignCell.Clone(false)); // зона
+                    tbl.AddCell(centrAlignCell.Clone(false)); // поз                        
+                    AddCellFormatted(sign); 
+                    AddCellFormatted(name);
+                    tbl.AddCell(centrAlignCell.Clone(false)); // кол
+                    tbl.AddCell(centrAlignCell.Clone(false)); // примеч.
+                    remainingPdfTableRows--;
+                    
                 } else  {
                     if (remainingPdfTableRows == 1) {
                         centrAlignCell.SetBorderBottom(THICK_BORDER);
