@@ -135,11 +135,13 @@ namespace GostDOC.Models
         #endregion
         private static double ParseMultiplier(string aSuffix)
         {
-            if (aSuffix.StartsWith("н", StringComparison.InvariantCulture))
-                return Math.Pow(10, -9);
             if (aSuffix.StartsWith("п", StringComparison.InvariantCulture))
-                return Math.Pow(10, -6);
+                return Math.Pow(10, -12);
+            if (aSuffix.StartsWith("н", StringComparison.InvariantCulture))
+                return Math.Pow(10, -9);            
             if (aSuffix.StartsWith("мк", StringComparison.InvariantCulture))
+                return Math.Pow(10, -6);
+            if (aSuffix.StartsWith("мл", StringComparison.InvariantCulture))
                 return Math.Pow(10, -3);
             if (aSuffix.StartsWith("к", StringComparison.InvariantCulture))
                 return Math.Pow(10, 3);
