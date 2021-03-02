@@ -162,7 +162,7 @@ namespace GostDOC.Models
                 var multiplier = ParseMultiplier(match.Groups[2].Value);
                 return num * multiplier;
             }
-            return 0.0;
+            return double.NaN;
         }
 
         private int CompareFirstLetter(string aFirst, string aSecond)
@@ -189,7 +189,23 @@ namespace GostDOC.Models
                 var num1 = ParseValue(nameX);
                 var num2 = ParseValue(nameY);
 
-                return num1.CompareTo(num2);
+                if (!double.IsNaN(num1) && !double.IsNaN(num2))
+                {
+                    return num1.CompareTo(num2);
+                }
+
+                if (double.IsNaN(num1) && !double.IsNaN(num2))
+                {
+                    return -1;
+                }
+
+                if (!double.IsNaN(num1) && double.IsNaN(num2))
+                {
+                    return 1;
+                }
+
+                // не удалось распарсить основные парметры - сортируем по алфавиту
+                return string.Compare(nameX, nameY, true);
             });
             return aItems;
         }
