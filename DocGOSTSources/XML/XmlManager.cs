@@ -896,13 +896,18 @@ namespace GostDOC.Models
                 {
                     // Update component name
                     Component cp = gp.Value.Components.First();
-                    string type = cp.GetProperty(Constants.ComponentType);
-                    string name = cp.GetProperty(Constants.ComponentName);
-                    cp.SetPropertyValue(Constants.ComponentName, name.Contains(type) ? name : type + " " + name);
-                    // Move component to parent group
-                    aGroup.Components.Insert(0, cp);// Add(cp);
-                    // Remove subgroup
-                    aGroup.SubGroups.Remove(gp.Value.Name);
+
+                    // если это не спецификация печатной платы либо компонент не имеет позиционного обозначения
+                    if (!_isPcbFound || string.IsNullOrEmpty(cp.GetProperty(Constants.ComponentDesignatorID)))
+                    {
+                        string type = cp.GetProperty(Constants.ComponentType);
+                        string name = cp.GetProperty(Constants.ComponentName);
+                        cp.SetPropertyValue(Constants.ComponentName, name.Contains(type) ? name : type + " " + name);
+                        // Move component to parent group
+                        aGroup.Components.Insert(0, cp);// Add(cp);
+                                                        // Remove subgroup
+                        aGroup.SubGroups.Remove(gp.Value.Name);
+                    }
                 }
             }
         }
