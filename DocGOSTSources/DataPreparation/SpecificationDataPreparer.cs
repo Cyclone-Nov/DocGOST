@@ -310,7 +310,7 @@ namespace GostDOC.DataPreparation
                     string subGroupName = GetSubgroupNameByCount(subgroup);
                     if (isStandardGroup && !string.IsNullOrEmpty(subGroupName))
                         changeComponentName = ChangeNameBySubGroupName.ExcludeSubgroupSingleName;
-                    else if (HasDifferentSubGroupNames(subgroup.Value.Components))
+                    else if (HasDifferentSubGroupNames(subgroup.Value.Components) || subgroup.Value.Components.Count == 1)
                         changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;
                     else
                         changeComponentName = ChangeNameBySubGroupName.WithoutChanges;
