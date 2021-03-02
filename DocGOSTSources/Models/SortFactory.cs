@@ -191,20 +191,18 @@ namespace GostDOC.Models
 
                 if (!double.IsNaN(num1) && !double.IsNaN(num2))
                 {
-                    return num1.CompareTo(num2);
-                }
-
-                if (double.IsNaN(num1) && !double.IsNaN(num2))
+                    var result = num1.CompareTo(num2);
+                    if (result != 0)
+                        return result;
+                } else if(double.IsNaN(num1) && !double.IsNaN(num2))
                 {
                     return -1;
-                }
-
-                if (!double.IsNaN(num1) && double.IsNaN(num2))
+                }else if (!double.IsNaN(num1) && double.IsNaN(num2))
                 {
                     return 1;
                 }
 
-                // не удалось распарсить основные парметры - сортируем по алфавиту
+                // не удалось распарсить основные парметры либо они одинаковы - сортируем по алфавиту
                 return string.Compare(nameX, nameY, true);
             });
             return aItems;
