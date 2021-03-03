@@ -283,7 +283,26 @@ namespace GostDOC.Common
     /// </summary>
     internal static class Constants {
 
+        /// <summary>
+        /// список типов документов
+        /// </summary>
+        /// <value>
+        /// The document formats list.
+        /// </value>
         public static IEnumerable<DocumentFormats> DocumentFormatsList => Enum.GetValues(typeof(DocumentFormats)).Cast<DocumentFormats>();
+
+        /// <summary>
+        /// список литер
+        /// </summary>
+        /// <value>
+        /// The literas list.
+        /// </value>
+        public static IEnumerable<string> LiterasList => new List<string>() { string.Empty, "П", "Э", "Т","О", "О1", "О2", "О3", "А", "Б", "И", "РО", "РО1", "РО2", "РА", "РБ", "РИ" };
+
+        /// <summary>
+        /// основное название тегов с литерой: Литера
+        /// </summary>
+        public static readonly string LiteraName = "Литера";
 
         #region Графы
 

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GostDOC.Interfaces;
 using GostDOC.Models;
+using GostDOC.Common;
 
 namespace GostDOC.ViewModels
 {
@@ -60,34 +61,43 @@ namespace GostDOC.ViewModels
 
         public GraphValueVM(string aName, string aText)
         {
-            Name.Value = aName;
-            Text.Value = aText;
-
-            if (aName.Contains("Литера"))
+            if (IsLiteraField(aName))
             {
+                aName = ConvertToLiteraName(aName);
                 GraphType = ItemType.ComboBox;
-                Items.Add(string.Empty);
-                Items.Add("П");
-                Items.Add("Э");
-                Items.Add("Т");
-                Items.Add("О");
-                Items.Add("О1");
-                Items.Add("О2");
-                Items.Add("О3");
-                Items.Add("А");
-                Items.Add("Б");
-                Items.Add("И");
-                Items.Add("РО");
-                Items.Add("РО1");
-                Items.Add("РО2");
-                Items.Add("РА");
-                Items.Add("РБ");
-                Items.Add("РИ");
+                foreach (var it in Constants.LiterasList)
+                    Items.Add(it);
             }
             else
             {
                 GraphType = ItemType.Text;
             }
+
+            Name.Value = aName;
+            Text.Value = aText;
+        }
+
+        /// <summary>
+        /// определение что данное поле относится к литерам
+        /// </summary>
+        /// <param name="aFieldName">Name of a field.</param>
+        /// <returns>
+        ///   <c>true</c> if [is litera field] [the specified a field name]; otherwise, <c>false</c>.
+        /// </returns>
+        private bool IsLiteraField(string aFieldName)
+        {
+            return aFieldName.Contains(Constants.LiteraName);
+        }
+
+        /// <summary>
+        /// конвертирование названия поля с литерой в допустимое название
+        /// </summary>
+        /// <param name="aName">a name.</param>
+        /// <returns></returns>
+        private string ConvertToLiteraName(string aName)
+        {
+            string digit = aName.Substring(Constants.LiteraName.Length, aName.Length - Constants.LiteraName.Length).Trim();                
+            return string.IsNullOrEmpty(digit) ? $"{Constants.LiteraName} 1" : $"{Constants.LiteraName} {digit}";
         }
     }
 }
