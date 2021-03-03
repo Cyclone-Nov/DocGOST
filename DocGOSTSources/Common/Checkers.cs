@@ -24,7 +24,7 @@ namespace GostDOC.Common
             for (int i = 0; i < aDesigantor.Length; i++)
             {
                 if (Char.IsDigit(aDesigantor[i]))
-                {                    
+                {   
                     string symb = aDesigantor.Substring(0, i);
                     // символы должны быть
                     if (string.IsNullOrEmpty(symb))
@@ -36,6 +36,10 @@ namespace GostDOC.Common
                         return false;
                     // 
                     return Int32.TryParse(digs, out var dig);
+                }
+                else if (!Char.IsLetter(aDesigantor[i]))
+                {
+                    return false;
                 }
             }
 
