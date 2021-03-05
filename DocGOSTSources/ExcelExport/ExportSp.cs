@@ -31,15 +31,15 @@ namespace GostDOC.ExcelExport
         {
             get
             {
-                int count = 1;
-                if (_tbl != null)
-                {
-                    if (_tbl.Rows.Count > RowCountFirst)
-                    {
-                        count += (_tbl.Rows.Count - RowCountFirst) / RowCountSecond + 1;
-                    }
-                }
-                return count;
+                //int count = 1;
+                //if (_tbl != null)
+                //{
+                //    if (_tbl.Rows.Count > RowCountFirst)
+                //    {
+                //        count += (_tbl.Rows.Count - RowCountFirst) / RowCountSecond + 1;
+                //    }
+                //}
+                return CommonUtils.GetCountPage(DocType.Specification, _tbl.Rows.Count);
             }
         }
 
@@ -53,7 +53,7 @@ namespace GostDOC.ExcelExport
 
             // Fill 1st sheet
             FillFirstSheet(aApp);
-
+            
             int pages = Pages;
             if (pages > 1)
             {
@@ -85,8 +85,15 @@ namespace GostDOC.ExcelExport
             }
 
             // Update ЛРИ
-            aApp.Sheets["ЛРИ"].Cells[37, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2); // Cells[35, 12]
-            aApp.Sheets["ЛРИ"].Cells[39, ExcelColumn.U] = pages + 1; //Cells[37, 19]
+            if (pages > 3)
+            {
+                aApp.Sheets["ЛРИ"].Cells[37, ExcelColumn.L] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2); // Cells[35, 12]
+                aApp.Sheets["ЛРИ"].Cells[39, ExcelColumn.U] = pages + 1; //Cells[37, 19]
+            }
+            else
+            {
+                aApp.Sheets["ЛРИ"].Delete();
+            }
 
             // Select 1st sheet
             aApp.Sheets["1"].Select();
@@ -120,7 +127,7 @@ namespace GostDOC.ExcelExport
                 range.Orientation = 90;
             }
             // Set pages count
-            sheet.Cells[39, ExcelColumn.V] = Pages + 1; //Cells[34, 20]
+            sheet.Cells[39, ExcelColumn.V] = Pages; //Cells[34, 20]
 
             if (Pages > 1)
             {
