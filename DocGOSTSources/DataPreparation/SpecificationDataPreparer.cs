@@ -650,10 +650,12 @@ namespace GostDOC.DataPreparation
             foreach (var cmp in aComponents)
             {
                 currentSubGroupName = cmp.GetProperty(Constants.SubGroupNameSp);
-                if (!string.IsNullOrEmpty(lastSubGroupName) && 
+                var componentName = cmp.GetProperty(Constants.ComponentName);
+                if (!string.IsNullOrEmpty(lastSubGroupName) &&
+                    !string.IsNullOrEmpty(componentName) &&
                     !string.IsNullOrEmpty(currentSubGroupName) && 
                     !string.Equals(lastSubGroupName, currentSubGroupName, StringComparison.InvariantCultureIgnoreCase))
-                {
+                {                    
                     return true;
                 }
             }
