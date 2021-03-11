@@ -34,7 +34,11 @@ namespace GostDOC.DataPreparation
 
     internal class SpecificationDataPreparer : BasePreparer
     {
-
+        /// <summary>
+        /// признак что это спецификация для печатной платы
+        /// </summary>
+        public bool IsPCBSpecification { get; private set; } = false;
+        
         public override string GetDocSign(Configuration aMainConfig)
         {
             return "СП";
@@ -232,11 +236,10 @@ namespace GostDOC.DataPreparation
                 row[Constants.ColumnName] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };                
                 aTable.Rows.Add(row);                
             }
-
-            bool isPCB = false;
+                        
             if (aConfig.PrivateProperties.TryGetValue(Constants.SignPCB, out var val))
             {
-                isPCB = (bool)val;
+                IsPCBSpecification = (bool)val;
             }
 
             AddGroup(aTable, Constants.GroupDoc, data, ref aPosition, aPositions);
@@ -244,7 +247,7 @@ namespace GostDOC.DataPreparation
             AddGroup(aTable, Constants.GroupAssemblyUnits, data, ref aPosition, aPositions);
             AddGroup(aTable, Constants.GroupDetails, data, ref aPosition, aPositions);
             AddGroup(aTable, Constants.GroupStandard, data, ref aPosition, aPositions);
-            AddGroup(aTable, Constants.GroupOthers, data, ref aPosition, aPositions, isPCB);
+            AddGroup(aTable, Constants.GroupOthers, data, ref aPosition, aPositions);
             AddGroup(aTable, Constants.GroupMaterials, data, ref aPosition, aPositions);
             AddGroup(aTable, Constants.GroupKits, data, ref aPosition, aPositions);
 
@@ -260,7 +263,7 @@ namespace GostDOC.DataPreparation
         /// <param name="aComponents"></param>
         /// <param name="aOtherComponents"></param>
         /// <param name="aSchemaDesignation"></param>
-        private void AddGroup(DataTable aTable, string aGroupName, IDictionary<string, Group> aGroupDic, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions, bool isPCB = false)
+        private void AddGroup(DataTable aTable, string aGroupName, IDictionary<string, Group> aGroupDic, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions)
         {
             if (aGroupDic == null || !aGroupDic.ContainsKey(aGroupName))
                 return;
@@ -279,8 +282,7 @@ namespace GostDOC.DataPreparation
                 AddEmptyRow(aTable);
             }
 
-            var сomponents = group.Components;
-            bool subgroupsFirst = isPCB;
+            var сomponents = group.Components;            
 
             // добавим в наименование компонента название группы для компонентов без групппы для раздела Прочие изделия
             ChangeNameBySubGroupName changeComponentName = ChangeNameBySubGroupName.WithoutChanges;
@@ -290,7 +292,7 @@ namespace GostDOC.DataPreparation
             // будем добавлять позицию, если раздел не Документация и не Комплексы
             bool setPos = !string.Equals(aGroupName, Constants.GroupDoc) && !string.Equals(aGroupName, Constants.GroupComplex);
 
-            if (!subgroupsFirst)
+            if (!IsPCBSpecification)
             {
                 if (сomponents.Count > 0)
                 {
@@ -330,7 +332,7 @@ namespace GostDOC.DataPreparation
                 }                
             }
 
-            if (subgroupsFirst)
+            if (IsPCBSpecification)
             {
                 changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;
                 AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, changeComponentName);
@@ -410,6 +412,13 @@ namespace GostDOC.DataPreparation
                     {                                                
                         if (component_name.IndexOf(subGroupName, 0, StringComparison.InvariantCultureIgnoreCase) == 0)
                             prepared_component_name = component_name.Substring(subGroupName.Length).TrimStart();
+                    }
+
+                    if (IsPCBSpecification)
+                    {
+                        string doc = component.GetProperty(Constants.ComponentDoc);
+                        if (!string.IsNullOrEmpty(doc))
+                            prepared_component_name += $" {doc}";
                     }
                 }
 
