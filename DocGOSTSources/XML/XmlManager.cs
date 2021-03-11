@@ -77,7 +77,13 @@ namespace GostDOC.Models
 
             // Fill configurations
             foreach (var cfg in _xml.Transaction.Project.Configurations)
-            {                
+            {
+                if (!Utils.FormatConfigurationNameIsValid(cfg.Name))
+                {
+                    _error.Error($"Имя конфигурации \"{cfg.Name}\" не соответсвует формату имен конфигураций (-ХХ, XX - число от 00 (для базовой конфигурации) и до 99). Данная конфигурация загружена не будет");
+                    continue;
+                }
+
                 Configuration newCfg = new Configuration() { Name = cfg.Name };
              
                 // Fill graphs
@@ -141,7 +147,7 @@ namespace GostDOC.Models
                 // add two empty components for every group in specification
                 if (aDocType == DocType.Specification && _projectType == ProjectType.Other)
                     AddTwoEmptyComponentsToSpecificationGroups(newCfg);
-
+                                    
                 aResult.Configurations.Add(newCfg.Name, newCfg);
             }
             return OpenFileResult.Ok;
@@ -371,6 +377,8 @@ namespace GostDOC.Models
                 // Add component to specification
                 if (_docType == DocType.Specification || _docType == DocType.ItemsList)
                 {
+                    
+
                     AddComponent(aNewCfg.Specification, component, groups[0]);
 
                     // Save added component for counting

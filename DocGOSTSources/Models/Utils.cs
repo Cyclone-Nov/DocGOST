@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Text.RegularExpressions;
 using GostDOC.Common;
 using GostDOC.Interfaces;
 using SoftCircuits.Collections;
@@ -18,6 +19,12 @@ namespace GostDOC.Models
     static class Utils
     {
         private static Random random = new Random();
+
+        /// <summary>
+        /// Randoms the string.
+        /// </summary>
+        /// <param name="length">The length.</param>
+        /// <returns></returns>
         public static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -25,6 +32,105 @@ namespace GostDOC.Models
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
+
+        /// <summary>
+        /// Gets the type of the sort.
+        /// </summary>
+        /// <param name="aDocType">Type of a document.</param>
+        /// <param name="aGroupName">Name of a group.</param>
+        /// <returns></returns>
+        public static SortType GetSortType(DocType aDocType, string aGroupName)
+        {
+            SortType sortType = SortType.None;
+            switch (aDocType)
+            {
+                case DocType.Bill:
+                    sortType = SortType.Name;
+                    break;
+                case DocType.Specification:
+                    if (aGroupName.Equals(Constants.GroupComplex) || aGroupName.Equals(Constants.GroupAssemblyUnits) || aGroupName.Equals(Constants.GroupDetails))
+                    {
+                        return SortType.SpComplex;
+                    }
+                    if (aGroupName.Equals(Constants.GroupStandard))
+                    {
+                        return SortType.SpStandard;
+                    }
+                    if (aGroupName.Equals(Constants.GroupOthers))
+                    {
+                        return SortType.SpOthers;
+                    }
+                    if (aGroupName.Equals(Constants.GroupMaterials))
+                    {
+                        return SortType.SpMaterials;
+                    }
+                    if (aGroupName.Equals(Constants.GroupKits))
+                    {
+                        return SortType.SpKits;
+                    }
+                    break;
+            }
+            return sortType;
+        }
+
+        /// <summary>
+        /// Reads the CFG file lines.
+        /// </summary>
+        /// <param name="aFileName">Name of a file.</param>
+        /// <returns></returns>
+        public static string[] ReadCfgFileLines(string aFileName)
+        {
+            string filePath = Path.Combine(Environment.CurrentDirectory, Constants.Settings, $"{aFileName}.cfg");
+            if (File.Exists(filePath))
+            {
+                return File.ReadAllLines(filePath);
+            }
+            return new string[] { };
+        }
+
+        /// <summary>
+        /// Gets the template path.
+        /// </summary>
+        /// <param name="aTemplateName">Name of a template.</param>
+        /// <returns></returns>
+        public static string GetTemplatePath(string aTemplateName)
+        {
+            return Path.Combine(Environment.CurrentDirectory, Constants.TemplatesFolder, aTemplateName);
+        }
+
+        /// <summary>
+        /// Gets the graph value.
+        /// </summary>
+        /// <param name="graphs">The graphs.</param>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
+        public static string GetGraphValue(IDictionary<string, string> graphs, string name)
+        {
+            string result;
+            graphs.TryGetValue(name, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// проверка имени конфигурации на соотвествие формату
+        /// </summary>
+        /// <param name="aConfigName">имя конфигурации</param>
+        /// <returns><param>true</param> - имя имеет верный формат</returns>
+        public static bool FormatConfigurationNameIsValid(string aConfigName)
+        {   
+            Regex regex = new Regex(@"^-\d{2}");
+            var matches = regex.Matches(aConfigName);
+            if (matches.Count == 1)            
+                return true;            
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    static class Extensions
+    {
         public static void AddRange<T, V>(this IDictionary<T, V> dst, IDictionary<T, V> src)
         {
             foreach (var val in src)
@@ -101,7 +207,7 @@ namespace GostDOC.Models
             return -1;
         }
 
-        public static void InsertSorted<T>(this ObservableCollection<T> collection, T item) where T : IComparable<T> 
+        public static void InsertSorted<T>(this ObservableCollection<T> collection, T item) where T : IComparable<T>
         {
             if (collection.Count == 0)
                 collection.Add(item);
@@ -123,65 +229,6 @@ namespace GostDOC.Models
             }
         }
 
-        public static SortType GetSortType(DocType aDocType, string aGroupName)
-        {
-            SortType sortType = SortType.None;
-            switch (aDocType)
-            {
-                case DocType.Bill:
-                    sortType = SortType.Name;
-                    break;
-                case DocType.Specification:
-                    if (aGroupName.Equals(Constants.GroupComplex) || aGroupName.Equals(Constants.GroupAssemblyUnits) || aGroupName.Equals(Constants.GroupDetails))
-                    {
-                        return SortType.SpComplex;
-                    }
-                    if (aGroupName.Equals(Constants.GroupStandard))
-                    {
-                        return SortType.SpStandard;
-                    }
-                    if (aGroupName.Equals(Constants.GroupOthers))
-                    {
-                        return SortType.SpOthers;
-                    }
-                    if (aGroupName.Equals(Constants.GroupMaterials))
-                    {
-                        return SortType.SpMaterials;
-                    }
-                    if (aGroupName.Equals(Constants.GroupKits))
-                    {
-                        return SortType.SpKits;
-                    }
-                    break;
-            }
-            return sortType;
-        }
-        
-        public static string[] ReadCfgFileLines(string aFileName)
-        {
-            string filePath = Path.Combine(Environment.CurrentDirectory, Constants.Settings, $"{aFileName}.cfg");
-            if (File.Exists(filePath))
-            {
-                return File.ReadAllLines(filePath);
-            }
-            return new string[] { };
-        }
-
-        public static string GetTemplatePath(string aTemplateName)
-        {
-            return Path.Combine(Environment.CurrentDirectory, Constants.TemplatesFolder, aTemplateName);
-        }
-
-        public static string GetGraphValue(IDictionary<string, string> graphs, string name)
-        {
-            string result;
-            graphs.TryGetValue(name, out result);
-            return result;
-        }
-    }
-
-    static class Extensions
-    {
         public static void UpdateComponentProperties(this Component current, Component update)
         {
             foreach (var prop in update.Properties)
@@ -278,6 +325,14 @@ namespace GostDOC.Models
             }
         }
 
+        public static void AddGraph(IDictionary<string, string> aGraphs, string aName)
+        {
+            if (!aGraphs.ContainsKey(aName))
+            {
+                aGraphs.Add(aName, string.Empty);
+            }
+        }
+
         public static void FillDefaultGroups(this Configuration aCfg)
         {            
             AddGroup(aCfg.Specification, Constants.GroupDoc, 0);
@@ -288,14 +343,6 @@ namespace GostDOC.Models
             AddGroup(aCfg.Specification, Constants.GroupOthers, 5);
             AddGroup(aCfg.Specification, Constants.GroupMaterials, 6);
             AddGroup(aCfg.Specification, Constants.GroupKits, 7);         
-        }
-
-        public static void AddGraph(IDictionary<string, string> aGraphs, string aName)
-        {
-            if (!aGraphs.ContainsKey(aName))
-            {
-                aGraphs.Add(aName, string.Empty);
-            }
         }
 
         public static void FillDefaultGraphs(this Configuration aCfg)
