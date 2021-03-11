@@ -341,14 +341,18 @@ namespace GostDOC.Models
                     Position = position?.Text ?? string.Empty,                    
                 };
 
-                if (!string.IsNullOrEmpty(combine.RefDesignation))
+                if (_docType == DocType.Specification || _docType == DocType.ItemsList)
                 {
-                    if (positions.Contains(combine.RefDesignation))
+                    if (!string.IsNullOrEmpty(combine.RefDesignation))
                     {
-                        _error.Error($"Найдено дублирующееся позиционное обозначение {combine.RefDesignation}. Имя компонента {combine.Name}!");
-                    } else
-                    {
-                        positions.Add(combine.RefDesignation);
+                        if (positions.Contains(combine.RefDesignation))
+                        {
+                            _error.Error($"Найдено дублирующееся позиционное обозначение {combine.RefDesignation}. Имя компонента {combine.Name}!");
+                        }
+                        else
+                        {
+                            positions.Add(combine.RefDesignation);
+                        }
                     }
                 }
 
@@ -368,6 +372,9 @@ namespace GostDOC.Models
                 if (_docType == DocType.Specification || _docType == DocType.ItemsList)
                 {
                     AddComponent(aNewCfg.Specification, component, groups[0]);
+
+                    // Save added component for counting
+                    components.Add(combine, component);
                 }
 
                 // Add component to bill
@@ -409,9 +416,6 @@ namespace GostDOC.Models
                     // Reset current D27 group
                     _currentAssemblyD27 = groupD27;
                 }
-
-                // Save added component for counting
-                components.Add(combine, component);
             }
 
             if (_docType == DocType.Specification)
@@ -590,7 +594,8 @@ namespace GostDOC.Models
 
                     return true;
                 }
-            } else if (_docType == DocType.ItemsList)
+            } 
+            else if (_docType == DocType.ItemsList)
             {
                 if (aComponents.TryGetValue(aCombine, out existing))
                 {

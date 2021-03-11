@@ -966,7 +966,13 @@ namespace GostDOC.ViewModels
                 DocNodes.Clear();
 
                 if (OpenFile(path))
-                {                    
+                {
+                    if (aDocType == DocType.Specification)
+                    {
+                        // Save current file name only if one file was selected
+                        _filePath = path;
+                    }
+                    
                     DocNodes.Add(aNode);
                     IsSaveEnabled.Value = (aDocType == DocType.Specification || aDocType == DocType.Bill);                    
                 }
@@ -986,14 +992,11 @@ namespace GostDOC.ViewModels
             _isSpecPositionsRecalculated = false;
             _specifiactionPositionsDic?.Clear();
             _specifiactionPositionsDic = null;
-
-            // Save current file name only if one file was selected
-            _filePath = aFilePath;
             
             ClearVisible();
 
             // Parse xml files
-            switch (_docManager.LoadData(_filePath, _docType))
+            switch (_docManager.LoadData(aFilePath, _docType))
             {
                 case OpenFileResult.Ok:
                     // update title by path
@@ -1004,10 +1007,10 @@ namespace GostDOC.ViewModels
                     ShowErrors();                                     
                     return true;
                 case OpenFileResult.FileFormatError:
-                    System.Windows.MessageBox.Show($"Попытка открыть файл ведомости ({_filePath}) в другом режиме!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Windows.MessageBox.Show($"Попытка открыть файл ведомости ({aFilePath}) в другом режиме!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
                 case OpenFileResult.Fail:
-                    System.Windows.MessageBox.Show($"Некорректный Формат файла ({_filePath})!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Windows.MessageBox.Show($"Некорректный Формат файла ({aFilePath})!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
             }
 
