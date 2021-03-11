@@ -161,9 +161,14 @@ namespace GostDOC.PDF
 
         public byte[] GetData()
         {
-            _doc.Flush();
-            _pdfWriter.Flush();
-            return MainStream.ToArray();
+            if (_doc != null)            
+            {
+                _doc.Flush();
+                _pdfWriter.Flush();
+                return MainStream.ToArray();
+            }
+            
+            return null;
         }
                 
 
