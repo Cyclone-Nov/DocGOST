@@ -107,7 +107,9 @@ namespace GostDOC.Models
                 if (_docType != DocType.Bill && _docType != DocType.D27)
                 {
                     AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, unitSign);
-                    _isPcbFound = cfg.ComponentsPCB.Count > 0;
+                    // так как спецификация является PCB если компоненты PCB есть в базовой конфигурации, то для остальых конфигураций автоматически будет PCB
+                    if (!_isPcbFound)
+                        _isPcbFound = cfg.ComponentsPCB.Count > 0;
                     newCfg.PrivateProperties.Add(Constants.SignPCB, _isPcbFound);
                 }
 
@@ -377,8 +379,6 @@ namespace GostDOC.Models
                 // Add component to specification
                 if (_docType == DocType.Specification || _docType == DocType.ItemsList)
                 {
-                    
-
                     AddComponent(aNewCfg.Specification, component, groups[0]);
 
                     // Save added component for counting
@@ -899,28 +899,32 @@ namespace GostDOC.Models
         /// <param name="aGroup"></param>
         private void ProcessGroups(Group aGroup)
         {
+            bool isStandardGroup = string.Equals(aGroup.Name, Constants.GroupStandard);
             foreach (var gp in aGroup.SubGroups.AsNotNull().ToList())
             {
                 // Update group names
                 UpdateGroupNames(aGroup.SubGroups, gp.Value);
 
-                // Move single component to parent group
-                if (gp.Value.Components.Count == 1)
+                // Move single component or components from standard subgroups to parent group
+                if (gp.Value.Components.Count == 1 || isStandardGroup)
                 {
+                    bool components_to_remove = false;
                     // Update component name
-                    Component cp = gp.Value.Components.First();
-
-                    // если это не спецификация печатной платы либо компонент не имеет позиционного обозначения
-                    if (!_isPcbFound || string.IsNullOrEmpty(cp.GetProperty(Constants.ComponentDesignatorID)))
+                    foreach(var cp in gp.Value.Components)
                     {
-                        string type = cp.GetProperty(Constants.ComponentType);
-                        string name = cp.GetProperty(Constants.ComponentName);
-                        cp.SetPropertyValue(Constants.ComponentName, name.Contains(type) ? name : type + " " + name);
-                        // Move component to parent group
-                        aGroup.Components.Insert(0, cp);// Add(cp);
-                                                        // Remove subgroup
-                        aGroup.SubGroups.Remove(gp.Value.Name);
+                        // если это не спецификация печатной платы либо компонент не имеет позиционного обозначения
+                        if (!_isPcbFound || string.IsNullOrEmpty(cp.GetProperty(Constants.ComponentDesignatorID)))
+                        {
+                            string type = cp.GetProperty(Constants.ComponentType);
+                            string name = cp.GetProperty(Constants.ComponentName);
+                            cp.SetPropertyValue(Constants.ComponentName, name.Contains(type) ? name : type + " " + name);
+                            // Move component to parent group
+                            aGroup.Components.Insert(0, cp);
+                            components_to_remove = true;
+                        }
                     }
+                    if (components_to_remove)
+                        aGroup.SubGroups.Remove(gp.Value.Name);
                 }
             }
         }

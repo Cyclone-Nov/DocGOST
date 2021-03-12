@@ -282,11 +282,13 @@ namespace GostDOC.DataPreparation
                 AddEmptyRow(aTable);
             }
 
-            var сomponents = group.Components;            
+            var сomponents = group.Components;
 
-            // добавим в наименование компонента название группы для компонентов без групппы для раздела Прочие изделия
+            // добавим в наименование компонента название группы для компонентов без групппы для раздела Прочие изделия и раздела Стандартны изделия
+            bool isStandardGroup = string.Equals(aGroupName, Constants.GroupStandard);
+            bool isOthersGroup = string.Equals(aGroupName, Constants.GroupOthers);
             ChangeNameBySubGroupName changeComponentName = ChangeNameBySubGroupName.WithoutChanges;
-            if (string.Equals(aGroupName, Constants.GroupOthers))            
+            if (isOthersGroup || isStandardGroup)            
                 changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;                            
 
             // будем добавлять позицию, если раздел не Документация и не Комплексы
@@ -301,8 +303,6 @@ namespace GostDOC.DataPreparation
                 }
             }
 
-            bool isStandardGroup = string.Equals(aGroupName, Constants.GroupStandard);
-
             // добавляем подгруппы
             foreach (var subgroup in group.SubGroups.OrderBy(key => key.Value.SortName ?? key.Value.Name).
                                                      Where(key => !string.Equals(key.Key, Constants.SUBGROUPFORSINGLE)))
@@ -310,11 +310,23 @@ namespace GostDOC.DataPreparation
                 if (subgroup.Value.Components.Count > 0)
                 {
                     string subGroupName = GetSubgroupNameByCount(subgroup);
-                    if (isStandardGroup && !string.IsNullOrEmpty(subGroupName))
-                        changeComponentName = ChangeNameBySubGroupName.ExcludeSubgroupSingleName;
-                    else if (HasDifferentSubGroupNames(subgroup.Value.Components) || subgroup.Value.Components.Count == 1)
+                    //if (isStandardGroup && !string.IsNullOrEmpty(subGroupName))
+                    //{
+                    //    changeComponentName = ChangeNameBySubGroupName.ExcludeSubgroupSingleName;
+                    bool hasDifferSubgroupNamesInComponents = HasDifferentSubGroupNames(subgroup.Value.Components);
+
+                    // поменяем имя подгруппы если все компоненты имеют одно и тоже имя подгруппы, но оно отличается от исходного для раздела прочие изделия
+                    if (!hasDifferSubgroupNamesInComponents && isOthersGroup && IsPCBSpecification)
+                    {
+                        string newSubGroupName = subgroup.Value.Components.First().GetProperty(Constants.SubGroupNameSp);
+                        if (!string.IsNullOrEmpty(newSubGroupName))
+                            subGroupName = GetSubgroupName(newSubGroupName, subgroup.Value.Components.Count() == 1); 
+                    }
+                     
+                    if (hasDifferSubgroupNamesInComponents || subgroup.Value.Components.Count == 1)
+                    {
                         changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;
-                    else
+                    } else
                         changeComponentName = ChangeNameBySubGroupName.WithoutChanges;
 
                     AddSubgroup(aTable, subGroupName, subgroup.Value.Components, ref aPos, aPositions, changeComponentName);
@@ -649,12 +661,14 @@ namespace GostDOC.DataPreparation
         /// Determines whether [has different group names] [the specified components].
         /// </summary>
         /// <param name="Components">The components.</param>
+        /// <param name="aBaseSubGroupName">The components.</param>
         /// <returns>
         ///   <c>true</c> if [has different group names] [the specified components]; otherwise, <c>false</c>.
         /// </returns>
         private bool HasDifferentSubGroupNames(IList<Component> aComponents)
         {
             string lastSubGroupName = aComponents.First().GetProperty(Constants.SubGroupNameSp);
+
             string currentSubGroupName = string.Empty;
 
             foreach (var cmp in aComponents)
@@ -669,7 +683,6 @@ namespace GostDOC.DataPreparation
                     return true;
                 }
             }
-
             return false;
         }
 
