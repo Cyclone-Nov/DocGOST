@@ -336,6 +336,7 @@ namespace GostDOC.DataPreparation
             {
                 changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;
                 AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, changeComponentName);
+                AddEmptyRow(aTable);
             }
 
             RemoveLastRow(aTable);
