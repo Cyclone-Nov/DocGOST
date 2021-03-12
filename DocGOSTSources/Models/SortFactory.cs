@@ -238,23 +238,39 @@ namespace GostDOC.Models
         {
             aItems.Sort((x, y) =>
             {
-                string docX = x.GetProperty(Constants.ComponentDoc);
-                string docY = y.GetProperty(Constants.ComponentDoc);
+                string typeX = x.GetProperty(Constants.ComponentType);
+                string typeY = y.GetProperty(Constants.ComponentType);
 
-                if (string.IsNullOrEmpty(docX))
+                if (string.IsNullOrEmpty(typeX))
                 {
                     return 1;
                 }
-                if (string.IsNullOrEmpty(docY))
+                if (string.IsNullOrEmpty(typeX))
                 {
                     return -1;
-                }             
-
-                var result = ParseStandard(docX).CompareTo(ParseStandard(docY));
+                }
+                var result = typeX.CompareTo(typeY);
                 if (result == 0)
                 {
-                    result = x.CompareTo(y, Constants.ComponentName);
+                    string docX = x.GetProperty(Constants.ComponentDoc);
+                    string docY = y.GetProperty(Constants.ComponentDoc);
+
+                    if (string.IsNullOrEmpty(docX))
+                    {
+                        return 1;
+                    }
+                    if (string.IsNullOrEmpty(docY))
+                    {
+                        return -1;
+                    }
+
+                    result = ParseStandard(docX).CompareTo(ParseStandard(docY));
+                    if (result == 0)
+                    {
+                        result = x.CompareTo(y, Constants.ComponentName);
+                    }
                 }
+
                 return result;
 
             });
