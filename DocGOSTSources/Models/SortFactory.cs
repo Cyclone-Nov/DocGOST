@@ -234,10 +234,59 @@ namespace GostDOC.Models
             return string.Empty;
         }
 
+
+        private string GetNameWithoutStandard(string aName, string aStandard)
+        {
+            string GetName(string aDoc)
+            {
+                int index = aName.IndexOf(aDoc);
+                string firstPart = aName.Substring(0, index);
+                string secondPart = aName.Substring(index + aDoc.Length);
+                return $"{firstPart}{secondPart}";
+            }
+
+            if (aName.Contains(aStandard))
+            {
+                return GetName(aStandard);
+            }
+            else
+            {
+                var standard_part = aStandard.Split('-');
+                if(standard_part.Length > 1)
+                {
+                    int year = Convert.ToInt32(standard_part[1]);
+                    string main_standard = standard_part[0];
+                    if (aName.Contains(main_standard))
+                    {
+                        return GetName(main_standard);
+                    }
+                }
+            }
+            
+            return aName;
+        }
+
+        private Tuple<float, float> ParseParams(string aName)
+        {
+            float param1 = 0.0f;
+            float param2 = 0.0f;
+            Regex regex = new Regex(@"\d+([\,]\d+)*([\.]\d+)?x\d+([\,]\d+)*([\.]\d+)?");
+            var match = regex.Match(aName);
+            if (match.Success)
+            {
+                var values = match.Value.Split('x');
+                param1 = Convert.ToSingle(values[0]);
+                param2 = Convert.ToSingle(values[1]);
+            }
+
+            return new Tuple<float, float>(param1, param2);
+        }
+
         public List<Component> Sort(List<Component> aItems)
         {
             aItems.Sort((x, y) =>
             {
+                // сначала сортируем по типу
                 string typeX = x.GetProperty(Constants.ComponentType);
                 string typeY = y.GetProperty(Constants.ComponentType);
 
@@ -245,16 +294,17 @@ namespace GostDOC.Models
                 {
                     return 1;
                 }
-                if (string.IsNullOrEmpty(typeX))
+                if (string.IsNullOrEmpty(typeY))
                 {
                     return -1;
                 }
                 var result = typeX.CompareTo(typeY);
                 if (result == 0)
                 {
+                    // сортируем по наличию стандартного документа
                     string docX = x.GetProperty(Constants.ComponentDoc);
                     string docY = y.GetProperty(Constants.ComponentDoc);
-
+                    
                     if (string.IsNullOrEmpty(docX))
                     {
                         return 1;
@@ -264,11 +314,46 @@ namespace GostDOC.Models
                         return -1;
                     }
 
-                    result = ParseStandard(docX).CompareTo(ParseStandard(docY));
-                    if (result == 0)
+                    // исключим стандартный документ из наименования 
+                    // и в оставшемся наименовании пробуем найти параметры пошаблоны D*xD*, D* - произвольное количесмтво цифр, а x - может быть символом как русского так и латинского алфавита
+                    string nameX = x.GetProperty(Constants.ComponentName);
+                    string nameY = y.GetProperty(Constants.ComponentName);
+
+                    string name_without_standardX = GetNameWithoutStandard(nameX, docX);
+                    string name_without_standardY = GetNameWithoutStandard(nameY, docY);
+                    Tuple<float, float> paramsX = ParseParams(name_without_standardX);
+                    Tuple<float, float> paramsY = ParseParams(name_without_standardY);
+
+                    if (paramsX.Item1 > paramsY.Item1)
                     {
-                        result = x.CompareTo(y, Constants.ComponentName);
+                        return 1;
                     }
+                    else if (paramsX.Item1 < paramsY.Item1)
+                    {
+                        return -1;
+                    }
+                    else
+                    {
+                        if (paramsX.Item2 > paramsY.Item2)
+                        {
+                            return 1;
+                        } else if (paramsX.Item2 < paramsY.Item2)
+                        {
+                            return -1;
+                        }
+                        else
+                        {
+                            result = String.CompareOrdinal(nameX, nameY);
+                            //result = nameX.CompareTo(nameY);
+                            //result = x.CompareTo(y, Constants.ComponentName);
+                        }
+                    }
+
+                    //result = ParseStandard(docX).CompareTo(ParseStandard(docY));
+                    //if (result == 0)
+                    //{
+                    //    result = x.CompareTo(y, Constants.ComponentName);
+                    //}
                 }
 
                 return result;
