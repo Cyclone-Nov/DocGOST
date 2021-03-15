@@ -276,9 +276,10 @@ namespace GostDOC.DataPreparation
 
             // наименование раздела
             AddEmptyRow(aTable);
-            if (AddGroupName(aTable, aGroupName))
+            if (!string.IsNullOrEmpty(aGroupName))
             {
                 ShiftToNextPageIfEnd(aTable, true);
+                AddGroupName(aTable, aGroupName);
                 AddEmptyRow(aTable);
             }
 
@@ -435,7 +436,7 @@ namespace GostDOC.DataPreparation
                     }
                 }
 
-                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 4, prepared_component_name, new char[] {' '}, Constants.SpecificationFontSize).ToArray();                
+                string[] namearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn5NameWidth - 4, prepared_component_name, new char[] {' '}, Constants.SpecificationFontSize, true).ToArray();                
                 var note = component.GetProperty(Constants.ComponentNote);
                 string[] notearr = PdfUtils.SplitStringByWidth(Constants.SpecificationColumn7FootnoteWidth - 3, note, new char[] {' ','-', ',' }, Constants.SpecificationFontSize).ToArray();
                 string designation = component.GetProperty(Constants.ComponentSign);
@@ -443,7 +444,7 @@ namespace GostDOC.DataPreparation
 
                 row = aTable.NewRow();
                 row[Constants.ColumnFormat] = new FormattedString { Value = component.GetProperty(Constants.ComponentFormat) };
-                row[Constants.ColumnZone] = new FormattedString{ Value = zone };  
+                row[Constants.ColumnZone] = new FormattedString{ Value = zone }; 
                 
                 // если необходимо установить позицию
                 if (aSetPos)
@@ -494,14 +495,13 @@ namespace GostDOC.DataPreparation
         /// </summary>
         /// <param name="aTable"></param>
         /// <param name="aGroupName"></param>
-        private bool AddGroupName(DataTable aTable, string aGroupName, bool aIsUnderline = true, TextAlignment aTextAlignment = TextAlignment.CENTER) 
+        private void AddGroupName(DataTable aTable, string aGroupName, bool aIsUnderline = true, TextAlignment aTextAlignment = TextAlignment.CENTER) 
         {
             if (string.IsNullOrEmpty(aGroupName)) 
-                return false;
+                return;
             DataRow row = aTable.NewRow();
             row[Constants.ColumnName] = new FormattedString {Value = aGroupName, IsUnderlined = aIsUnderline, TextAlignment = aTextAlignment };
-            aTable.Rows.Add(row);
-            return true;
+            aTable.Rows.Add(row);            
         }
 
 
