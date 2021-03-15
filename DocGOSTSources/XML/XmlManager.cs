@@ -900,13 +900,14 @@ namespace GostDOC.Models
         private void ProcessGroups(Group aGroup)
         {
             bool isStandardGroup = string.Equals(aGroup.Name, Constants.GroupStandard);
+            bool isOtherGroup = string.Equals(aGroup.Name, Constants.GroupOthers);
             foreach (var gp in aGroup.SubGroups.AsNotNull().ToList())
             {
                 // Update group names
                 UpdateGroupNames(aGroup.SubGroups, gp.Value);
 
                 // Move single component or components from standard subgroups to parent group
-                if (gp.Value.Components.Count == 1 || isStandardGroup)
+                if (gp.Value.Components.Count == 1 || isStandardGroup || (isOtherGroup && !_isPcbFound))
                 {
                     bool components_to_remove = false;
                     // Update component name
