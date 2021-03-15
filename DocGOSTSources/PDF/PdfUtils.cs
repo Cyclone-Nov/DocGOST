@@ -84,9 +84,13 @@ namespace GostDOC.PDF
                     if (aUseGOST && PREF_ARR.Any(s => partName.Contains(s)))
                     {
                         index = partName.IndexOf(PREF_ARR.Find(b => partName.Contains(b)));
+                        // если начало стандартного документа находится в первой половине строки, то не переносим по нему
+                        if (index < partName.Length/2)
+                            index = -1;
                         aUseGOST = false;
                     }
-                    else
+                    
+                    if(index < 0)
                     {
                         if(aDelimiters.Contains(' '))
                             index = partName.LastIndexOfAny(new char[] { ' ' });
