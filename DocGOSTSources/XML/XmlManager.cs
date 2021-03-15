@@ -75,6 +75,9 @@ namespace GostDOC.Models
             // Clear configurations
             aResult.Configurations.Clear();
 
+            // компоненты PCB основного исполнения            
+            List<ComponentXml> mainPCBComponents = null;
+
             // Fill configurations
             foreach (var cfg in _xml.Transaction.Project.Configurations)
             {
@@ -106,7 +109,12 @@ namespace GostDOC.Models
                 AddComponents(newCfg, cfg.Documents, ComponentType.Document, unitSign);
                 if (_docType != DocType.Bill && _docType != DocType.D27)
                 {
-                    AddComponents(newCfg, cfg.ComponentsPCB, ComponentType.ComponentPCB, unitSign);
+                    // так как компоненты PCB уникальны для всей спецификации независимо от колчиества исполнений и присутствуют только в основном исполнении
+                    // то добавим их остальным исполнениям
+                    if (mainPCBComponents == null)
+                        mainPCBComponents = cfg.ComponentsPCB;
+
+                    AddComponents(newCfg, mainPCBComponents, ComponentType.ComponentPCB, unitSign);
                     // так как спецификация является PCB если компоненты PCB есть в базовой конфигурации, то для остальых конфигураций автоматически будет PCB
                     if (!_isPcbFound)
                         _isPcbFound = cfg.ComponentsPCB.Count > 0;
