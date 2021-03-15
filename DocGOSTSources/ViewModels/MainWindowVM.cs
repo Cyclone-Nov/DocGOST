@@ -821,6 +821,7 @@ namespace GostDOC.ViewModels
         {
             if (IsExportPdfEnabled.Value)
             {
+                SaveData();
                 var path = CommonDialogs.SaveFileAs("PDF files (*.pdf) | *.pdf", "Сохранить файл", GetDefaultFileName("pdf", true));
                 if (!string.IsNullOrEmpty(path))
                 {
@@ -833,6 +834,7 @@ namespace GostDOC.ViewModels
         {
             if (_excelManager.CanExport(_docType))
             {
+                SaveData();
                 var path = CommonDialogs.SaveFileAs("Excel Files *.xlsx | *.xlsx", "Сохранить файл", GetDefaultFileName("xlsx", true));
                 if (!string.IsNullOrEmpty(path))
                 {
