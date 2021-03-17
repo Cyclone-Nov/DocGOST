@@ -8,6 +8,10 @@ namespace GostDOC.Models
 {
     class CombineProperties : IEquatable<CombineProperties>
     {
+        private static int HashEmptyCounter = 0;
+
+        private int _hashCounterForEmpty = 0;
+
         private bool _combinePosition = false;
 
         /// <summary>
@@ -56,7 +60,14 @@ namespace GostDOC.Models
 
             if (_combinePosition)
             {
-                return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign) && string.Equals(other.Position, Position);
+                bool equal_res = string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign) && string.Equals(other.Position, Position);
+
+                // если компоненты пустые, то они неравны
+                if (equal_res && string.IsNullOrEmpty(other.Name) && string.IsNullOrEmpty(Name))
+                {                    
+                    return false;
+                }                
+                return equal_res;
             }
             return string.Equals(other.Name, Name) && string.Equals(other.Sign, Sign) && string.Equals(other.RefDesignation, RefDesignation) && string.Equals(other.Position, Position);
         }
@@ -69,7 +80,13 @@ namespace GostDOC.Models
         {
             if (_combinePosition)
             {
-                return (Name?.GetHashCode() ?? 0) ^ (Sign?.GetHashCode() ?? 0);
+                // для пустых компонентов введем инкремент, чтобы верно рассчитывать хэш
+                if (string.IsNullOrEmpty(Name) && (string.IsNullOrEmpty(Position) || string.Equals(Position, "0")))
+                {
+                    if (_hashCounterForEmpty == 0)                    
+                        _hashCounterForEmpty = ++HashEmptyCounter;                    
+                }
+                return (Name?.GetHashCode() ?? 0) ^ (Sign?.GetHashCode() ?? 0) ^ _hashCounterForEmpty.GetHashCode();
             }
             return (Name?.GetHashCode() ?? 0) ^ (Sign?.GetHashCode() ?? 0) ^ (RefDesignation?.GetHashCode() ?? 0) ^ (Position?.GetHashCode() ?? 0);
         }
