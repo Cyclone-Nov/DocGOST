@@ -218,24 +218,72 @@ namespace GostDOC.Models
         public static StandardSort Instance => _instance.Value;
         private StandardSort()
         {
-            _standards.AddRange(Utils.ReadCfgFileLines("Standard"));
+            _standards.AddRange(Utils.ReadCfgFileLines("Standards"));
         }
         #endregion
-        
-        private string ParseStandard(string aName)
+
+        /// <summary>
+        /// парсит тип и параметры стандарта из полного наименования стандарта
+        /// </summary>
+        /// <param name="aStandardName">полное наименование стандарта</param>
+        /// <param name="StandardParams">параметры стандарта: порядковый индекс стандарта из приоритетного списка (0 - самый высокий приоритет), список с частями номера стандарта</param>
+        /// <returns><param>true</param> - удалось найти стандарт></returns>
+        private bool ParseStandard(string aStandardName, out Tuple<int, List<int>> StandardParams)
         {
-            foreach (var str in _standards)
+            string standardType = string.Empty;
+            int standardPriorIndex = -1;
+            List<int> standard_numbers = new List<int>();
+            bool result = false;
+
+            if (!string.IsNullOrEmpty(aStandardName))
             {
-                if (aName.Contains(str))
+                // выделим тип стандарта
+                var arr_standards = _standards.ToArray();
+                for (int i = 0; i < arr_standards.Length; i++)
                 {
-                    return str;
+                    // типы стандартов в своем наименовании могут содержать наименования других типов стандартов, 
+                    // потому выбор типа будет осуществлять так же по длине строки - чем длинее строка с названием типа, тем более он является подходящим
+                    if (aStandardName.Contains(arr_standards[i]))
+                    {
+                        if (arr_standards[i].Length > standardType.Length)
+                        {
+                            standardType = arr_standards[i];
+                            standardPriorIndex = i;
+                        }
+                    }
+                }
+
+                // если удалось выделить тип стандарта, то выделим его парметры
+                if (standardPriorIndex > -1)
+                {
+                    // примем что имя любого стандарта начинается с типа, потому вырезаем от начала и до длины типа стандарта
+                    var std_params = aStandardName.Substring(standardType.Length).Split(new char[] {' ', '-'}, StringSplitOptions.RemoveEmptyEntries);
+                    if (std_params != null)
+                    {
+                        foreach (var part in std_params)
+                        {
+                            try
+                            {
+                                int val = Convert.ToInt32(part);
+                                standard_numbers.Add(val);
+                            } catch { };                            
+                        }
+                    }
+                    result = true;
                 }
             }
-            return string.Empty;
+
+            StandardParams = new Tuple<int, List<int>>(standardPriorIndex, standard_numbers);
+            return result;
         }
 
-
-        private string GetNameWithoutStandard(string aName, string aStandard)
+        /// <summary>
+        /// Gets the name without standard.
+        /// </summary>
+        /// <param name="aName">a name.</param>
+        /// <param name="aStandard">a standard.</param>
+        /// <returns></returns>
+        private string GetNameWithoutStandardAndType(string aName, string aStandard, string aType)
         {
             string GetName(string aDoc)
             {
@@ -245,26 +293,77 @@ namespace GostDOC.Models
                 return $"{firstPart}{secondPart}";
             }
 
+            if (aName.IndexOf(aType) == 0)
+            {
+                aName = aName.Remove(0, aType.Length).TrimStart();
+            }
+
+            // проверим не содежится ли все наименование стандарта в имени
             if (aName.Contains(aStandard))
             {
                 return GetName(aStandard);
             }
             else
             {
-                var standard_part = aStandard.Split('-');
-                if(standard_part.Length > 1)
+                // иначе разобьем наименование стандарта на части и будем отбрасывать по одной части с конца
+                int index = 0;
+                string less_standard = aStandard;
+                do
                 {
-                    int year = Convert.ToInt32(standard_part[1]);
-                    string main_standard = standard_part[0];
-                    if (aName.Contains(main_standard))
+                    index = less_standard.LastIndexOf('-');
+                    if (index > -1)
                     {
-                        return GetName(main_standard);
+                        less_standard = less_standard.Substring(0, index + 1); // +1 чтобы исключить знак - из названия
+                        if (aName.Contains(less_standard))
+                        {
+                            return GetName(less_standard);
+                        }
                     }
                 }
+                while (index > 0);
             }
             
             return aName;
         }
+
+        private int CompareNames(string aNameX, string aNameY)
+        {        
+            var separators = new char[] { ' ', '-' };
+            var nameArrX = aNameX.Split(separators);
+            var nameArrY = aNameY.Split(separators);
+
+            int length = Math.Min(nameArrX.Length, nameArrY.Length);
+            if (length > 0)
+            {                
+                float fvalX, fvalY;                
+                for (int i = 0; i < length; i++)
+                {
+                    fvalX = 0f; fvalY = 0f;
+                    try
+                    {
+                        fvalX = Convert.ToSingle(nameArrX[i]);             
+                    }
+                    catch {}
+
+                    try
+                    {
+                        fvalY = Convert.ToSingle(nameArrY[i]);                        
+                    } catch {}
+
+                    if (fvalX > fvalY)
+                    {
+                        return 1;
+                    }
+                    else if (fvalX < fvalY)
+                    {
+                        return -1;
+                    }
+                }
+            }
+
+            return String.CompareOrdinal(aNameX, aNameY);
+        }
+
 
         private Tuple<float, float> ParseParams(string aName)
         {
@@ -314,46 +413,75 @@ namespace GostDOC.Models
                         return -1;
                     }
 
-                    // исключим стандартный документ из наименования 
-                    // и в оставшемся наименовании пробуем найти параметры пошаблоны D*xD*, D* - произвольное количесмтво цифр, а x - может быть символом как русского так и латинского алфавита
-                    string nameX = x.GetProperty(Constants.ComponentName);
-                    string nameY = y.GetProperty(Constants.ComponentName);
-
-                    string name_without_standardX = GetNameWithoutStandard(nameX, docX);
-                    string name_without_standardY = GetNameWithoutStandard(nameY, docY);
-                    Tuple<float, float> paramsX = ParseParams(name_without_standardX);
-                    Tuple<float, float> paramsY = ParseParams(name_without_standardY);
-
-                    if (paramsX.Item1 > paramsY.Item1)
-                    {
+                    // сортируем по типу стандартного документа (относительно индекса типа из файла)
+                    bool parseStdX = ParseStandard(docX, out var stdParamsX);
+                    bool parseStdY = ParseStandard(docY, out var stdParamsY);
+                    
+                    if (!parseStdX)
                         return 1;
-                    }
-                    else if (paramsX.Item1 < paramsY.Item1)
+
+                    if (!parseStdY)
+                        return -1;                    
+
+                    if (stdParamsX.Item1 < stdParamsY.Item1)
                     {
                         return -1;
                     }
+                    else if (stdParamsX.Item1 > stdParamsY.Item1)
+                    {
+                        return 1;
+                    }
                     else
                     {
-                        if (paramsX.Item2 > paramsY.Item2)
+                        // сортируем по номеру стандартного документа:
+                        // нмоер может состоять из нескольких частей
+                        int length = Math.Min(stdParamsX.Item2.Count, stdParamsY.Item2.Count);
+                        for (int i = 0; i < length ;i++)
+                        {
+                            if (stdParamsX.Item2[i] > stdParamsY.Item2[i])
+                            {
+                                return 1;
+                            }
+                            else if (stdParamsX.Item2[i] < stdParamsY.Item2[i])
+                            {
+                                return -1;
+                            }
+                        }
+
+                        // сортируем по параметрам компонента либо по наименованию
+
+                        // исключим стандартный документ и тип из наименования 
+                        // и в оставшемся наименовании пробуем найти параметры по шаблону D*xD*, D* - число целое или дробное, а x - символом латинского алфавита
+                        string nameX = x.GetProperty(Constants.ComponentName);
+                        string nameY = y.GetProperty(Constants.ComponentName);
+
+                        string name_without_standardX = GetNameWithoutStandardAndType(nameX, docX, typeX);
+                        string name_without_standardY = GetNameWithoutStandardAndType(nameY, docY, typeY);
+                        Tuple<float, float> paramsX = ParseParams(name_without_standardX);
+                        Tuple<float, float> paramsY = ParseParams(name_without_standardY);
+
+                        if (paramsX.Item1 > paramsY.Item1)
                         {
                             return 1;
-                        } else if (paramsX.Item2 < paramsY.Item2)
+                        } else if (paramsX.Item1 < paramsY.Item1)
                         {
                             return -1;
-                        }
-                        else
+                        } else
                         {
-                            result = String.CompareOrdinal(nameX, nameY);
-                            //result = nameX.CompareTo(nameY);
-                            //result = x.CompareTo(y, Constants.ComponentName);
+                            if (paramsX.Item2 > paramsY.Item2)
+                            {
+                                return 1;
+                            } else if (paramsX.Item2 < paramsY.Item2)
+                            {
+                                return -1;
+                            } else // эта ситуация возможна когда не удалось ничего распарсить
+                            {
+                                // перед тем как просто сравним строки, попытаемся разбить на массив и выделить числа
+                                //result = String.CompareOrdinal(name_without_standardX, name_without_standardY);
+                                result = CompareNames(name_without_standardX, name_without_standardY);
+                            }
                         }
                     }
-
-                    //result = ParseStandard(docX).CompareTo(ParseStandard(docY));
-                    //if (result == 0)
-                    //{
-                    //    result = x.CompareTo(y, Constants.ComponentName);
-                    //}
                 }
 
                 return result;
