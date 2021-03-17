@@ -310,21 +310,24 @@ namespace GostDOC.DataPreparation
             {
                 if (subgroup.Value.Components.Count > 0)
                 {
-                    string subGroupName = GetSubgroupNameByCount(subgroup);
-                    //if (isStandardGroup && !string.IsNullOrEmpty(subGroupName))
-                    //{
-                    //    changeComponentName = ChangeNameBySubGroupName.ExcludeSubgroupSingleName;
+                    string subGroupName = GetSubgroupNameByCount(subgroup);                    
                     bool hasDifferSubgroupNamesInComponents = HasDifferentSubGroupNames(subgroup.Value.Components);
+                    int componentsCount = subgroup.Value.Components.Count;
 
                     // поменяем имя подгруппы если все компоненты имеют одно и тоже имя подгруппы, но оно отличается от исходного для раздела прочие изделия
                     if (!hasDifferSubgroupNamesInComponents && isOthersGroup && IsPCBSpecification)
                     {
                         string newSubGroupName = subgroup.Value.Components.First().GetProperty(Constants.SubGroupNameSp);
                         if (!string.IsNullOrEmpty(newSubGroupName))
-                            subGroupName = GetSubgroupName(newSubGroupName, subgroup.Value.Components.Count() == 1); 
+                        {
+                            // у нас есть пустые компонеты (имя пусто), но они не должны учитываться при расчете количества
+                            var components = subgroup.Value.Components.Where(cmp => !string.IsNullOrEmpty(cmp.GetProperty(Constants.ComponentName)));
+                            componentsCount = components.Count();
+                            subGroupName = GetSubgroupName(newSubGroupName, componentsCount == 1);
+                        }
                     }
                      
-                    if (hasDifferSubgroupNamesInComponents || subgroup.Value.Components.Count == 1)
+                    if (hasDifferSubgroupNamesInComponents || componentsCount == 1)
                     {
                         changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;
                     } else
