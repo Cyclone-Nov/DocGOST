@@ -231,6 +231,7 @@ namespace GostDOC.Models
 
         public static void UpdateComponentProperties(this Component current, Component update)
         {
+            current.Count = update.Count;
             foreach (var prop in update.Properties)
             {
                 current.Properties[prop.Key] = prop.Value;
