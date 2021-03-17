@@ -397,6 +397,7 @@ namespace GostDOC.ViewModels
 
         private void SaveFile(object obj = null)
         {
+            SaveData();
             if (string.IsNullOrEmpty(_filePath))
             {
                 SaveFileAs();
@@ -414,7 +415,7 @@ namespace GostDOC.ViewModels
             {
                 _filePath = path;
                 // Save file path to title
-                UpdateTitle();
+                UpdateTitle(path);
                 // Save file
                 Save();
             }
@@ -485,6 +486,7 @@ namespace GostDOC.ViewModels
         {
             var cmp = new ComponentVM();
             cmp.CountDev.Value = 0;
+            cmp.Name.Value = string.Empty;
             cmp.IsReadOnly = true;            
             Components.Add(cmp);
             UpdateUndoRedoComponents();
@@ -1002,11 +1004,11 @@ namespace GostDOC.ViewModels
             {
                 case OpenFileResult.Ok:
                     // update title by path
-                    UpdateTitle(_filePath);
+                    UpdateTitle(aFilePath);
                     // Update visual data
                     UpdateData();
                     // Show errors
-                    ShowErrors();                                     
+                    ShowErrors();                    
                     return true;
                 case OpenFileResult.FileFormatError:
                     System.Windows.MessageBox.Show($"Попытка открыть файл ведомости ({aFilePath}) в другом режиме!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -1275,7 +1277,8 @@ namespace GostDOC.ViewModels
             string groupName = GroupName;
             bool isDocument = groupName == Constants.GroupDoc;
 
-            aDst.Type = isDocument ? ComponentType.Document : ComponentType.Component;
+            aDst.Type = isDocument ? ComponentType.Document : ComponentType.Component;            
+            aDst.Properties.Add(Constants.SubGroupNameSp, SubGroupName);
             aDst.Properties.Add(Constants.GroupNameSp, groupName);
             aDst.Properties.Add(Constants.ComponentName, aSrc.Name.Value);
             aDst.Properties.Add(Constants.ComponentSign, aSrc.Sign.Value);
@@ -1451,6 +1454,8 @@ namespace GostDOC.ViewModels
         {
             if(_docType == DocType.Specification)
             {
+                SaveData();
+
                 if (_docManager.PrepareData(_docType))
                 {
                     var dataProperties = _docManager.GetPreparedDataProperties(_docType);
