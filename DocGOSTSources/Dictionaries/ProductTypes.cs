@@ -125,7 +125,7 @@ namespace GostDOC.Dictionaries
                 }
                 foreach (var gp in products.ProductGroups)
                 {
-                    AddGroup(Products.Groups, gp);
+                    AddOrUpdateGroup(Products.Groups, gp);
                 }
                 return true;
             }
@@ -150,27 +150,75 @@ namespace GostDOC.Dictionaries
             XmlSerializeHelper.SaveXmlStructFile(products, string.IsNullOrEmpty(aFilePath) ? _filePath : aFilePath);
         }
 
-        private void AddGroup(IDictionary<string, ProductGroup> aGroups, ProductGroupXml aGroup)
+        /// <summary>
+        /// добавить или обновить папки материалов
+        /// </summary>
+        /// <param name="aGroups">a groups.</param>
+        /// <param name="aNewGroup">a new group.</param>
+        private void AddOrUpdateGroup(IDictionary<string, ProductGroup> aGroups, ProductGroupXml aNewGroup)
         {
-            if (!aGroups.ContainsKey(aGroup.Name))
+            if (!aGroups.ContainsKey(aNewGroup.Name))
             {
-                ProductGroup gp = new ProductGroup(aGroup.Name);
-                foreach (var product in aGroup.Products)
-                {
-                    gp.ProductsList[product.Name] = product;
-                }
-                aGroups.Add(aGroup.Name, gp);
-
-                if (aGroup.Groups != null)
-                {
-                    gp.SubGroups = new Dictionary<string, ProductGroup>();
-                    foreach (var subGroup in aGroup.Groups)
-                    {
-                        AddGroup(gp.SubGroups, subGroup);
-                    }
-                }
+                AddGroup(aGroups, aNewGroup);
+            }
+            else
+            {
+                UpdateGroup(aGroups, aNewGroup);
             }
         }
+
+        /// <summary>
+        /// добавить новую группу с материалами
+        /// </summary>
+        /// <param name="aGroups">a groups.</param>
+        /// <param name="aGroup">a group.</param>
+        private void AddGroup(IDictionary<string, ProductGroup> aGroups, ProductGroupXml aGroup)
+        {            
+            ProductGroup gp = new ProductGroup(aGroup.Name);
+            foreach (var product in aGroup.Products)
+            {
+                gp.ProductsList[product.Name] = product;
+            }
+            aGroups.Add(aGroup.Name, gp);
+
+            if (aGroup.Groups != null)
+            {
+                gp.SubGroups = new Dictionary<string, ProductGroup>();
+                foreach (var subGroup in aGroup.Groups)
+                {
+                    AddOrUpdateGroup(gp.SubGroups, subGroup);
+                }
+            }            
+        }
+
+        /// <summary>
+        /// обновить группу материалов
+        /// </summary>
+        /// <param name="aGroups">a groups.</param>
+        /// <param name="aGroup">a group.</param>
+        private void UpdateGroup(IDictionary<string, ProductGroup> aGroups, ProductGroupXml aGroup)
+        {                         
+            // добавим новые материалы
+            var baseGroup = aGroups[aGroup.Name];
+            foreach (var new_mat in aGroup.Products)
+            {
+                if (!baseGroup.ProductsList.ContainsKey(new_mat.Name))
+                {
+                    baseGroup.ProductsList[new_mat.Name] = new_mat;
+                }
+            }
+
+            // добавим новые подгруппы
+            var baseSubGroups = aGroups[aGroup.Name].SubGroups;
+            if (aGroup.Groups != null)
+            {
+                foreach (var newSubGroup in aGroup.Groups)
+                {
+                    AddOrUpdateGroup(baseSubGroups, newSubGroup);
+                }
+            }            
+        }
+
         private void AddGroup(List<ProductGroupXml> aGroups, ProductGroup aGroup)
         {
             ProductGroupXml gp = new ProductGroupXml() { Name = aGroup.Name };
