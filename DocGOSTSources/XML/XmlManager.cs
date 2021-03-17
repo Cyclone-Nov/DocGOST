@@ -136,8 +136,8 @@ namespace GostDOC.Models
                 // Move single elements to group "Прочие" and update group names
                 ProcessGroups(newCfg);
 
-                // не будем сортировать компоненты для спецификации, которые имеют непустую позицию
-                if (_docType == DocType.Specification && _projectType == ProjectType.GostDoc && IsPositionExists(newCfg))
+                // не будем сортировать компоненты для спецификации, которую уже правили ранее
+                if (_docType == DocType.Specification && _projectType == ProjectType.GostDoc) // && IsPositionExists(newCfg))
                 {   
                     // и отключим автосортировку для всей конфигурации
                     newCfg.ChangeAutoSort(false);
@@ -146,6 +146,8 @@ namespace GostDOC.Models
                 {
                     // Sort components
                     SortComponents(newCfg);
+                    // отключим автосортировку сразу после сортировки
+                    newCfg.ChangeAutoSort(false);
                 }
                 
                 // Fill default graphs
@@ -509,16 +511,16 @@ namespace GostDOC.Models
                 }
             }
 
-            if (string.Equals(result[0].GroupName, Constants.GroupOthers) && string.IsNullOrEmpty(result[0].SubGroupName))
-            {
-                //var id = aSrc.Properties.Find(x => x.Name == Constants.ComponentDesignatorID)?.Text ?? string.Empty;
-                var name = aSrc.Properties.Find(x => x.Name == Constants.ComponentName)?.Text ?? string.Empty;
-                if (!string.IsNullOrEmpty(name))
-                {
-                    var included = aSrc.Properties.Find(x => x.Name == Constants.ComponentWhereIncluded)?.Text ?? string.Empty;
-                    _error.Error($"Не задан Подраздел СП для раздела {result[0].GroupName} в файле {included} компонента {name}!");
-                }
-            }
+            //if (string.Equals(result[0].GroupName, Constants.GroupOthers) && string.IsNullOrEmpty(result[0].SubGroupName))
+            //{
+            //    //var id = aSrc.Properties.Find(x => x.Name == Constants.ComponentDesignatorID)?.Text ?? string.Empty;
+            //    var name = aSrc.Properties.Find(x => x.Name == Constants.ComponentName)?.Text ?? string.Empty;
+            //    if (!string.IsNullOrEmpty(name))
+            //    {
+            //        var included = aSrc.Properties.Find(x => x.Name == Constants.ComponentWhereIncluded)?.Text ?? string.Empty;
+            //        _error.Error($"Не задан Подраздел СП для раздела {result[0].GroupName} в файле {included} компонента {name}!");
+            //    }
+            //}
             return result;
         }
 
@@ -553,7 +555,7 @@ namespace GostDOC.Models
                 SortComponents(subGroup.Value, aGroupName, aDocType);
             }
 
-            aGroup.AutoSort = CheckEnableAutoSort(aGroup.Components);
+            //aGroup.AutoSort = CheckEnableAutoSort(aGroup.Components);
             if (aGroup.AutoSort)
             {
                 // Sort components
@@ -660,8 +662,15 @@ namespace GostDOC.Models
         /// <returns></returns>
         private uint ParseCount(ComponentXml aComponent)
         {
+            // if empty component 
+            string name = GetProperty(aComponent, Constants.ComponentName);
+            if (string.IsNullOrEmpty(name))
+            {
+                return 0;
+            }
+
             uint.TryParse(GetProperty(aComponent, Constants.ComponentCount), out var count);
-            // Return 1 as default or count if set
+            // Return 1 as default or count if set            
             return count > 0 ? count : 1;
         }
 
@@ -1084,8 +1093,8 @@ namespace GostDOC.Models
                 return (string.Equals(cmp_name, name) && string.Equals(cmp_whereIncluded, whereIncluded) && string.Equals(cmp_sign, sign));
             }
 
-            return (string.Equals(cmp_name, name) && string.Equals(cmp_sign, sign) && string.Equals(cmp_position, position));
-                        
+            bool result = (string.Equals(cmp_name, name) && string.Equals(cmp_sign, sign) && string.Equals(cmp_position, position));
+            return (string.IsNullOrEmpty(cmp_name) && string.IsNullOrEmpty(name)) ? false : result;                        
         }
 
         /// <summary>
