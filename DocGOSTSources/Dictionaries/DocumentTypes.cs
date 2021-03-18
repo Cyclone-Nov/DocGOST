@@ -33,7 +33,13 @@ namespace GostDOC.Models
                 if (split.Length == 1)
                 {
                     current = line.TrimEnd(new char[] { ':' });
-                    Documents.Add(current, new Dictionary<string, Document>());
+                    if (!Documents.ContainsKey(current))
+                        Documents.Add(current, new Dictionary<string, Document>());
+                    else
+                    {
+
+                    }
+
                     continue;
                 }
 
@@ -45,7 +51,16 @@ namespace GostDOC.Models
                     string name = split[1];
                     string code = split[0];
 
-                    Documents[current].Add(name, new Document() { Code = code, Name = name });
+                    if (Documents.ContainsKey(current))
+                    {
+                       if (!Documents[current].ContainsKey(name))                       
+                            Documents[current].Add(name, new Document() { Code = code, Name = name });
+                       //else
+                       // err.log(repeat)
+                    } else
+                    {
+
+                    }
                 }
             }
         }
