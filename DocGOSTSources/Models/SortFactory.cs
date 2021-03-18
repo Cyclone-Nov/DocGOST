@@ -369,14 +369,22 @@ namespace GostDOC.Models
         {
             float param1 = 0.0f;
             float param2 = 0.0f;
-            Regex regex = new Regex(@"\d+([\,]\d+)*([\.]\d+)?x\d+([\,]\d+)*([\.]\d+)?");
+            Regex regex;
+            char separator = 'x';
+            if (aName.Contains('x'))
+                regex = new Regex(@"\d+([\,]\d+)*([\.]\d+)?x\d+([\,]\d+)*([\.]\d+)?");
+            else
+            {
+                separator = 'х';
+                regex = new Regex(@"\d+([\,]\d+)*([\.]\d+)?х\d+([\,]\d+)*([\.]\d+)?");               
+            }
             var match = regex.Match(aName);
             if (match.Success)
             {
-                var values = match.Value.Split('x');
-                param1 = Convert.ToSingle(values[0]);
-                param2 = Convert.ToSingle(values[1]);
-            }
+                var values = match.Value.Split(separator);
+                Single.TryParse(values[0], out param1);
+                Single.TryParse(values[1], out param2);
+            }            
 
             return new Tuple<float, float>(param1, param2);
         }
