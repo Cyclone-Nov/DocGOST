@@ -9,7 +9,7 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:GostDOC.Views"
         mc:Ignorable="d"
-        Title="{Binding Title.Value}" Icon="pack://application:,,/Resources/ghost.png" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+        Title="{Binding Title.Value}" Icon="pack://application:,,/Resources/icon.jpg" Height="450" Width="800" WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
         <viewModels:ProductTypesVM x:Name="ViewModel" />
