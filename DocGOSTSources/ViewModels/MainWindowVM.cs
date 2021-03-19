@@ -396,8 +396,7 @@ namespace GostDOC.ViewModels
         }
 
         private void SaveFile(object obj = null)
-        {
-            SaveData();
+        {            
             if (string.IsNullOrEmpty(_filePath))
             {
                 SaveFileAs();
@@ -964,7 +963,7 @@ namespace GostDOC.ViewModels
             // Open new file
             string path = CommonDialogs.OpenFile("xml Files *.xml | *.xml", "Выбрать файл...");
             if (!string.IsNullOrEmpty(path))
-            {
+            {                
                 UpdateDocType(aDocType);
 
                 DocNodes.Clear();
@@ -998,6 +997,7 @@ namespace GostDOC.ViewModels
             _specifiactionPositionsDic = null;
             
             ClearVisible();
+            _docManager.Reset();
 
             // Parse xml files
             switch (_docManager.LoadData(aFilePath, _docType))
@@ -1025,6 +1025,7 @@ namespace GostDOC.ViewModels
 
         private bool Save()
         {
+            SaveData();
             _shouldSave = false;
             return string.IsNullOrEmpty(_filePath) ? false : _docManager.SaveData(_filePath);
         }
