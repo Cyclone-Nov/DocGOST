@@ -10,10 +10,10 @@ namespace GostDOC.Common
     {
 
         /// <summary>
-        /// Конвертирование строки с позиционным обозначением компонента в формате 
-        /// </summary>
-        /// <param name="s">The s.</param>
-        /// <param name="Result">The result.</param>
+        /// Конвертирование строки с позиционным обозначением компонента. 
+        /// Формат позиционного обозначения: SSDD, где SS - набор символов английского алфавита от 1 и более, DD - набор цифр от одной и более
+        /// </summary>        
+        /// <param name="aDesigantor">строка форматов X или X,Y,Z (и т.д.) или X-Y, где символы - позиционны обозначения</param>
         /// <returns></returns>
         public static bool CheckDesignatorFormat(string aDesigantor)
         {
