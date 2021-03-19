@@ -764,8 +764,10 @@ namespace GostDOC.Models
         }
 
         private void UpdateNote(Component aCmp, string aNote)
-        {            
-            aCmp.Properties[Constants.ComponentNote] = aNote;
+        {
+            string note = aCmp.Properties[Constants.ComponentNote];
+            if(string.IsNullOrEmpty(note))
+                aCmp.Properties[Constants.ComponentNote] = aNote;
         }
 
         private void UpdateDesignators(IDictionary<CombineProperties, Component> aComponents)
