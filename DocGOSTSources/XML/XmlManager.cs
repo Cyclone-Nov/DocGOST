@@ -764,7 +764,7 @@ namespace GostDOC.Models
         }
 
         private void UpdateNote(Component aCmp, string aNote)
-        {
+        {            
             aCmp.Properties[Constants.ComponentNote] = aNote;
         }
 
@@ -778,7 +778,8 @@ namespace GostDOC.Models
                     if (_projectType != ProjectType.Other)
                     {
                         // Not needed to process already combined components
-                        UpdateNote(cmp, currentPos);
+                        if (!string.IsNullOrEmpty(currentPos))
+                            UpdateNote(cmp, currentPos);
                         continue;
                     }
 
