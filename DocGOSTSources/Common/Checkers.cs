@@ -21,30 +21,36 @@ namespace GostDOC.Common
             if (string.IsNullOrEmpty(aDesigantor) || aDesigantor.Length < 2)
                 return false;
 
-            for (int i = 0; i < aDesigantor.Length; i++)
-            {
-                if (Char.IsDigit(aDesigantor[i]))
-                {   
-                    string symb = aDesigantor.Substring(0, i);
-                    // символы должны быть
-                    if (string.IsNullOrEmpty(symb))
-                        return false;
+            // позиционное обозначение может быть объединным, тогда проверим каждый символ
+            var designators = aDesigantor.Split(new char[] { '-',','}, StringSplitOptions.RemoveEmptyEntries);
 
-                    string digs = aDesigantor.Substring(i);
-                    // цифры должны быть
-                    if (string.IsNullOrEmpty(digs))
-                        return false;
-                    // 
-                    return Int32.TryParse(digs, out var dig);
-                }
-                else if (!Char.IsLetter(aDesigantor[i]))
+            bool res = true;
+            foreach (var item in designators)
+            {
+                string desigantor = item.Trim();
+                for (int i = 0; i < desigantor.Length; i++)
                 {
-                    return false;
+                    if (Char.IsDigit(desigantor[i]))
+                    {
+                        string symb = desigantor.Substring(0, i);
+                        // символы должны быть
+                        if (string.IsNullOrEmpty(symb))
+                            return false;
+
+                        string digs = desigantor.Substring(i);
+                        // цифры должны быть
+                        if (string.IsNullOrEmpty(digs))
+                            return false;
+                        // 
+                        res &= Int32.TryParse(digs, out var dig);
+                    } else if (!Char.IsLetter(desigantor[i]))
+                    {
+                        return false;
+                    }
                 }
             }
-
-            // не нашли цифр
-            return false;
+                        
+            return res;
         }
 
     }
