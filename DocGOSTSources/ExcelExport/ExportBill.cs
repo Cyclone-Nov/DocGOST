@@ -12,13 +12,7 @@ namespace GostDOC.ExcelExport
 {
     class ExportBill : IExcelExport
     {
-        private const int MinRowIndex = 3;
-        private readonly int MaxRowIndexFirst = Constants.BillRowsOnFirstPage;
-        private readonly int MaxRowIndexNext = Constants.BillRowsOnNextPage;
         private const string BillPostfix = "ВП";
-
-        private readonly int RowCountFirst = Constants.BillRowsOnFirstPage - MinRowIndex + 1;
-        private readonly int RowCountNext = Constants.BillRowsOnNextPage - MinRowIndex + 1;
 
         private PrepareManager _prepareManager = PrepareManager.Instance;
         private DocManager _docManager = DocManager.Instance;
@@ -33,9 +27,9 @@ namespace GostDOC.ExcelExport
                 int count = 1;
                 if (_tbl != null)
                 {
-                    if (_tbl.Rows.Count > RowCountFirst)
+                    if (_tbl.Rows.Count > Constants.BillRowsOnFirstPage)
                     {
-                        count += (_tbl.Rows.Count - RowCountFirst) / RowCountNext + 1;
+                        count += (_tbl.Rows.Count - Constants.BillRowsOnFirstPage) / Constants.BillRowsOnNextPage + 1;
                     }
                 }
                 return count;
@@ -131,7 +125,7 @@ namespace GostDOC.ExcelExport
             
 
             // Fill data
-            FillRows(sheet, MaxRowIndexFirst, true);
+            FillRows(sheet, Constants.BillRowsOnFirstPage, true);
         }
 
         public void FillSheet(Excel._Worksheet sheet)
@@ -145,7 +139,7 @@ namespace GostDOC.ExcelExport
                 sheet.Cells[42, ExcelColumn.O] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2) + BillPostfix;
             }
             // Fill data
-            FillRows(sheet, MaxRowIndexNext);
+            FillRows(sheet, Constants.BillRowsOnNextPage);
         }
 
         private void FillCount(Excel._Worksheet sheet, int row, int col, int tableIndex)

@@ -15,10 +15,10 @@ namespace GostDOC.Converters
             if (value == null)
                 return "";
 
-            int val = 0;
+            float val = 0;
             try
             {
-                val = Convert.ToInt32(value);
+                val = Convert.ToSingle(value);
             }
             catch
             {
@@ -37,7 +37,7 @@ namespace GostDOC.Converters
             if (value == null)
                 return 0;
 
-            if (int.TryParse(value.ToString(), out var count))
+            if (float.TryParse(value.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var count))
                 return count;
 
             return 0;
