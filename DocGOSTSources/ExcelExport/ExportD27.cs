@@ -12,11 +12,10 @@ namespace GostDOC.ExcelExport
 {
     class ExportD27 : IExcelExport
     {
-        private const int FirstColor = 15;
+        private int _colorIndex = 0;
+        private List<int> _colors = new List<int>() { 22, 15, 17, 20, 24, 33, 34, 36, 37, 38, 39, 40, 43, 44, 45, 46, 48 };
 
         private DocManager _docManager = DocManager.Instance;
-
-        private int _nextColor;
         private List<ComponentGroupD27> _components = new List<ComponentGroupD27>();
 
         private int _complexColumn = 0;
@@ -73,7 +72,7 @@ namespace GostDOC.ExcelExport
 
         private void Reset()
         {
-            _nextColor = FirstColor;
+            _colorIndex = 0;
             _complexColumn = 2;
             _complexRow = 1;
             _complex = null;
@@ -136,7 +135,11 @@ namespace GostDOC.ExcelExport
 
         private void Print(Excel._Worksheet aWs, ComplexD27 aSrc)
         {
-            _nextColor++;
+            if (++_colorIndex >= _colors.Count)
+            {
+                _colorIndex = 0;
+            }
+
             int endRow = _complex.Size.Height;
 
             if (aSrc.SubComplex?.Count > 0)
@@ -144,10 +147,10 @@ namespace GostDOC.ExcelExport
                 // Set name
                 aWs.Cells[aSrc.Row, aSrc.Column] = aSrc.Name;
                 // horizontal
-                aWs.MergeRange(aSrc.Row, aSrc.Column, aSrc.Row, aSrc.Column + aSrc.Size.Width - 1, _nextColor);
+                aWs.MergeRange(aSrc.Row, aSrc.Column, aSrc.Row, aSrc.Column + aSrc.Size.Width - 1, _colors[_colorIndex]);
                 aWs.GroupRange(aSrc.Row, aSrc.Column + 1, aSrc.Row, aSrc.Column + aSrc.Size.Width - 1);
                 // vertical
-                aWs.MergeRange(aSrc.Row + 1, aSrc.Column, endRow, aSrc.Column, _nextColor);
+                aWs.MergeRange(aSrc.Row + 1, aSrc.Column, endRow, aSrc.Column, _colors[_colorIndex]);
 
                 foreach (var complex in aSrc.SubComplex)
                 {
@@ -159,7 +162,7 @@ namespace GostDOC.ExcelExport
                 // Set name
                 aWs.Cells[aSrc.Row, aSrc.Column] = aSrc.Name;
                 // vertical only
-                var range = aWs.MergeRange(aSrc.Row, aSrc.Column, endRow, aSrc.Column, _nextColor);
+                var range = aWs.MergeRange(aSrc.Row, aSrc.Column, endRow, aSrc.Column, _colors[_colorIndex]);
                 range.Orientation = 90;
             }            
         }
