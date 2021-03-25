@@ -1,38 +1,93 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" docType="Materials">
   <groups>
     <group name="Металлы черные">
-      <materials />
+      <products />
+      <subgroups />
     </group>
     <group name="Металлы магнитоэлектрические и ферромагнитные">
-      <materials />
+      <products />
+      <subgroups />
     </group>
     <group name="Металлы цветные, благородные и редкие">
-      <materials />
+      <products />
+      <subgroups />
     </group>
     <group name="Кабели, провода и шнуры">
-      <materials />
+      <products>
+        <product name="Провод МГТФ 1х0,75 ТУ 16-505.185-71" note="" />
+        <product name="Провод МГТФ 1х0,35 ТУ 16-505.185-71" note="" />
+        <product name="Провод МГТФ 1х0,2 ТУ 16-505.185-71" note="" />
+        <product name="Провод МГТФ 1х0,5 ТУ 16-505.185-71" note="" />
+        <product name="Провод МГТФ 1х1,0 ТУ 16-505.185-71" note="" />
+        <product name="Провод МСЭО 36-13 4х0,2 ТУ 16-505.083-78" note="" />
+        <product name="Кабель КВПЭнг(А)-6А-БГ 4х2х0,57 ФЖТК.357400.062ТУ" note="" />
+        <product name="Провод МСЭО 15-11 2х0,20 ТУ 16-705.199-81" note="" />
+      </products>
+      <subgroups />
     </group>
     <group name="Пластмассы и пресс-материалы">
-      <materials />
+      <products />
+      <subgroups>
+        <subgroup name="Трубка ТТЭНГ-С">
+          <products>
+            <product name="Трубка ТТЭНГ-С-2/1-Ч  ТУ 16-503.250-84" note="" />
+            <product name="Трубка ТТЭНГ-С-4/2-Ч  ТУ 16-503.250-84" note="" />
+            <product name="Трубка ТТЭНГ-С-6/3-Ч  ТУ 16-503.250-84" note="" />
+            <product name="Трубка ТТЭНГ-С-8/4-Ч  ТУ 16-503.250-84" note="" />
+            <product name="Трубка ТТЭНГ-С-10/5-Ч  ТУ 16-503.250-84" note="" />
+            <product name="Трубка ТТЭНГ-С-12/6-Ч  ТУ 16-503.250-84" note="" />
+            <product name="Трубка ТТЭНГ-С-14/7-Ч  ТУ 16-503.250-84" note="" />
+            <product name="Трубка ТТЭНГ-С-16/8-Ч  ТУ 16-503.250-84" note="" />
+          </products>
+          <subgroups />
+        </subgroup>
+      </subgroups>
     </group>
     <group name="Бумажные и текстильные материалы">
-      <materials />
+      <products>
+        <product name="Нитки армированные 200ЛЛ черные ТУ 8147-028-00319629-2000" note="" />
+      </products>
+      <subgroups />
     </group>
     <group name="Резиновые и кожевенные материалы">
-      <materials />
+      <products>
+        <product name="Шнур 1-5 Ф2-Т1-1,2-80 ГОСТ 6467-79" note="" />
+      </products>
+      <subgroups />
     </group>
     <group name="Минеральные, керамические и стеклянные материалы">
-      <materials />
+      <products />
+      <subgroups />
     </group>
     <group name="Лаки, краски, нефтепродукты и химикаты">
-      <materials />
+      <products />
+      <subgroups />
     </group>
     <group name="Металлические, неметаллические порошки">
-      <materials />
+      <products />
+      <subgroups />
     </group>
     <group name="Прочие материалы">
-      <materials />
+      <products />
+      <subgroups>
+        <subgroup name="НомаконКПТД-2М/2  лист 2,5 Вт/(м•К)">
+          <products>
+            <product name="Лист 150х110 КПТД-2М/2-ВН-0,25 ТУ РБ 100009933.004-2001" note="" />
+            <product name="Лист 150х110 КПТД-2М/2-ВН-0,5 ТУ РБ 100009933.004-2001" note="" />
+            <product name="Лист 150х110 КПТД-2М/2-ВН-0,75 ТУ РБ 100009933.004-2001" note="" />
+            <product name="Лист 150х110 КПТД-2М/2-ВН-2,0 ТУ РБ 100009933.004-2001" note="" />
+            <product name="Лист 150х110 КПТД-2М/2-ВН-1,5 ТУ РБ 100009933.004-2001" note="" />
+            <product name="Лист 150х110 КПТД-2М/2-ВН-3,0 ТУ РБ 100009933.004-2001" note="" />
+            <product name="Лист 150х110 КПТД-2М/2-ВН-4,0 ТУ РБ 100009933.004-2001" note="" />
+            <product name="Лист 150х110 КПТД-2М/2-ВН-1,0 ТУ РБ 100009933.004-2001" note="" />
+            <product name="Лист 150х110 КПТД-2М/2-ВН-5,0 ТУ РБ 100009933.004-2001" note="" />
+            <product name="Лист 150х110 КПТД-2М/2-ВН-6,0 ТУ РБ 100009933.004-2001" note="" />
+          </products>
+          <subgroups />
+        </subgroup>
+      </subgroups>
     </group>
   </groups>
+  <products />
 </root>
