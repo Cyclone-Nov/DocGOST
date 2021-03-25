@@ -92,10 +92,16 @@ namespace GostDOC.Models
                 // Fill graphs
                 foreach (var graph in cfg.Graphs)
                 {
-                    if (newCfg.Graphs.ContainsKey(graph.Name))
-                        _error.Error($"Обнаружено дублирование графа {graph.Name}. Будет использован первый");
+                    string key = graph.Name;
+                    if (CommonUtils.IsLiteraField(key))
+                    {
+                        key = CommonUtils.ConvertToLiteraName(key);                        
+                    }
+
+                    if (newCfg.Graphs.ContainsKey(key))
+                        _error.Error($"Обнаружено дублирование графа {key}. Будет использован первый");
                     else
-                        newCfg.Graphs.Add(graph.Name, graph.Text);
+                        newCfg.Graphs.Add(key, graph.Text);
                 }
 
                 if (string.IsNullOrEmpty(unitSign))

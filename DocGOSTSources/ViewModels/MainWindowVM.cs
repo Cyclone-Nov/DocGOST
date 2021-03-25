@@ -561,7 +561,8 @@ namespace GostDOC.ViewModels
             Dictionary<string, string> values = new Dictionary<string, string>();
             foreach (var value in GeneralGraphValues)
             {
-                values.Add(value.Name.Value, value.Text.Value);
+                if (!values.ContainsKey(value.Name.Value))
+                    values.Add(value.Name.Value, value.Text.Value);
             }
             _project.SaveGraphValues(values);
         }

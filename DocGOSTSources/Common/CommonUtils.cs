@@ -222,5 +222,29 @@ namespace GostDOC.Common
         {
             get => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
+
+
+        /// <summary>
+        /// определение что данное поле относится к литерам
+        /// </summary>
+        /// <param name="aFieldName">Name of a field.</param>
+        /// <returns>
+        ///   <c>true</c> if [is litera field] [the specified a field name]; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsLiteraField(string aFieldName)
+        {
+            return aFieldName.Contains(Constants.LiteraName);
+        }
+
+        /// <summary>
+        /// конвертирование названия поля с литерой в допустимое название
+        /// </summary>
+        /// <param name="aName">a name.</param>
+        /// <returns></returns>
+        public static string ConvertToLiteraName(string aName)
+        {
+            string digit = aName.Substring(Constants.LiteraName.Length, aName.Length - Constants.LiteraName.Length).Trim();
+            return string.IsNullOrEmpty(digit) ? $"{Constants.LiteraName} 1" : $"{Constants.LiteraName} {digit}";
+        }
     }
 }

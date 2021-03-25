@@ -61,9 +61,9 @@ namespace GostDOC.ViewModels
 
         public GraphValueVM(string aName, string aText)
         {
-            if (IsLiteraField(aName))
+            if (CommonUtils.IsLiteraField(aName))
             {
-                aName = ConvertToLiteraName(aName);
+                aName = CommonUtils.ConvertToLiteraName(aName);
                 GraphType = ItemType.ComboBox;
                 foreach (var it in Constants.LiterasList)
                     Items.Add(it);
@@ -77,27 +77,5 @@ namespace GostDOC.ViewModels
             Text.Value = aText;
         }
 
-        /// <summary>
-        /// определение что данное поле относится к литерам
-        /// </summary>
-        /// <param name="aFieldName">Name of a field.</param>
-        /// <returns>
-        ///   <c>true</c> if [is litera field] [the specified a field name]; otherwise, <c>false</c>.
-        /// </returns>
-        private bool IsLiteraField(string aFieldName)
-        {
-            return aFieldName.Contains(Constants.LiteraName);
-        }
-
-        /// <summary>
-        /// конвертирование названия поля с литерой в допустимое название
-        /// </summary>
-        /// <param name="aName">a name.</param>
-        /// <returns></returns>
-        private string ConvertToLiteraName(string aName)
-        {
-            string digit = aName.Substring(Constants.LiteraName.Length, aName.Length - Constants.LiteraName.Length).Trim();                
-            return string.IsNullOrEmpty(digit) ? $"{Constants.LiteraName} 1" : $"{Constants.LiteraName} {digit}";
-        }
     }
 }
