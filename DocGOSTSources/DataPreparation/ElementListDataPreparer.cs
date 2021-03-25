@@ -45,7 +45,7 @@ namespace GostDOC.DataPreparation
 
             // инициализируем таблицу данных
             DataTable table = CreateTable("ElementListData");
-            Dictionary<string, Tuple<string, Component, uint>> allComponentsDic = null;
+            Dictionary<string, Tuple<string, Component, float>> allComponentsDic = null;
 
             void AddComponents(string aGroupName) 
             {                
@@ -86,7 +86,7 @@ namespace GostDOC.DataPreparation
         /// <param name="aSchemaDesignation">обзначение схемы</param>
         private void FillDataTable(
                 DataTable aTable,
-                Dictionary<string, Tuple<string, Component, uint>> aComponentsDic,                
+                Dictionary<string, Tuple<string, Component, float>> aComponentsDic,                
                 IEnumerable<Dictionary<string, Component>> aOtherComponents,
                 string aSchemaDesignation)
         {
@@ -110,7 +110,7 @@ namespace GostDOC.DataPreparation
                 var united_component = component_pair_arr[i].Value.Item2;
                 string first_designator = component_pair_arr[i].Key;
                 string last_designator = component_pair_arr[i].Value.Item1;
-                uint count = component_pair_arr[i].Value.Item3;
+                var count = component_pair_arr[i].Value.Item3;
 
                 string designator = GetDesignator(first_designator, last_designator, count);
                 string doc = united_component.GetProperty(Constants.ComponentDoc);                
@@ -138,7 +138,7 @@ namespace GostDOC.DataPreparation
                         var next_united_component = component_pair_arr[j].Value.Item2;
                         var next_first_designator = component_pair_arr[j].Key;
                         var next_last_designator = component_pair_arr[j].Value.Item1;
-                        uint next_count = component_pair_arr[j].Value.Item3;
+                        var next_count = component_pair_arr[j].Value.Item3;
                         string componentNext_name = next_united_component.GetProperty(Constants.ComponentName);
                         string nextSubGroupName = next_united_component.GetProperty(Constants.SubGroupNameSp);
                         string componentNext_sign = next_united_component.GetProperty(Constants.ComponentSign);
@@ -164,7 +164,7 @@ namespace GostDOC.DataPreparation
                 if (groupNames.ContainsKey(designator)) 
                 {   
                     string groupName = groupNames[designator].Item1;
-                    int ncount = groupNames[designator].Item2;
+                    float ncount = groupNames[designator].Item2;
                     addGroupNameToNameField = string.IsNullOrEmpty(groupName) || (ncount == sameComponents);
                     
                     // первая строка на первом листе не может быть пустой
@@ -222,10 +222,10 @@ namespace GostDOC.DataPreparation
         /// </summary>
         /// <param name="aGroup">группа с компонентами</param>
         /// <returns>словарь </returns>
-        private Dictionary<string, Tuple<string, Component, uint>> 
+        private Dictionary<string, Tuple<string, Component, float>> 
         PrepareComponentsList(Group aMainGroup)
         {
-            var dic = new Dictionary<string, Tuple<string, Component, uint>>();
+            var dic = new Dictionary<string, Tuple<string, Component, float>>();
             
             // выбираем из корня группы компоненты с заполненным тегом Позиционное обозначение
             var mainсomponents = aMainGroup.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
@@ -247,7 +247,7 @@ namespace GostDOC.DataPreparation
         /// </summary>
         /// <param name="aDic">словарь компонентов</param>
         /// <param name="aComponents">список компонентов</param>
-        private void FillPrepareDictionary(Dictionary<string, Tuple<string, Component, uint>> aDic,
+        private void FillPrepareDictionary(Dictionary<string, Tuple<string, Component, float>> aDic,
                                            IEnumerable<Component> aComponents)
         {
             foreach (var component in aComponents)
@@ -268,23 +268,23 @@ namespace GostDOC.DataPreparation
                 {
                     if (designators.Length == 1)
                     {
-                        aDic.Add(designator.Trim(), new Tuple<string, Component, uint>(string.Empty, component, component.Count));
+                        aDic.Add(designator.Trim(), new Tuple<string, Component, float>(string.Empty, component, component.Count));
                     } else if (designators.Length == 2)
                     {
                         if (designator.Contains('-'))
                         {
-                            aDic.Add(designators[0].TrimStart(), new Tuple<string, Component, uint>(designators[1].TrimEnd(), component, component.Count));
+                            aDic.Add(designators[0].TrimStart(), new Tuple<string, Component, float>(designators[1].TrimEnd(), component, component.Count));
                         } else
                         {
                             string firstDesignator = designators[0].TrimEnd();
                             string lastDesignator = designators[1].TrimStart();
                             if (GetCountByDesignators(firstDesignator, lastDesignator) == 2)
                             {
-                                aDic.Add(firstDesignator, new Tuple<string, Component, uint>(lastDesignator, component, 2));
+                                aDic.Add(firstDesignator, new Tuple<string, Component, float>(lastDesignator, component, 2));
                             } else
                             {
-                                aDic.Add(firstDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
-                                aDic.Add(lastDesignator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                                aDic.Add(firstDesignator, new Tuple<string, Component, float>(string.Empty, component, 1));
+                                aDic.Add(lastDesignator, new Tuple<string, Component, float>(string.Empty, component, 1));
                             }
                         }
                     } else
@@ -299,7 +299,7 @@ namespace GostDOC.DataPreparation
                                 string keyDesigantor = first_designator.Substring(0, ind);
                                 string lastDesigantor = first_designator.Substring(ind + 1);
                                 uint subcount = GetCountByDesignators(keyDesigantor, lastDesigantor);
-                                Tuple<string, Component, uint> component_rec = new Tuple<string, Component, uint>(lastDesigantor, component, subcount);
+                                var component_rec = new Tuple<string, Component, float>(lastDesigantor, component, subcount);
                                 aDic.Add(keyDesigantor, component_rec);
                                 i++;
                             } else
@@ -309,16 +309,16 @@ namespace GostDOC.DataPreparation
                                     var next_designator = designators[i + 1].Trim();
                                     if (!next_designator.Contains('-') && GetCountByDesignators(first_designator, next_designator) == 2)
                                     {
-                                        aDic.Add(first_designator, new Tuple<string, Component, uint>(next_designator, component, 2));
+                                        aDic.Add(first_designator, new Tuple<string, Component, float>(next_designator, component, 2));
                                         i += 2;
                                     } else
                                     {
-                                        aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                                        aDic.Add(first_designator, new Tuple<string, Component, float>(string.Empty, component, 1));
                                         i++;
                                     }
                                 } else
                                 {
-                                    aDic.Add(first_designator, new Tuple<string, Component, uint>(string.Empty, component, 1));
+                                    aDic.Add(first_designator, new Tuple<string, Component, float>(string.Empty, component, 1));
                                     i++;
                                 }
                             }
@@ -367,7 +367,7 @@ namespace GostDOC.DataPreparation
         /// <param name="aName">a name.</param>
         /// <param name="aCount">a count.</param>
         /// <param name="aNote">a note.</param>
-        private void AddNewRow(DataTable aTable, string aDesignators, string aName, uint aCount, string aNote)
+        private void AddNewRow(DataTable aTable, string aDesignators, string aName, float aCount, string aNote)
         {
             string[] designatorarr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn1PositionWidth, aDesignators, new char[] { ',', ' ', '-' }, Constants.ItemListFontSize).ToArray();
             string[] namearr = PdfUtils.SplitStringByWidth(Constants.ItemsListColumn2NameWidth, aName, new char[] { '.', ' ', '-' }, Constants.ItemListFontSize, true).ToArray();
@@ -515,7 +515,7 @@ namespace GostDOC.DataPreparation
         /// </summary>
         /// <param name="aDesignators">список позиционных обозначений всех индентичных элементов</param>
         /// <returns></returns>
-        private string GetDesignator(string aFirstDesignator, string aLastDesignator, uint count)
+        private string GetDesignator(string aFirstDesignator, string aLastDesignator, float count)
         {            
             if (count == 1)
                 return aFirstDesignator;
@@ -623,10 +623,10 @@ namespace GostDOC.DataPreparation
         /// </summary>
         /// <param name="aSortedComponents">a sorted components.</param>
         /// <returns> dictionary with key = desigantor of first component of group, value = Tuple of group name and count components in group </returns>
-        private IDictionary<string, Tuple<string,int>>
-        MakeGroupNamesDic(KeyValuePair<string, Tuple<string, Component, uint>>[] aSortedComponents)
+        private IDictionary<string, Tuple<string, float>>
+        MakeGroupNamesDic(KeyValuePair<string, Tuple<string, Component, float>>[] aSortedComponents)
         {
-            var groupNamesDic = new Dictionary<string, Tuple<string, int>>();
+            var groupNamesDic = new Dictionary<string, Tuple<string, float>>();
             if (aSortedComponents.Length > 1)
             {                
                 string lastGroupName = aSortedComponents[0].Value.Item2.GetProperty(Constants.SubGroupNameSp);
@@ -644,7 +644,7 @@ namespace GostDOC.DataPreparation
                     // если происходит смена типа позиционного обозначения, то создадим новую группу
                     if (!string.Equals(lastDesignatorType, currDesignatorType))
                     {
-                        groupNamesDic.Add(firstDesignator, new Tuple<string, int>(countSubGroupCanges > 0 ? "" : lastGroupName, 
+                        groupNamesDic.Add(firstDesignator, new Tuple<string, float>(countSubGroupCanges > 0 ? "" : lastGroupName, 
                                                                                   countComponents - 1));
                         firstDesignator = aSortedComponents[i].Key;
                         countSubGroupCanges = 0;
@@ -661,7 +661,7 @@ namespace GostDOC.DataPreparation
                     }
                 }
 
-                groupNamesDic.Add(firstDesignator, new Tuple<string, int>(countSubGroupCanges > 0 ? "" : lastGroupName, countComponents));
+                groupNamesDic.Add(firstDesignator, new Tuple<string, float>(countSubGroupCanges > 0 ? "" : lastGroupName, countComponents));
             }
 
             return groupNamesDic;

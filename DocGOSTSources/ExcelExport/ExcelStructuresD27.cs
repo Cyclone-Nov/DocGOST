@@ -12,7 +12,7 @@ namespace GostDOC.ExcelExport
         public string Name { get; set; }
         public string Supplier { get; set; }
         public int Column { get; set; }
-        public uint Count { get; set; } = 1;
+        public float Count { get; set; } = 1;
     }
 
     class ComponentGroupD27

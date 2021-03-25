@@ -14,14 +14,14 @@ namespace GostDOC.Models
         public Guid Guid { get; } = Guid.NewGuid();
         public ComponentType Type { get; set; }
         public IDictionary<string, string> Properties { get; } = new Dictionary<string, string>();
-        public uint Count { get; set; } = 1;
+        public float Count { get; set; } = 1;
 
         public Component(Guid aGuid)
         {
             Guid = aGuid;
         }
 
-        public Component(Guid aGuid, uint aCount)
+        public Component(Guid aGuid, float aCount)
         {
             Guid = aGuid;
             Count = aCount;

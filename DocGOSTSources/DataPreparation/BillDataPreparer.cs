@@ -309,8 +309,8 @@ namespace GostDOC.DataPreparation
             //записываем таблицу данных объединяя подряд идущие компоненты с одинаковым наименованием    
             DataRow row;
             Component prevComponent = null;
-            uint prevCnt = 0;
-            uint compCount = 0;
+            float prevCnt = 0;
+            float compCount = 0;
             for (int i = 0; i < sortComponents.Length; i++)
             {
                 var component = sortComponents[i];
@@ -331,12 +331,12 @@ namespace GostDOC.DataPreparation
                     {
                         row = aTable.NewRow();
                         row[Constants.ColumnEntry] = new FormattedString { Value = component.GetProperty(Constants.ComponentWhereIncluded) };
-                        UInt32.TryParse(component.GetProperty(Constants.ComponentCountDev), out uint cnt_dev_n);
+                        float.TryParse(component.GetProperty(Constants.ComponentCountDev), out float cnt_dev_n);
                         if (cnt_dev_n == 0) cnt_dev_n = component.Count;
                         row[Constants.ColumnQuantityDevice] = cnt_dev_n;
-                        UInt32.TryParse(component.GetProperty(Constants.ComponentCountSet), out uint cnt_comp_n);
+                        float.TryParse(component.GetProperty(Constants.ComponentCountSet), out float cnt_comp_n);
                         row[Constants.ColumnQuantityComplex] = cnt_comp_n;
-                        UInt32.TryParse(component.GetProperty(Constants.ComponentCountReg), out uint cnt_reg_n);
+                        float.TryParse(component.GetProperty(Constants.ComponentCountReg), out float cnt_reg_n);
                         row[Constants.ColumnQuantityRegul] = cnt_reg_n;
                         row[Constants.ColumnQuantityTotal] = new FormattedString { Value = (cnt_dev_n + cnt_comp_n + cnt_reg_n).ToString() };
                         aTable.Rows.Add(row);
@@ -390,13 +390,13 @@ namespace GostDOC.DataPreparation
                 row[Constants.ColumnDeliveryDocSign] = new FormattedString { Value = component.GetProperty(Constants.ComponentDoc) };
                 row[Constants.ColumnSupplier] = new FormattedString { Value = supplierarr.First() };
                 row[Constants.ColumnEntry] = new FormattedString { Value = component.GetProperty(Constants.ComponentWhereIncluded) };
-                
-                UInt32.TryParse(component.GetProperty(Constants.ComponentCountDev), out uint cnt_dev);
+
+                float.TryParse(component.GetProperty(Constants.ComponentCountDev), out float cnt_dev);
                 if (cnt_dev == 0) cnt_dev = component.Count;
                 row[Constants.ColumnQuantityDevice] = cnt_dev;
-                UInt32.TryParse(component.GetProperty(Constants.ComponentCountSet), out uint cnt_comp);
+                float.TryParse(component.GetProperty(Constants.ComponentCountSet), out float cnt_comp);
                 row[Constants.ColumnQuantityComplex] = cnt_comp;
-                UInt32.TryParse(component.GetProperty(Constants.ComponentCountReg), out uint cnt_reg);
+                float.TryParse(component.GetProperty(Constants.ComponentCountReg), out float cnt_reg);
                 row[Constants.ColumnQuantityRegul] = cnt_reg;
                 prevCnt = cnt_dev + cnt_comp + cnt_reg;
                 row[Constants.ColumnQuantityTotal] = new FormattedString { Value = prevCnt.ToString() };

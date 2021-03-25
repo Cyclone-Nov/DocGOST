@@ -14,13 +14,6 @@ namespace GostDOC.ExcelExport
 {
     class ExportSp : IExcelExport
     {
-        private const int MinRowIndex = 2;
-        //private const int MaxRowIndexFirst = Constants.SpecificationRowsOnFirstPage;//24;
-        //private const int MaxRowIndexSecond = Constants.SpecificationRowsOnNextPage;//30;
-
-        //private const int RowCountFirst = MaxRowIndexFirst - MinRowIndex + 1;
-        //private const int RowCountSecond = MaxRowIndexSecond - MinRowIndex + 1;
-
         private PrepareManager _prepareManager = PrepareManager.Instance;
         private DocManager _docManager = DocManager.Instance;
         private int _tableRow = 0;           
@@ -31,14 +24,6 @@ namespace GostDOC.ExcelExport
         {
             get
             {
-                //int count = 1;
-                //if (_tbl != null)
-                //{
-                //    if (_tbl.Rows.Count > RowCountFirst)
-                //    {
-                //        count += (_tbl.Rows.Count - RowCountFirst) / RowCountSecond + 1;
-                //    }
-                //}
                 return CommonUtils.GetCountPage(DocType.Specification, _tbl.Rows.Count);
             }
         }
@@ -49,10 +34,7 @@ namespace GostDOC.ExcelExport
 
             var wb = aApp.Workbooks.Open(Utils.GetTemplatePath(Constants.SpecificationTemplateName));
 
-            _graphs = ExcelUtils.GetGraphs();
-
-            
-            
+            _graphs = ExcelUtils.GetGraphs();          
 
             // Fill 1st sheet
             FillFirstSheet(aApp);

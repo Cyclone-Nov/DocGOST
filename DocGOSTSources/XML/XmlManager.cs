@@ -247,7 +247,7 @@ namespace GostDOC.Models
                 || aGroupInfo.GroupName == Constants.GroupKits;
         }
 
-        private bool ParseAssemblyUnit(Configuration aNewCfg, string aUnitSign, string aUnitName, string aTopSpecFile, uint complexCount)
+        private bool ParseAssemblyUnit(Configuration aNewCfg, string aUnitSign, string aUnitName, string aTopSpecFile, float complexCount)
         {
             string searchCfg = Constants.MAIN_CONFIG_INDEX;
 
@@ -315,7 +315,7 @@ namespace GostDOC.Models
             return true;
         }
 
-        private void AddComponents(Configuration aNewCfg, List<ComponentXml> aComponents, ComponentType aType, string aSpecFileName, uint complexCount = 1)
+        private void AddComponents(Configuration aNewCfg, List<ComponentXml> aComponents, ComponentType aType, string aSpecFileName, float complexCount = 1)
         {
             var groupD27 = _currentAssemblyD27;
             Dictionary<CombineProperties, Component> components = new Dictionary<CombineProperties, Component>();
@@ -375,7 +375,7 @@ namespace GostDOC.Models
                 }
 
                 // Parse component count
-                uint count = ParseCount(cmp) * complexCount;
+                float count = ParseCount(cmp) * complexCount;
 
                 if (CombineComponent(components, combine, count))
                     continue;
@@ -588,7 +588,7 @@ namespace GostDOC.Models
         /// <param name="aCombine">a combine.</param>
         /// <param name="aCount">a count.</param>
         /// <returns></returns>
-        private bool CombineComponent(Dictionary<CombineProperties, Component> aComponents, CombineProperties aCombine, uint aCount)
+        private bool CombineComponent(Dictionary<CombineProperties, Component> aComponents, CombineProperties aCombine, float aCount)
         {
             Component existing = null;
             if (_docType == DocType.Specification)

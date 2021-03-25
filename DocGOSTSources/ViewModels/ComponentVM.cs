@@ -75,28 +75,28 @@ namespace GostDOC.ViewModels
         /// <value>
         /// The count dev.
         /// </value>
-        public ObservableProperty<uint> CountDev { get; } = new ObservableProperty<uint>(1);
+        public ObservableProperty<float> CountDev { get; } = new ObservableProperty<float>(1);
         /// <summary>
         /// Количество на комплект
         /// </summary>
         /// <value>
         /// The count set.
         /// </value>
-        public ObservableProperty<uint> CountSet { get; } = new ObservableProperty<uint>(0);
+        public ObservableProperty<float> CountSet { get; } = new ObservableProperty<float>(0);
         /// <summary>
         /// Количество на регулир.
         /// </summary>
         /// <value>
         /// The count reg.
         /// </value>
-        public ObservableProperty<uint> CountReg { get; } = new ObservableProperty<uint>(0);
+        public ObservableProperty<float> CountReg { get; } = new ObservableProperty<float>(0);
         /// <summary>
         /// Количество
         /// </summary>
         /// <value>
         /// The count.
         /// </value>
-        public ObservableProperty<uint> Count { get; } = new ObservableProperty<uint>(0);
+        public ObservableProperty<float> Count { get; } = new ObservableProperty<float>(0);
         /// <summary>
         /// позиционное обозначение (для радиокомпонентов, узлови и деталей)
         /// </summary>
@@ -137,9 +137,9 @@ namespace GostDOC.ViewModels
             public string Entry { get; set; }
             public string Manufacturer { get; set; }
             public int Position { get; set; }
-            public uint CountDev { get; set; }
-            public uint CountSet { get; set; }
-            public uint CountReg { get; set; }
+            public float CountDev { get; set; }
+            public float CountSet { get; set; }
+            public float CountReg { get; set; }
             public string DesignatorID { get; set; }
             public string Note { get; set; }
             public string Sign { get; set; }

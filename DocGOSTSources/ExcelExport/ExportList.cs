@@ -14,13 +14,6 @@ namespace GostDOC.ExcelExport
 {
     class ExportList : IExcelExport
     {
-        private const int MinRowIndex = 2;
-        private const int MaxRowIndexFirst = 24;
-        private const int MaxRowIndexSecond = 30;
-
-        private const int RowCountFirst = MaxRowIndexFirst - MinRowIndex + 1;
-        private const int RowCountSecond = MaxRowIndexSecond - MinRowIndex + 1;
-
         private PrepareManager _prepareManager = PrepareManager.Instance;
         private DocManager _docManager = DocManager.Instance;
         private int _tableRow = 0;           
@@ -34,9 +27,9 @@ namespace GostDOC.ExcelExport
                 int count = 1;
                 if (_tbl != null)
                 {
-                    if (_tbl.Rows.Count > RowCountFirst)
+                    if (_tbl.Rows.Count > Constants.ItemListRowsOnFirstPage)
                     {
-                        count += (_tbl.Rows.Count - RowCountFirst) / RowCountSecond + 1;
+                        count += (_tbl.Rows.Count - Constants.ItemListRowsOnFirstPage) / Constants.ItemListRowsOnNextPage + 1;
                     }
                 }
                 return count;
@@ -128,7 +121,7 @@ namespace GostDOC.ExcelExport
             }
                         
             // Fill data
-            FillRows(sheet, MaxRowIndexFirst, true);
+            FillRows(sheet, Constants.ItemListRowsOnFirstPage, true);
         }
 
         public void FillSheet(Excel._Worksheet sheet)
@@ -141,7 +134,7 @@ namespace GostDOC.ExcelExport
                 sheet.Cells[39, ExcelColumn.J] = Utils.GetGraphValue(_graphs, Common.Constants.GRAPH_2); //[34, 10]
             }
             // Fill data
-            FillRows(sheet, MaxRowIndexSecond);
+            FillRows(sheet, Constants.ItemListRowsOnNextPage);
         }
 
         private void FillRows(Excel._Worksheet sheet, int maxRows, bool aFirst = false)
