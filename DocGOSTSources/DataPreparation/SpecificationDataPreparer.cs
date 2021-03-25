@@ -414,7 +414,7 @@ namespace GostDOC.DataPreparation
                 string component_name = component.GetProperty(Constants.ComponentName);
                 string prepared_component_name = component_name;
                 string groupSp = component.GetProperty(Constants.GroupNameSp);
-                int component_count = GetComponentCount(component, string.Equals(groupSp, Constants.GroupDoc));
+                float component_count = GetComponentCount(component, string.Equals(groupSp, Constants.GroupDoc));
 
                 // признак что компонент не пустой
                 bool nonEmptyComponent = !string.IsNullOrEmpty(component_name);
@@ -529,7 +529,7 @@ namespace GostDOC.DataPreparation
             AddColumn(table, Constants.ColumnPosition, "Поз.",         typeof(FormattedString));
             AddColumn(table, Constants.ColumnSign,     "Обозначение",  typeof(FormattedString));
             AddColumn(table, Constants.ColumnName,     "Наименование", typeof(FormattedString));
-            AddColumn(table, Constants.ColumnQuantity, "Кол.",         typeof(Int32));
+            AddColumn(table, Constants.ColumnQuantity, "Кол.",         typeof(Single));
             AddColumn(table, Constants.ColumnFootnote, "Примечание",   typeof(FormattedString));
 
             return table;
@@ -567,20 +567,20 @@ namespace GostDOC.DataPreparation
         /// </summary>
         /// <param name="aCountStr"></param>
         /// <returns></returns>
-        private int GetComponentCount(Component aComponent, bool ZeroCount) {
+        private float GetComponentCount(Component aComponent, bool ZeroCount) {
 
             if (ZeroCount)            
                 return 0;
             
             string aCountStr = aComponent.GetProperty(Constants.ComponentCountDev);
-            uint count = 1;
+            float count = 1;
             if (!string.IsNullOrEmpty(aCountStr)) {
-                if (Int32.TryParse(aCountStr, out var cnt)) {
-                    count = (uint)cnt;                    
+                if (Single.TryParse(aCountStr, out var cnt)) {
+                    count = cnt;                    
                 }
             }
 
-            return (int)((count > aComponent.Count) ?  count : aComponent.Count);
+            return (float)((count > (float)aComponent.Count) ?  count : aComponent.Count);
         }
 
         /// <summary>

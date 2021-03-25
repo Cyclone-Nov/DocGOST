@@ -285,9 +285,9 @@ namespace GostDOC.PDF
                     sign.Value = sign.Value.Truncate(38);
                     
                 var name = GetCellStringFormatted(Constants.ColumnName);
-                int quantity = (row[Constants.ColumnQuantity] == System.DBNull.Value)
+                float quantity = (row[Constants.ColumnQuantity] == System.DBNull.Value)
                     ? 0
-                    : (int) row[Constants.ColumnQuantity];
+                    : (float) row[Constants.ColumnQuantity];
 
                 // если пустая строка или строка с резервированием номера позиции
                 if ((name == null || string.IsNullOrEmpty(name.Value)) &&
