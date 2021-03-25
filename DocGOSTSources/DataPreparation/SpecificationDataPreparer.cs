@@ -224,6 +224,7 @@ namespace GostDOC.DataPreparation
             if (data.Count == 0)
                 return;
 
+            // если это не общая конфигурация, а 
             if (!aСommonConfig)
             {
                 string configName;
@@ -233,7 +234,7 @@ namespace GostDOC.DataPreparation
                     configName = $"{aSign}{aConfig.Name}"; // "Обозначение""aConfigName"
 
                 var row = aTable.NewRow();
-                row[Constants.ColumnName] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.LEFT };                
+                row[Constants.ColumnName] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.CENTER };
                 aTable.Rows.Add(row);                
             }
                         
