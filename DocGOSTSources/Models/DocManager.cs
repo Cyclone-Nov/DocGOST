@@ -128,17 +128,7 @@ namespace GostDOC.Models
         {
             return _pdfManager.GetPDFData(aDocType);
         }
-
-        /// <summary>
-        /// Получить полное имя файл pdf для выбранного типа документа
-        /// </summary>
-        /// <param name="aDocType">Type of a document.</param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public string GetPdfFileName(DocType aDocType)
-        {
-            return _pdfManager.GetFileName(aDocType);
-        }
+               
 
         /// <summary>
         /// Получить строку с кодом документа по типу документа

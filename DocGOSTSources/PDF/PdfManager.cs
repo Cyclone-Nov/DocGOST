@@ -30,25 +30,6 @@ namespace GostDOC.PDF
         }
         #endregion
 
-        public string GetFileName(DocType aDocType)
-        {
-            switch (aDocType)
-            {
-                case DocType.Specification:                    
-                    break;
-
-                case DocType.ItemsList:
-                    break;
-
-                case DocType.Bill:
-                    break;
-
-                case DocType.D27:
-                    throw new NotSupportedException("Экспорт в pdf документа Д27 не поддерживается");                    
-            }
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// подготовить PDF документ
         /// </summary>
@@ -71,31 +52,7 @@ namespace GostDOC.PDF
         public byte[] GetPDFData(DocType aDocType) {
             return GetCreator(aDocType).GetData();
         }
-
-        /// <summary>
-        /// Creates the document.
-        /// </summary>
-        /// <param name="aType">a type.</param>
-        /// <exception cref="NotSupportedException">Экспорт в pdf документа Д27 не поддерживается</exception>
-        /// <exception cref="NotImplementedException"></exception>
-        public void SavePDF(DocType aType)
-        {
-            switch (aType)
-            {
-            case DocType.Specification:
-                break;
-
-            case DocType.ItemsList:
-                break;
-
-            case DocType.Bill:
-                break;
-
-            case DocType.D27:
-                throw new NotSupportedException("Экспорт в pdf документа Д27 не поддерживается");
-            }
-            throw new NotImplementedException();
-        }
+                
 
         private PdfCreator GetCreator(DocType aDocType) {
             PdfCreator creator;
