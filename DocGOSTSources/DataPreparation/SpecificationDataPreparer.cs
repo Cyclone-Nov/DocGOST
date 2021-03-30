@@ -38,7 +38,17 @@ namespace GostDOC.DataPreparation
         /// признак что это спецификация для печатной платы
         /// </summary>
         public bool IsPCBSpecification { get; private set; } = false;
-        
+
+        /// <summary>
+        /// текущая позиция компонента
+        /// </summary>
+        private int _position = 0;
+
+        /// <summary>
+        /// словарь позиций
+        /// </summary>
+        IDictionary<string, List<Tuple<string, int>>> _Positions = new Dictionary<string, List<Tuple<string, int>>>();
+
         public override string GetDocSign(Configuration aMainConfig)
         {
             return "СП";
@@ -71,8 +81,9 @@ namespace GostDOC.DataPreparation
             // получим обозначение изделия
             string sign = GetDeviceSign(aConfigs);
 
-            // позиция должна быть сквозной для всего документа
-            int position = 0;
+            // обнулим позиции для нового расчета
+            _position = 0;
+            _Positions.Clear();
 
             // если есть остальные исполнения то составим имя для общих данных
             if (appliedConfigs)
@@ -84,7 +95,7 @@ namespace GostDOC.DataPreparation
                 table.TableName = mainConfig.Name; 
 
             // заполнение данных из основного исполнения или общих данных при наличии нескольких исполнений
-            FillConfiguration(table, mainConfig, ref position, Positions, sign);
+            FillConfiguration(table, mainConfig, sign);
 
             // заполним переменные данные исполнений, если они есть
             if (appliedConfigs)
@@ -94,7 +105,7 @@ namespace GostDOC.DataPreparation
                 foreach (var config in listPreparedConfigs.OrderBy(key => key.Key))
                 {
                     table.TableName = config.Key; // будем передавать имя конфигурации через название таблицы
-                    FillConfiguration(table, config.Value, ref position, Positions, sign, false);
+                    FillConfiguration(table, config.Value, sign, false);
                 }
             }
             RemoveEmptyRowsAtEnd(table);
@@ -218,24 +229,18 @@ namespace GostDOC.DataPreparation
         /// <param name="aTable">итоговая таблица с данными</param>
         /// <param name="aConfig">конфигурация</param>
         /// <param name="aManyConfigs">признак наличия нескольких конфигураций: если <c>true</c> то несколько конфигураций</param>
-        private void FillConfiguration(DataTable aTable, Configuration aConfig, ref int aPosition, IDictionary<string, List<Tuple<string, int>>> aPositions, string aSign, bool aСommonConfig = true)
+        private void FillConfiguration(DataTable aTable, Configuration aConfig, string aSign, bool aСommonConfig = true)
         {
             var data = aConfig.Specification;            
             if (data.Count == 0)
                 return;
 
-            // если это не общая конфигурация, а 
+            // если это не общая конфигурация, а переменные данные
             if (!aСommonConfig)
             {
-                string configName;
-                if (string.Equals(aConfig.Name, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))                
-                    configName = aSign; // "Обозначение"
-                 else                
-                    configName = $"{aSign}{aConfig.Name}"; // "Обозначение""aConfigName"
-
-                var row = aTable.NewRow();
-                row[Constants.ColumnName] = new FormattedString { Value = configName, IsUnderlined = true, TextAlignment = TextAlignment.CENTER };
-                aTable.Rows.Add(row);                
+                string configName = string.Equals(aConfig.Name, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase) ? aSign : $"{aSign}{aConfig.Name}";
+                ShiftToNextPageIfEnd(aTable, DocType.Specification, HeaderType.Configuration);
+                AddGroupName(aTable, configName, true, TextAlignment.CENTER);
             }
                         
             if (aConfig.PrivateProperties.TryGetValue(Constants.SignPCB, out var val))
@@ -243,28 +248,29 @@ namespace GostDOC.DataPreparation
                 IsPCBSpecification = (bool)val;
             }
 
-            AddGroup(aTable, Constants.GroupDoc, data, ref aPosition, aPositions);
-            AddGroup(aTable, Constants.GroupComplex, data, ref aPosition, aPositions);
-            AddGroup(aTable, Constants.GroupAssemblyUnits, data, ref aPosition, aPositions);
-            AddGroup(aTable, Constants.GroupDetails, data, ref aPosition, aPositions);
-            AddGroup(aTable, Constants.GroupStandard, data, ref aPosition, aPositions);
-            AddGroup(aTable, Constants.GroupOthers, data, ref aPosition, aPositions);
-            AddGroup(aTable, Constants.GroupMaterials, data, ref aPosition, aPositions);
-            AddGroup(aTable, Constants.GroupKits, data, ref aPosition, aPositions);
+            // тип заголовка
+            HeaderType headerType = aСommonConfig ? HeaderType.Group : HeaderType.Config_Group;
+
+            AddGroup(aTable, Constants.GroupDoc, data, ref headerType);
+            AddGroup(aTable, Constants.GroupComplex, data, ref headerType);
+            AddGroup(aTable, Constants.GroupAssemblyUnits, data, ref headerType);
+            AddGroup(aTable, Constants.GroupDetails, data, ref headerType);
+            AddGroup(aTable, Constants.GroupStandard, data, ref headerType);
+            AddGroup(aTable, Constants.GroupOthers, data, ref headerType);
+            AddGroup(aTable, Constants.GroupMaterials, data, ref headerType);
+            AddGroup(aTable, Constants.GroupKits, data, ref headerType);
 
             AddEmptyRow(aTable);
             aTable.AcceptChanges();
         }
 
         /// <summary>
-        /// заполнить таблицу данных
+        /// добавить раздел
         /// </summary>
         /// <param name="aTable"></param>
         /// <param name="aGroupName"></param>
-        /// <param name="aComponents"></param>
-        /// <param name="aOtherComponents"></param>
-        /// <param name="aSchemaDesignation"></param>
-        private void AddGroup(DataTable aTable, string aGroupName, IDictionary<string, Group> aGroupDic, ref int aPos, IDictionary<string, List<Tuple<string, int>>> aPositions)
+        /// <param name="aGroupDic"></param>        
+        private void AddGroup(DataTable aTable, string aGroupName, IDictionary<string, Group> aGroupDic, ref HeaderType aHeaderType)
         {
             if (aGroupDic == null || !aGroupDic.ContainsKey(aGroupName))
                 return;
@@ -273,16 +279,21 @@ namespace GostDOC.DataPreparation
                 return;
 
             if (group.Components?.Count == 0 && group.SubGroups?.Count == 0)            
-                return;            
+                return;
+
+            // для переноса заголовков на одну страницу с данными заведем признак что данному наименование предшествует название раздела
+            HeaderType nextHeaderType = HeaderType.Subgroup;            
 
             // наименование раздела
             AddEmptyRow(aTable);
             if (!string.IsNullOrEmpty(aGroupName))
             {
-                ShiftToNextPageIfEnd(aTable, true);
+                ShiftToNextPageIfEnd(aTable, DocType.Specification, aHeaderType);
                 AddGroupName(aTable, aGroupName);
-                AddEmptyRow(aTable);
+                AddEmptyRow(aTable);                
+                nextHeaderType = HeaderType.Group_Subgroup;
             }
+            aHeaderType = HeaderType.Group;
 
             var сomponents = group.Components;
 
@@ -300,8 +311,9 @@ namespace GostDOC.DataPreparation
             {
                 if (сomponents.Count > 0)
                 {
-                    AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, changeComponentName);
-                    AddEmptyRow(aTable);
+                    AddComponents(aTable, сomponents, setPos, changeComponentName);
+                    AddEmptyRow(aTable);                    
+                    nextHeaderType = HeaderType.Subgroup;
                 }
             }
 
@@ -334,8 +346,9 @@ namespace GostDOC.DataPreparation
                     } else
                         changeComponentName = ChangeNameBySubGroupName.WithoutChanges;
 
-                    AddSubgroup(aTable, subGroupName, subgroup.Value.Components, ref aPos, aPositions, changeComponentName);
+                    AddSubgroup(aTable, subGroupName, subgroup.Value.Components, nextHeaderType, changeComponentName);
                     AddEmptyRow(aTable);
+                    nextHeaderType = HeaderType.Subgroup;                    
                 }
             }
 
@@ -344,7 +357,7 @@ namespace GostDOC.DataPreparation
             {
                 if (subgroup_other.Components.Count > 0)
                 {                    
-                    AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, subgroup_other.Components, ref aPos, aPositions, ChangeNameBySubGroupName.AddSubgroupName);
+                    AddSubgroup(aTable, Constants.SUBGROUPFORSINGLE, subgroup_other.Components, nextHeaderType, ChangeNameBySubGroupName.AddSubgroupName);
                     AddEmptyRow(aTable);
                 }                
             }
@@ -352,7 +365,7 @@ namespace GostDOC.DataPreparation
             if (IsPCBSpecification)
             {
                 changeComponentName = ChangeNameBySubGroupName.AddSubgroupName;
-                AddComponents(aTable, сomponents, ref aPos, aPositions, setPos, changeComponentName);
+                AddComponents(aTable, сomponents, setPos, changeComponentName);
                 AddEmptyRow(aTable);
             }
 
@@ -371,9 +384,8 @@ namespace GostDOC.DataPreparation
         /// <returns></returns>
         private bool AddSubgroup(DataTable aTable, 
                                  string aGroupName, 
-                                 List<Component> aSortComponents, 
-                                 ref int aPos, 
-                                 IDictionary<string, List<Tuple<string, int>>> aPositions,
+                                 List<Component> aSortComponents,
+                                 HeaderType aHeaderType,
                                  ChangeNameBySubGroupName aChangeComponentName = ChangeNameBySubGroupName.WithoutChanges)
         {
             if (!aSortComponents.Any())            
@@ -381,13 +393,13 @@ namespace GostDOC.DataPreparation
 
             // не будем добавлять имя подгруппы если надо добавлять наименование группы каждому компоненту
             if (aChangeComponentName != ChangeNameBySubGroupName.AddSubgroupName)
-            {
-                ShiftToNextPageIfEnd(aTable, false);
+            {                
+                ShiftToNextPageIfEnd(aTable, DocType.Specification, aHeaderType);
 
                 AddGroupName(aTable, aGroupName, false, TextAlignment.LEFT);
             }
 
-            AddComponents(aTable, aSortComponents, ref aPos, aPositions, true, aChangeComponentName);                        
+            AddComponents(aTable, aSortComponents, true, aChangeComponentName);                        
             aTable.AcceptChanges();
             return true;
         }
@@ -402,9 +414,7 @@ namespace GostDOC.DataPreparation
         /// <param name="aSetPos">if set to <c>true</c> [a set position].</param>
         /// <param name="aChangeComponentName">Name of a change component.</param>
         private void AddComponents(DataTable aTable, 
-                                   List<Component> aSortComponents, 
-                                   ref int aPos, 
-                                   IDictionary<string, List<Tuple<string, int>>> aPositions, 
+                                   List<Component> aSortComponents,                                   
                                    bool aSetPos = true, 
                                    ChangeNameBySubGroupName aChangeComponentName = ChangeNameBySubGroupName.WithoutChanges)
         {
@@ -453,20 +463,20 @@ namespace GostDOC.DataPreparation
                 // если необходимо установить позицию
                 if (aSetPos)
                 {
-                    ++aPos;
+                    ++_position;
                     // если элемент не пустой
                     if (nonEmptyComponent)
-                        row[Constants.ColumnPosition] = new FormattedString { Value = aPos.ToString(), TextAlignment = TextAlignment.CENTER };
+                        row[Constants.ColumnPosition] = new FormattedString { Value = _position.ToString(), TextAlignment = TextAlignment.CENTER };
 
                     string posComponentName = DataPreparationUtils.GetNameForPositionDictionary(component);
                     var configNames = aTable.TableName.Split(',');
                     foreach (var cfgName in configNames)
                     {
                         string key = ($"{cfgName} {groupSp}").Trim();                        
-                        if (!aPositions.ContainsKey(key))
-                            aPositions.Add(key, new List<Tuple<string, int>>() { new Tuple<string, int>(posComponentName, aPos) });
+                        if (!_Positions.ContainsKey(key))
+                            _Positions.Add(key, new List<Tuple<string, int>>() { new Tuple<string, int>(posComponentName, _position) });
                         else
-                            aPositions[key].Add(new Tuple<string, int>(posComponentName, aPos));
+                            _Positions[key].Add(new Tuple<string, int>(posComponentName, _position));
                     }
                 }
                                                 
@@ -554,7 +564,8 @@ namespace GostDOC.DataPreparation
         /// <param name="table">The table.</param>
         private void AddConfigsVariableDataSign(DataTable aTable)
         {
-            //AddEmptyRow(aTable);
+            ShiftToNextPageIfEnd(aTable, DocType.Specification, HeaderType.AppData);
+
             var row = aTable.NewRow();
             row[Constants.ColumnSign] = new FormattedString { Value = "Переменные данные", IsUnderlined = true, TextAlignment = TextAlignment.RIGHT };
             row[Constants.ColumnName] = new FormattedString { Value = "для исполнений", IsUnderlined = true, TextAlignment = TextAlignment.LEFT };            
@@ -690,23 +701,6 @@ namespace GostDOC.DataPreparation
             return false;
         }
 
-        /// <summary>
-        /// добавить пустые строки для выравния по странице если заголовок раздела или подгруппы и копоненты оказываются на разных страницах 
-        /// </summary>
-        /// <param name="aTable">таблица с данными</param>
-        /// <param name="aIsGroup"><c>true</c> - если это раздел, иначе подгруппа (<c>false</c>).</param>
-        private void ShiftToNextPageIfEnd(DataTable aTable, bool aIsGroup)
-        {
-            int groupNameRowNumber = aTable.Rows.Count + 1;
-            int firstComponentRowNumber = aIsGroup ? groupNameRowNumber + 2 : groupNameRowNumber + 1;
-            int groupNamePageNumber = CommonUtils.GetCurrentPage(DocType.Specification, groupNameRowNumber);
-            int firstComponentPageNumber = CommonUtils.GetCurrentPage(DocType.Specification, firstComponentRowNumber);
-            if (firstComponentPageNumber > groupNamePageNumber)
-            {
-                AddEmptyRowsToEndPage(aTable, DocType.Specification, groupNameRowNumber);
-            }
-        }
-
 
         private bool EqualsSpecComponents(Component aFirstComponent, Component aSecondComponent)
         {
@@ -724,8 +718,6 @@ namespace GostDOC.DataPreparation
             }
 
             return false;
-
-            //return aFirstComponent.Equals(aSecondComponent); //TODO: override Equals
         }
 
         private void RemoveEmptyRowsAtEnd(DataTable table)

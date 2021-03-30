@@ -9,6 +9,47 @@ using GostDOC.Models;
 using iText.Layout.Properties;
 
 namespace GostDOC.DataPreparation {
+
+/// <summary>
+/// тип заголовка для учета при смещении на следующую страницу
+/// </summary>
+public enum HeaderType
+{
+    /// <summary>
+    /// объединение компонентов или группа
+    /// </summary>
+    Subgroup,
+    /// <summary>
+    /// если в предыдущих строках идет название раздела
+    /// </summary>
+    Group_Subgroup,
+    /// <summary>
+    /// Раздел
+    /// </summary>
+    Group,
+    /// <summary>
+    /// если в предыдущих строках идет название конфигурации
+    /// </summary>
+    Config_Group,
+    /// <summary>
+    /// Наименование конфигурации в случае переменных данных
+    /// </summary>
+    Configuration,
+    /// <summary>
+    /// если в предыдущих строках идет строка "Переменные данные"
+    /// </summary>
+    AppData_Configuration,
+    /// <summary>
+    /// Строка "Переменные данные"
+    /// </summary>
+    AppData,
+    /// <summary>
+    /// нет заголовка
+    /// </summary>
+    None
+}
+
+
 /// <summary>
 /// базовый класс для всех классов подготовки данных перед экспортом
 /// </summary>
@@ -375,12 +416,96 @@ public abstract class BasePreparer {
     }
 
     /// <summary>
+    /// добавить пустые строки для выравния по странице если заголовок раздела или подгруппы и кмопоненты оказываются на разных страницах 
+    /// </summary>
+    /// <param name="aTable">таблица с данными</param>
+    /// <param name="aIsGroup"><c>true</c> - если это раздел, иначе подгруппа (<c>false</c>).</param>
+    /// <param name="aBeforeHeader">предшествующий тип заголовка.</param>
+    /// <param name="aCurrentHeader">текущий тип заголовка</param>
+    /// <param name="aAppRows">количество дополнительных строк в случае если, это конфигурация</param>
+    protected void ShiftToNextPageIfEnd(DataTable aTable, DocType aDocType, HeaderType aHeader, int aAppRows = 0)
+    {        
+        // row number of current header
+        int currentHeaderRowNumber = aTable.Rows.Count + 1;
+        // get page number of current header
+        int currentHeaderPageNumber = CommonUtils.GetCurrentPage(aDocType, currentHeaderRowNumber);
+
+        // get row number of component
+        int firstComponentRowNumber = currentHeaderRowNumber + 1;        
+        int shiftRowNumber = currentHeaderRowNumber;
+        switch(aHeader)
+        {
+            case HeaderType.Subgroup:
+                firstComponentRowNumber = currentHeaderRowNumber + 1;                
+                break;
+            case HeaderType.Group_Subgroup:
+                firstComponentRowNumber = currentHeaderRowNumber + 1;
+                shiftRowNumber -= 2; // так как подгруппе предшествует название группы, то сместим и название группы
+                break;
+            case HeaderType.Group:
+                firstComponentRowNumber = currentHeaderRowNumber + 3; // если после раздела так же следует наименование подгруппы, иначе +2
+                break;
+            case HeaderType.Config_Group:
+                firstComponentRowNumber = currentHeaderRowNumber + 3; // если после раздела так же следует наименование подгруппы, иначе +2
+                shiftRowNumber -= 2; // так как разделу предшествует название конфигурации, то сместим и название конфигурации
+                break;
+            case HeaderType.Configuration:
+                firstComponentRowNumber = currentHeaderRowNumber + aAppRows + 5; // если после раздела так же следует наименование подгруппы, иначе +4            
+                break;
+            case HeaderType.AppData_Configuration:
+                firstComponentRowNumber = currentHeaderRowNumber + aAppRows + 5; // если после раздела так же следует наименование подгруппы, иначе +4            
+                shiftRowNumber -= 2; // так как конфигурации предшествует название "Переменные данные", то сместим и их
+                break;
+            case HeaderType.AppData:
+                firstComponentRowNumber = currentHeaderRowNumber + aAppRows + 7; // если после раздела так же следует наименование подгруппы, иначе +4
+                break;
+
+        }
+        int firstComponentPageNumber = CommonUtils.GetCurrentPage(aDocType, firstComponentRowNumber);
+
+        // insert rows after or befor
+        if (firstComponentPageNumber > currentHeaderPageNumber)
+        {
+            AddEmptyRowsToEndPage(aTable, aDocType, shiftRowNumber);
+        }
+    }
+
+    public bool IsComponentRow(DocType aDocType, DataRow aRow)
+    {
+        // номер столбца с именем группы
+        int groupColumn = 0;
+        switch(aDocType)
+        {
+            case DocType.Specification:
+                groupColumn = 5;
+                break;
+            case DocType.Bill:
+                groupColumn = 1;
+                break;
+            case DocType.ItemsList:
+                groupColumn = 2;
+                break;
+        }
+        
+        // начнем с 1 так как первый столбец занят под инкремент
+        for (int i = 1; i < aRow.ItemArray.Length; i++)
+        {
+            if (i != groupColumn && !string.IsNullOrEmpty(aRow.ItemArray[i].ToString()))
+            {
+                return true;
+            }            
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Gets the value form formatted string.
     /// </summary>
     /// <param name="columnName">Name of the column.</param>
     /// <param name="aRow">a row.</param>
     /// <returns></returns>
-    protected string 
+        protected string 
     GetValueFormFormattedString(string columnName, DataRow aRow) =>
                             (aRow[columnName] == DBNull.Value) ? string.Empty : ((BasePreparer.FormattedString)aRow[columnName]).Value;
 
