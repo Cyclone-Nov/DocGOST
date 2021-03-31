@@ -234,7 +234,7 @@ namespace GostDOC.DataPreparation
             FillPrepareDictionary(dic, mainсomponents);
 
             // выбираем из подгрупп группы компоненты с заполненным тегом Позиционное обозначение и заполним словарь
-            foreach (var subgroup in aMainGroup.SubGroups.OrderBy(key => GroupNameConverter.GetSymbol(key.Key)))
+            foreach (var subgroup in aMainGroup.SubGroups.OrderBy(key => DesignatorGroupNameConverter.GetSymbol(key.Key)))
             {   
                 var сomponents = subgroup.Value.Components.Where(val => !string.IsNullOrEmpty(val.GetProperty(Constants.ComponentDesignatorID)));
                 FillPrepareDictionary(dic, сomponents);

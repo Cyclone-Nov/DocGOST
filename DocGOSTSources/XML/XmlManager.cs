@@ -23,6 +23,7 @@ namespace GostDOC.Models
         private Group _currentAssemblyD27 = null;
         private bool _isPcbFound = false;
 
+        private SubGroupInfo _lastSubGroupInfo = new SubGroupInfo();
         private ErrorHandler _error = ErrorHandler.Instance;
 
         public XmlManager()
@@ -336,15 +337,15 @@ namespace GostDOC.Models
                 var position = cmp.Properties.Find(x => x.Name == Constants.ComponentPosition);                
 
                 // для спецификации добавим возможность добавлять пустые компоненты
-                if ((name == null && _docType != DocType.Specification) ||
-                   (name == null && position == null && _docType == DocType.Specification))
+                if ((name == null && _docType != DocType.Specification)/* ||
+                   (name == null && position == null && _docType == DocType.Specification)*/)
                 {
                     _error.Error($"Файл {_specFileName}: имя компонента не задано!");
                     continue;
                 }
                                 
-                if ((sign == null && _docType != DocType.Specification) ||
-                   (sign == null && position == null && _docType == DocType.Specification))
+                if ((sign == null && _docType != DocType.Specification) /*||
+                   (sign == null && position == null && _docType == DocType.Specification)*/)
                 {
                     _error.Error($"Файл {_specFileName}. Компонент \"{name?.Text}\": 'Обозначение' не задано!");
                     continue;
@@ -483,6 +484,13 @@ namespace GostDOC.Models
                 new SubGroupInfo()
             };
 
+            // check for empty component
+            var name = aSrc.Properties.SingleOrDefault(prop => string.Equals(prop.Name, Constants.ComponentName));
+
+            bool emptyComponent = false;
+            if (name == null || string.IsNullOrEmpty(name.Text))
+                emptyComponent = true;
+
             foreach (var property in aSrc.Properties)
             {
                 if (property.Name == Constants.GroupNameSp)
@@ -495,16 +503,30 @@ namespace GostDOC.Models
                         if (!string.IsNullOrEmpty(designatorId))
                         {
                             var parse = ParseDesignatorId(designatorId);
-                            result[0].SubGroupName = GroupNameConverter.GetUnitedGroupName(parse.Item1);
+                            result[0].SubGroupName = DesignatorGroupNameConverter.GetUnitedGroupName(parse.Item1);
                             result[0].SubGroupSortName = parse.Item1;
-                        }
+                            SetLastSubGroup(result[0]);
+                        }                        
                     }
                 } 
                 else if (property.Name == Constants.SubGroupNameSp)
                 {                   
                     if (string.IsNullOrEmpty(result[0].SubGroupName))
                     {
-                        result[0].SubGroupName = property.Text;                        
+                        if (emptyComponent)
+                        {                            
+                            if (EqualsLastSubGroup(property.Text, out var aNames))
+                            {                                
+                                result[0].SubGroupName = aNames.Item1;
+                                result[0].SubGroupSortName = aNames.Item2;
+                            }
+                            else
+                            {
+                                result[0].SubGroupName = CommonGroupNameConverter.GetUnitedGroupName(property.Text);
+                            }                            
+                        }
+                        else
+                            result[0].SubGroupName = property.Text;
                     }
                 } 
                 else if (property.Name == Constants.GroupNameB)
@@ -885,7 +907,7 @@ namespace GostDOC.Models
             string[] split = aGroup.Name.Split(new char[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);            
             if (aGroup.Components.Count > 1)
             {                
-                aName = split.Length == 2 ? split[1] : GroupNames.GetPluralGroupName(aGroup.Name);
+                aName = split.Length == 2 ? split[1] : CommonGroupNameConverter.GetPluralGroupName(aGroup.Name);
             }
             else            
                 aName = split[0];
@@ -1145,6 +1167,28 @@ namespace GostDOC.Models
                 }
             }
             
+            return false;
+        }
+
+        private void SetLastSubGroup(SubGroupInfo aLastSubgroup)
+        {
+            _lastSubGroupInfo.GroupName = aLastSubgroup.GroupName;
+            _lastSubGroupInfo.SubGroupName = aLastSubgroup.SubGroupName;
+            _lastSubGroupInfo.SubGroupSortName = aLastSubgroup.SubGroupSortName;
+        }
+
+        private bool EqualsLastSubGroup(string aSubgroupName, out Tuple<string, string> oNames)
+        {
+            if (!string.IsNullOrEmpty(aSubgroupName))
+            {
+                var arr = _lastSubGroupInfo.SubGroupName.Split(new char[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                if (arr.Contains(aSubgroupName))
+                {
+                    oNames = new Tuple<string, string>(_lastSubGroupInfo.SubGroupName, _lastSubGroupInfo.SubGroupSortName);
+                    return true;
+                }
+            }
+            oNames = new Tuple<string, string>("", "");
             return false;
         }
     }
