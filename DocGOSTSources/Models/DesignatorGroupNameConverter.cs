@@ -8,11 +8,11 @@ using GostDOC.Common;
 
 namespace GostDOC.Models
 {
-    static class GroupNameConverter
+    static class DesignatorGroupNameConverter
     {
         static Dictionary<string, Tuple<string, string>> _groupNames = new Dictionary<string, Tuple<string, string>>();
 
-        static GroupNameConverter()
+        static DesignatorGroupNameConverter()
         {
             FillGroupNames();
         }
@@ -46,11 +46,12 @@ namespace GostDOC.Models
         public static string GetUnitedGroupName(string aSymbol)
         {
             if (!string.IsNullOrEmpty(aSymbol))
-            {
-                string symbol = string.Concat(aSymbol.Where(char.IsLetter));
+            {   
+                if (UnicodeCyrillicToASCIIUtils.IsUnicode(aSymbol))
+                    aSymbol = GetASCIIDesignatorSymbols(aSymbol);
 
                 Tuple<string, string> names;
-                if (_groupNames.TryGetValue(symbol, out names))
+                if (_groupNames.TryGetValue(aSymbol, out names))
                 {
                     return $"{names.Item1}\\{names.Item2}";
                 }
@@ -77,6 +78,17 @@ namespace GostDOC.Models
                 }
             }
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Gets the ASCII designator symbols.
+        /// </summary>
+        /// <param name="aSymbol">a symbol.</param>
+        /// <returns></returns>
+        public static string GetASCIIDesignatorSymbols(string aSymbol)
+        {
+            string symbol = string.Concat(aSymbol.Where(char.IsLetter));            
+            return UnicodeCyrillicToASCIIUtils.UnicodeRusStringToASCII(symbol);
         }
 
         /// <summary>

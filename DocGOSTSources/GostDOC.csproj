@@ -331,7 +331,7 @@
     <Compile Include="ExcelExport\ExcelManager.cs" />
     <Compile Include="Models\ErrorHandler.cs" />
     <Compile Include="Models\GroupData.cs" />
-    <Compile Include="Models\GroupNames.cs" />
+    <Compile Include="Models\CommonGroupNameConverter.cs" />
     <Compile Include="Dictionaries\DictionaryNode.cs" />
     <Compile Include="Models\MenuNode.cs" />
     <Compile Include="Models\MoveInfo.cs" />
@@ -388,7 +388,7 @@
       <DependentUpon>Progress.xaml</DependentUpon>
     </Compile>
     <Compile Include="XML\XUtils.cs" />
-    <Compile Include="Models\GroupNameConverter.cs" />
+    <Compile Include="Models\DesignatorGroupNameConverter.cs" />
     <Compile Include="Models\DataStructures.cs" />
     <Compile Include="Models\Node.cs" />
     <Compile Include="XML\XmlManager.cs" />

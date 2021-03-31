@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace GostDOC.Models
 {
-    static class GroupNames
+    static class CommonGroupNameConverter
     {
         static Dictionary<string, string> _groupNames = new Dictionary<string, string>();
 
-        static GroupNames()
+        static CommonGroupNameConverter()
         {
             FillGroupNames();
         }
@@ -28,6 +28,26 @@ namespace GostDOC.Models
                 if (_groupNames.TryGetValue(aSingleGroupName, out plauralName))
                 {
                     return plauralName;
+                }
+            }
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="aAnyPart">a name.</param>
+        /// <returns></returns>
+        public static string GetUnitedGroupName(string aAnyPart)
+        {
+            if (!string.IsNullOrEmpty(aAnyPart))
+            {
+                foreach (var item in _groupNames)
+                {
+                    if (string.Equals(item.Key, aAnyPart) || string.Equals(item.Value, aAnyPart))
+                    {
+                        return $"{item.Key}\\{item.Value}";
+                    }
                 }
             }
             return string.Empty;
