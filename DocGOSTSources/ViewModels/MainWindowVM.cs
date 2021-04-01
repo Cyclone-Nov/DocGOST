@@ -476,6 +476,7 @@ namespace GostDOC.ViewModels
         private void AddComponent(object obj)
         {
             var cmp = new ComponentVM();
+            cmp.CountDev.Value = 1;
             cmp.Name.Value = Constants.ComponentName;
             cmp.WhereIncluded.Value = _project.GetGraphValue(ConfigurationName, Constants.GraphSign);
             AddComponent(cmp);
