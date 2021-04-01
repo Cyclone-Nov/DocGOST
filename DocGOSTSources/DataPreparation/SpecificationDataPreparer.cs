@@ -71,10 +71,8 @@ namespace GostDOC.DataPreparation
                 return null;
             }
 
-            bool appliedConfigs = (listPreparedConfigs != null && listPreparedConfigs.Count() > 0);                        
-
-            appliedParams.Clear();
-            IDictionary<string, List<Tuple<string, int>>> Positions = new Dictionary<string, List<Tuple<string, int>>>();
+            bool appliedConfigs = (listPreparedConfigs != null && listPreparedConfigs.Count() > 0);
+            appliedParams.Clear();            
 
             DataTable table = CreateTable("SpecificationData");
 
@@ -110,7 +108,7 @@ namespace GostDOC.DataPreparation
             }
             RemoveEmptyRowsAtEnd(table);
                         
-            appliedParams.Add(Constants.AppDataSpecPositions, Positions);
+            appliedParams.Add(Constants.AppDataSpecPositions, _Positions);
 
             return table;           
         }
@@ -137,8 +135,9 @@ namespace GostDOC.DataPreparation
             }
 
             // если конфигураций несколько            
-            aCommonConfig = new Configuration();
-            var deltaMainConfig = new Configuration();
+
+            aCommonConfig = new Configuration(); // общая конфигурация, куда попадают одинаковые компоненты
+            var deltaMainConfig = new Configuration(); // дельта между основной конифигурацией и остальными, сюда попадают те компоненты что есть только в основной конфигурации
             deltaMainConfig.Graphs = aCommonConfig.Graphs = mainConfig.Graphs;
             var mainData = mainConfig.Specification;
 
@@ -158,6 +157,7 @@ namespace GostDOC.DataPreparation
                 // для каждого компонента из корня каждого раздела
                 foreach (var component in group.Value.Components)
                 {
+                    // если компонент исключили из всех конфигураций - значит он общий и его надо добавить в общую конфигурацию
                     if (ExcludeCommonComponentFormOtherConfigs(otherConfigs, component, group.Key))
                     {
                         if (!aCommonConfig.Specification.ContainsKey(group.Key))
@@ -166,11 +166,13 @@ namespace GostDOC.DataPreparation
                             aCommonConfig.Specification[group.Key].Name = group.Key;
                         }
                         aCommonConfig.Specification[group.Key].Components.Add(component);
-                    } else
+                    } 
+                    else // компонент не общий - добавим в дельту основной конфигурации
                     {
                         if (!deltaMainConfig.Specification.ContainsKey(group.Key))
                         {
                             deltaMainConfig.Specification.Add(group.Key, new Group());
+                            deltaMainConfig.Specification[group.Key].Name = group.Key;
                         }
                         deltaMainConfig.Specification[group.Key].Components.Add(component);                        
                     }
@@ -188,10 +190,12 @@ namespace GostDOC.DataPreparation
                             if (!aCommonConfig.Specification.ContainsKey(group.Key))
                             {
                                 aCommonConfig.Specification.Add(group.Key, new Group());
+                                aCommonConfig.Specification[group.Key].Name = group.Key;
                             }
                             if (!aCommonConfig.Specification[group.Key].SubGroups.ContainsKey(subgroup.Key))
                             {
                                 aCommonConfig.Specification[group.Key].SubGroups.Add(subgroup.Key, new Group());
+                                aCommonConfig.Specification[group.Key].SubGroups[subgroup.Key].Name = subgroup.Key;
                             }
                             aCommonConfig.Specification[group.Key].SubGroups[subgroup.Key].Components.Add(component);
                         } else
@@ -200,10 +204,12 @@ namespace GostDOC.DataPreparation
                             if (!deltaMainConfig.Specification.ContainsKey(group.Key))
                             {
                                 deltaMainConfig.Specification.Add(group.Key, new Group());
+                                deltaMainConfig.Specification[group.Key].Name = group.Key;
                             }
                             if (!deltaMainConfig.Specification[group.Key].SubGroups.ContainsKey(subgroup.Key))
                             {
                                 deltaMainConfig.Specification[group.Key].SubGroups.Add(subgroup.Key, new Group());
+                                deltaMainConfig.Specification[group.Key].SubGroups[subgroup.Key].Name = subgroup.Key;
                             }
                             deltaMainConfig.Specification[group.Key].SubGroups[subgroup.Key].Components.Add(component);
                         }
@@ -211,7 +217,7 @@ namespace GostDOC.DataPreparation
                 }
             }
 
-            // если часть основного исполнения с различиями не пуста, то добавим ее к прочим исполнениям
+            // если дельта основного исполнения заполнена, то добавим ее к списку прочих дельт остальных исполнений
             if (deltaMainConfig.Specification.Count > 0)
             {
                 deltaMainConfig.Graphs = mainConfig.Graphs;
@@ -271,14 +277,15 @@ namespace GostDOC.DataPreparation
         /// <param name="aGroupName"></param>
         /// <param name="aGroupDic"></param>        
         private void AddGroup(DataTable aTable, string aGroupName, IDictionary<string, Group> aGroupDic, ref HeaderType aHeaderType)
-        {
+        {   
             if (aGroupDic == null || !aGroupDic.ContainsKey(aGroupName))
                 return;
 
             if (!aGroupDic.TryGetValue(aGroupName, out var group))
                 return;
 
-            if (group.Components?.Count == 0 && group.SubGroups?.Count == 0)            
+            // если в разделе нет ни одного непустого компонента ни в одной подгруппе
+            if (IsEmptyGroup(group))
                 return;
 
             // для переноса заголовков на одну страницу с данными заведем признак что данному наименование предшествует название раздела
@@ -751,6 +758,32 @@ namespace GostDOC.DataPreparation
                     return false;
             }
             return true;           
+        }
+
+        private bool IsEmptyGroup(Group aGroup)
+        {            
+            if (!IsEmptyComponents(aGroup.Components))
+                return false;
+                            
+            foreach (var subgr in aGroup.SubGroups)
+            {   
+                if (!IsEmptyGroup(subgr.Value))
+                    return false;
+            }
+            return true;
+        }
+                
+
+        private bool IsEmptyComponents(List<Component> aComponents)
+        {
+            if (aComponents?.Count == 0)
+                return true;
+
+            var nonzero_components = aComponents.Where(cmp => !string.IsNullOrEmpty(cmp.GetProperty(Constants.ComponentName))).ToList();
+            if (nonzero_components == null || nonzero_components.Count == 0)
+                return true;
+
+            return false;
         }
 
     }
