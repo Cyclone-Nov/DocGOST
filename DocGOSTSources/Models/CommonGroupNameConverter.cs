@@ -40,13 +40,17 @@ namespace GostDOC.Models
         /// <returns></returns>
         public static string GetUnitedGroupName(string aAnyPart)
         {
+            var parts = aAnyPart.Split('\\');
             if (!string.IsNullOrEmpty(aAnyPart))
             {
                 foreach (var item in _groupNames)
                 {
-                    if (string.Equals(item.Key, aAnyPart) || string.Equals(item.Value, aAnyPart))
+                    foreach (var part in parts)
                     {
-                        return $"{item.Key}\\{item.Value}";
+                        if (string.Equals(item.Key, part) || string.Equals(item.Value, part))
+                        {
+                            return $"{item.Key}\\{item.Value}";
+                        }
                     }
                 }
             }
