@@ -1182,7 +1182,7 @@ namespace GostDOC.Models
             if (!string.IsNullOrEmpty(aSubgroupName))
             {
                 var arr = _lastSubGroupInfo.SubGroupName.Split(new char[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                if (arr.Contains(aSubgroupName))
+                if (string.Equals(_lastSubGroupInfo.SubGroupName, aSubgroupName) || arr.Contains(aSubgroupName))
                 {
                     oNames = new Tuple<string, string>(_lastSubGroupInfo.SubGroupName, _lastSubGroupInfo.SubGroupSortName);
                     return true;
