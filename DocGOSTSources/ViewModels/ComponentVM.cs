@@ -217,6 +217,8 @@ namespace GostDOC.ViewModels
             CountSet.Value = Convert(GetValue(Constants.ComponentCountSet, aComponent));
             CountReg.Value = Convert(GetValue(Constants.ComponentCountReg, aComponent));
 
+            Count.Value = aComponent.Count;
+
             Note.Value = GetValue(Constants.ComponentNote, aComponent);
             Sign.Value = GetValue(Constants.ComponentSign, aComponent);
 
