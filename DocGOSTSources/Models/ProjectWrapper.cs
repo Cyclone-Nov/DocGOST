@@ -169,6 +169,8 @@ namespace GostDOC.Models
 
         private void UpdatePositions(string aConfigName, string aGroup, List<Component> aComponents, Dictionary<string, List<Tuple<string, int>>> aPositions)
         {
+            if (aComponents.Count == 0)
+                return;
             string key = ($"{aConfigName} {aGroup}").Trim();
             if (aPositions.TryGetValue(key, out var positions))
             {             
@@ -196,12 +198,14 @@ namespace GostDOC.Models
                 var positions = aPositions.Where(item => string.Equals(item.Item1, name));
                 if (positions != null && positions.Count() > 0)
                 {
+                    // если один компоне и одна позиция то присвоим
                     if (positions.Count() == 1)
                     {
                         retposition = positions.First().Item2;
                         aComponent.SetPropertyValue(Constants.ComponentPosition, retposition.ToString());
-                    } else
-                    {
+                    }
+                    else if (positions.Count() > 1) // если на один компонент несколько позиций - то значит есть компоненты с повторяющимся именем и тогда
+                    {                               // будем их присваивать последовательно, уичитывая значение предыдущей позиции
                         foreach (var pos in positions)
                         {
                             retposition = pos.Item2;
@@ -211,6 +215,12 @@ namespace GostDOC.Models
                                 return retposition;
                             }
                         }
+                        // если все позиции пройдены, но подобрать значение не удалось - значит компонент не участвовал в расчете позиции - обнулим ему позицию
+                        aComponent.SetPropertyValue(Constants.ComponentPosition, "0");
+                    }
+                    else
+                    {
+                        // если для компонента нет ни одной позиции, то ???
                     }
                 }
             }
