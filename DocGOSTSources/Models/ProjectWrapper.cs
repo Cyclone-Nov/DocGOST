@@ -209,7 +209,7 @@ namespace GostDOC.Models
                         foreach (var pos in positions)
                         {
                             retposition = pos.Item2;
-                            if (retposition != 0 && (retposition - aPrevPosition == 1))
+                            if (retposition != 0 && (retposition > aPrevPosition))
                             {
                                 aComponent.SetPropertyValue(Constants.ComponentPosition, retposition.ToString());
                                 return retposition;
