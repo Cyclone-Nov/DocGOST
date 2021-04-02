@@ -605,20 +605,29 @@ namespace GostDOC.ViewModels
             SaveData();
 
             bool removeComponents = false;
-            if (_docType == DocType.Specification)
+            //if (_docType == DocType.Specification)
+            
+            // Ask user to remove components in group
+            var groupData = GetGroupData();
+            if (groupData?.Components.Count > 0)
             {
-                // Ask user to remove components in group
-                var groupData = GetGroupData();
-                if (groupData?.Components.Count > 0)
+                MessageBoxResult result = MessageBoxResult.Cancel;
+                if (_docType == DocType.Specification)
                 {
-                    var result = System.Windows.MessageBox.Show("Удалить также и компоненты в выбранной группе?\r\n\r\nДа\t - компоненты будут удалены безвозвратно\r\nНет\t - компоненты будут перенесены в раздел\r\nОтмена\t - еще подумаю, ничего не делать", "Удаление группы", MessageBoxButton.YesNoCancel);
-                    if (result == MessageBoxResult.Cancel)
-                    {
-                        return;
-                    }
+                    result = System.Windows.MessageBox.Show("Удалить также и компоненты в выбранной группе?\r\n\r\nДа\t - компоненты будут удалены безвозвратно\r\nНет\t - компоненты будут перенесены в раздел\r\nОтмена\t - передумал, нехочу ничего удалять", "Удаление группы", MessageBoxButton.YesNoCancel);
                     removeComponents = (result == MessageBoxResult.Yes);
                 }
+                else
+                {
+                    result = System.Windows.MessageBox.Show("Вы уверены, что хотите удалить выбранную группу?\r\n\r\nOК\t - группа будет удалена, компоненты перенесены в группу \"Прочие изделия\"\r\nОтмена\t - отмена удаления", "Удаление группы", MessageBoxButton.OKCancel);
+                }
+
+                if (result == MessageBoxResult.Cancel)
+                {
+                    return;
+                }
             }
+            
           
             string name = string.Empty;
             SubGroupInfo groupInfo = null;
