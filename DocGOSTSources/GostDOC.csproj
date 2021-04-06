@@ -514,6 +514,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Settings\NewSpecificationGraphNames.cfg" />
+    <None Include="docs\diagrams\plantumlfile1.puml" />
     <Resource Include="Resources\ghost.png" />
     <Resource Include="Resources\icon.jpg" />
     <Resource Include="icon.ico" />

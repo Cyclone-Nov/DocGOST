@@ -1,0 +1,10 @@
+﻿@startuml
+'' plantumlfile1
+object Student
+object Room
+object Chair
+
+Student -> Room
+
+
+@enduml
