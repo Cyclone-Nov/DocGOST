@@ -60,7 +60,7 @@ namespace GostDOC.Models
                 {
                     if (aDocType == DocType.Bill)
                     {
-                        // Move components to default group
+                        // Move components to Others
                         Group defaultGroup = GetDefaultGroup(groups);
                         defaultGroup.Components.AddRange(removed);
                         // Update group info for each component
@@ -354,9 +354,9 @@ namespace GostDOC.Models
         private Group GetDefaultGroup(IDictionary<string, Group> aGroups)
         {
             Group defaultGroup;
-            if (!aGroups.TryGetValue("", out defaultGroup))
+            if (!aGroups.TryGetValue(Constants.GroupOthers, out defaultGroup))
             {
-                defaultGroup = new Group() { Name = "" };
+                defaultGroup = new Group() { Name = Constants.GroupOthers }; // По ТЗ "Без группы", но тогда потребуется больше изменений - проброс новой группы в интерфейс для добавления в дерево в UI
                 aGroups.Add(defaultGroup.Name, defaultGroup);
             }
             return defaultGroup;
