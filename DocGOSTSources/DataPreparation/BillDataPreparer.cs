@@ -142,10 +142,10 @@ namespace GostDOC.DataPreparation
                     aConfigs.Where(cfg => !string.Equals(cfg.Key, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase)).
                     ToDictionary(key => key.Key, value => value.Value.DeepCopy());
 
-            Dictionary<string, Configuration> otherConfigs2 = new Dictionary<string, Configuration>();
-            foreach (var config in aConfigs)            
-                if (!string.Equals(config.Key, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))                
-                    otherConfigs2.Add(config.Key, config.Value.DeepCopy());
+            //Dictionary<string, Configuration> otherConfigs2 = new Dictionary<string, Configuration>();
+            //foreach (var config in aConfigs)            
+            //    if (!string.Equals(config.Key, Constants.MAIN_CONFIG_INDEX, StringComparison.InvariantCultureIgnoreCase))                
+            //        otherConfigs2.Add(config.Key, config.Value.DeepCopy());
                 
             void AddComponentToConfigGroup(IDictionary<string, Group> aConfig, string aGroupName, Component aCmp, bool aIncludeInAll = false)
             {
@@ -574,17 +574,21 @@ namespace GostDOC.DataPreparation
         private void AddContentToDataTable(DataTable aTable, string aSign)
         {
             // проверим надо ли добавить оглавление
-            int countPages = CommonUtils.GetCountPage(DocType.Bill, aTable.Rows.Count);
+            int countPages = CommonUtils.GetCountPage(DocType.Bill, aTable.Rows.Count); 
             int toComponentsOffset = 2;
+
+            // если количество страниц в документе превышает пороговое значение
             if (countPages > Constants.BillPagesWithoutContent)
             {
-                // сделаем оглавление
+                // сформируем список для оглавления
                 var content = MakeContent(aTable, aSign);
-                int contentRowsCount = content.Count * 2; // учитываем пустые строки между строками оглавления
+                // количество строк под оглавление c учитом пустых строк между строками оглавления
+                int contentRowsCount = content.Count * 2; 
+                // количество страниц, занимаемых оглавлением
                 int offsetPages = CommonUtils.GetCurrentPage(DocType.Bill, contentRowsCount);
+                // посчитаем кол-во строк под оглавление
                 int contentRowsOnPages = CommonUtils.GetRowsForPages(DocType.Bill, offsetPages);
-
-                // добавим пустые строки под страницы, занимаемые оглавлением, сразу
+                // сразу добавим пустые строки под страницы, занимаемые оглавлением
                 for (int i = 0; i < contentRowsOnPages; i++)
                     AddEmptyRow(aTable, i);
 
@@ -611,10 +615,9 @@ namespace GostDOC.DataPreparation
                                                 
                         offsetRows -= delta;
                         beginGroupRowNumber = str.Item2 + offsetRows;
-                    }
-                    int endGroupRowNumber = str.Item3 + offsetRows;
-                    endRowLastGroupContent = endGroupRowNumber;
-                    int endGroupPage = CommonUtils.GetCurrentPage(DocType.Bill, endGroupRowNumber);
+                    }                    
+                    endRowLastGroupContent = str.Item3 + offsetRows;
+                    int endGroupPage = CommonUtils.GetCurrentPage(DocType.Bill, endRowLastGroupContent);
                     endPageLastGroupContent = endGroupPage;
 
                     // оценим нахождение на разных страницах оглавления и 
@@ -643,8 +646,8 @@ namespace GostDOC.DataPreparation
         /// Создать оглавление.
         /// Агоритм: проходим по строкам документа, зная что заголовок выделяется пустыми строками ниже и выше.
         /// находим заголовок и запоминаем номер строки - это начало группы
-        /// ищем вторую пустую строку при непустом заголовке и берем номер строки - 1 = это последняя строка с данными для данный группы
-        /// если встречаем строку с переменными данными то ...
+        /// ищем вторую пустую строку при непустом заголовке и берем номер строки - 1 = это последняя строка с данными для данной группы
+        /// если встречаем строку с переменными данными то запускаем рекурсивный алгоритм поиска
         /// </summary>
         /// <param name="aTable">таблица данных</param>
         /// <param name="aSign">значение тега Обозначение исходной спецификации</param>
