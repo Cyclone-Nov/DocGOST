@@ -11,7 +11,8 @@ using GostDOC.PDF;
 using iText.Layout.Properties;
 
 namespace GostDOC.DataPreparation
-{
+{   
+
     internal class BillDataPreparer : BasePreparer
     {
         public override string GetDocSign(Configuration aMainConfig)
@@ -654,53 +655,72 @@ namespace GostDOC.DataPreparation
         /// <returns>список для созданий оглавления типа List<Tuple<Наименование группы, номер строки начала группы, номер строки конца группы></returns>
         private List<Tuple<string,int,int>> MakeContent(DataTable aTable, string aSign)
         {
-            List<Tuple<string, int, int>> content = new List<Tuple<string, int, int>>();
+            return MakeConfigurationContent(aTable, aSign, 0, false, out var lastIndex);
+        }
 
-            bool firstEmptyRow = false;            
+        private List<Tuple<string, int, int>> MakeConfigurationContent(DataTable aTable, string aSign, int aBeginRowIndex, bool aStartAppConfig, out int aEndRowIndex)
+        {            
+            var mainContent = new List<Tuple<string, int, int>>();
+            
+            bool firstEmptyRow = false;
             string groupName = string.Empty;
-            int beginRowNumber = 1;            
+            int beginGroupRowNumber = 1;            
+            int endOfTable = aTable.Rows.Count;            
 
-            int rowsCount = aTable.Rows.Count;            
-            for (int cnt = 0; cnt < rowsCount; cnt++)
+            int cnt = aBeginRowIndex;
+            do
             {
+                // встретили пустую строку и имя группы не пустое
                 if (IsEmptyRow(aTable.Rows[cnt]) && !string.IsNullOrEmpty(groupName))
                 {
-                    // если первая пустая строка уже была
-                    if (firstEmptyRow )
+                    // это конец группы
+                    if (firstEmptyRow)
                     {
                         int endRowNumber = cnt; // последняя строка группы - это последняя непустая строка
                         if (!string.IsNullOrEmpty(groupName))
                         {
-                            content.Add(new Tuple<string, int, int>(groupName, beginRowNumber, endRowNumber));
+                            mainContent.Add(new Tuple<string, int, int>(groupName, beginGroupRowNumber, endRowNumber));
                             groupName = string.Empty;
-                            beginRowNumber = 0;
+                            beginGroupRowNumber = 0;
                             firstEmptyRow = false;
                         }
-                    } else
-                    {                        
+                    } else // это начало группы
+                    {
                         firstEmptyRow = true;
                     }
-                }
-                else if (IsGroupName(aTable.Rows[cnt]))
+                } else if (IsGroupName(aTable.Rows[cnt])) // это имя группы
                 {
-                    beginRowNumber = cnt + 1;
-                    groupName = GetValueFormFormattedString(Constants.ColumnName, aTable.Rows[cnt]);
-                }
-                else if (IsVariableConfigData(aTable.Rows[cnt]))
-                {
-                    content.Add(new Tuple<string, int, int>($"{Constants.VariableConfigDataSig1} {Constants.VariableConfigDataSig2}", cnt, aTable.Rows.Count));
+                    beginGroupRowNumber = cnt + 1;
+                    groupName = GetValueFromFormattedString(Constants.ColumnName, aTable.Rows[cnt]);
                 } 
-                else if (IsVariableConfiguration(aTable.Rows[cnt], aSign))
+                else if (IsVariableConfigData(aTable.Rows[cnt])) // это начало переменных данных исполнений
                 {
-                    throw new NotImplementedException("оглавление для переменных данных не реализовано");
-                    // TODO: доделать оглавление при учете переменных данных исполнения
-                }
+                    mainContent.Add(new Tuple<string, int, int>($"{Constants.VariableConfigDataSig1} {Constants.VariableConfigDataSig2}", cnt, aTable.Rows.Count));                    
+                } 
+                else if (IsVariableConfiguration(aTable.Rows[cnt], aSign)) // это начало конфигурации из переменных данных исполнений
+                {
+                    if (aStartAppConfig)
+                    {
+                        --cnt;
+                        break;
+                    }
+                    else
+                    {
+                        string configName = GetValueFromFormattedString(Constants.ColumnName, aTable.Rows[cnt]);
+                        //  рекурсивно заполним оглавление для конфигурации
+                        var content = MakeConfigurationContent(aTable, aSign, cnt + 1, true, out var lastIndex);
+                        mainContent.Add(new Tuple<string, int, int>(configName, cnt, lastIndex));
+                        mainContent.AddRange(content);
+                        cnt = lastIndex;                        
+                    }
+                }                
             }
+            while (++cnt < endOfTable);
             
-            content.Add(new Tuple<string, int, int>(groupName, beginRowNumber, rowsCount));
-
-            return content;
+            aEndRowIndex = cnt;
+            return mainContent;
         }
+
 
         /// <summary>
         /// проверка на пустую строку
@@ -747,8 +767,8 @@ namespace GostDOC.DataPreparation
         /// </returns>
         bool IsVariableConfigData(DataRow aRow)
         {
-            var name = GetValueFormFormattedString(Constants.ColumnName, aRow);
-            var productCode = GetValueFormFormattedString(Constants.ColumnProductCode, aRow);            
+            var name = GetValueFromFormattedString(Constants.ColumnName, aRow);
+            var productCode = GetValueFromFormattedString(Constants.ColumnProductCode, aRow);            
 
             if (string.Equals(name, Constants.VariableConfigDataSig1) &&
                 string.Equals(productCode, Constants.VariableConfigDataSig1))
@@ -768,7 +788,7 @@ namespace GostDOC.DataPreparation
         /// </returns>
         bool IsVariableConfiguration(DataRow aRow, string aSign)
         {
-            var name = GetValueFormFormattedString(Constants.ColumnName, aRow);
+            var name = GetValueFromFormattedString(Constants.ColumnName, aRow);
             if (!string.IsNullOrEmpty(aSign) && name.Contains(aSign))
             {
                 return true;

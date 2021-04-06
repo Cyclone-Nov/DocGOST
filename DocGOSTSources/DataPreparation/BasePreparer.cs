@@ -506,7 +506,7 @@ public abstract class BasePreparer {
     /// <param name="aRow">a row.</param>
     /// <returns></returns>
     protected string 
-    GetValueFormFormattedString(string columnName, DataRow aRow) =>
+    GetValueFromFormattedString(string columnName, DataRow aRow) =>
                             (aRow[columnName] == DBNull.Value) ? string.Empty : ((BasePreparer.FormattedString)aRow[columnName]).Value;
 
     /// <summary>
