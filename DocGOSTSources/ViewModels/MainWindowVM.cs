@@ -692,7 +692,7 @@ namespace GostDOC.ViewModels
             if (_docManager.PrepareData(_docType))
             {
                 _docManager.PreparePDF(_docType);
-                CurrentPdfData.Value = _docManager.GetPdfData(_docType);
+                CurrentPdfData.Value = _docManager.GetPdfData(_docType);                
             }
         }
 
@@ -829,7 +829,7 @@ namespace GostDOC.ViewModels
             aProductTypes.Save();
         }
 
-        private void ExportPDF(object obj)
+        private async void ExportPDF(object obj)
         {
             if (IsExportPdfEnabled.Value)
             {
@@ -837,7 +837,17 @@ namespace GostDOC.ViewModels
                 var path = CommonDialogs.SaveFileAs("PDF files (*.pdf) | *.pdf", "Сохранить файл", GetDefaultFileName("pdf", true));
                 if (!string.IsNullOrEmpty(path))
                 {
-                    _docManager.SavePDF(_docType, path);
+                    OpenProgressWindow();
+                    Task<bool> t = Task<bool>.Run(() => {
+                        return _docManager.SavePDF(_docType, path);
+                    });
+                    bool res = await t;
+                    CloseProgressWindow();
+
+                    if (!res)
+                        System.Windows.MessageBox.Show($"Не удалось экспортировать документ в PDF формат по заданному пути: {path}!", "Ошибка экпорта в PDF", MessageBoxButton.OK, MessageBoxImage.Error);
+                     else
+                        System.Windows.MessageBox.Show($"Экспорт документа {path} прошел успешно!", "Экспорт в PDF", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
         }
@@ -853,6 +863,7 @@ namespace GostDOC.ViewModels
                     _progress = new Progress();
                     _excelManager.Export(_docType, path);
                     _progress.ShowDialog();
+                    
                 }
             }
         }
@@ -958,12 +969,12 @@ namespace GostDOC.ViewModels
 
         #endregion Commands impl
 
-        private void OnDragDropFile_FileDropped(object sender, TEventArgs<string> e)
+        private async void OnDragDropFile_FileDropped(object sender, TEventArgs<string> e)
         {
-            OpenFile(e.Arg);
+            await OpenFileAsync(e.Arg);
         }
 
-        private void OpenFile(Node aNode, DocType aDocType)
+        private async void OpenFile(Node aNode, DocType aDocType)
         {
             if (!SavePreviousFile())
             {
@@ -979,7 +990,8 @@ namespace GostDOC.ViewModels
 
                 DocNodes.Clear();
 
-                if (OpenFile(path))
+                var result = await OpenFileAsync(path);
+                if (result)
                 {
                     if (aDocType == DocType.Specification)
                     {
@@ -1000,7 +1012,7 @@ namespace GostDOC.ViewModels
             }            
         }
 
-        private bool OpenFile(string aFilePath)
+        private async Task<bool> OpenFileAsync(string aFilePath)
         {
             // сбросим флаг расчета позиции при загрузке нового документа
             _isSpecPositionsRecalculated = false;
@@ -1011,7 +1023,14 @@ namespace GostDOC.ViewModels
             _docManager.Reset();
 
             // Parse xml files
-            switch (_docManager.LoadData(aFilePath, _docType))
+            OpenProgressWindow();
+            Task<OpenFileResult> t = Task<bool>.Run(() => {
+                return _docManager.LoadData(aFilePath, _docType);
+            });
+            var result = await t;
+            CloseProgressWindow();
+            
+            switch (result)
             {
                 case OpenFileResult.Ok:
                     // update title by path
@@ -1028,6 +1047,7 @@ namespace GostDOC.ViewModels
                     System.Windows.MessageBox.Show($"Некорректный Формат файла ({aFilePath})!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
             }
+            
 
             // update title
             UpdateTitle(string.Empty);
@@ -1448,6 +1468,17 @@ namespace GostDOC.ViewModels
         }
         private void OnExportComplete(object sender, EventArgs e)
         {
+            CloseProgressWindow();            
+        }
+
+        private void OpenProgressWindow()
+        {
+            _progress = new Progress();
+            _progress.Show();
+        }
+
+        private void CloseProgressWindow()
+        {
             DispatcherHelper.CheckBeginInvokeOnUI(() =>
             {
                 if (_progress != null)
@@ -1455,7 +1486,7 @@ namespace GostDOC.ViewModels
                     _progress.Close();
                     _progress = null;
                 }
-            }); 
+            });
         }
 
         /// <summary>
