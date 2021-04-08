@@ -571,6 +571,10 @@ namespace GostDOC.ViewModels
             _project.SaveGraphValues(values);
         }
 
+        /// <summary>
+        /// Adds the group.
+        /// </summary>
+        /// <param name="obj">The object.</param>
         private void AddGroup(object obj)
         {
             string name = CommonDialogs.GetGroupName();
