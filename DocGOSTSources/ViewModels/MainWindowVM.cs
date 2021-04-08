@@ -1046,8 +1046,7 @@ namespace GostDOC.ViewModels
                 case OpenFileResult.Fail:
                     System.Windows.MessageBox.Show($"Некорректный Формат файла ({aFilePath})!", "Ошибка открытия файла", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
-            }
-            
+            }            
 
             // update title
             UpdateTitle(string.Empty);
@@ -1158,25 +1157,16 @@ namespace GostDOC.ViewModels
                 return;
             }
 
-            IsAutoSortEnabled.Value = aAutoSort ?? groupData.AutoSort;            
+            IsAutoSortEnabled.Value = aAutoSort ?? groupData.AutoSort;
 
-            // для спецификации проверим признак рачета позиции и отключим автосортировку
-            if (_docType == DocType.Specification && _isSpecPositionsRecalculated)
-            {                
-                IsAutoSortEnabled.Value = false;
-            }
+            // для спецификации отключим автосортировку если позиции для компонентов расчитаны
+            if (_docType == DocType.Specification && _isSpecPositionsRecalculated)                            
+                IsAutoSortEnabled.Value = false;            
 
             // Fill components
-            Components.Clear();
-                        
-            //var positions = GetSpecificationPositions();
-            //int lastPosition = 0;
-            foreach (var component in groupData.Components)
-            {
-                //lastPosition = SetSpecificationPosition(positions, component, lastPosition);
-                //add position here
-                Components.Add(new ComponentVM(component));
-            }
+            Components.Clear();            
+            foreach (var component in groupData.Components)                        
+                Components.Add(new ComponentVM(component));            
         }
 
         private void UpdateGroupData()
