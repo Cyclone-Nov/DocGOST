@@ -530,6 +530,9 @@ namespace GostDOC.ViewModels
             }
         }
 
+        /// <summary>
+        /// Saves the components.
+        /// </summary>
         private void SaveComponents()
         {
             string cfgName = ConfigurationName;
