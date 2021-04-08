@@ -557,6 +557,9 @@ namespace GostDOC.ViewModels
             _project.UpdateGroup(cfgName, _docType, groupInfo, groupData);
         }
 
+        /// <summary>
+        /// Saves the graph values.
+        /// </summary>
         private void SaveGraphValues()
         {
             Dictionary<string, string> values = new Dictionary<string, string>();
